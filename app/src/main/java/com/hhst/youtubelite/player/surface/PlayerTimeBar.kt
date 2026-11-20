@@ -122,7 +122,7 @@ fun PlayerTimeBar(
             size = Size(size.width * buffered, thickness),
         )
         drawRect(
-            PlayerUi.Accent,
+            PlayerUi.brandBrush(size.width),
             topLeft = Offset(0f, y),
             size = Size(size.width * played, thickness),
         )

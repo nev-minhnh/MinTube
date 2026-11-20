@@ -7,7 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.pow
 
-/** WCAG 2.1 contrast of the Mint palette, both themes (docs/UI_PLAN.md 2.1). */
+/** WCAG 2.1 contrast of the Signal palette, both themes (tools/tasks/palette.md). */
 class MintContrastTest {
     private fun channel(value: Float): Double {
         val c = value.toDouble()

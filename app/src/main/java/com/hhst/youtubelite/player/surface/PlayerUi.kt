@@ -44,7 +44,7 @@ object PlayerUi {
     }
 
     /**
-     * On-video chrome is always dark, in both themes: it takes the dark-palette mint accent
+     * On-video chrome is always dark, in both themes: it takes the dark-palette cyan accent
      * (progress, thumb, active toggles) and the dark-palette danger tone for the live marker.
      */
     val Accent = Color(com.hhst.youtubelite.ui.design.MintColors.DarkAccent)
@@ -53,6 +53,14 @@ object PlayerUi {
     val OnAccent = Color(com.hhst.youtubelite.ui.design.MintColors.DarkOnAccent)
     val Icon = Color.White.copy(alpha = 0.92f)
     val Unplayed = Color(0x99FFFFFF)
+    /** Signature gradient for the played track only; spans the full track so colour maps to position. */
+    fun brandBrush(width: Float, reversed: Boolean = false): androidx.compose.ui.graphics.Brush =
+        androidx.compose.ui.graphics.Brush.horizontalGradient(
+            colors = listOf(Color(com.hhst.youtubelite.ui.design.MintColors.GradientStart),
+                Color(com.hhst.youtubelite.ui.design.MintColors.GradientEnd)),
+            startX = if (reversed) width else 0f,
+            endX = if (reversed) 0f else width,
+        )
     val Buffered = Color.White
     val HintBg = Color(0xCC000000)
     private val Author = Color.White.copy(alpha = 0.7f)
@@ -66,7 +74,7 @@ object PlayerUi {
     val GlassBg = Color(0x66000000)
     val GlassStroke = Color(0x24FFFFFF)
     /** Peek strip of a mini-player collapsed to the screen edge. */
-    val MiniEdge = Color(0xE61D2423)
+    val MiniEdge = Color(0xE61C1D21)
 
     /** Time bar: 2 dp track, 48 dp minimum accessibility hit area, 100 dp edge gradients. */
     const val TIME_BAR_HIT_DP = 48

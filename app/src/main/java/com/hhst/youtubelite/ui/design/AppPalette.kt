@@ -4,7 +4,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * "Mint" palette (docs/UI_PLAN.md 2.1). This is the single source of truth: the Material3
+ * "Signal" palette v2 (tools/tasks/palette.md). This is the single source of truth: the Material3
  * scheme in `ui/theme` and the XML window colors mirror these values.
  */
 data class AppPalette(
@@ -41,36 +41,39 @@ data class AppPalette(
 
 /** Raw ARGB values, shared with [com.hhst.youtubelite.ui.theme] and with non-Compose window code. */
 object MintColors {
-    const val LightBackground = 0xFFFAFBFA
-    const val LightPanel = 0xFFFFFFFF
-    const val LightSurface = 0xFFEEF2F0
-    const val LightGhost = 0xFFE2E8E5
-    const val LightInk = 0xFF101514
-    const val LightSecondary = 0xFF56615E
-    /** UI_PLAN lists #0B8F6A; darkened one step so white text on it reaches 4.5:1 (was 4.08:1). */
-    const val LightAccent = 0xFF0A8663
-    const val LightOnAccent = 0xFFFFFFFF
-    const val LightAccentContainer = 0xFFD6F3E8
-    const val LightAccentText = 0xFF087456
-    const val LightDanger = 0xFFC4321F
-    const val LightOnDanger = 0xFFFFFFFF
-    const val LightLink = 0xFF0B62C4
-    const val LightOutline = 0xFFC9D2CE
+    /** Brand gradient, seek bar and mini-player progress only. */
+    const val GradientStart = 0xFF2EC8F0
+    const val GradientEnd = 0xFFFF3D86
 
-    const val DarkBackground = 0xFF0D1110
-    const val DarkPanel = 0xFF141918
-    const val DarkSurface = 0xFF1D2423
-    const val DarkGhost = 0xFF27302E
-    const val DarkInk = 0xFFEDF2F0
-    const val DarkSecondary = 0xFFA3AFAB
-    const val DarkAccent = 0xFF4FD8AE
-    const val DarkOnAccent = 0xFF06231A
-    const val DarkAccentContainer = 0xFF123A2E
-    const val DarkAccentText = 0xFF4FD8AE
+    const val LightBackground = 0xFFFAFAFB
+    const val LightPanel = 0xFFFFFFFF
+    const val LightSurface = 0xFFF1F2F4
+    const val LightGhost = 0xFFE6E8EB
+    const val LightInk = 0xFF0E0F12
+    const val LightSecondary = 0xFF5B6068
+        const val LightAccent = 0xFF0A7EA4
+    const val LightOnAccent = 0xFFFFFFFF
+    const val LightAccentContainer = 0xFFD9F3FB
+    const val LightAccentText = 0xFF08708F
+    const val LightDanger = 0xFFC8321F
+    const val LightOnDanger = 0xFFFFFFFF
+    const val LightLink = 0xFF0A62C2
+    const val LightOutline = 0xFFCDD0D5
+
+    const val DarkBackground = 0xFF0A0A0A
+    const val DarkPanel = 0xFF121316
+    const val DarkSurface = 0xFF1C1D21
+    const val DarkGhost = 0xFF26282D
+    const val DarkInk = 0xFFEEF0F3
+    const val DarkSecondary = 0xFFA2A7B0
+    const val DarkAccent = 0xFF4DD4F5
+    const val DarkOnAccent = 0xFF04222C
+    const val DarkAccentContainer = 0xFF0E3442
+    const val DarkAccentText = 0xFF6FDDF7
     const val DarkDanger = 0xFFFF8A75
-    const val DarkOnDanger = 0xFF3A0D05
+    const val DarkOnDanger = 0xFF2A0904
     const val DarkLink = 0xFF7DB8FF
-    const val DarkOutline = 0xFF3A4543
+    const val DarkOutline = 0xFF3A3D43
 }
 
 val LightAppPalette = AppPalette(

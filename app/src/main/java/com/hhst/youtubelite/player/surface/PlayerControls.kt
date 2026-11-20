@@ -690,7 +690,7 @@ fun MiniPlayerChrome(
                     val played = PlayerUi.progressFraction(positionState.value, state.durationMs)
                     val start = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) size.width * (1f - played) else 0f
                     drawRect(Color.White.copy(alpha = 0.24f))
-                    drawRect(PlayerUi.Accent, topLeft = Offset(start, 0f),
+                    drawRect(PlayerUi.brandBrush(size.width, reversed = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl), topLeft = Offset(start, 0f),
                         size = androidx.compose.ui.geometry.Size(size.width * played, size.height))
                 },
         )

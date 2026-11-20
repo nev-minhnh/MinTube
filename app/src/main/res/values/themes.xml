@@ -16,16 +16,16 @@
     <style name="Theme.App.Dialog.Light" parent="android:style/Theme.Material.Light.Dialog.Alert">
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:colorBackgroundFloating">#FFFFFF</item>
-        <item name="android:textColorPrimary">#101514</item>
-        <item name="android:textColorSecondary">#56615E</item>
-        <item name="android:colorAccent">#087456</item>
+        <item name="android:textColorPrimary">#0E0F12</item>
+        <item name="android:textColorSecondary">#5B6068</item>
+        <item name="android:colorAccent">#08708F</item>
     </style>
     <style name="Theme.App.Dialog.Dark" parent="android:style/Theme.Material.Dialog.Alert">
-        <item name="android:colorBackground">#141918</item>
-        <item name="android:colorBackgroundFloating">#141918</item>
-        <item name="android:textColorPrimary">#EDF2F0</item>
-        <item name="android:textColorSecondary">#A3AFAB</item>
-        <item name="android:colorAccent">#4FD8AE</item>
+        <item name="android:colorBackground">#121316</item>
+        <item name="android:colorBackgroundFloating">#121316</item>
+        <item name="android:textColorPrimary">#EEF0F3</item>
+        <item name="android:textColorSecondary">#A2A7B0</item>
+        <item name="android:colorAccent">#4DD4F5</item>
     </style>
 
     <style name="Theme.App.DownloadSheet" parent="Theme.App">
