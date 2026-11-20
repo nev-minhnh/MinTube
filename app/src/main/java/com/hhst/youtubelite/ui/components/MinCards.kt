@@ -281,6 +281,8 @@ fun PlaylistCard(
     onMenu: (() -> Unit)? = null,
     menuDescription: String = "",
     artworkModifier: Modifier = Modifier,
+    /** Test tag on the title text, e.g. `playlist-title-<id>`. */
+    titleTag: String? = null,
 ) {
     Column(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)) {
         Box(Modifier.fillMaxWidth().padding(top = MinSpace.sm)) {
@@ -304,7 +306,7 @@ fun PlaylistCard(
         }
         Row(Modifier.fillMaxWidth().padding(top = MinSpace.sm), verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {
-                AppText(title, MinType.Subtitle, maxLines = 2)
+                AppText(title, MinType.Subtitle, if (titleTag != null) Modifier.testTag(titleTag) else Modifier, maxLines = 2)
                 if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs), color = DesignTokens.Secondary, maxLines = 1)
             }
             if (onMenu != null) AppIconButton(AppIcon.More, menuDescription, onClick = onMenu)

@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.playlist
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -40,7 +41,7 @@ class PlaylistScreenAndroidTest {
         var content by mutableStateOf<PlaylistContent>(ready())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { PlaylistScreen(state(content), {}, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { PlaylistScreen(state(content), {}, {}) }
             }
         }
         var cover = compose.onNodeWithTag("playlist-hero-cover").fetchSemanticsNode().boundsInRoot
@@ -86,7 +87,7 @@ class PlaylistScreenAndroidTest {
         val actions = mutableListOf<PlaylistAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { PlaylistScreen(current, actions::add, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { PlaylistScreen(current, actions::add, {}) }
             }
         }
         compose.waitUntil(5_000) { PlaylistAction.LoadNext in actions }
@@ -101,7 +102,7 @@ class PlaylistScreenAndroidTest {
         var current by mutableStateOf(state())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { PlaylistScreen(current, actions::add, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { PlaylistScreen(current, actions::add, {}) }
             }
         }
         compose.onNodeWithTag("playlist-play-all").performClick()
@@ -129,7 +130,7 @@ class PlaylistScreenAndroidTest {
         val actions = mutableListOf<SearchAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     SearchResultsScreen(SearchUiState("open movie", SearchContent.Results(SearchPage("open movie", emptyList(), playlists)),
                         filters = SearchFilters(type = SearchResultType.Playlists), signedInPreview = false), actions::add, {})
                 }
@@ -138,10 +139,11 @@ class PlaylistScreenAndroidTest {
         fun bounds(tag: String) = compose.onNodeWithTag(tag, useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         var title = bounds("playlist-title-${summary.id}")
         assertEquals(64f, title.left, 1f)
-        assertEquals(278.375f, title.top, 1f)
+        // The Mint search chrome above the results is 56dp taller than the old one.
+        assertEquals(334f, title.top, 1f)
         var menu = compose.onNodeWithContentDescription("More actions for ${summary.title}").fetchSemanticsNode().boundsInRoot
         assertEquals(342f, menu.left, 1f)
-        assertEquals(270.375f, menu.top, 1f)
+        assertEquals(326f, menu.top, 1f)
         assertEquals(48f, menu.height, 1f)
         compose.onNodeWithContentDescription("More actions for ${summary.title}").performTouchInput {
             click(androidx.compose.ui.geometry.Offset(center.x, 2f))
@@ -153,7 +155,7 @@ class PlaylistScreenAndroidTest {
         compose.runOnIdle { width = 1280 }
         title = bounds("playlist-title-${summary.id}")
         assertEquals(444f, title.left, 1f)
-        assertEquals(65f, title.top, 1f)
+        assertEquals(121f, title.top, 1f)
         menu = compose.onNodeWithContentDescription("More actions for ${summary.title}").fetchSemanticsNode().boundsInRoot
         assertEquals(996f, menu.left, 1f)
         assertEquals(40f, menu.height, 1f)
@@ -170,7 +172,7 @@ class PlaylistScreenAndroidTest {
         val channel = ChannelPage(FixtureChannelRepository.profile(), FixtureChannelRepository.sampleVideos(), FixturePlaylistRepository.summaries())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, font)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                     when (scene) {
                         "search" -> SearchResultsScreen(SearchUiState("open movie", SearchContent.Results(SearchPage("open movie", emptyList(), FixturePlaylistRepository.summaries())),
                             filters = SearchFilters(type = SearchResultType.Playlists), signedInPreview = false), {}, {})
