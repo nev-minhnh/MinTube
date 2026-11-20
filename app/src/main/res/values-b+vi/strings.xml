@@ -739,4 +739,5 @@
     <string name="browse_search_edit">Sửa từ khóa tìm kiếm</string>
     <string name="browse_explore_empty_title">Chưa có nội dung</string>
     <string name="browse_explore_empty_message">Danh mục này hiện chưa có video nào. Hãy thử lại sau.</string>
+    <string name="library_download_share_hint">Tải từ trang video, hoặc chia sẻ đường liên kết video tới MinTube từ bất kỳ ứng dụng nào.</string>
 </resources>

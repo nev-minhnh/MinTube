@@ -28,7 +28,6 @@ import com.hhst.youtubelite.R
 import com.hhst.youtubelite.downloader.core.EnqueueResult
 import com.hhst.youtubelite.core.PipAutoEnter
 import com.hhst.youtubelite.ui.theme.AppTheme
-import com.hhst.youtubelite.ui.theme.NeutralControls
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +45,7 @@ class DownloadSheetActivity : ComponentActivity() {
         setContent {
             androidx.compose.runtime.CompositionLocalProvider(
                 com.hhst.youtubelite.ui.components.LocalSheetPlayerBottomFraction provides intent.getFloatExtra(EXTRA_PLAYER_BOTTOM, 0f),
-            ) { AppTheme { NeutralControls {
+            ) { AppTheme {
                 val vm = koinViewModel<DownloadViewModel>()
                 val snackbar = remember { SnackbarHostState() }
                 var result by remember { mutableStateOf<EnqueueResult?>(null) }
@@ -111,7 +110,7 @@ class DownloadSheetActivity : ComponentActivity() {
                             .padding(16.dp),
                     )
                 }
-            } } }
+            } }
         }
     }
 

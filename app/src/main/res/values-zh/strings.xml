@@ -741,4 +741,5 @@
     <string name="browse_search_edit">Edit search</string>
     <string name="browse_explore_empty_title">Nothing here yet</string>
     <string name="browse_explore_empty_message">This category has no videos right now. Try again later.</string>
+    <string name="library_download_share_hint">Download from a video page, or share a video link to MinTube from any app.</string>
 </resources>

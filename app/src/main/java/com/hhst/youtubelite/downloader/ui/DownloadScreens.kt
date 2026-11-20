@@ -18,23 +18,23 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import com.hhst.youtubelite.ui.components.AppAlertDialog as AlertDialog
 import com.hhst.youtubelite.ui.components.AppCheckbox as Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import com.hhst.youtubelite.ui.components.AppLinearProgressIndicator as LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import com.hhst.youtubelite.ui.components.AppSlider as Slider
 import androidx.compose.material3.SnackbarHost
@@ -42,8 +42,6 @@ import androidx.compose.material3.SnackbarHostState
 import com.hhst.youtubelite.ui.components.AppSwitch as Switch
 import androidx.compose.material3.Text
 import com.hhst.youtubelite.ui.components.AppTextButton as TextButton
-import com.hhst.youtubelite.ui.components.AppTopAppBar as TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -60,24 +58,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hhst.youtubelite.R
-import com.hhst.youtubelite.ui.theme.AppStyle
-import com.hhst.youtubelite.ui.theme.SettingsTokens
-import com.hhst.youtubelite.ui.theme.settingsAppBarHeight
 import com.hhst.youtubelite.core.HapticsController
 import com.hhst.youtubelite.downloader.core.DownloadSettings
 import com.hhst.youtubelite.downloader.core.DownloadStatus
 import com.hhst.youtubelite.downloader.core.DownloadTarget
 import com.hhst.youtubelite.downloader.core.RemoveMode
 import com.hhst.youtubelite.ui.components.ConstrainedPage
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
+import com.hhst.youtubelite.ui.components.MinTopBar
+import com.hhst.youtubelite.ui.components.SkeletonBox
+import com.hhst.youtubelite.ui.components.SkeletonLine
+import com.hhst.youtubelite.ui.components.StateMessage
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppIconButton
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
@@ -167,53 +175,28 @@ fun DownloadManagerScreen(
         enabled = dest != DownloadDest.Settings && !downloadItems.value.isNullOrEmpty())
     Scaffold(
         modifier = Modifier.fillMaxSize().nestedScroll(appBar.connection),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = DesignTokens.Background,
+        contentColor = DesignTokens.Ink,
         snackbarHost = { SnackbarHost(snackbar) },
         topBar = {
-            CollapsingAppBar(appBar) { TopAppBar(
-                expandedHeight = settingsAppBarHeight(),
-                title = {
-                    Text(
-                        when (dest) {
-                            DownloadDest.Settings -> stringResource(R.string.download_settings)
-                            DownloadDest.History -> stringResource(R.string.download_history)
-                            is DownloadDest.Batch -> stringResource(R.string.download_batch_details)
-                            DownloadDest.List -> stringResource(R.string.downloads)
-                        },
-                    )
-                },
-                navigationIcon = {
-                    val back = stringResource(R.string.navigate_back)
-                    IconButton(
-                        onClick = { if (dest != DownloadDest.List) dest = DownloadDest.List else onClose() },
-                        modifier = Modifier.semantics { contentDescription = back },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back),
-                            contentDescription = null,
-                            modifier = Modifier.padding(0.dp),
-                        )
-                    }
-                },
-                actions = {
+            CollapsingAppBar(appBar) {
+                MinTopBar(
+                    title = when (dest) {
+                        DownloadDest.Settings -> stringResource(R.string.download_settings)
+                        DownloadDest.History -> stringResource(R.string.download_history)
+                        is DownloadDest.Batch -> stringResource(R.string.download_batch_details)
+                        DownloadDest.List -> stringResource(R.string.downloads)
+                    },
+                    onBack = { if (dest != DownloadDest.List) dest = DownloadDest.List else onClose() },
+                    backDescription = stringResource(R.string.navigate_back),
+                    tag = "download-topbar",
+                ) {
                     if (dest is DownloadDest.List) {
-                        val settings = stringResource(R.string.download_settings)
-                        IconButton(
-                            onClick = { dest = DownloadDest.Settings },
-                            modifier = Modifier.semantics { contentDescription = settings },
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_settings),
-                                contentDescription = null,
-                            )
-                        }
+                        AppIconButton(AppIcon.Settings, stringResource(R.string.download_settings),
+                            Modifier.testTag("download-settings")) { dest = DownloadDest.Settings }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-            ) }
+                }
+            }
         },
     ) { padding ->
         ConstrainedPage {
@@ -290,8 +273,9 @@ private fun DownloadListPane(
             Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(start = DownloadTokens.PageInset, end = DownloadTokens.PageInset, top = 4.dp, bottom = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .testTag("download-filters")
+                .padding(start = DownloadTokens.PageInset, end = DownloadTokens.PageInset, bottom = MinSpace.xs),
+            horizontalArrangement = Arrangement.spacedBy(MinSpace.sm),
         ) {
             DownloadFilterChip(filter == ManagerFilter.ALL, stringResource(R.string.download_filter_all), compact = true) {
                 onFilter(ManagerFilter.ALL)
@@ -307,7 +291,8 @@ private fun DownloadListPane(
         if (loaded == null) {
             DownloadsLoading()
         } else if (items.isEmpty()) {
-            EmptyDownloads()
+            // The share-to-download entry is explained only on the full empty list, not per filter.
+            EmptyDownloads(showShareHint = loaded.isEmpty())
         } else {
             SelectableDownloads(items, listState = listState,
                 onOpen = { it.batchId?.let(onOpenBatch) }, onAction = onAction, onRemove = onRemove)
@@ -315,38 +300,47 @@ private fun DownloadListPane(
     }
 }
 
+/** Download rows in shimmer; held back 150ms so a fast local read never flashes it. */
 @Composable
 private fun DownloadsLoading() {
-    var showProgress by remember { mutableStateOf(false) }
+    var showSkeleton by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(150)
-        showProgress = true
+        showSkeleton = true
     }
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (showProgress) com.hhst.youtubelite.home.presentation.LoadingSpinner()
+    val loading = stringResource(R.string.a11y_loading)
+    Column(
+        Modifier.fillMaxSize().testTag("download-skeleton").clearAndSetSemantics { contentDescription = loading }
+            .padding(horizontal = DownloadTokens.PageInset, vertical = MinSpace.md),
+        verticalArrangement = Arrangement.spacedBy(MinSpace.lg),
+    ) {
+        if (showSkeleton) repeat(6) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SkeletonBox(Modifier.width(120.dp).aspectRatio(DownloadTokens.ThumbAspect), MinRadius.Field)
+                Spacer(Modifier.width(MinSpace.md))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
+                    SkeletonLine(fraction = 0.9f)
+                    SkeletonLine(fraction = 0.5f, height = 12.dp)
+                    SkeletonLine(fraction = 0.7f, height = 12.dp)
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun EmptyDownloads() {
-    Box(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_download),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
-                modifier = Modifier.size(44.dp),
-            )
-            Text(
-                text = stringResource(R.string.download_empty),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = SettingsTokens.BodySize.sp,
-                modifier = Modifier.padding(top = 12.dp),
-            )
-        }
+private fun EmptyDownloads(showShareHint: Boolean = false) {
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("download-empty"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        StateMessage(
+            stringResource(R.string.download_empty),
+            message = if (showShareHint) stringResource(R.string.library_download_share_hint) else null,
+            icon = AppIcon.Download,
+            tag = "download-empty-message",
+        )
     }
 }
 
@@ -368,28 +362,29 @@ private fun DownloadBatchPane(
     Column(Modifier.fillMaxSize().padding(padding)) {
         Text(
             text = batch?.name.orEmpty(),
-            modifier = Modifier.padding(horizontal = DownloadTokens.PageInset, vertical = 12.dp),
-            color = MaterialTheme.colorScheme.onSurface,
-            fontSize = SettingsTokens.BodySize.sp,
+            modifier = Modifier.padding(horizontal = DownloadTokens.PageInset, vertical = MinSpace.md)
+                .semantics { heading() },
+            style = MinType.Title,
+            color = DesignTokens.Ink,
         )
         if (stats != null && stats.total > 0) {
             val completedText = stringResource(R.string.download_batch_progress, stats.completed, stats.total)
             val failedText = if (stats.failed > 0) {
                 stringResource(R.string.download_batch_failed_count, stats.failed)
             } else null
-            Text(
-                text = listOfNotNull(completedText, failedText).joinToString(" · "),
-                modifier = Modifier.padding(horizontal = DownloadTokens.PageInset),
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(Modifier.padding(horizontal = DownloadTokens.PageInset)) {
+                Text(completedText, style = MinType.Caption, color = DesignTokens.Secondary)
+                if (failedText != null) Text(" · $failedText", style = MinType.Caption, color = DesignTokens.Danger)
+            }
             LinearProgressIndicator(
                 progress = { stats.completed.toFloat() / stats.total.toFloat() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = DownloadTokens.PageInset, vertical = 8.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-                trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.16f),
+                    .padding(horizontal = DownloadTokens.PageInset, vertical = MinSpace.sm)
+                    .height(4.dp)
+                    .clip(MinRadius.Full),
+                color = DesignTokens.Accent,
+                trackColor = DesignTokens.Ghost,
             )
         }
         // Batch controls mirror the per-row semantics offered by actionsFor.
@@ -410,22 +405,21 @@ private fun DownloadBatchPane(
                 DownloadStatus.QUEUED,
             )
         } }
-        if (items.isNotEmpty()) {
+        if (items.isNotEmpty() && (pausable.isNotEmpty() || resumable.isNotEmpty())) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = DownloadTokens.PageInset, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = DownloadTokens.PageInset, vertical = MinSpace.xs),
+                horizontalArrangement = Arrangement.spacedBy(MinSpace.sm),
             ) {
                 if (pausable.isNotEmpty()) {
-                    TextButton(onClick = { pausable.forEach { viewModel.pause(target(it)) } }) {
-                        Text(stringResource(R.string.download_pause_all))
-                    }
+                    MinButton(stringResource(R.string.download_pause_all), { pausable.forEach { viewModel.pause(target(it)) } },
+                        kind = MinButtonKind.Tonal, icon = AppIcon.Pause, testTag = "download-pause-all")
                 }
                 if (resumable.isNotEmpty()) {
-                    TextButton(onClick = { resumable.forEach { viewModel.resume(target(it)) } }) {
-                        Text(stringResource(R.string.download_resume_all))
-                    }
+                    MinButton(stringResource(R.string.download_resume_all), { resumable.forEach { viewModel.resume(target(it)) } },
+                        kind = MinButtonKind.Tonal, icon = AppIcon.PlayFilled, testTag = "download-resume-all")
                 }
             }
         }
@@ -473,38 +467,40 @@ private fun DownloadSettingsPane(
         DownloadHairline()
         Text(
             text = stringResource(R.string.download_quality),
-            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = MinSpace.lg, bottom = MinSpace.xs).semantics { heading() },
+            style = MinType.Subtitle,
+            color = DesignTokens.Ink,
         )
         Text(
             text = stringResource(R.string.download_quality_hint),
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
+            style = MinType.Caption,
+            color = DesignTokens.Secondary,
+            modifier = Modifier.padding(bottom = MinSpace.sm),
         )
         qualities.forEach { option ->
             Row(
                 Modifier
                     .fillMaxWidth()
                     .heightIn(min = DownloadTokens.MinTouch)
-                    .clickable {
+                    .clip(MinRadius.Field)
+                    .selectable(selected = quality == option, role = Role.RadioButton) {
                         quality = option
                         viewModel.setDefaultQuality(option)
-                    },
+                    }
+                    .padding(horizontal = MinSpace.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(option, Modifier.weight(1f), fontSize = 14.sp, lineHeight = 20.sp,
-                    color = MaterialTheme.colorScheme.onSurface)
-                if (quality == option) Icon(painterResource(R.drawable.ic_check), null,
-                    Modifier.size(24.dp), tint = MaterialTheme.colorScheme.onSurface)
+                Text(option, Modifier.weight(1f), style = MinType.Body, color = DesignTokens.Ink)
+                if (quality == option) AppIcon(AppIcon.Check, Modifier.size(24.dp), color = DesignTokens.AccentText)
                 else Spacer(Modifier.size(24.dp))
             }
         }
         DownloadHairline()
         Text(
             text = stringResource(R.string.download_connections, connections),
-            modifier = Modifier.padding(top = 16.dp),
-            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = MinSpace.lg),
+            style = MinType.Subtitle,
+            color = DesignTokens.Ink,
         )
         Slider(
             value = connections.toFloat(),
@@ -515,7 +511,7 @@ private fun DownloadSettingsPane(
             valueRange = DownloadSettings.MIN_CONNECTIONS.toFloat()..DownloadSettings.MAX_CONNECTIONS.toFloat(),
             steps = DownloadSettings.MAX_CONNECTIONS - DownloadSettings.MIN_CONNECTIONS - 1,
         )
-
+        Spacer(Modifier.height(MinSpace.xxl))
     }
 }
 
@@ -535,14 +531,8 @@ private fun DownloadHistoryPane(
     val clearedMessage = stringResource(R.string.download_history_cleared)
     val failedMessage = stringResource(R.string.download_failed)
     Column(Modifier.fillMaxSize().padding(padding)) {
-        TextButton(
-            onClick = { confirmClear = true },
-            modifier = Modifier
-                .padding(horizontal = DownloadTokens.PageInset)
-                .heightIn(min = DownloadTokens.MinTouch),
-        ) {
-            Text(stringResource(R.string.download_clear_history))
-        }
+        MinButton(stringResource(R.string.download_clear_history), { confirmClear = true },
+            Modifier.padding(horizontal = MinSpace.sm), kind = MinButtonKind.Text, icon = AppIcon.Delete, danger = true)
         DownloadHairline()
         if (items == null) {
             DownloadsLoading()
@@ -564,15 +554,17 @@ private fun DownloadHistoryPane(
     if (confirmClear) {
         AlertDialog(
             onDismissRequest = { confirmClear = false },
-            containerColor = AppStyle.Panel,
+            containerColor = DesignTokens.Panel,
             tonalElevation = 0.dp,
-            title = { Text(stringResource(R.string.download_clear_history)) },
+            title = { Text(stringResource(R.string.download_clear_history), style = MinType.Title, color = DesignTokens.Ink) },
             text = {
                 Column {
-                    Text(stringResource(R.string.download_clear_history_message))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.download_clear_history_message), style = MinType.Body, color = DesignTokens.Secondary)
+                    Row(Modifier.padding(top = MinSpace.sm).heightIn(min = DownloadTokens.MinTouch),
+                        verticalAlignment = Alignment.CenterVertically) {
                         Switch(checked = deleteFiles, onCheckedChange = { deleteFiles = it })
-                        Text(stringResource(R.string.download_delete_files), modifier = Modifier.padding(start = 8.dp))
+                        Text(stringResource(R.string.download_delete_files), Modifier.padding(start = MinSpace.sm),
+                            style = MinType.Body, color = DesignTokens.Ink)
                     }
                 }
             },
@@ -583,10 +575,10 @@ private fun DownloadHistoryPane(
                         val outcome = runCatching { viewModel.clearHistory(deleteFiles) }
                         snackbar.showSnackbar(if (outcome.isSuccess) clearedMessage else failedMessage)
                     }
-                }) { Text(stringResource(R.string.confirm)) }
+                }) { Text(stringResource(R.string.confirm), style = MinType.Label, color = DesignTokens.Danger) }
             },
             dismissButton = {
-                TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.cancel), style = MinType.Label) }
             },
         )
     }
@@ -605,13 +597,13 @@ private fun SettingsRow(
             .fillMaxWidth()
             .heightIn(min = DownloadTokens.MinTouch)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(vertical = 8.dp),
+            .padding(vertical = MinSpace.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(title, color = MaterialTheme.colorScheme.onSurface)
+        Column(Modifier.weight(1f).padding(end = MinSpace.md)) {
+            Text(title, style = MinType.Body, color = DesignTokens.Ink)
             if (subtitle != null) {
-                Text(subtitle, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(subtitle, style = MinType.Caption, color = DesignTokens.Secondary)
             }
         }
         trailing?.invoke()
@@ -627,27 +619,28 @@ internal fun DeleteDialog(
     val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = AppStyle.Panel,
+        containerColor = DesignTokens.Panel,
         tonalElevation = 0.dp,
-        title = { Text(stringResource(R.string.download_delete)) },
+        title = { Text(stringResource(R.string.download_delete), style = MinType.Title, color = DesignTokens.Ink) },
         text = {
             Row(
-                Modifier.fillMaxWidth().heightIn(min = DownloadTokens.MinTouch)
+                Modifier.fillMaxWidth().heightIn(min = DownloadTokens.MinTouch).clip(MinRadius.Field)
                     .toggleable(value = files, role = Role.Checkbox,
                         onValueChange = { haptic(); files = it }),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Checkbox(checked = files, onCheckedChange = null)
-                Text(stringResource(R.string.download_delete_local_file), Modifier.padding(start = 8.dp))
+                Text(stringResource(R.string.download_delete_local_file), Modifier.padding(start = MinSpace.sm),
+                    style = MinType.Body, color = DesignTokens.Ink)
             }
         },
         confirmButton = {
             TextButton(onClick = {
                 onConfirm(if (files) RemoveMode.RECORD_AND_FILES else RemoveMode.RECORD_ONLY)
-            }) { Text(stringResource(R.string.download_delete)) }
+            }) { Text(stringResource(R.string.download_delete), style = MinType.Label, color = DesignTokens.Danger) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), style = MinType.Label) }
         },
     )
 }

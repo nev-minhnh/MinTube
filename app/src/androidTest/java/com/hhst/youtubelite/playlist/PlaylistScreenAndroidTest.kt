@@ -45,23 +45,25 @@ class PlaylistScreenAndroidTest {
         }
         var cover = compose.onNodeWithTag("playlist-hero-cover").fetchSemanticsNode().boundsInRoot
         assertEquals(16f, cover.left, 1f)
-        assertEquals(64f, cover.top, 1f)
+        // 56dp Mint top bar + 16dp page inset.
+        assertEquals(72f, cover.top, 1f)
         assertEquals(358f, cover.width, 1f)
         assertEquals(201.4375f, cover.height, 1f)
         val heading = compose.onNodeWithTag("playlist-heading", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(281.4375f, heading.top, 1f)
+        assertEquals(289.4375f, heading.top, 1f)
         val menu = compose.onNodeWithTag("playlist-entry-menu-bunny-1").fetchSemanticsNode().boundsInRoot
-        assertEquals(344f, menu.left, 1f)
-        assertEquals(40f, menu.width, 1f)
+        // The overflow is a full 48dp target, 4dp from the edge, level with the thumbnail.
+        assertEquals(338f, menu.left, 1f)
+        assertEquals(48f, menu.width, 1f)
         val phoneThumb = compose.onNodeWithTag("playlist-entry-cover-bunny-1", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(phoneThumb.top - 6f, menu.top, 1f)
+        assertEquals(phoneThumb.top, menu.top, 1f)
         compose.runOnIdle { width = 1280; height = 800 }
         cover = compose.onNodeWithTag("playlist-hero-cover").fetchSemanticsNode().boundsInRoot
         assertEquals(427f, cover.width, 1f)
         assertEquals(240f, cover.height, 1f)
         val first = compose.onNodeWithTag("playlist-entry-cover-bunny-1", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         assertEquals(16f, first.left, 1f)
-        assertEquals(328f, first.top, 2f)
+        assertEquals(336f, first.top, 2f)
         assertEquals(160f, first.width, 1f)
         assertEquals(90f, first.height, 1f)
         for ((w, h) in listOf(839 to 800, 840 to 800, 1023 to 800, 1024 to 800, 1280 to 1104, 1600 to 800)) {

@@ -83,6 +83,8 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
     private var showQueue by mutableStateOf(false)
     private var showSwitchSheet by mutableStateOf(false)
     private var confirmSignOut by mutableStateOf(false)
+    /** Drawn as a badge only; re-read on resume because the switch lives on the Settings screen. */
+    private var privateBrowsing by mutableStateOf(false)
 
     val shareGateway: com.hhst.youtubelite.share.ShareGateway by lazy { com.hhst.youtubelite.share.ShareGateway(this) }
 
@@ -158,7 +160,8 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
             BackHandler(onBack = back)
             YouScreen(state, youViewModel::onAction,
                 modifier = Modifier.fillMaxSize().background(com.hhst.youtubelite.ui.design.DesignTokens.Background)
-                    .windowInsetsPadding(WindowInsets.safeDrawing).imePadding())
+                    .windowInsetsPadding(WindowInsets.safeDrawing).imePadding(),
+                privateBrowsing = privateBrowsing)
             if (showQueue) com.hhst.youtubelite.player.surface.LibraryQueueSheet(
                 onDismiss = { showQueue = false },
                 onPlay = { id -> showQueue = false; launchNavigation(WatchActivity.intent(this, id)) },
@@ -288,8 +291,8 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
             if (confirmSignOut) {
                 com.hhst.youtubelite.ui.components.AppAlertDialog(
                     onDismissRequest = { confirmSignOut = false },
-                    title = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_sign_out)) },
-                    text = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_this_removes_the_account_from_this_device_downloads_and_settings_are_k)) },
+                    title = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_sign_out), com.hhst.youtubelite.ui.design.MinType.Title) },
+                    text = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_this_removes_the_account_from_this_device_downloads_and_settings_are_k), color = com.hhst.youtubelite.ui.design.DesignTokens.Secondary) },
                     confirmButton = {
                         com.hhst.youtubelite.ui.components.AppTextButton(onClick = {
                             confirmSignOut = false
@@ -299,7 +302,7 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
                                 youViewModel.updateSession(session.signedIn, session.generation)
                             }
                         }, modifier = Modifier.testTag("account-signout-confirm")) {
-                            com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_sign_out_2), color = com.hhst.youtubelite.ui.theme.AppStyle.Action)
+                            com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_sign_out_2), color = com.hhst.youtubelite.ui.design.DesignTokens.Danger)
                         }
                     },
                     dismissButton = {
@@ -330,6 +333,7 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
 
     private fun syncSession() {
         if (!com.hhst.youtubelite.data.media.ContentRepositories.fixtures(intent)) {
+            privateBrowsing = com.hhst.youtubelite.data.media.MediaSession.privateBrowsing()
             com.hhst.youtubelite.data.media.MediaSession.snapshot().let { youViewModel.updateSession(it.signedIn, it.generation) }
         }
     }
