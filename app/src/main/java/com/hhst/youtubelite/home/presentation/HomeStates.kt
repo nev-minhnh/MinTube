@@ -108,7 +108,7 @@ internal fun ErrorHome(onAction: (HomeAction) -> Unit) {
 @Composable
 internal fun HomeSkeleton(window: WindowClass, topInset: Dp) {
     val inset = MinSpace.pageInset(window)
-    LazyVerticalGrid(GridCells.Fixed(window.feedColumns), Modifier.fillMaxSize().testTag("home-skeleton").clearAndSetSemantics {},
+    LazyVerticalGrid(GridCells.Fixed(com.hhst.youtubelite.ui.design.rememberFeedColumns()), Modifier.fillMaxSize().testTag("home-skeleton").clearAndSetSemantics {},
         contentPadding = PaddingValues(start = inset, end = inset, top = topInset + MinSpace.sm, bottom = MinSpace.xxl),
         horizontalArrangement = Arrangement.spacedBy(MinSpace.lg), verticalArrangement = Arrangement.spacedBy(MinSpace.xxl),
         userScrollEnabled = false) {

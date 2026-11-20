@@ -228,7 +228,7 @@ fun HomeScreen(state: HomeUiState, onAction: (HomeAction) -> Unit, modifier: Mod
                         // Navigation and card anchors stay in place while the first page loads.
                         HomeContent.Loading -> HomeSkeleton(window, chromeHeight)
                         is HomeContent.Feed -> LazyVerticalGrid(
-                            columns = GridCells.Fixed(window.feedColumns), state = grid,
+                            columns = GridCells.Fixed(com.hhst.youtubelite.ui.design.rememberFeedColumns()), state = grid,
                             // Pull moves the feed rows only; the chrome stack keeps its place.
                             modifier = Modifier.fillMaxSize().graphicsLayer { translationY = pullMotion.offset }.testTag("home-feed"),
                             contentPadding = PaddingValues(start = inset, end = inset, top = chromeHeight + MinSpace.sm, bottom = MinSpace.xxl),

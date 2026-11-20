@@ -56,6 +56,15 @@ enum class WindowClass {
         const val MediumFromDp = 600
         const val ExpandedFromDp = 840
 
+        /** A medium window this wide (a tablet in portrait) already fits three feed cards. */
+        const val ThreeFeedColumnsFromDp = 760
+
+        /** Feed columns by width: 1 on compact, 2 on medium, 3 from [ThreeFeedColumnsFromDp]. */
+        fun feedColumnsFor(widthDp: Int): Int = when {
+            widthDp >= ThreeFeedColumnsFromDp -> 3
+            else -> of(widthDp).feedColumns
+        }
+
         fun of(widthDp: Int): WindowClass = when {
             widthDp >= ExpandedFromDp -> Expanded
             widthDp >= MediumFromDp -> Medium
@@ -71,3 +80,7 @@ fun rememberWindowClass(): WindowClass = WindowClass.of(LocalConfiguration.curre
 /** True when a wide window is also wider than tall: the layout uses the start-edge rail ([NavigationForm.Rail]). */
 @Composable
 fun rememberWideLandscape(): Boolean = rememberNavigationForm() == NavigationForm.Rail
+
+/** Feed grid columns for the current window width ([WindowClass.feedColumnsFor]). */
+@Composable
+fun rememberFeedColumns(): Int = WindowClass.feedColumnsFor(LocalConfiguration.current.screenWidthDp)
