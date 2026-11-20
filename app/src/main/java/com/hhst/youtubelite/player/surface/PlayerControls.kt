@@ -745,15 +745,17 @@ fun MiniPlayerChrome(
                     contentDescription = stringResource(R.string.action_restore_watch),
                     onClick = onRestore,
                     enabled = !suppressControls,
+                    // Top row with queue and close (not stacked over the transport row), so every
+                    // control gets a full 48x48 box at the default mini size.
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .miniTouchBox(MiniTouchTargets.RESTORE_DP.dp, touchHeight(MiniTouchTargets.RESTORE_DP)),
+                        .align(Alignment.TopCenter)
+                        .size(MiniTouchTargets.MIN_TOUCH_DP.dp),
                     iconSize = 20,
                 )
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .offset(y = (-4).dp),
+                        .offset(y = -MiniTouchTargets.rowOffsetFromBottomDp().dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     PlayerIconButton(

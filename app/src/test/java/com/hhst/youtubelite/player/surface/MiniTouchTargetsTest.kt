@@ -22,19 +22,22 @@ class MiniTouchTargetsTest {
         for (drawn in listOf(side, play, restore)) assertEquals(48f, MiniTouchTargets.touchHeightDp(drawn, 180f), 0.01f)
     }
 
-    @Test fun smallMinisNeverLetStackedControlsOverlapMoreThanTheyDraw() {
-        // Default compact mini: 190dp wide -> 106.9dp tall. The centre gap is 32.4dp, below the drawn
-        // sizes of play/restore, so those keep their drawn height and the side buttons grow to the gap.
-        val height = 190f * 9f / 16f
-        val gap = MiniTouchTargets.stackGapDp(height)
-        assertEquals(gap, MiniTouchTargets.touchHeightDp(side, height), 0.01f)
-        assertEquals(play.toFloat(), MiniTouchTargets.touchHeightDp(play, height), 0.01f)
-        assertEquals(restore.toFloat(), MiniTouchTargets.touchHeightDp(restore, height), 0.01f)
-        // Mid size: each box stops at the midpoint between the two centres.
-        val mid = 240f * 9f / 16f
-        val midGap = MiniTouchTargets.stackGapDp(mid)
-        assertTrue(midGap in 40f..48f)
-        assertEquals(midGap, MiniTouchTargets.touchHeightDp(play, mid), 0.01f)
-        assertEquals(midGap, MiniTouchTargets.touchHeightDp(restore, mid), 0.01f)
+    @Test fun defaultMiniGivesEveryControlA48dpSquare() {
+        // Intent changed (fix-all W8): the restore button moved into the top row, so even the
+        // smallest default mini (190dp wide -> 106.9dp tall) has full 48x48 boxes on both rows.
+        for (screen in listOf(360, 411, 800)) {
+            val height = MiniPlayerLayout.defaultWidthDp(screen) * 9f / 16f
+            assertTrue(MiniTouchTargets.stackGapDp(height) >= 48f)
+            for (drawn in listOf(side, play)) assertEquals(48f, MiniTouchTargets.touchHeightDp(drawn, height), 0.01f)
+        }
+    }
+
+    @Test fun transportBoxesEndOnTheBottomEdgeAndRowsDoNotOverlap() {
+        // Row centre half a box above the bottom edge: the 48dp boxes stay inside the card.
+        assertEquals(24f, MiniTouchTargets.ROW_CENTER_FROM_BOTTOM_DP, 0.01f)
+        assertEquals(24f - play / 2f, MiniTouchTargets.rowOffsetFromBottomDp(), 0.01f)
+        // A hypothetical shorter card shrinks boxes to the midpoint between the rows, never below drawn size.
+        assertEquals(40f, MiniTouchTargets.touchHeightDp(side, 88f), 0.01f)
+        assertEquals(play.toFloat(), MiniTouchTargets.touchHeightDp(play, 60f), 0.01f)
     }
 }

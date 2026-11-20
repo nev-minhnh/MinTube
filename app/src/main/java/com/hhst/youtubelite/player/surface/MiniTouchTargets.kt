@@ -8,28 +8,34 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
- * Touch boxes for the mini-player's small controls. The drawn icons, their 30/34/40dp layout slots
- * and every [MiniPlayerLayout] constant stay as they are: each control only answers touches (and
- * reports its accessibility bounds) over a larger box centred on the same spot.
+ * Touch boxes for the mini-player's small controls. The drawn transport icons keep their 30/34dp
+ * layout slots and every [MiniPlayerLayout] constant stays as it is: each control answers touches
+ * (and reports its accessibility bounds) over a larger box centred on the same spot.
  *
- * Width is always at least 48dp (the transport row's centres are >= 50dp apart, so neighbours never
- * overlap). Height reaches 48dp only when the mini is tall enough: the restore button and the
- * transport row are stacked, and neither box may reach past the midpoint between their centres,
- * so a small mini keeps the drawn heights rather than letting one control steal the other's taps.
+ * Two rows: queue, restore and close are 48x48 buttons along the top edge; the transport row
+ * (previous, play, next) has its centre [ROW_CENTER_FROM_BOTTOM_DP] above the bottom edge, so its
+ * 48dp boxes end exactly on that edge. The rows never overlap while the mini is at least
+ * 2 x 48dp tall; the smallest mini (190dp wide -> 106dp tall) is taller than that.
+ * Width is always at least 48dp (the transport row's centres are >= 50dp apart).
  */
 internal object MiniTouchTargets {
     const val MIN_TOUCH_DP = 48
-    /** Drawn size of the centre restore button. */
+    /** Drawn size of the restore button's icon slot (now a full 48dp button in the top row). */
     const val RESTORE_DP = 40
-    /** The transport row sits 4dp above the bottom edge; its centre is half the 34dp play slot above that. */
-    const val ROW_CENTER_FROM_BOTTOM_DP = 4f + MiniPlayerLayout.CONTROL_PLAY_DP / 2f
+    /** The transport row's centre sits half a touch box above the bottom edge. */
+    const val ROW_CENTER_FROM_BOTTOM_DP = MIN_TOUCH_DP / 2f
+    /** Centre of the top row's 48dp buttons, measured from the top edge. */
+    const val TOP_ROW_CENTER_DP = MIN_TOUCH_DP / 2f
 
     fun touchWidthDp(drawnDp: Int): Int = maxOf(drawnDp, MIN_TOUCH_DP)
 
-    /** Distance between the restore button's centre and the transport row's centre. */
-    fun stackGapDp(miniHeightDp: Float): Float = miniHeightDp / 2f - ROW_CENTER_FROM_BOTTOM_DP
+    /** Offset that puts the transport row (laid out at the 34dp play slot) on [ROW_CENTER_FROM_BOTTOM_DP]. */
+    fun rowOffsetFromBottomDp(): Float = ROW_CENTER_FROM_BOTTOM_DP - MiniPlayerLayout.CONTROL_PLAY_DP / 2f
 
-    /** Never below the drawn size, never above 48dp, never past the stacked neighbour's midpoint. */
+    /** Distance between the top row's centre and the transport row's centre. */
+    fun stackGapDp(miniHeightDp: Float): Float = miniHeightDp - TOP_ROW_CENTER_DP - ROW_CENTER_FROM_BOTTOM_DP
+
+    /** Never below the drawn size, never above 48dp, never past the other row's midpoint. */
     fun touchHeightDp(drawnDp: Int, miniHeightDp: Float): Float =
         stackGapDp(miniHeightDp).coerceIn(drawnDp.toFloat(), maxOf(drawnDp, MIN_TOUCH_DP).toFloat())
 }
