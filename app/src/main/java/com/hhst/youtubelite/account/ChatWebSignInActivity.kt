@@ -22,6 +22,7 @@ import com.hhst.youtubelite.core.WebViewTimerOwner
 import com.hhst.youtubelite.data.media.MediaSession
 import com.hhst.youtubelite.data.media.PreferencesAuthStore
 import com.hhst.youtubelite.data.media.requireValue
+import com.hhst.youtubelite.ui.design.MintColors
 import com.hhst.youtubelite.watch.chat.ChatWebSessionStore
 import com.liskovsoft.youtubeapi.videoinfo.V2.WebSession
 import com.liskovsoft.youtubeapi.videoinfo.V2.loadActiveAccount
@@ -49,18 +50,47 @@ class ChatWebSignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!native.signedIn || expected == null) return finish()
+        val colors = ChromeColors.of(this)
+        val density = resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(0xff0f0f0f.toInt())
+            setBackgroundColor(colors.background)
         }
-        val close = Button(this).apply { text = getString(if (forPost) com.hhst.youtubelite.R.string.post_auth_close else com.hhst.youtubelite.R.string.chat_auth_close); setOnClickListener { finish() } }
+        // Text button at the start of a 56dp bar: the same place every other screen keeps "back".
+        val close = Button(this, null, 0).apply {
+            text = getString(if (forPost) com.hhst.youtubelite.R.string.post_auth_close else com.hhst.youtubelite.R.string.chat_auth_close)
+            isAllCaps = false
+            setTextColor(colors.accentText); textSize = 14f
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            background = pill(colors.surface, dp(20), dp(8))
+            minHeight = dp(56); minimumHeight = dp(56); minWidth = dp(48); minimumWidth = dp(48)
+            setPadding(dp(20), 0, dp(20), 0)
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                .apply { marginStart = dp(8); marginEnd = dp(8) }
+            setOnClickListener { finish() }
+        }
         status = TextView(this).apply {
-            setTextColor(0xfff1f1f1.toInt()); textSize = 16f
-            setPadding(24, 16, 24, 16)
+            setTextColor(colors.ink); textSize = 14f
+            setLineSpacing(0f, 1.2f)
+            setBackgroundColor(colors.panel)
+            setPadding(dp(16), dp(12), dp(16), dp(12))
+            accessibilityLiveRegion = android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE
             text = getString(if (forPost) com.hhst.youtubelite.R.string.post_auth_explanation else com.hhst.youtubelite.R.string.chat_auth_explanation, expected?.email ?: expected?.name.orEmpty())
         }
-        verify = Button(this).apply {
+        verify = Button(this, null, 0).apply {
             text = getString(com.hhst.youtubelite.R.string.chat_auth_continue)
+            isAllCaps = false
+            setTextColor(android.content.res.ColorStateList(
+                arrayOf(intArrayOf(-android.R.attr.state_enabled), intArrayOf()),
+                intArrayOf(colors.secondary, colors.onAccent)))
+            textSize = 14f
+            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            background = pill(colors.accent, dp(24), dp(8), colors.surface)
+            minHeight = dp(64); minimumHeight = dp(64)
+            setPadding(dp(24), 0, dp(24), 0)
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                .apply { marginStart = dp(16); marginEnd = dp(16) }
             setOnClickListener { verifySession() }
         }
         root.addView(close); root.addView(status)
@@ -153,6 +183,37 @@ class ChatWebSignInActivity : ComponentActivity() {
         web?.let { view -> view.stopLoading(); (view.parent as? ViewGroup)?.removeView(view); view.destroy() }
         web = null
         super.onDestroy()
+    }
+
+    /**
+     * Pill background with a transparent vertical inset: the view stays [inset]*2 taller than the
+     * visible pill, which keeps a 48dp touch target around a 40dp/48dp shape.
+     */
+    private fun pill(color: Int, radius: Int, inset: Int, disabled: Int = color): android.graphics.drawable.Drawable {
+        fun shape(fill: Int) = android.graphics.drawable.InsetDrawable(
+            android.graphics.drawable.GradientDrawable().apply { cornerRadius = radius.toFloat(); setColor(fill) }, 0, inset, 0, inset)
+        return android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(-android.R.attr.state_enabled), shape(disabled))
+            addState(intArrayOf(), shape(color))
+        }
+    }
+
+    /** Mint palette for this View-based chrome, following the in-app theme choice. */
+    private class ChromeColors(val background: Int, val panel: Int, val surface: Int, val ink: Int, val secondary: Int,
+        val accent: Int, val onAccent: Int, val accentText: Int) {
+        companion object {
+            fun of(context: android.content.Context): ChromeColors {
+                val night = context.resources.configuration.uiMode and
+                    android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                val dark = com.hhst.youtubelite.ui.theme.AppAppearance.dark ?: night
+                return if (dark) ChromeColors(MintColors.DarkBackground.toInt(), MintColors.DarkPanel.toInt(),
+                    MintColors.DarkSurface.toInt(), MintColors.DarkInk.toInt(), MintColors.DarkSecondary.toInt(),
+                    MintColors.DarkAccent.toInt(), MintColors.DarkOnAccent.toInt(), MintColors.DarkAccentText.toInt())
+                else ChromeColors(MintColors.LightBackground.toInt(), MintColors.LightPanel.toInt(),
+                    MintColors.LightSurface.toInt(), MintColors.LightInk.toInt(), MintColors.LightSecondary.toInt(),
+                    MintColors.LightAccent.toInt(), MintColors.LightOnAccent.toInt(), MintColors.LightAccentText.toInt())
+            }
+        }
     }
 
     companion object {
