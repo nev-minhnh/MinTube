@@ -70,17 +70,14 @@ object DesignTokens {
     @Deprecated("The brand accent is mint, not red. Use Accent (or Danger for errors and live badges).", ReplaceWith("DesignTokens.Accent"))
     val Red: Color @Composable get() = LocalAppColors.current.accent
     val Link: Color @Composable get() = LocalAppColors.current.link
-    val Font = FontFamily(
-        Font(R.font.roboto_regular, FontWeight.Normal), Font(R.font.roboto_medium, FontWeight.Medium),
-        Font(R.font.roboto_bold, FontWeight.Bold),
-        Font(R.font.roboto_bold, FontWeight.Black),
-    )
+    /** Body family (Roboto). Titles use [MinFonts.Display]; prefer the named styles in [MinType]. */
+    val Font = MinFonts.Body
     val TopBarHeight = 48.dp
     val BottomBarHeight = 56.dp
     val GridGap = 16.dp
     @Composable
     fun text(size: Int = 14, line: Int = 20, weight: FontWeight = FontWeight.Normal, color: Color = Ink) = TextStyle(
-        color = color, fontFamily = Font, fontWeight = weight, fontSize = size.sp, lineHeight = line.sp,
+        color = color, fontFamily = MinFonts.familyFor(size, weight), fontWeight = weight, fontSize = size.sp, lineHeight = line.sp,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
         lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.None),
     )
@@ -131,6 +128,16 @@ fun AppText(
 ) {
     BasicText(text, modifier, style = DesignTokens.text(size, line, weight, color).copy(textAlign = align ?: TextAlign.Start,
         lineHeight = exactLineHeight ?: line.sp),
+        maxLines = maxLines, overflow = TextOverflow.Ellipsis)
+}
+
+/** Text in a named [MinType] style, e.g. `AppText(title, MinType.Title)`. */
+@Composable
+fun AppText(
+    text: String, style: TextStyle, modifier: Modifier = Modifier, color: Color = DesignTokens.Ink,
+    maxLines: Int = Int.MAX_VALUE, align: TextAlign? = null,
+) {
+    BasicText(text, modifier, style = style.copy(color = color, textAlign = align ?: TextAlign.Start),
         maxLines = maxLines, overflow = TextOverflow.Ellipsis)
 }
 
@@ -233,11 +240,10 @@ fun LitubeMark(modifier: Modifier = Modifier) {
 
 @Composable
 fun LitubeBrand(modifier: Modifier = Modifier) {
-    CompositionLocalProvider(LocalDensity provides androidx.compose.ui.unit.Density(LocalDensity.current.density, 1f)) {
+    // Follows the system font scale like every other text.
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         LitubeMark(Modifier.size(28.dp))
-        Spacer(Modifier.width(3.dp))
-        AppText(stringResource(R.string.app_name), size = 22, line = 28, weight = FontWeight.Black)
-    }
+        Spacer(Modifier.width(6.dp))
+        AppText(stringResource(R.string.app_name), MinType.Wordmark, maxLines = 1)
     }
 }
