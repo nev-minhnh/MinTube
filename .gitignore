@@ -7,7 +7,6 @@
 .idea/
 build/
 external/
-docs/
 **/build/
 out/
 release/
@@ -21,3 +20,9 @@ local.properties
 *.patch
 
 /scripts/
+
+# MinTube: signing material must never be committed
+*.jks
+*.keystore
+credentials.txt
+keystore.properties
