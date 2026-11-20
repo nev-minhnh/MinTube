@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:01" hostname="MINHNH-LAPTOP" time="0.003">
+  <properties/>
+  <testcase name="suppression survives a refetch with equal segments" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.002"/>
+  <testcase name="countdown off skips instantly (legacy)" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="countdown shows before segment then skips at entry" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="landing mid-segment counts down before skipping" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="segment chip wins over highlight chip" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="fired skip does not re-arm on keyframe snap-back" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="reset clears retired highlights" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="no countdown outside the pre-window" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="highlight chip shows within window and jumps to the point" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="tapping the countdown card skips the pending segment now" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="skip pending without a pending segment is a no-op" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="dismissed highlight chip stays retired for the video" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="zero-length poi segments do not arm countdown" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="cancel suppresses the segment and offers the chip" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="reset clears suppression" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.001"/>
+  <testcase name="user seek into segment suppresses it" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <testcase name="legacy instant skip does not loop on snap-back" classname="com.hhst.youtubelite.player.sponsor.SponsorSkipControllerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

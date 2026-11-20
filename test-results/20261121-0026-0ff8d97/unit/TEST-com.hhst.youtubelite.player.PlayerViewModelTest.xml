@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.PlayerViewModelTest" tests="63" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:01" hostname="MINHNH-LAPTOP" time="0.287">
+  <properties/>
+  <testcase name="identitySwitchActivatesTheNewQueueAndDropsTheOldNavigationContext" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.054"/>
+  <testcase name="shortReentryPreservesManualPauseAndAvoidsReload" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="explicitStopRejectsADelayedAutoplayResult" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.006"/>
+  <testcase name="downwardSwipeRestoresThePreFullscreenPolicyWhileUpwardSwipeKeepsDirection" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="nativeEntryLoadsOnceAndRestoresThePreservedEngine" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="recastPublishedSource_withoutSessionIsNoOp" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="ordinaryExitStillPreservesPlaybackWhenBackgroundPlayIsEnabled" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="dismissedFailureStaysClosedUntilAnotherFailureAndCanBeReopened" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="centerDownwardSwipeIgnoresShortsAndFullscreenSurfaces" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="leavingShortsNeverCollapsesIntoTheMiniPlayer" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="explicitStopEndsTheDlnaReceiverWithoutAResumeEcho" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.007"/>
+  <testcase name="aStaleQueueNeverSeizesAPlainWatch" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="explicitStopRejectsACastSourceThatFinishesAfterPendingPlaybackWasCancelled" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.015"/>
+  <testcase name="castHandoff_staleErrorDoesNotSettleNewVideo" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.001"/>
+  <testcase name="explicitStopEndsAudioOnlyBackgroundAndReopeningLoadsFreshMedia" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="castHandoff_neverWithoutVideoId" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.0"/>
+  <testcase name="explicitStopCancelsThePendingDlnaTransferBeforeItPublishesAProxy" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.008"/>
+  <testcase name="castHandoff_readyOnExtractionError" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.0"/>
+  <testcase name="centerDownwardSwipeEntersTheMiniPlayerWhenEnabled" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="explicitPlaylistPreservesItsHeadAndOverridesAnOldQueue" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="explicitStopAlsoEndsAChromecastHandshakeBeforeItReportsConnected" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="queueTakesPriorityOverServiceAutoplayAndPreviousAtTheHeadDoesNotChangeVideo" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="swipePausesNeverBecomeAnExplicitShortPause" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="loopOneDoesNotBlockManualQueueNext" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="swipeExitAfterButtonEntryKeepsOrientationUntilTheNextButtonAction" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="recoveringCredentialsActivatesTheAccountQueueWithoutRestartingPlayback" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="gesturePrefKey_picksEmbeddedOrFullscreen" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.001"/>
+  <testcase name="onMiniClose_cancelsLongVideoWithoutRestoringIt" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="nativeAutoplayUsesTheServiceOncePerPlayback" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="shortsStopClearsFloatingStateAndBrowseKeepsItClosed" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="identitySwitchKeepsTheCurrentVideoAndSurfaceRunning" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="relatedMissKeepsTheCurrentPlaybackAndDisablesNext" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="endingAShortNeverRequestsWatchAutoplay" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="shortsAlwaysPauseOutsideTheirHost" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.007"/>
+  <testcase name="explicitStopClosesTheCastLinkAndRejectsItsLateDisconnectEcho" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="explicitStopClearsPlaybackAndPresentationWithEitherBackgroundPreference" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="playbackModeSelectionUsesTheRequestedValue" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="settlingOnANewShortDoesNotResumeThePreviousSwipe" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="shortsExposeNoWatchNavigation" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="aRepeatedGenerationWithTheSameQueueOwnerKeepsTheBrowsingContext" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.014"/>
+  <testcase name="pipDismissalKeepsTheConnectedCastAndOnlyPausesLocalPlayback" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="leavingForShortsPausesAndReopeningTheVideoPreservesPosition" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="attachingToAnAlreadyPreparedEngineInitializesNavigationBeforeCollecting" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="resumedShortContinuesWithoutReloadingItsMedia" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="openingWatchAfterAHiddenLandscapeEventAppliesAutoFullscreen" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="previousWalksBackThisSessionsTrail" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="manualNextUsesRelatedVideosEvenWhenAutoplayIsOff" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="castHandoff_notReadyWhileStillLoading" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.0"/>
+  <testcase name="manualFullscreenExitWaitsForPortraitBeforeAutoEnteringAgain" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="reopeningPreservesPausedPlaybackAndPosition" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="endingAShortNeverConsumesAnActiveWatchQueue" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="castHandoff_neverCastsPreviousVideo" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.0"/>
+  <testcase name="loadSettledFor_whenNewVideoPrepared" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.0"/>
+  <testcase name="openingANewVideoRestoresOutputVisibilityAfterTheActivityStartsHidden" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="explicitStopEndsTheChromecastSessionWithoutResumingLocalPlayback" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="pipDismissalStopsLocalPlaybackWithEitherBackgroundPreference" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="previousRestartsTheCurrentVideoPastTheThreshold" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="autoplayPreferenceStopsServiceRequestsWithoutBreakingManualQueue" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="pausedOrReplacedPlaybackRejectsDelayedNativeAutoplay" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="endingAnInactiveHoldPreservesSpeedAndStoppingRestoresAnActiveHoldOnce" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="contentPullPreservesOrientationWhileTheButtonKeepsItsNormalBehavior" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="aDepartingShortsHostCannotPauseTheNewWatchSession" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="aDragCommitFromThePreviousOwnerNeverReachesTheNewQueue" classname="com.hhst.youtubelite.player.PlayerViewModelTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

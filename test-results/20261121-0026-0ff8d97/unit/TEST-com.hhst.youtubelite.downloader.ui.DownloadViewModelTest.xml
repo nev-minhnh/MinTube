@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:57" hostname="MINHNH-LAPTOP" time="0.041">
+  <properties/>
+  <testcase name="failedAsset_exposesReasonEvenWhenVideoWasPublished" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" time="0.007"/>
+  <testcase name="observeDownloads_hidesRemoved" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" time="0.004"/>
+  <testcase name="connectionSettingUpdatesBothTheSavedAndLivePerHostBudget" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" time="0.001"/>
+  <testcase name="progress_ignoresUnusedMuxedInputAndUnknownSidecars" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" time="0.008"/>
+  <testcase name="observeApis_mapPersistedState" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelTest" time="0.02"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

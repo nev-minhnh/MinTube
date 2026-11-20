@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.core.MarkupTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:51" hostname="MINHNH-LAPTOP" time="0.001">
+  <properties/>
+  <testcase name="xml_escapesMarkupSensitiveCharacters" classname="com.hhst.youtubelite.core.MarkupTest" time="0.001"/>
+  <testcase name="jsString_quotesAndEscapes" classname="com.hhst.youtubelite.core.MarkupTest" time="0.0"/>
+  <testcase name="html_alsoEscapesApostrophe" classname="com.hhst.youtubelite.core.MarkupTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

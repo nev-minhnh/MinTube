@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.QueueRepositoryTest" tests="32" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:01" hostname="MINHNH-LAPTOP" time="0.037">
+  <properties/>
+  <testcase name="load_deduplicatesPersistedVideoIds" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="legacyGlobalQueueFallsBackToTheDeviceOwnerOnly" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="switchingBetweenEmptyQueuesStillPublishesTheNewOwner" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.006"/>
+  <testcase name="add_stillAppendsAtTheTailAfterAddNext" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="nextStrict_stopsAtTail_previous_nullAtHead" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="add_capsAtMaxItems" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.003"/>
+  <testcase name="addNext_isCapacityBoundedAndKeepsThePlayingItem" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.007"/>
+  <testcase name="add_rejectsUnparseable" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="addNext_withoutAQueuedPlayingItem_landsAtTheHead" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="activate_restoresEachOwnerOwnQueue" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.002"/>
+  <testcase name="upsertPlaying_mergesAndCaps" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="move_reorders" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="load_keepsEnabledWhenItemsKeyMissing" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="nullOwnerTokenAppliesToTheActiveOwner" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="aLateWriteFromAPreviousOwnerIsDropped" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="add_canonicalizesUrlAndThumbnail" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="random_excludesCurrent" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="upsertPlaying_capsAtMaxItems" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.003"/>
+  <testcase name="sameVideoInTwoOwnersStaysIsolated" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="stateRestored_fromCache" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="playNextAnchorIsPerOwner" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.002"/>
+  <testcase name="addNext_keepsThePlayingItemAndNeverDuplicatesIt" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="firstPerOwnerSaveStopsTheLegacyFallback" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="load_discardsNullEntriesAndNormalizesNullFields" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="nextStrict_nullWhenSingleItem_firstWhenCurrentMissing" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="sameOwnerActivationKeepsStateWithoutReload" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="eachOwnerQueueSurvivesRestart" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="add_doesNotEvictPlayingItem" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.003"/>
+  <testcase name="addNext_movesAnAlreadyQueuedItemInsteadOfDuplicating" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="enabledFlagIsPerOwner" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.001"/>
+  <testcase name="addNext_insertsDirectlyAfterThePlayingItem" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <testcase name="add_remove_persisted" classname="com.hhst.youtubelite.player.QueueRepositoryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.comments.CommentsViewModelTest" tests="30" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:42" hostname="MINHNH-LAPTOP" time="0.139">
+  <properties/>
+  <testcase name="disabledAndEmptyAndErrorStatesAreDistinct" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.006"/>
+  <testcase name="firstPageLoadsTheLocalFixture" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="postAuthorizationKeepsTheComposerDraftAndRefreshDoesNotSubmitIt" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.007"/>
+  <testcase name="ownerOnlyRowsOpenEditAndDeleteWithoutChangingTheFixture" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.006"/>
+  <testcase name="publicCommentsNeverExposeOwnerOnlyMenuRows" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <testcase name="threadAndReplyMenusKeepTheThreadAndCommentIdentitiesApart" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="toggleRepliesOnlyExpandsExistingThreads" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <testcase name="postingKeepsDraftUntilConfirmedAndRejectsDuplicateSubmission" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.005"/>
+  <testcase name="postSubmissionsRetainBothChannelAndPostIdentityAcrossRecreation" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <testcase name="explicitCommentInteractionDoesNotWaitForPlayback" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.007"/>
+  <testcase name="changingSortCancelsPaginationAndStartsWithTheNewFirstPage" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.005"/>
+  <testcase name="interactionsEmitTypedRequestsAndNeverChangeContent" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.011"/>
+  <testcase name="composerSubmitsTypedTextWithoutFakingAPostedComment" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.01"/>
+  <testcase name="authorizationRefreshPublishesLoadedPagesTogetherAndKeepsRepliesAndDraft" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="startupDefersCommentReadsUntilReleasedAndUsesTheCurrentVideo" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.002"/>
+  <testcase name="retryReloadsAfterFailure" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="newestSortRefetchesAndKeepsExpandedThreads" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="sortAndExpansionSurviveRecreation" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <testcase name="changingVideoCancelsPendingCommentWithoutChangingTheNewPanel" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="paginationAppendsPagesUntilTheFixtureEnds" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="newestSortFallsBackToTopWithANoticeWhenTheLaneIsMissing" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="submittingAfterPostAuthorizationWaitsForFreshActionTokens" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="paginationFailureKeepsTheLoadedPageAndRetryRecovers" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.002"/>
+  <testcase name="changingSessionDropsTheComposerDraftAndOldRestoreDepth" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.002"/>
+  <testcase name="recreatingTheModelRestoresLoadedPagesBeforePublishingTheList" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="selectingTheActiveSortDoesNotRefetch" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.005"/>
+  <testcase name="failedPostingPreservesEditorAndDraftAcrossRecreation" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.004"/>
+  <testcase name="aWriteCancelledByASessionSwitchCannotPublishStaleResults" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.006"/>
+  <testcase name="openMenuSurvivesSavedStateReconstruction" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <testcase name="closingTheMenuKeepsThePanelExpansionAndLoadedPages" classname="com.hhst.youtubelite.comments.CommentsViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

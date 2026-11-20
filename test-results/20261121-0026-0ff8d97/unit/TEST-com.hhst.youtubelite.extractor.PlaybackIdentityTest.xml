@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.PlaybackIdentityTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:58" hostname="MINHNH-LAPTOP" time="0.084">
+  <properties/>
+  <testcase name="deferredFallbackDoesNotReplayClientsThatAlreadyRefusedTheVideo" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.052"/>
+  <testcase name="anAccountSessionCannotBecomeTheDeviceVisitor" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.001"/>
+  <testcase name="directFormatsPreserveTheAnswersMediaReadinessWindow" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.003"/>
+  <testcase name="aBrowserAccountCannotInitializeTheAnonymousProfile" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.001"/>
+  <testcase name="aTransientPlayerDisconnectRetriesTheSameClientAndRequest" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.002"/>
+  <testcase name="catalogDiscoversDubsAfterPlaybackLearnedAnUnnamedHlsFallback" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.009"/>
+  <testcase name="anUnsupportedTransportContinuesTheQueueBeforeReturningAStream" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.002"/>
+  <testcase name="playbackDoesNotWaitForACatalogSupplement" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.004"/>
+  <testcase name="signedInVodStartsWithDirectFormatsBeforeTheWebTokenPath" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.002"/>
+  <testcase name="scriptTransportFailuresRetainTheirClassificationAndSafeCause" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.003"/>
+  <testcase name="resolutionFailureRetainsIdentityAndEveryClientOutcome" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.001"/>
+  <testcase name="anExistingIdentityBindsBothThePlayerRequestAndMediaToken" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.002"/>
+  <testcase name="webPlayerAndMediaUseTheSameCapturedBrowserUserAgent" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.001"/>
+  <testcase name="playbackWithoutAHomeVisitAdoptsTheCapturedAnonymousIdentity" classname="com.hhst.youtubelite.extractor.PlaybackIdentityTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

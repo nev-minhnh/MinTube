@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.cast.DlnaTransportTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:32" hostname="MINHNH-LAPTOP" time="8.455">
+  <properties/>
+  <testcase name="blankNamesFallBackAndNestedServicesStayWithTheirDevice" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.066"/>
+  <testcase name="unsupportedPositionInfoDoesNotBlockAPlayingRenderer" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.615"/>
+  <testcase name="soapFaultKeepsTheFailingActionAndDeviceError" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.015"/>
+  <testcase name="bufferingAloneDoesNotCountAsReadyAndReportsTheLastState" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.382"/>
+  <testcase name="commandXmlParseFailuresCarryTheActionStage" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.05"/>
+  <testcase name="transientSeekRejectionIsRetriedAndProgressComesFromTheRenderer" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.326"/>
+  <testcase name="setUriPlayAndSeekUseAdvertisedServiceAndPreserveEscaping" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.038"/>
+  <testcase name="aPlayingRendererIsNotResumedOrPausedAfterASeekFailure" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.039"/>
+  <testcase name="discoveryUsesCompleteCrLfAndValidatesLocationHeaders" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.005"/>
+  <testcase name="aFailedPausedSeekRestoresPauseAndKeepsTheSeekError" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.077"/>
+  <testcase name="cancellationClosesAnInFlightDescriptionRequest" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="1.017"/>
+  <testcase name="descriptionFailureIsRetriedInsteadOfCachingAnEmptyDevice" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.019"/>
+  <testcase name="playingDoesNotRequireDurationOrAnUnmodifiedTrackUri" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="3.761"/>
+  <testcase name="aRendererThatRejectsPausedSeekIsResumedAndPausedAgain" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.056"/>
+  <testcase name="malformedXmlKeepsTheStageEndpointAndHttpStatus" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.015"/>
+  <testcase name="everySoapCommandOpensANewConnectionForRenderersWithBrokenKeepAlive" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.032"/>
+  <testcase name="urlBaseAndAbsoluteServiceUrlsKeepTheirPorts" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.005"/>
+  <testcase name="externalEntitiesAndOversizedResponsesAreRejected" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.005"/>
+  <testcase name="waitsForTheNewTrackBeforeAllowingResumeSeekAndPause" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.563"/>
+  <testcase name="pauseIsRetriedWhenALateMediaOpenResumesTheRenderer" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="1.362"/>
+  <testcase name="namesNamespacesAndRelativeControlPathsAreParsed" classname="com.hhst.youtubelite.cast.DlnaTransportTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[[Fatal Error] :1:9: XML document structures must start and end within the same entity.
+[Fatal Error] :1:9: XML document structures must start and end within the same entity.
+[Fatal Error] :1:1: Premature end of file.
+[Fatal Error] :1:17: XML document structures must start and end within the same entity.
+[Fatal Error] :1:17: XML document structures must start and end within the same entity.
+]]></system-err>
+</testsuite>

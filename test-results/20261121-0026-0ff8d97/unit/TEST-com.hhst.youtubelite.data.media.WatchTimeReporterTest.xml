@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.WatchTimeReporterTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:12" hostname="MINHNH-LAPTOP" time="4.303">
+  <properties/>
+  <testcase name="anotherVideosSeekDoesNotMoveTheActiveWatchAnchor" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.005"/>
+  <testcase name="aBackwardSeekResetsTheRangeWithoutAZeroLengthReport" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.345"/>
+  <testcase name="switchingVideosFlushesTheObservedShortTailWithItsOwnNonce" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.004"/>
+  <testcase name="seekingBeforePlaybackDoesNotCreateAView" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.002"/>
+  <testcase name="missingAnonymousTrackingDisablesReporting" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.302"/>
+  <testcase name="privacyToggledMidSessionCancelsTheQueuedReport" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.044"/>
+  <testcase name="anAnonymousVisitorCanReportButPrivateBrowsingCannot" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.323"/>
+  <testcase name="pausingFlushesTheTailWithoutRepeatingIt" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.003"/>
+  <testcase name="aFailedAccountTrackingReadDoesNotFallBackToAnonymousEndpoints" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.003"/>
+  <testcase name="anonymousSuccessSignalsARefreshOnlyAfterAWatchedInterval" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.003"/>
+  <testcase name="anEndedShortReportsItsLastInterval" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.003"/>
+  <testcase name="aFailedTailRetriesAfterSwitchingToAnotherVideo" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.003"/>
+  <testcase name="failedReportsBackOffAndRecoverAfterABoundedProbeInterval" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.748"/>
+  <testcase name="anonymousSessionsDoNotReport" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.302"/>
+  <testcase name="trackingFromThePreviousIdentityCannotBeSentAfterSignOut" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.322"/>
+  <testcase name="shortIntervalsOnBothSidesOfASeekNeverIncludeTheSkippedSpan" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.004"/>
+  <testcase name="aForwardSeekReanchorsWithoutCountingTheSkippedSpan" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.345"/>
+  <testcase name="ticksReportWhilePlayingAndThrottleToTenSecondsOfProgress" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.344"/>
+  <testcase name="seekDuringBackoffReanchorsWithoutResettingTheRetryDeadline" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.004"/>
+  <testcase name="progressFromAnotherVideoCannotBeAttributedToThePreviousOne" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.301"/>
+  <testcase name="signedInPlaybackResolvesAccountTrackingOnceInsteadOfUsingAnonymousEndpoints" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.004"/>
+  <testcase name="pausedOrStoppedPlaybackDoesNotReport" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.625"/>
+  <testcase name="leavingPrivateModeDoesNotReportThePrivateInterval" classname="com.hhst.youtubelite.data.media.WatchTimeReporterTest" time="0.264"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

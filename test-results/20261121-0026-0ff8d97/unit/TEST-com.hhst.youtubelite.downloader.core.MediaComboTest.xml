@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.core.MediaComboTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:26" hostname="MINHNH-LAPTOP" time="0.119">
+  <properties/>
+  <testcase name="aacM4a_roundTripExtractMux" classname="com.hhst.youtubelite.downloader.core.MediaComboTest" time="0.085"/>
+  <testcase name="matrixMarksProvenCombosEnabled" classname="com.hhst.youtubelite.downloader.core.MediaComboTest" time="0.001"/>
+  <testcase name="avcAacMp4_roundTripExtractMux" classname="com.hhst.youtubelite.downloader.core.MediaComboTest" time="0.033"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

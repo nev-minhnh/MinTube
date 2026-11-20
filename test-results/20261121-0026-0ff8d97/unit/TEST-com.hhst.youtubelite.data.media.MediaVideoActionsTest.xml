@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaVideoActionsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:03" hostname="MINHNH-LAPTOP" time="1.113">
+  <properties/>
+  <testcase name="anAmbiguousUnsubscribeRequiresAnExplicitFalseState" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.277"/>
+  <testcase name="anAmbiguousVoteIsConfirmedByOneUncachedReadWithoutRepeatingTheWrite" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.011"/>
+  <testcase name="confirmedVotesAndSubscriptionsInvalidateBothWatchCacheLayers" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.017"/>
+  <testcase name="aMismatchedOrMissingVoteRemainsUnconfirmedWithSafeResponseDetails" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.782"/>
+  <testcase name="anExplicitConfirmationOrRefusalDoesNotTriggerReadback" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.009"/>
+  <testcase name="removingEitherRatingUsesTheNeutralEndpointAndConfirmsTheServerState" classname="com.hhst.youtubelite.data.media.MediaVideoActionsTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

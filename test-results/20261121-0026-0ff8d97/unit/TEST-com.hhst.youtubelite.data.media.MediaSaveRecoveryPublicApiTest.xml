@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:00" hostname="MINHNH-LAPTOP" time="1.055">
+  <properties/>
+  <testcase name="anUnrecognizedEmptyLibraryDoesNotAuthorizeRepeatingTheSave" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.258"/>
+  <testcase name="anExistingWatchLaterMembershipSkipsTheAppend" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.006"/>
+  <testcase name="aFreshOldMembershipAfterAnAmbiguousAddDoesNotAuthorizeAnotherAppend" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.256"/>
+  <testcase name="aDisconnectedPreflightDoesNotSpendTheFirstAppendAttempt" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.003"/>
+  <testcase name="aLibrarySaveIsConfirmedByAFreshSecondPageWithoutAnotherWrite" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.004"/>
+  <testcase name="aPlaylistCreationWithALostReplyIsNeverCreatedAgain" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.01"/>
+  <testcase name="anUnknownMembershipFlagCannotConfirmRemoval" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.256"/>
+  <testcase name="aMissingPlaylistOptionDoesNotConfirmRemoval" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.257"/>
+  <testcase name="anAmbiguousAddCanBeConfirmedByFreshMembershipWithoutAppendingAgain" classname="com.hhst.youtubelite.data.media.MediaSaveRecoveryPublicApiTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 21, 2026 12:30:00 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[7166] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:52" hostname="MINHNH-LAPTOP" time="0.213">
+  <properties/>
+  <testcase name="muxAacM4aFromTransferredInput" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.045"/>
+  <testcase name="fileReaderPreservesEverySampleWithoutRetainingPayloads" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.022"/>
+  <testcase name="gatedCodec_isRejectedWithReason" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.023"/>
+  <testcase name="enospc_isReportedWithoutMux" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.006"/>
+  <testcase name="avDesyncAboveTwoSeconds_isRejected" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.0"/>
+  <testcase name="muxAvcAacFromTransferredInputs" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.049"/>
+  <testcase name="fileLargerThanAndroidHeapMuxesWithoutReadingWholeFile" classname="com.hhst.youtubelite.downloader.io.DownloadFinalizerImplTest" time="0.067"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

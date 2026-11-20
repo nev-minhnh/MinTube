@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:18" hostname="MINHNH-LAPTOP" time="2.554">
+  <properties/>
+  <testcase name="segmentsRotateAndActiveFilesSurviveOtherOwnersCleanup" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.053"/>
+  <testcase name="deadlineDoesNotWaitForeverForCrossProcessQuotaLock" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.057"/>
+  <testcase name="malformedAndOverlongRowsAreCountedAndV2IsRedactedAgain" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.044"/>
+  <testcase name="diskFailureIsVisibleAndDoesNotEraseExistingFiles" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.003"/>
+  <testcase name="archiveIsParseableSortedAndContainsLineProvenance" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.022"/>
+  <testcase name="quotaStaysBoundedAndSegmentsStayUnder512KiB" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="2.354"/>
+  <testcase name="legacyFilesDoNotCollideAndPayloadsAreRemovedReadOnly" classname="com.hhst.youtubelite.diagnostics.DiagnosticArchiveTest" time="0.021"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

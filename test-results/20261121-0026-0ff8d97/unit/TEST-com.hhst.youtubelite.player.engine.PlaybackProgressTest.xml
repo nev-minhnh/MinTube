@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.engine.PlaybackProgressTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:01" hostname="MINHNH-LAPTOP" time="0.004">
+  <properties/>
+  <testcase name="resolveStartMs_explicitZeroBeatsRemembered_andClampsPastEnd" classname="com.hhst.youtubelite.player.engine.PlaybackProgressTest" time="0.001"/>
+  <testcase name="localProgressKeysAreIsolatedByAccountAndDelegatedChannel" classname="com.hhst.youtubelite.player.engine.PlaybackProgressTest" time="0.002"/>
+  <testcase name="write_clearsOnEndedOrNearEnd_savesMidRoll" classname="com.hhst.youtubelite.player.engine.PlaybackProgressTest" time="0.001"/>
+  <testcase name="remoteProgressOverridesLocalButExplicitLinksRemainAuthoritative" classname="com.hhst.youtubelite.player.engine.PlaybackProgressTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

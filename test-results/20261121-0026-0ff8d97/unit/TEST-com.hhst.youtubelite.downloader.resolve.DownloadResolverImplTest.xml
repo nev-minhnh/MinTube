@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:57" hostname="MINHNH-LAPTOP" time="0.065">
+  <properties/>
+  <testcase name="liveResolve_failsWithDistinctReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.006"/>
+  <testcase name="poTokenRefresh_concurrentComponentsShareOneRefresh" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.004"/>
+  <testcase name="resolve_retryKeepsExplicitQuality" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.007"/>
+  <testcase name="changingSessionDoesNotReuseThePreviousRecoveryCatalog" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.003"/>
+  <testcase name="resolveCancel_doesNotCancelSharedParse" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.007"/>
+  <testcase name="resolve_writesMimeAndExpectedBytes" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.01"/>
+  <testcase name="cancelDownloadWait_doesNotCancelSharedParse" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.006"/>
+  <testcase name="extractionFailure_exposesActualCauseInDownloadRow" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.007"/>
+  <testcase name="unknownMediaLength_doesNotUseBitrateEstimateOrPreviousLength" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.005"/>
+  <testcase name="identityMismatch_afterUrlRefresh_marksRedownload" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverImplTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

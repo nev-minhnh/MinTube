@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:20" hostname="MINHNH-LAPTOP" time="5.083">
+  <properties/>
+  <testcase name="ringRespectsAgeCountAndByteCaps" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="5.04"/>
+  <testcase name="loggingFailureStillCallsTheOriginalCrashHandler" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="repeatedWarningsFlushAfterTenSecondsAndAtOperationEnd" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="childEndDoesNotCloseItsParentIncident" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.002"/>
+  <testcase name="largeRowsAreTruncatedAndCounted" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.013"/>
+  <testcase name="processFailureKeepsAllActiveModuleContexts" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="operationHasExactlyOneTerminalEvenAfterCancellationAndFinally" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="sharedExtractionJoinRetainsTheWorkersPrehistory" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="contextAndFieldTypesSurviveChildrenAndSerialization" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.0"/>
+  <testcase name="thousandsOfSuccessfulChildRequestsProduceOneAggregate" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.016"/>
+  <testcase name="incidentKeepsRelatedPrehistorySnapshotAndBoundedFollowup" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="queueRetainsReservedFailuresAndCountsOverflow" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <testcase name="repeatedCauseUsesOneErrorIdAndOneStack" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.004"/>
+  <testcase name="priorityEvictsOrdinaryBytesBeforeBeingDropped" classname="com.hhst.youtubelite.diagnostics.DiagnosticRecorderTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

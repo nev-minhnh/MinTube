@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.shorts.RecentCommentsViewModelTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:02" hostname="MINHNH-LAPTOP" time="0.012">
+  <properties/>
+  <testcase name="reopeningRetainsTheLoadedModelAndEvictionReleasesTheOldestScope" classname="com.hhst.youtubelite.shorts.RecentCommentsViewModelTest" time="0.009"/>
+  <testcase name="unchangedSessionsRetainContentAndChangedSessionsRefreshIt" classname="com.hhst.youtubelite.shorts.RecentCommentsViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.comments.CommentWriteContinuityTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:42" hostname="MINHNH-LAPTOP" time="0.072">
+  <properties/>
+  <testcase name="togglingAReplyChangesOnlyThatReplyAndNeverReadsTheThreadAgain" classname="com.hhst.youtubelite.comments.CommentWriteContinuityTest" time="0.033"/>
+  <testcase name="deletionAndEditingPreserveOtherThreadsAndCursors" classname="com.hhst.youtubelite.comments.CommentWriteContinuityTest" time="0.007"/>
+  <testcase name="serverCreatedCommentsAndRepliesAreInsertedWithoutDiscardingExistingPages" classname="com.hhst.youtubelite.comments.CommentWriteContinuityTest" time="0.007"/>
+  <testcase name="ratingKeepsAllPagesExpandedRepliesAndConcurrentPaginationWithoutAnyLoadingTransition" classname="com.hhst.youtubelite.comments.CommentWriteContinuityTest" time="0.013"/>
+  <testcase name="failedRatingLeavesTheExactContentAndExpandedStateInPlace" classname="com.hhst.youtubelite.comments.CommentWriteContinuityTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

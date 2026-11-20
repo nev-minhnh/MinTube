@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.channel.ChannelLoadingStabilityTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:42" hostname="MINHNH-LAPTOP" time="0.033">
+  <properties/>
+  <testcase name="livePaginationAdvancesTheScreenCursorAndStopsAtTheEnd" classname="com.hhst.youtubelite.channel.ChannelLoadingStabilityTest" time="0.005"/>
+  <testcase name="emptyPagesWithChangingCursorsStayResumableAndAutomaticLoadingIsBounded" classname="com.hhst.youtubelite.channel.ChannelLoadingStabilityTest" time="0.014"/>
+  <testcase name="anObsoleteSearchAppendCannotChangeNewResultsOrTheirLoadingState" classname="com.hhst.youtubelite.channel.ChannelLoadingStabilityTest" time="0.009"/>
+  <testcase name="repeatedVideoCursorCannotCreateAnAutomaticRequestLoop" classname="com.hhst.youtubelite.channel.ChannelLoadingStabilityTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

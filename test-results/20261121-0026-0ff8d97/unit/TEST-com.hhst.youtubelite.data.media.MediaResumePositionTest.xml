@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaResumePositionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:00" hostname="MINHNH-LAPTOP" time="0.016">
+  <properties/>
+  <testcase name="accountProgressUsesAFreshReadAndPreservesZeroAsARealPosition" classname="com.hhst.youtubelite.data.media.MediaResumePositionTest" time="0.013"/>
+  <testcase name="anonymousAndFixturePlaybackDoNotMakeAccountProgressRequests" classname="com.hhst.youtubelite.data.media.MediaResumePositionTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

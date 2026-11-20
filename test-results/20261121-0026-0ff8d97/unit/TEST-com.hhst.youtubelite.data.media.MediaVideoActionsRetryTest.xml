@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:01" hostname="MINHNH-LAPTOP" time="2.136">
+  <properties/>
+  <testcase name="aNewAccountDoesNotWaitForTheOldAccountsNonCooperativeHttpCall" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.012"/>
+  <testcase name="changingAccountsDuringConfirmationCannotRetryUnderTheNewIdentity" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.004"/>
+  <testcase name="aNewerIntentSupersedesAnOldRetryAcrossCallers" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.256"/>
+  <testcase name="anOldLateConfirmationCannotInvalidateTheNewIntentsCache" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.006"/>
+  <testcase name="exhaustedOldStateStaysUnconfirmedWithBoundedAttempts" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.508"/>
+  <testcase name="anUnknownReadbackIsNotTreatedAsAnExplicitOldState" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.257"/>
+  <testcase name="aDelayedVisibleChangeSettlesBeforeAnyBusinessResend" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.255"/>
+  <testcase name="anAmbiguousTransportWriteReadsBeforeDecidingWhetherToResend" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.257"/>
+  <testcase name="responseSizePolicyErrorsNeverBecomeRetryableTransportFailures" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.05"/>
+  <testcase name="cancellationDoesNotRetryOrInvalidateAnAmbiguousWrite" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.009"/>
+  <testcase name="oneBusinessRetryCanSetEitherDesiredStateWithoutHttpReplay" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.513"/>
+  <testcase name="explicitRefusalRateLimitAndTrafficChallengeStaySingleAttempt" classname="com.hhst.youtubelite.data.media.MediaVideoActionsRetryTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

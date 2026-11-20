@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.AudioCatalogSupplementTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:00" hostname="MINHNH-LAPTOP" time="0.018">
+  <properties/>
+  <testcase name="extraChoicesOnlyReturnsRowsTheMenuDoesNotShowYet" classname="com.hhst.youtubelite.player.AudioCatalogSupplementTest" time="0.017"/>
+  <testcase name="extraChoicesIsEmptyWhenThePoolAddsNothing" classname="com.hhst.youtubelite.player.AudioCatalogSupplementTest" time="0.0"/>
+  <testcase name="needsSupplementOnlyWhenTheCurrentPoolCannotSatisfyThePick" classname="com.hhst.youtubelite.player.AudioCatalogSupplementTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

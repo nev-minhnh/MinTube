@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.io.PublishedStreamIntegrityTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:53" hostname="MINHNH-LAPTOP" time="0.007">
+  <properties/>
+  <testcase name="aSameLengthCorruptionFailsVerification" classname="com.hhst.youtubelite.downloader.io.PublishedStreamIntegrityTest" time="0.002"/>
+  <testcase name="truncatedAndOverlongStreamsFailEvenWithoutAChecksum" classname="com.hhst.youtubelite.downloader.io.PublishedStreamIntegrityTest" time="0.001"/>
+  <testcase name="overlongStreamsStopWithoutReadingTheWholeResource" classname="com.hhst.youtubelite.downloader.io.PublishedStreamIntegrityTest" time="0.002"/>
+  <testcase name="completeContentMatchesItsLengthAndChecksum" classname="com.hhst.youtubelite.downloader.io.PublishedStreamIntegrityTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

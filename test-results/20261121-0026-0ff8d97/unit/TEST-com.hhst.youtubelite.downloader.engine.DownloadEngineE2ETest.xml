@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.engine.DownloadEngineE2ETest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:26" hostname="MINHNH-LAPTOP" time="25.089">
+  <properties/>
+  <testcase name="audioOnly_muxesM4a" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineE2ETest" time="0.174"/>
+  <testcase name="attachmentFailure_isPartialAndRetryFailedOnly" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineE2ETest" time="0.153"/>
+  <testcase name="singleVideo_downloadResumeFinish_publishedUriOpenable" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineE2ETest" time="24.762"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

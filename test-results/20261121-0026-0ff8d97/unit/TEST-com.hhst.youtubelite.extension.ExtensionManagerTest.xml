@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extension.ExtensionManagerTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:57" hostname="MINHNH-LAPTOP" time="0.005">
+  <properties/>
+  <testcase name="setEnabled_sameValue_doesNotBumpVersion" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="usesPreferencesPrefixInStore" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="setEnabled_persistsAndRoundTrips" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="migratesLegacyGestureMasterSwitch" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="zeroHapticsNeverTouchesThePlatformVibrator" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.002"/>
+  <testcase name="importPreferences_appliesValuesAndHapticStrength" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.001"/>
+  <testcase name="seedsDefaultsOnFirstLaunch" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="resetToDefault_restoresAllAndBumpsVersion" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="resetToDefault_notifiesOnceWithWildcard" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.001"/>
+  <testcase name="allPreferences_containsEveryDefaultKey" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="numericHaptics_defaultsClampPersistAndResetWithoutChangingBooleanApi" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="unknownKey_defaultsToFalse" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <testcase name="setEnabled_change_bumpsVersion" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.001"/>
+  <testcase name="doesNotOverwriteExistingGestureKeysOnMigration" classname="com.hhst.youtubelite.extension.ExtensionManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

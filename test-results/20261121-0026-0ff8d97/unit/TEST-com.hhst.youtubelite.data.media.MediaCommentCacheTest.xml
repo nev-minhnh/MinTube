@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaCommentCacheTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:53" hostname="MINHNH-LAPTOP" time="0.067">
+  <properties/>
+  <testcase name="aPageAlreadyInFlightCannotRestoreDeletedCommentCapabilities" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.023"/>
+  <testcase name="commentPagesKeepAllActionCapabilitiesBeyondThePostCacheLimit" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.012"/>
+  <testcase name="failedWritesKeepTheConfirmedCountSnapshot" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.006"/>
+  <testcase name="anOldWorkerCannotReplaceANewerSessionsCommentCapabilities" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.006"/>
+  <testcase name="aPartialRepeatedParentAddsRatingActionsWithoutLosingCountsReplyOrDeleteCapabilities" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.008"/>
+  <testcase name="aLaterStaleReadCannotChangeTheDisplayedUnlikeIntentOrMixCountSnapshots" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.006"/>
+  <testcase name="olderPagesCannotReplaceNewerCommandTokens" classname="com.hhst.youtubelite.data.media.MediaCommentCacheTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

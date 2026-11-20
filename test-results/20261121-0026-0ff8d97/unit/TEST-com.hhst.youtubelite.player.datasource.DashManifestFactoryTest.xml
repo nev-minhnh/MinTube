@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:01" hostname="MINHNH-LAPTOP" time="0.01">
+  <properties/>
+  <testcase name="buildVideoPool_nullItag_fallsBackToUniqueIds" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.003"/>
+  <testcase name="build_escapesUrlAmpersands" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="build_missingRanges_throws" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.004"/>
+  <testcase name="buildVideoPool_groupsRepresentationsPerMime" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.001"/>
+  <testcase name="build_validFormat_containsRequiredElements" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="buildVideoPool_rangelessFormat_throws" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.001"/>
+  <testcase name="build_audioFormat_includesAudioConfig" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="codecParametersDoNotSplitAdaptiveResolutionsIntoFixedTracks" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="build_fallbackDuration_usedWhenApproxUnknown" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.001"/>
+  <testcase name="buildVideoPool_emptyPool_throws" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="build_unknownVideoBitrate_usesHeightEstimate" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <testcase name="hasDashRanges_rejectsZeroDefaults" classname="com.hhst.youtubelite.player.datasource.DashManifestFactoryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

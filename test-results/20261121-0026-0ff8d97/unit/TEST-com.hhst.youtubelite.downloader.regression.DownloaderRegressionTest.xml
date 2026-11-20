@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:56" hostname="MINHNH-LAPTOP" time="0.102">
+  <properties/>
+  <testcase name="deleteFailure_keepsRecordVisible" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.002"/>
+  <testcase name="estimateWithoutClen_isNotTreatedAsTrustedLength" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.001"/>
+  <testcase name="systemWaitingTask_canBeExplicitlyResumed" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.002"/>
+  <testcase name="api33BatchSubmission_doesNotReplaceItsOwnWorkerPerItem" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.002"/>
+  <testcase name="interruptedPublish_isRecoveredByPublishIdWithoutOrphan" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.02"/>
+  <testcase name="fullResponse_shorterThanTrustedLength_doesNotSucceed" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.02"/>
+  <testcase name="missingSubtitle_doesNotBlockValidVideo" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.006"/>
+  <testcase name="partialCompletion_offersRetry" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.002"/>
+  <testcase name="batchFinalizer_doesNotProcessAnItemStillTransferring" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.014"/>
+  <testcase name="resumeWithChangedMedia_doesNotReusePreviousObjectChunks" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.023"/>
+  <testcase name="networkRecovery_hasExecutableWorkAfterUidtEnded" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.003"/>
+  <testcase name="resolver_preservesUserFilename" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.005"/>
+  <testcase name="explicitQuality_doesNotSilentlyFallBack" classname="com.hhst.youtubelite.downloader.regression.DownloaderRegressionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

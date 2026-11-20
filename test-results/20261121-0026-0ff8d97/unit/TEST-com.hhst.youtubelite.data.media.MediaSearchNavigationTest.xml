@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:01" hostname="MINHNH-LAPTOP" time="0.058">
+  <properties/>
+  <testcase name="anUnprovenRetainedSelectionCannotReuseThePanel" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.008"/>
+  <testcase name="resetsAndTwoGroupChangesKeepTheColdSearchRecipe" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.005"/>
+  <testcase name="aMissingRetainedGroupCannotProveThatTheDefaultSelectionIsPreserved" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.003"/>
+  <testcase name="queryExpiryAndEveryRequestIdentityDimensionPreventPanelReuse" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.028"/>
+  <testcase name="changingOneFilterUsesItsCurrentCumulativeEndpointAndPreservesTheOtherGroup" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.005"/>
+  <testcase name="oauthTokenRotationPreservesTheSameProfileButAnAnonymousAuthFallbackDoesNot" classname="com.hhst.youtubelite.data.media.MediaSearchNavigationTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

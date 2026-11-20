@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.ui.DownloadFileShareTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:57" hostname="MINHNH-LAPTOP" time="0.01">
+  <properties/>
+  <testcase name="shareIntent_grantsReadViaClipData" classname="com.hhst.youtubelite.downloader.ui.DownloadFileShareTest" time="0.001"/>
+  <testcase name="invalidUri_isNotOpenable" classname="com.hhst.youtubelite.downloader.ui.DownloadFileShareTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

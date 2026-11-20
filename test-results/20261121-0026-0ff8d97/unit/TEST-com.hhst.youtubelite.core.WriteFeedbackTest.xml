@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.core.WriteFeedbackTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:51" hostname="MINHNH-LAPTOP" time="0.043">
+  <properties/>
+  <testcase name="alreadyCancelledScopesDoNotLeaveProgressStuck" classname="com.hhst.youtubelite.core.WriteFeedbackTest" time="0.006"/>
+  <testcase name="overlappingWritesKeepProgressUntilBothFinish" classname="com.hhst.youtubelite.core.WriteFeedbackTest" time="0.029"/>
+  <testcase name="cancellationOfAnOldWriteCannotHideANewerWrite" classname="com.hhst.youtubelite.core.WriteFeedbackTest" time="0.004"/>
+  <testcase name="retiringASessionClearsItsProgressWithoutHidingTheNextSessionsWrite" classname="com.hhst.youtubelite.core.WriteFeedbackTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

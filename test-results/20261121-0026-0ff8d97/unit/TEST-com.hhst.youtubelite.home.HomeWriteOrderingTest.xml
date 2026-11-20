@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.home.HomeWriteOrderingTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:00" hostname="MINHNH-LAPTOP" time="0.05">
+  <properties/>
+  <testcase name="appendingWaitsForFeedbackAndKeepsTheConfirmedRemovalAndCursor" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.005"/>
+  <testcase name="aFailedQueuedRefreshKeepsTheConfirmedRemoval" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.003"/>
+  <testcase name="changingAccountDoesNotWaitForOrPublishAnOldNonCancellableFailure" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.007"/>
+  <testcase name="feedbackWaitsForTheEarlierAppendBeforeRemovingTheCard" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.005"/>
+  <testcase name="recreatedSaveSheetKeepsOnlyAnUnsubmittedPlaylistDraft" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.016"/>
+  <testcase name="openingAnotherSaveSheetDoesNotCancelWatchLater" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.006"/>
+  <testcase name="leavingAndReturningToAFilterDoesNotReviveItsOldMutationOwner" classname="com.hhst.youtubelite.home.HomeWriteOrderingTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

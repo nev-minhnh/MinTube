@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.search.SearchResultsViewModelTest" tests="41" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:02" hostname="MINHNH-LAPTOP" time="0.115">
+  <properties/>
+  <testcase name="liveSubscribeWritesThroughTheServerAndUpdatesTheState" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.008"/>
+  <testcase name="paginationAppendsUniqueResultsAndRetriesWithoutReplacingTheList" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="pinnedScenariosDoNotCallTheRepository" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="inlineFiltersStayOpenUnderMenusAndSearch" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="querySurvivesSavedStateReconstruction" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.001"/>
+  <testcase name="ordinaryEntryLoadsTheLocalResultsForTheSubmittedQuery" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="channelAvatarEmitsTheChannelRequest" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="narrowLandscapeAndSquareWindowsKeepTheirOwnGeometry" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.001"/>
+  <testcase name="liveMenuSaveToPlaylistOpensTheSheetWithChoices" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.004"/>
+  <testcase name="stackedLockupMatchesTheSampledPhoneAndTabletAnchors" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.0"/>
+  <testcase name="channelsTypeLoadsChannelCardsAndSubscriptionKeepsTypedIdentity" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.004"/>
+  <testcase name="resultsColumnIsCappedAtTheSampledWideColumn" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.001"/>
+  <testcase name="editingSurvivesReconstructionAndDoesNotSearchUntilSubmitted" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="liveNotInterestedRemovesOnlyTheTargetCard" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.007"/>
+  <testcase name="failedRequestKeepsLoadingOutAndRetryRecovers" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.004"/>
+  <testcase name="filterMenuAndSearchOverlaysRestoreThroughSavedState" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="changedSessionReloadsResultsWithoutLosingQueryOrFilters" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="emptyReplyIsItsOwnStateAndNotAFailure" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="listLockupMatchesTheSampledWideAnchors" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.0"/>
+  <testcase name="aMenuCapturedByAnotherSessionIsNeverReadOrWritten" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="resultClickEmitsOnlyTheWatchRequest" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="changingQueryCancelsMetadataAndAllowsTheSameVideoToBeEnrichedAgain" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.004"/>
+  <testcase name="chromeControlsEmitTypedRequestsWithoutSimulatingSuccess" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.005"/>
+  <testcase name="changingQueryCancelsOldPaginationAndPreservesTheNewResults" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="liveMenuReadsTheCardsOwnEndpointAndWritesBackItsCapabilities" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="itemMenuShareExitsAndOtherRowsStayTypedRequests" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.004"/>
+  <testcase name="pagingKeepsMetadataThatArrivesWhileTheNextPageIsPending" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="subscriptionProgressClearsOnFailureAndPreservesConfirmedMembership" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="liveFeedbackRemovesTheCardAndOnlyItsOwnChannelCards" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="failedMenuReadOffersRetryAndRecoveryClearsIt" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="restoredEmptyStateUsesTheRestoredQuery" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.0"/>
+  <testcase name="fixtureKeepsEnglishMetadataAndLocalArtwork" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.001"/>
+  <testcase name="sampledSessionUsesTheSignedInPivotBar" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.0"/>
+  <testcase name="uploadDateAppliesImmediatelyAndReloadsWithTheFilter" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="failedLiveSubscribeKeepsTheStateAndNotifies" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <testcase name="singleTopIntentWithAnotherQueryReloadsTheLocalPage" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="listLockupFollowsTheSampledLandscapeRule" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.001"/>
+  <testcase name="liveMenuWithoutCapturedTokensNeverWritesFeedback" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.005"/>
+  <testcase name="optionalMetadataIsBoundedAndDoesNotBlockResults" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.005"/>
+  <testcase name="signedInRecoveryWithinTheGenerationDoesNotRestartThePendingSearch" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.002"/>
+  <testcase name="liveMenuWatchLaterWritesThroughTheSaveSheet" classname="com.hhst.youtubelite.search.SearchResultsViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaPostActionsTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:59" hostname="MINHNH-LAPTOP" time="0.601">
+  <properties/>
+  <testcase name="aReadStartedBeforeConfirmationCannotReplaceTheConfirmedCommandTokens" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.007"/>
+  <testcase name="missingWebAuthorizationDoesNotSendAMutation" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.004"/>
+  <testcase name="expiredWebCookiesOfferAuthorizationInsteadOfSendingAnEmptyCommand" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.005"/>
+  <testcase name="failedWritesDoNotAdvanceTheCountSnapshot" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.004"/>
+  <testcase name="aStalePostReadCannotTurnAnUnlikeIntoAnotherLike" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.004"/>
+  <testcase name="stalePollReadsCannotTurnAnExplicitDeselectIntoAnotherSelect" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.005"/>
+  <testcase name="postCommentsCanBeCreatedRepliedToRatedAndDeletedWithTheSameWebIdentity" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.006"/>
+  <testcase name="commandCacheRetainsTheMostRecentlyUsed32Posts" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.018"/>
+  <testcase name="olderReadsCannotReplaceNewerCapabilitiesOrRecreateAnEvictedEntry" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.021"/>
+  <testcase name="likesTogglesAndPollVotesUseAuthorizedServerCommands" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.006"/>
+  <testcase name="aDifferentSessionMustLoadItsOwnCommandTokens" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.005"/>
+  <testcase name="anUnconfirmedPostMutationRemainsAFailureAfterOneBoundedRecovery" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.51"/>
+  <testcase name="anOldWorkerEnteringAfterANewSessionCannotResetTheNewCache" classname="com.hhst.youtubelite.data.media.MediaPostActionsTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

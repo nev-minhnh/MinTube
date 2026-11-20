@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.comments.CommentTextTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:42" hostname="MINHNH-LAPTOP" time="0.022">
+  <properties/>
+  <testcase name="timestampsNavigateToTheCurrentVideoWithoutChangingText" classname="com.hhst.youtubelite.comments.CommentTextTest" time="0.007"/>
+  <testcase name="structuredStylesAndTargetsSurviveFallbackLinkParsing" classname="com.hhst.youtubelite.comments.CommentTextTest" time="0.005"/>
+  <testcase name="externalLinksDoNotLinkifyEmbeddedTimesOrAcceptCredentials" classname="com.hhst.youtubelite.comments.CommentTextTest" time="0.002"/>
+  <testcase name="onlyMatchingVodTimestampsSeekAndPositionsStayBounded" classname="com.hhst.youtubelite.comments.CommentTextTest" time="0.006"/>
+  <testcase name="mismatchedServerRunsFallBackToTheActualBody" classname="com.hhst.youtubelite.comments.CommentTextTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

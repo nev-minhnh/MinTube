@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.library.LibraryViewModelTest" tests="33" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:31:00" hostname="MINHNH-LAPTOP" time="0.109">
+  <properties/>
+  <testcase name="youPageUndoIsDiscardedWhenTheAccountChanges" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.005"/>
+  <testcase name="deviceLaneRemovalSurfacesUndoAndRestoreReloadsTheStore" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="searchOverlayRestoresQueryAfterClose" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="collectionEmptiesAndOpensPlaylistIdentity" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="deviceIdentityCanReturnToASavedAccount" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="signedOutYouPageShowsTheSampledPromptWithoutLoading" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="accountChangesCloseOldLibrarySaveChoicesAndClearConfirmation" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.007"/>
+  <testcase name="collectionRefreshResetsAndCancelsAnInterruptedAppend" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="signOutKeepsTheDevicePageBackedContent" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="closeOverlayDisarmsTheClearConfirmation" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="clearHistoryRequiresConfirmationAndRefreshes" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="liveHistoryMenuWatchLaterAndSaveRunThroughTheSaveSheet" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.005"/>
+  <testcase name="historyRefreshResetsAndCancelsAnInterruptedAppend" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="queueIsAvailableWithoutAnAccount" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="youShelfMenuSavesAndRemovesThroughTheLiveSheet" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="historyMenuEmitsOneRequestAndCloses" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="youPageReportsFailedShelvesWithoutFailingTheAccount" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.001"/>
+  <testcase name="aFailedYouReadShowsFailureAndRetryRecovers" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="collectionAppendsPagesAndACountSwitchResets" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="unconfirmedRemovalKeepsTheEntryAndNotifies" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="loginRefreshesAndLogoutDiscardsPendingAccountContent" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="youPageLoadsSectionsAndEmitsTypedExits" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.005"/>
+  <testcase name="watchLaterExitFollowsTheSessionIdentity" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.005"/>
+  <testcase name="manageHistoryPausesAndResumesThroughTheServer" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="removalWithoutTokenNotifiesAndWritesNothing" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="selectingYourOwnTabDoesNotNavigateAway" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="historyAppendsPagesAndKeepsRowsOnFailure" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <testcase name="submittedSearchAndOpenOverlayRestoreWithoutExposingSignedOutContent" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="liveRemoveFromHistoryWritesTheTokenAndDropsTheEntry" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.004"/>
+  <testcase name="anIdentityChangeReloadsHistoryAndDropsTheStaleCursor" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="theAnonymousAccountMenuRoutesToSignInAndNeverToTheSwitcher" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.005"/>
+  <testcase name="historyUndoIsDiscardedWhenTheIdentityChanges" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.003"/>
+  <testcase name="historyEmptyAndErrorStatesStayTyped" classname="com.hhst.youtubelite.library.LibraryViewModelTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

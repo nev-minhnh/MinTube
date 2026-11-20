@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:30:09" hostname="MINHNH-LAPTOP" time="2.189">
+  <properties/>
+  <testcase name="progressFromAnotherVideoCannotBeAttributedToThePublishedOne" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.358"/>
+  <testcase name="oldMetadataDoesNotCreateHistoryForANewAnonymousIdentity" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.004"/>
+  <testcase name="pausedSamplesMissingSamplesAndStoppedMetadataRecordNothing" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.303"/>
+  <testcase name="pagePublishWithoutEndpointsDoesNotDisarmThePlaybackSession" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.058"/>
+  <testcase name="signedInPlaybackReportsWatchTimeButLeavesLocalHistoryAlone" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.343"/>
+  <testcase name="identitySwitchDuringPlaybackReadsFreshEndpointsBeforeReportingAgain" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.066"/>
+  <testcase name="detachAllowsAnIdentityRefreshWhenPlaybackReattaches" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.025"/>
+  <testcase name="privacyChangesBetweenSamplesStillBreakTheReportingInterval" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.043"/>
+  <testcase name="metadataCannotRearmThePreviousIdentitysEndpoints" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.024"/>
+  <testcase name="privateBrowsingReportsNothing" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.301"/>
+  <testcase name="aPlaybackBoundaryIncludesProgressAfterTheLastSamplerTick" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.023"/>
+  <testcase name="delayedPlaybackAndPageResponsesCannotReplaceTheCurrentIdentity" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.022"/>
+  <testcase name="playbackResponseEndpointsArmReportingWhenThePageCarriesNone" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.022"/>
+  <testcase name="incompletePageTrackingDoesNotReplaceThePlaybackEndpoints" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.044"/>
+  <testcase name="zeroDurationSamplesRecordWithoutProgress" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.021"/>
+  <testcase name="playbackReportsWithoutPageMetadataAndKeepsHistoryEmpty" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.023"/>
+  <testcase name="aLateIdentityRefreshCannotReplaceTheNextVideo" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.025"/>
+  <testcase name="playbackEndpointsTakePriorityOverASeparatePageResponse" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.023"/>
+  <testcase name="armedEndpointsDoNotLeakToAnotherVideo" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.301"/>
+  <testcase name="aFailedIdentityRefreshRetriesAfterTheBackoff" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.023"/>
+  <testcase name="clearingPageMetadataDoesNotDisarmAnActivePlayer" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.043"/>
+  <testcase name="missingEngineTrackingPreservesUsablePageEndpoints" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.049"/>
+  <testcase name="anonymousVisitorPlaybackReportsWatchTimeAndRecordsLocalHistory" classname="com.hhst.youtubelite.data.media.PlaybackWatchReportingTest" time="0.043"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

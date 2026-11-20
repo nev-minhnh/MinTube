@@ -8,7 +8,7 @@
 # device suite. Exit code is non-zero when any stage fails; the summary is written either way.
 set -uo pipefail
 
-AVD="mintube_phone"
+AVD="mintube_ci"  # dedicated to this script; agents must not boot it
 DEVICE=1
 while [[ $# -gt 0 ]]; do
   case "$1" in

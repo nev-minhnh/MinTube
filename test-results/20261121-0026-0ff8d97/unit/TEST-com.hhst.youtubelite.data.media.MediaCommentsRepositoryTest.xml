@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaCommentsRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-20T17:29:53" hostname="MINHNH-LAPTOP" time="0.042">
+  <properties/>
+  <testcase name="postingAfterChangingSortUsesTheInitialCreationTokenAndRequiresConfirmation" classname="com.hhst.youtubelite.data.media.MediaCommentsRepositoryTest" time="0.016"/>
+  <testcase name="aVideoReadWithoutCreationTokensCanSubmitExactlyOnce" classname="com.hhst.youtubelite.data.media.MediaCommentsRepositoryTest" time="0.015"/>
+  <testcase name="newestUsesTheOpeningSortKeyWithoutFetchingTopAndKeepsTheCreationToken" classname="com.hhst.youtubelite.data.media.MediaCommentsRepositoryTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
