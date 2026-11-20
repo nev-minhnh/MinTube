@@ -80,7 +80,9 @@ Build the instrumented test APK:
 ./gradlew :app:assembleDebugAndroidTest
 ```
 
-Instrumented tests use local fixtures by default. To run live-service read checks, pass `network=1` as an instrumentation runner argument. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Android workflow](.github/workflows/android.yml) for device testing and release verification, including R8 checks.
+Instrumented tests use local fixtures by default. To run live-service read checks, pass `network=1` as an instrumentation runner argument.
+
+MinTube runs every test locally. GitHub Actions only builds the APKs and publishes releases. `ci/local-test.sh` runs the unit tests, lint, the debug, release and R8 builds, and the offline emulator suite (`ci/device-suite.sh`). It writes the results to `test-results/<time>-<commit>/` (`SUMMARY.md`, JUnit XML, lint report, device suite output), and those results are committed with the code.
 
 </details>
 
