@@ -88,7 +88,7 @@ class WindowTransitionAndroidTest {
         compose.mainClock.advanceTimeBy(600)
         compose.runOnIdle {
             assertTrue("The destination must draw the collapse, not wait until it settles", ready)
-            assertTrue("The first displayed frame must not flash at the dock before expanding", firstReadyWidth!! > store.load().widthDp * density)
+            assertTrue("The first displayed frame must not flash at the dock before expanding", firstReadyWidth!! > MiniPlayerLayout.defaultWidthDp(390) * density)
             assertEquals(640, videoSurface!!.holder.surfaceFrame.width())
         }
         val waiting = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
@@ -97,11 +97,11 @@ class WindowTransitionAndroidTest {
         compose.mainClock.advanceTimeBy(128)
         val shrinking = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
         assertTrue(shrinking.width < 390*density)
-        assertTrue(shrinking.width > store.load().widthDp * density)
+        assertTrue(shrinking.width > MiniPlayerLayout.defaultWidthDp(390) * density)
         compose.runOnIdle { parentHeight = 560.dp }
         compose.mainClock.advanceTimeBy(32)
         val resized = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
-        assertTrue("Settling destination insets must not skip the remaining collapse", resized.width > store.load().widthDp * density)
+        assertTrue("Settling destination insets must not skip the remaining collapse", resized.width > MiniPlayerLayout.defaultWidthDp(390) * density)
         compose.mainClock.advanceTimeBy(400)
         compose.runOnIdle {
             assertEquals(1, surfaces)
@@ -109,7 +109,7 @@ class WindowTransitionAndroidTest {
             assertEquals(360, videoSurface!!.holder.surfaceFrame.height())
         }
         val settled = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
-        assertEquals(store.load().widthDp * density, settled.width, 2f)
+        assertEquals(MiniPlayerLayout.defaultWidthDp(390) * density, settled.width, 2f)
         compose.mainClock.autoAdvance = true
     }
 
@@ -340,11 +340,13 @@ class WindowTransitionAndroidTest {
 
     @Test fun inactivePipBoundsDoNotOverwriteMiniPlacement() {
         val store = MiniPlayerStore(com.hhst.youtubelite.core.PreferenceStore.of(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>(), "transition-placement").apply { clearAll() })
-        store.save(220, -180f, -150f)
+        store.writeLegacyPlacement(220, -180f, -150f)
         var mini by mutableStateOf(true)
         var pip by mutableStateOf(false)
+        var screenWidth = 0
         compose.setContent { AppTheme {
             val width = LocalConfiguration.current.screenWidthDp
+            screenWidth = width
             MiniPlayerWindow(width, 0, store, false, {}, mini = mini, fillsWindow = pip,
                 fullscreenSwipeEnabled = !pip, embeddedTopDp = 24, embeddedHeightDp = 200,
                 modifier = Modifier.size(if (pip) 160.dp else width.dp, if (pip) 90.dp else 600.dp)) {
@@ -352,20 +354,21 @@ class WindowTransitionAndroidTest {
             }
         } }
         compose.waitForIdle()
-        val saved = store.load()
+        // The legacy offset is dropped; the mini sits at the fixed bottom-start dock.
+        assertFalse(store.hasLegacyPlacement())
         val initial = compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot
+        val margin = MiniPlayerLayout.outerMarginDp(screenWidth) * compose.density.density
+        assertEquals(margin, initial.left, 1.5f)
         compose.runOnIdle { mini = false; pip = true }
         compose.waitForIdle()
-        assertEquals(saved, store.load())
         compose.runOnIdle { pip = false }
         compose.waitForIdle()
-        assertEquals(saved, store.load())
         compose.runOnIdle { mini = true }
         compose.waitForIdle()
         val restored = compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot
         assertEquals(initial.left, restored.left, 1f)
         assertEquals(initial.top, restored.top, 1f)
-        assertEquals(saved, store.load())
+        assertFalse(store.hasLegacyPlacement())
     }
 
     @Test fun fullscreenFollowsFingerAndCancelsWithoutReplacingSurface() {

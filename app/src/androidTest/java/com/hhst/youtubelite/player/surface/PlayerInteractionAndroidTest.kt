@@ -104,17 +104,19 @@ class PlayerInteractionAndroidTest {
         speed.assertDoesNotExist()
     }
 
+    // Fixed in-app mini (owner 2026-11-21): one bottom-start dock, default size, nothing persisted.
     @Test fun landscapeMiniResizesAndRemembersBothDocks() {
         compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         compose.waitForIdle()
         val kv = com.hhst.youtubelite.core.PreferenceStore.of(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>(), "followup-landscape-mini")
         kv.clearAll()
         val store = MiniPlayerStore(kv)
-        store.save(280, 0f, -50f)
+        store.writeLegacyPlacement(280, 0f, -50f)
         var handle: MiniPlayerHandle? = null
+        var screenWidth = 0
         compose.setContent {
             AppTheme {
-                val screenWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
+                screenWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
                 MiniPlayerWindow(screenWidth, 24, store, true, {}, onDismiss = {}, topInsetDp = 24) {
                     handle = LocalMiniPlayerHandle.current
                     Box(Modifier.fillMaxSize().testTag("mini-viewport"))
@@ -122,20 +124,22 @@ class PlayerInteractionAndroidTest {
             }
         }
         compose.waitForIdle()
+        assertFalse(store.hasLegacyPlacement())
+        val docked = compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot
+        val density = compose.density.density
+        assertEquals(MiniPlayerLayout.defaultWidthDp(screenWidth) * density, docked.width, 1.5f)
+        assertEquals(MiniPlayerLayout.outerMarginDp(screenWidth) * density, docked.left, 1.5f)
         compose.runOnIdle { handle!!.begin(); handle!!.pinchScale(1.2f); handle!!.end(true) }
         compose.waitForIdle()
-        assertEquals(336, store.load().widthDp)
+        assertEquals(docked, compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(-10_000f, -10_000f); handle!!.end(true) }
         compose.waitForIdle()
-        assertTrue(store.load().translationXDp < 0)
-        compose.onNodeWithTag("mini-viewport").assertIsDisplayed()
-        val left = store.load()
-        assertEquals(left, MiniPlayerStore(kv).load())
+        assertEquals(docked, compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(10_000f, 10_000f); handle!!.end(true) }
         compose.waitForIdle()
-        assertTrue(store.load().translationXDp >= 0)
         compose.onNodeWithTag("mini-viewport").assertIsDisplayed()
-        assertEquals(store.load(), MiniPlayerStore(kv).load())
+        assertEquals(docked, compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot)
+        assertFalse(store.hasLegacyPlacement())
         kv.clearAll()
         compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
@@ -146,28 +150,31 @@ class PlayerInteractionAndroidTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val assertRestart = InstrumentationRegistry.getArguments().getString("miniRestartStage") == "assert"
         val kv = com.hhst.youtubelite.core.PreferenceStore.of(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>(), "followup-mini-process")
+        // First stage: an upgrade from a version that saved a dragged placement.
+        if (!assertRestart) { kv.clearAll(); MiniPlayerStore(kv).writeLegacyPlacement(250, -100f, -75f) }
         val store = MiniPlayerStore(kv)
         val record = java.io.File(instrumentation.targetContext.filesDir, "followup-mini-position.json")
-        val expected = if (assertRestart) kotlinx.serialization.json.Json.decodeFromString(
-                MiniPlayerStore.State.serializer(), record.readText()) else null
-        if (expected != null) assertEquals(expected, store.load())
-        else { kv.clearAll(); store.save(250, -100f, -75f) }
         compose.setContent {
             AppTheme {
                 val screenWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
-                MiniPlayerWindow(screenWidth, 24, store, true, {}, topInsetDp = 24) { Box(Modifier.fillMaxSize()) }
+                MiniPlayerWindow(screenWidth, 24, store, true, {}, topInsetDp = 24) {
+                    Box(Modifier.fillMaxSize().testTag("mini-viewport"))
+                }
             }
         }
         compose.waitForIdle()
-        if (expected != null) assertEquals(expected, store.load())
-        else record.writeText(kotlinx.serialization.json.Json.encodeToString(MiniPlayerStore.State.serializer(), store.load()))
+        assertFalse(store.hasLegacyPlacement())
+        val bounds = compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot
+        val position = listOf(bounds.left, bounds.top, bounds.width).joinToString(",") { it.toInt().toString() }
+        // The fixed dock is the same after a process restart; the old offset never comes back.
+        if (assertRestart) assertEquals(record.readText(), position) else record.writeText(position)
     }
 
     @Test fun miniRestoreKeepsSurfaceAndSettledPositionAndCloseAnimates() {
         val kv = com.hhst.youtubelite.core.PreferenceStore.of(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>(), "followup-mini-test")
         kv.clearAll()
         val store = MiniPlayerStore(kv)
-        store.save(220, -110f, -125f)
+        store.writeLegacyPlacement(220, -110f, -125f)
         var mini by mutableStateOf(false)
         var visible by mutableStateOf(true)
         var attached = 0
@@ -179,7 +186,7 @@ class PlayerInteractionAndroidTest {
         }
         compose.setContent {
             AppTheme(darkTheme = true, dynamicColor = false) {
-                Box(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize().testTag("mini-root")) {
                     if (visible) MiniPlayerWindow(411, 24, store, true, {}, onDismiss = { visible = false },
                         mini = mini, embeddedTopDp = 24, embeddedHeightDp = 231) {
                         handle = LocalMiniPlayerHandle.current
@@ -197,27 +204,30 @@ class PlayerInteractionAndroidTest {
         assertEquals(1, attached)
         compose.runOnIdle { mini = true }
         compose.waitForIdle()
-        val loaded = store.load()
-        assertEquals(220, loaded.widthDp)
-        assertEquals(-125f, loaded.translationYDp, 1f)
+        // The legacy placement is ignored: default width at the bottom-start corner.
+        assertFalse(store.hasLegacyPlacement())
+        val density = compose.density.density
+        val root = compose.onNodeWithTag("mini-root").fetchSemanticsNode().boundsInRoot
+        val docked = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
+        assertEquals(MiniPlayerLayout.defaultWidthDp(411) * density, docked.width, 1.5f)
+        assertEquals(root.left + MiniPlayerLayout.outerMarginDp(411) * density, docked.left, 1.5f)
         compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(-120f, -50f); handle!!.end(true) }
         compose.waitForIdle()
-        val dragged = store.load()
+        assertEquals(docked, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { mini = false }
         compose.waitForIdle()
         assertEquals(1, attached)
         assertEquals(0, detached)
         compose.runOnIdle { mini = true }
         compose.waitForIdle()
-        assertEquals(dragged, store.load())
+        assertEquals(docked, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { handle!!.dismiss() }
         compose.waitForIdle()
         assertFalse(visible)
-        assertEquals(dragged, store.load())
         assertEquals(1, detached)
         compose.runOnIdle { visible = true }
         compose.waitForIdle()
-        assertEquals(dragged, store.load())
+        assertFalse(store.hasLegacyPlacement())
         assertEquals(2, attached)
         kv.clearAll()
     }

@@ -79,33 +79,21 @@ class MiniPlayerGestureAndroidTest {
         assertEquals(0, detached)
     }
 
+    // Fixed in-app mini (owner 2026-11-21): a drag toward either wall neither moves nor folds the window.
     @Test fun bothWallsCollapseAndTapExpandsWithoutReplacingTheSurface() {
         showMini()
         val firstSurface = surface
         val density = compose.activity.resources.displayMetrics.density
-        for (side in listOf(MiniPlayerLayout.CollapsedSide.RIGHT, MiniPlayerLayout.CollapsedSide.LEFT)) {
-            // First dock at the requested wall without asking for a collapse.
-            compose.runOnIdle {
-                handle!!.begin()
-                handle!!.dragFromStart(if (side == MiniPlayerLayout.CollapsedSide.LEFT) -10_000f else 10_000f, 0f)
-                handle!!.end(true)
-            }
-            compose.waitForIdle()
-            val placement = store.load()
+        val docked = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
+        for (dx in listOf(140f, -140f)) {
             compose.onNodeWithTag("player-window").performTouchInput {
-                swipe(center, center + Offset((if (side == MiniPlayerLayout.CollapsedSide.LEFT) -140 else 140) * density, 0f), 300)
+                swipe(center, center + Offset(dx * density, 0f), 300)
             }
-            compose.waitForIdle()
-            assertEquals(side, handle!!.collapsedSide)
-            val host = compose.onNodeWithTag("mini-host").fetchSemanticsNode().boundsInRoot
-            val window = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
-            val visibleWidth = minOf(host.right, window.right) - maxOf(host.left, window.left)
-            assertEquals(MiniPlayerLayout.COLLAPSED_PEEK_DP * density, visibleWidth, 2f)
-            compose.onNodeWithTag("mini-expand").assertIsDisplayed().performTouchInput { click() }
             compose.waitForIdle()
             assertNull(handle!!.collapsedSide)
-            assertEquals(placement, store.load())
-            assertTrue("Fold/unfold fired a playback action: $calls", calls.isEmpty())
+            compose.onNodeWithTag("mini-expand").assertDoesNotExist()
+            assertEquals(docked, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
+            assertTrue("A drag fired a playback action: $calls", calls.isEmpty())
             assertSame(firstSurface, surface)
             assertEquals(1, attached)
             assertEquals(0, detached)
@@ -128,19 +116,22 @@ class MiniPlayerGestureAndroidTest {
     @Test fun aSmallFastEdgeDragReturnsToItsDock() {
         showMini()
         val density = compose.activity.resources.displayMetrics.density
+        val docked = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
         compose.onNodeWithTag("player-window").performTouchInput {
             swipe(center, center + Offset(40f * density, 0f), 64)
         }
         compose.waitForIdle()
         assertNull(handle!!.collapsedSide)
+        assertEquals(docked, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
         assertTrue(calls.isEmpty())
         assertEquals(1, attached)
         assertEquals(0, detached)
     }
 
+    // No resize gesture in-app: a pinch is still claimed (no control clicks) but keeps the default size.
     @Test fun pinchOverControlsResizesWithoutClickingOrReplacingSurface() {
         showMini()
-        val widthBefore = store.load().widthDp
+        val boundsBefore = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
         val firstSurface = surface
         compose.onNodeWithTag("player-window").performTouchInput {
             down(0, center - Offset(30f, 0f))
@@ -151,7 +142,7 @@ class MiniPlayerGestureAndroidTest {
         compose.runOnIdle { assertTrue(handle!!.interacting) }
         compose.onNodeWithTag("player-window").performTouchInput { up(0); up(1) }
         compose.waitForIdle()
-        assertTrue(store.load().widthDp > widthBefore)
+        assertEquals(boundsBefore, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
         assertFalse(handle!!.interacting)
         assertTrue(calls.isEmpty())
         assertSame(firstSurface, surface)

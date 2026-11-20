@@ -43,30 +43,31 @@ class ExperienceUpgradeAndroidTest {
             }
         } }
         compose.waitForIdle()
-        fun enter() {
-            val root = compose.onNodeWithTag("root").fetchSemanticsNode().boundsInRoot
-            val window = compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot
-            compose.runOnIdle {
-                handle!!.begin()
-                handle!!.dragFromStart(root.center.x-window.center.x, root.bottom-52*density-window.center.y)
-            }
-            compose.waitForIdle()
-            compose.onNodeWithContentDescription(compose.activity.getString(R.string.close_player)).assertIsDisplayed()
+        // Fixed in-app mini (owner 2026-11-21): dragging onto the old drop target neither moves the
+        // window, shows the target nor closes it; dismissal is the X button (handle.dismiss) only.
+        val before = compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot
+        val root = compose.onNodeWithTag("root").fetchSemanticsNode().boundsInRoot
+        compose.runOnIdle {
+            handle!!.begin()
+            handle!!.dragFromStart(root.center.x-before.center.x, root.bottom-52*density-before.center.y)
         }
-        compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(0f, 5*density); handle!!.release() }
+        compose.waitForIdle()
+        compose.onNodeWithContentDescription(compose.activity.getString(R.string.close_player)).assertDoesNotExist()
+        assertEquals(before, compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot)
+        compose.runOnIdle { handle!!.release() }
         compose.waitForIdle(); assertEquals(0, closed)
-        enter()
-        compose.runOnIdle { handle!!.dragFromStart(-400*density, 0f); handle!!.release() }
+        compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(-400*density, 0f); handle!!.release() }
         compose.waitForIdle(); assertEquals(0, closed)
-        enter(); compose.runOnIdle { handle!!.cancel() }; compose.waitForIdle(); assertEquals(0, closed)
-        enter(); compose.runOnIdle { handle!!.pinchScale(1.2f); handle!!.end(true) }; compose.waitForIdle(); assertEquals(0, closed)
-        enter(); compose.runOnIdle { handle!!.release(); handle!!.release() }; compose.waitForIdle()
+        compose.runOnIdle { handle!!.cancel() }; compose.waitForIdle(); assertEquals(0, closed)
+        compose.runOnIdle { handle!!.pinchScale(1.2f); handle!!.end(true) }; compose.waitForIdle(); assertEquals(0, closed)
+        assertEquals(before, compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot)
+        compose.runOnIdle { handle!!.dismiss(); handle!!.dismiss() }; compose.waitForIdle()
         assertEquals(1, closed)
     }
 
     @Test fun closingMiniShrinksAtItsExistingCenter() {
         val store = MiniPlayerStore(com.hhst.youtubelite.core.PreferenceStore.of(androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>(), "mini-close-center").apply { clearAll() })
-        store.save(200, -30f, -180f)
+        store.writeLegacyPlacement(200, -30f, -180f)
         var handle: MiniPlayerHandle? = null
         compose.setContent { AppTheme {
             MiniPlayerWindow(LocalConfiguration.current.screenWidthDp, 0, store, true, {}) {

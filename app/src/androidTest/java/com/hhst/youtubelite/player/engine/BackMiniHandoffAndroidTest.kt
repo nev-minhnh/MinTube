@@ -82,18 +82,14 @@ class BackMiniHandoffAndroidTest {
     @Test fun backFromATopDockKeepsTheSameBoundsAcrossHosts() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val store = GlobalContext.get().get<MiniPlayerStore>()
-        lateinit var previous: MiniPlayerStore.State
-        instrumentation.runOnMainSync {
-            previous = store.load()
-            // Force each host to apply its top-edge clamp rather than a placement left by another test or drag.
-            store.save(0, 0f, -10_000f)
-        }
+        // A top-edge placement saved by an older version must be ignored by both hosts: each docks at the
+        // same fixed bottom-start corner, so the handoff keeps the same bounds.
+        instrumentation.runOnMainSync { store.writeLegacyPlacement(0, 0f, -10_000f) }
         try {
             checkHandoff(null)
+            instrumentation.runOnMainSync { assertFalse(store.hasLegacyPlacement()) }
         } finally {
-            instrumentation.runOnMainSync {
-                store.save(previous.widthDp, previous.translationXDp, previous.translationYDp)
-            }
+            instrumentation.runOnMainSync { store.clearLegacyPlacement() }
         }
     }
 

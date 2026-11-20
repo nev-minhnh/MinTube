@@ -152,6 +152,13 @@ object MiniPlayerLayout {
         }
     }
 
+    /**
+     * Left edge (absolute px) of the one fixed in-app dock: the bottom-start corner of the content
+     * area, past [startInsetPx] (navigation rail / cut-out) plus the outer margin; mirrored in RTL.
+     */
+    fun fixedDockLeftPx(parentWidthPx: Float, windowWidthPx: Float, startInsetPx: Float, marginPx: Float, rtl: Boolean): Float =
+        if (rtl) parentWidthPx - startInsetPx - marginPx - windowWidthPx else startInsetPx + marginPx
+
     fun hitsCloseTarget(centerX: Float, centerY: Float, left: Float, top: Float, right: Float, bottom: Float): Boolean =
         right > left && bottom > top && centerX >= left && centerX <= right && centerY >= top && centerY <= bottom
 

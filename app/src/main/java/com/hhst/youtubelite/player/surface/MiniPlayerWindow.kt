@@ -2,15 +2,8 @@ package com.hhst.youtubelite.player.surface
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -22,7 +15,6 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -52,21 +44,18 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.testTag
-import com.hhst.youtubelite.R
 import com.hhst.youtubelite.core.HapticsController
 import com.hhst.youtubelite.ui.design.LocalMotionScale
 import com.hhst.youtubelite.ui.design.motionDuration
 import com.hhst.youtubelite.ui.design.GestureResistance
 import com.hhst.youtubelite.ui.design.GestureThreshold
 import kotlin.math.roundToInt
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
@@ -147,6 +136,8 @@ fun MiniPlayerWindow(
     embeddedLeftDp: Int = 0,
     embeddedWidthDp: Int = screenWidthDp,
     topInsetDp: Int = 0,
+    /** Start-edge inset (rail, cut-out) of the content area the fixed mini docks beside. */
+    startInsetDp: Int = 0,
     /** Committed fullscreen swipe → target mode. */
     onFullscreenSwipe: (Boolean) -> Unit = {},
     /** Downward exit restores pre-fullscreen state. */
@@ -175,41 +166,19 @@ fun MiniPlayerWindow(
 ) {
     val haptics: HapticsController = koinInject()
     val density = LocalDensity.current
-    val loaded = remember(store) { store.load() }
-    var widthOverrideDp by remember {
-        mutableIntStateOf(
-            if (loaded.widthDp > 0) {
-                MiniPlayerLayout.clampWidthDp(screenWidthDp, loaded.widthDp)
-            } else {
-                MiniPlayerLayout.defaultWidthDp(screenWidthDp)
-            },
-        )
-    }
-    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, widthOverrideDp)
+    // In-app the mini has one fixed corner and the default size; drop placements older versions saved.
+    remember(store) { store.clearLegacyPlacement() }
+    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var measuredParentSize by remember { mutableStateOf(IntSize.Zero) }
     // Effects must use this composition's restX/restY: a size callback can update
     // state before an effect starts while its captured dock is still zero-size.
     val parentSize = measuredParentSize
-    var dragX by remember { mutableFloatStateOf(with(density) { loaded.translationXDp.dp.toPx() }) }
-    var dragY by remember { mutableFloatStateOf(with(density) { loaded.translationYDp.dp.toPx() }) }
-    var originX by remember { mutableFloatStateOf(0f) }
-    var originY by remember { mutableFloatStateOf(0f) }
-    var pinchStartWidthDp by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
-    // Snap keeps writing dragX/dragY; a new grab must cancel the job or the
-    // finish block yanks the window back to the old dock and persists it.
-    var snapJob by remember { mutableStateOf<Job?>(null) }
-    // Exit only after release in the close target; then onDismiss tears down
-    // the surface (leaves composition — no drag/pinch/persist in between).
+    // The X button's exit animation runs first; then onDismiss tears down the surface.
     var dismissing by remember { mutableStateOf(false) }
-    var dragAccepted by remember { mutableStateOf(false) }
-    var dragging by remember { mutableStateOf(false) }
-    var collapsedSide by remember { mutableStateOf<MiniPlayerLayout.CollapsedSide?>(null) }
-    var collapseCandidate by remember { mutableStateOf<MiniPlayerLayout.CollapsedSide?>(null) }
-    var closeArmed by remember { mutableStateOf(false) }
     var dismissScale by remember { mutableFloatStateOf(1f) }
     var dismissAlpha by remember { mutableFloatStateOf(1f) }
-    var attraction by remember { mutableFloatStateOf(0f) }
     var viewport by remember { mutableStateOf(Rect.Zero) }
     val displayedViewport = remember { arrayOf(Rect.Zero) }
     val windowMotionClock = remember { arrayOf<WindowMotionClock?>(null) }
@@ -263,85 +232,29 @@ fun MiniPlayerWindow(
     val currentOnContentFullscreenPull by rememberUpdatedState(onContentFullscreenPull)
     val currentOnMiniSwipe by rememberUpdatedState(onMiniSwipe)
     val swipeThreshold = remember { GestureThreshold() }
-    val edgeThreshold = remember { GestureThreshold() }
-    val closeThreshold = remember { GestureThreshold() }
-    val displayedAttraction by animateFloatAsState(attraction,
-        tween(motionDuration(100, motionScale), easing = LinearOutSlowInEasing), label = "mini-close-attraction")
-    val closeTargetScale by animateFloatAsState(if (closeArmed) 64f / 56f else 1f,
-        tween(motionDuration(140, motionScale), easing = WindowEntryEasing), label = "mini-close-target")
 
     val widthPx = with(density) { spec.widthDp.dp.toPx() }
     val heightPx = with(density) { spec.heightDp.dp.toPx() }
-    val restX = if (parentSize.width > 0) {
-        parentSize.width - with(density) { spec.rightMarginDp.dp.toPx() } - widthPx
-    } else 0f
+    val edgeMarginPx = with(density) { spec.rightMarginDp.dp.toPx() }
+    // One fixed dock: bottom-start corner, beside the rail/cut-out, above the bar (mirrored in RTL).
+    val restX = if (parentSize.width > 0) MiniPlayerLayout.fixedDockLeftPx(parentSize.width.toFloat(), widthPx,
+        with(density) { startInsetDp.dp.toPx() }, edgeMarginPx, rtl) else 0f
     val restY = if (parentSize.height > 0) {
         parentSize.height - with(density) { spec.bottomMarginDp.dp.toPx() } - heightPx
     } else 0f
-    val edgeMarginPx = with(density) { spec.rightMarginDp.dp.toPx() }
-    val topMarginPx = with(density) { topInsetDp.dp.toPx() } + edgeMarginPx
-    val peekPx = with(density) { MiniPlayerLayout.COLLAPSED_PEEK_DP.dp.toPx() }
 
-    fun collapsedX(side: MiniPlayerLayout.CollapsedSide) = MiniPlayerLayout.collapsedTranslationX(
-        side, restX, widthPx, parentSize.width, peekPx,
-    )
-
-    fun snapMiniX(x: Float) = MiniPlayerLayout.snapX(
-        x, restX.toInt(), widthPx.toInt(), parentSize.width, edgeMarginPx,
-    )
-
-    fun settledMiniX(x: Float) = collapsedSide?.let(::collapsedX) ?: snapMiniX(x)
-
-    fun clampMiniY(y: Float) = MiniPlayerLayout.clampTranslation(
-        y, restY.toInt(), heightPx.toInt(), parentSize.height, topMarginPx, edgeMarginPx,
-    )
-
-    val closeWidth = with(density) { 96.dp.toPx() }
-    val closeHeight = with(density) { 72.dp.toPx() }
-    val closeBottom = parentSize.height - with(density) { (bottomInsetDp + 16).dp.toPx() }
-    val closeBounds = Rect((parentSize.width - closeWidth) / 2f, closeBottom - closeHeight,
-        (parentSize.width + closeWidth) / 2f, closeBottom)
-
-    fun persist(x: Float, y: Float) {
-        // Persist the normal dock for restore after navigation or process death.
-        store.save(spec.widthDp, snapMiniX(x) / density.density, y / density.density)
-    }
-
-    LaunchedEffect(mini, spec, parentSize, topInsetDp, density.density, windowOffset, windowPositioned) {
-        if (parentSize.width <= 0 || parentSize.height <= 0 || dismissing) return@LaunchedEffect
-        dragAccepted = false
-        dragging = false
-        closeArmed = false
-        // Layout change invalidates the snap's captured width/dock; a pinch ending
-        // this frame must not let an older snap completion overwrite the width.
-        snapJob?.cancel()
-        snapJob = null
-        // Non-mini modes must not clamp the saved placement to their bounds.
-        if (!mini) {
-            collapsedSide = null
-            return@LaunchedEffect
-        }
-        if (!placementRestored) {
-            if (miniEntryBounds != null && !windowPositioned) return@LaunchedEffect
-            val saved = store.load()
-            dragX = miniEntryBounds?.let { it.left - windowOffset.x - restX } ?: (saved.translationXDp * density.density)
-            dragY = miniEntryBounds?.let { it.top - windowOffset.y - restY } ?: (saved.translationYDp * density.density)
-            placementRestored = true
-        }
-        val x = settledMiniX(dragX)
-        val y = clampMiniY(dragY)
-        dragX = x
-        dragY = y
-        // Pinch re-docks/clamps every frame but persists only when no gesture holds
-        // the window — the end handler writes the final placement, not each event.
-        if (mini && pinchStartWidthDp == 0) persist(x, y)
+    LaunchedEffect(mini, parentSize, windowPositioned) {
+        if (parentSize.width <= 0 || parentSize.height <= 0 || dismissing || !mini || placementRestored) return@LaunchedEffect
+        // A mini created from another window's bounds animates from them once it knows its own offset.
+        if (miniEntryBounds != null && !windowPositioned) return@LaunchedEffect
+        placementRestored = true
     }
 
     val fullscreenBounds = Rect(0f, 0f, parentSize.width.toFloat(), parentSize.height.toFloat())
     val embeddedBounds = with(density) { Rect(embeddedLeftDp.dp.toPx(), embeddedTopDp.dp.toPx(),
         (embeddedLeftDp + embeddedWidthDp).dp.toPx(),
         embeddedTopDp.dp.toPx() + embeddedHeightDp.dp.toPx()) }
-    val target = if (mini) Rect(restX + dragX, restY + dragY, restX + dragX + widthPx, restY + dragY + heightPx)
+    val target = if (mini) Rect(restX, restY, restX + widthPx, restY + heightPx)
         else if (fillsWindow) fullscreenBounds else embeddedBounds
     val latestTarget by rememberUpdatedState(target)
     val parentOrientation = if (parentSize == IntSize.Zero) -1 else if (parentSize.width > parentSize.height) 1 else 0
@@ -373,12 +286,6 @@ fun MiniPlayerWindow(
         previousMini = mini
         previousFillsWindow = fillsWindow
         previousParentSize = parentSize
-        if (changed && !mini) {
-            dragging = false
-            closeArmed = false
-            snapJob?.cancel()
-            snapJob = null
-        }
         val displayed = displayedViewport[0]
         val previousFrame = if ((windowChanged || changed || rotatedDuringMotion) && transitionRunning && displayed.width > 0f && displayed.height > 0f)
             displayed else viewport
@@ -677,9 +584,7 @@ fun MiniPlayerWindow(
                 // A move and cancellation in one frame still need a settling animation.
                 swipeRelease++
                 if (commit) {
-                    dragX = snapMiniX(viewport.center.x - widthPx / 2f - restX)
-                    dragY = clampMiniY(viewport.center.y - heightPx / 2f - restY)
-                    persist(dragX, dragY)
+                    // The swipe always lands in the fixed dock, wherever the finger let go.
                     miniSwipeCommitted = true
                     currentOnMiniSwipe()
                 }
@@ -732,9 +637,6 @@ fun MiniPlayerWindow(
                 swipeRelease++
                 if (swipeToMini) {
                     if (committed) {
-                        dragX = snapMiniX(viewport.center.x - widthPx / 2f - restX)
-                        dragY = clampMiniY(viewport.center.y - heightPx / 2f - restY)
-                        persist(dragX, dragY)
                         miniSwipeCommitted = true
                         currentOnMiniSwipe()
                     }
@@ -745,116 +647,20 @@ fun MiniPlayerWindow(
                 }
             }
         }
-        // A plain tap also fires begin(): cancelling the snap here would freeze a
-        // mid-flight dock (end(false) does not resume it). Cancel on the first
-        // real DRAG move instead — see dragFromStart.
-        handle.begin = {
-            if (mini && !dismissing && !transitionRunning) {
-                collapseCandidate = null
-                edgeThreshold.reset()
-                closeThreshold.reset()
-                dragAccepted = true
-                originX = dragX
-                originY = dragY
-                pinchStartWidthDp = spec.widthDp
-            }
-        }
-        handle.dragFromStart = fun(dx, dy) {
-            if (!mini || !dragAccepted || parentSize.width <= 0 || dismissing || transitionRunning) return
-            // First drag move: cancel the in-flight snap and re-anchor origin to the
-            // CURRENT mid-animation position so the drag does not jump.
-            if (snapJob != null) {
-                snapJob?.cancel()
-                snapJob = null
-                originX = dragX
-                originY = dragY
-            }
-            dragging = true
-            val rawX = originX + dx
-            // Restoring a folded window stays attached to the finger.
-            val resistedX = if (collapsedSide != null) rawX else GestureResistance.beyondBounds(rawX,
-                -restX, (parentSize.width - widthPx - restX).coerceAtLeast(-restX), 128f * density.density)
-            dragX = resistedX.coerceIn(collapsedX(MiniPlayerLayout.CollapsedSide.LEFT),
-                collapsedX(MiniPlayerLayout.CollapsedSide.RIGHT))
-            collapseCandidate = MiniPlayerLayout.collapseSide(restX + dragX, widthPx,
-                parentSize.width, dx, dy, MiniPlayerLayout.COLLAPSE_THRESHOLD_DP * density.density)
-            if (edgeThreshold.crossed(if (collapseCandidate != null) 1f else 0f, 1f))
-                haptics.perform(HapticsController.Event.GESTURE_THRESHOLD)
-            // Partial off-screen travel lets every window size reach the bottom target.
-            dragY = (originY + dy).coerceIn(topMarginPx - restY,
-                maxOf(topMarginPx - restY, closeBounds.center.y - restY - heightPx / 2))
-            val hit = MiniPlayerLayout.hitsCloseTarget(restX + dragX + widthPx / 2,
-                restY + dragY + heightPx / 2, closeBounds.left, closeBounds.top, closeBounds.right, closeBounds.bottom)
-            if (closeThreshold.crossed(if (hit) 1f else 0f, 1f)) haptics.perform(HapticsController.Event.DROP_TARGET)
-            closeArmed = hit
-            val distance = (androidx.compose.ui.geometry.Offset(restX + dragX + widthPx / 2,
-                restY + dragY + heightPx / 2) - closeBounds.center).getDistance()
-            attraction = (1f - distance / with(density) { 128.dp.toPx() }).coerceIn(0f, 1f)
-        }
-        handle.pinchScale = { scale ->
-            dragging = false
-            closeArmed = false
-            collapseCandidate = null
-            if (mini && !dismissing && !transitionRunning) {
-                snapJob?.cancel()
-                snapJob = null
-                val start = pinchStartWidthDp.takeIf { it > 0 } ?: spec.widthDp
-                widthOverrideDp = MiniPlayerLayout.clampWidthDp(
-                    screenWidthDp,
-                    (start * scale).roundToInt(),
-                )
-            }
-        }
-        handle.end = fun(moved) {
-            handle.interacting = false
-            attraction = 0f
-            dragging = false
-            closeArmed = false
-            if (!mini || dismissing || transitionRunning) return
-            pinchStartWidthDp = 0
-            if (!moved || parentSize.width <= 0) return
-            snapJob?.cancel()
-            val x = settledMiniX(dragX)
-            val y = clampMiniY(dragY)
-            // Released drag continues toward its dock rather than stopping and
-            // accelerating from rest again.
-            val snapSpec = tween<Float>(motionDuration(220, motionScale), easing = LinearOutSlowInEasing)
-            snapJob = scope.launch {
-                val ax = Animatable(dragX)
-                val ay = Animatable(dragY)
-                coroutineScope {
-                    launch { ax.animateTo(x, snapSpec) { dragX = value } }
-                    launch { ay.animateTo(y, snapSpec) { dragY = value } }
-                }
-                dragX = x
-                dragY = y
-                persist(x, y)
-            }
-        }
-        handle.cancel = { collapseCandidate = null; dragging = false; closeArmed = false; handle.end(true) }
-        handle.release = {
-            if (dragging && closeArmed) handle.dismiss() else {
-                collapsedSide = collapseCandidate
-                handle.end(true)
-            }
-        }
-        handle.collapsedSide = collapsedSide
-        handle.tap = {
-            if (collapsedSide != null) {
-                haptics.perform(HapticsController.Event.SELECTION)
-                snapJob?.cancel()
-                collapsedSide = null
-                handle.end(true)
-            } else onBackgroundTap()
-        }
+        // The in-app mini never moves or resizes. Drags and pinches are still claimed by the
+        // gesture layer (a drag starting on a control must not click it) but leave the window docked;
+        // Picture-in-Picture outside the app is the system's to move.
+        handle.begin = {}
+        handle.dragFromStart = { _, _ -> }
+        handle.pinchScale = {}
+        handle.end = { handle.interacting = false }
+        handle.cancel = { handle.end(true) }
+        handle.release = { handle.end(true) }
+        handle.tap = { onBackgroundTap() }
         handle.dismiss = {
             if (mini && !dismissing && parentSize.width > 0 && parentSize.height > 0) {
-                dragging = false
                 handle.interacting = false
-                closeArmed = false
                 dismissing = true
-                snapJob?.cancel()
-                snapJob = null
                 scope.launch {
                     coroutineScope {
                         launch { Animatable(1f).animateTo(0.5f, tween(motionDuration(MiniPlayerLayout.DISMISS_MS, motionScale), easing = FastOutLinearInEasing)) { dismissScale = value } }
@@ -878,19 +684,6 @@ fun MiniPlayerWindow(
         ) {
             if (!mini && fullscreenSwipeEnabled && fullscreenProgress > 0f) {
                 if (!swipeToMini) Box(Modifier.fillMaxSize().graphicsLayer { alpha = fullscreenProgress }.background(Color.Black))
-            }
-            AnimatedVisibility(visible = mini && dragging && !dismissing,
-                modifier = Modifier.zIndex(2f).absoluteOffset { IntOffset(closeBounds.left.roundToInt(), closeBounds.top.roundToInt()) }.size(96.dp, 72.dp),
-                enter = fadeIn(tween(motionDuration(100, motionScale))) + scaleIn(tween(motionDuration(160, motionScale), easing = WindowEntryEasing), initialScale = 0.8f),
-                exit = fadeOut(tween(motionDuration(100, motionScale))) + scaleOut(tween(motionDuration(100, motionScale)), targetScale = 0.9f)) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Box(Modifier.size(56.dp).graphicsLayer { scaleX = closeTargetScale; scaleY = closeTargetScale }
-                        .background(Color(0xCC303030), androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(R.string.close_player),
-                        tint = Color.White.copy(alpha = if (closeArmed) 1f else 0.95f),
-                        modifier = Modifier.size(32.dp))
-                    }
-                }
             }
             // Wait until the parent reports its size; with restX/restY still 0 the
             // window would appear at the top-left before moving to its dock.
@@ -931,7 +724,7 @@ fun MiniPlayerWindow(
                         }
                         .graphicsLayer {
                             alpha = dismissAlpha
-                            scaleX = dismissScale * (1f - displayedAttraction * 0.35f)
+                            scaleX = dismissScale
                             scaleY = scaleX
                         }
                         .clip(corners)
