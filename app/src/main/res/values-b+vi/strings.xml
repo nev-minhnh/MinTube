@@ -735,4 +735,8 @@
     <string name="shorts_dislike">Không thích</string>
     <string name="shorts_empty_message">Hãy quay lại sau giây lát hoặc thử lại.</string>
     <string name="shorts_progress">Tiến trình phát</string>
+    <string name="browse_home_account">Tài khoản</string>
+    <string name="browse_search_edit">Sửa từ khóa tìm kiếm</string>
+    <string name="browse_explore_empty_title">Chưa có nội dung</string>
+    <string name="browse_explore_empty_message">Danh mục này hiện chưa có video nào. Hãy thử lại sau.</string>
 </resources>

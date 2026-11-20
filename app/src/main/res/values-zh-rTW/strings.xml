@@ -737,4 +737,8 @@
     <string name="shorts_dislike">Dislike</string>
     <string name="shorts_empty_message">Check back in a moment or try again.</string>
     <string name="shorts_progress">Playback progress</string>
+    <string name="browse_home_account">Account</string>
+    <string name="browse_search_edit">Edit search</string>
+    <string name="browse_explore_empty_title">Nothing here yet</string>
+    <string name="browse_explore_empty_message">This category has no videos right now. Try again later.</string>
 </resources>
