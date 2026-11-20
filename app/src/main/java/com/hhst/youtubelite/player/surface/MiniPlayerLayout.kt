@@ -18,7 +18,11 @@ object MiniPlayerLayout {
     private const val LARGE_MAX_WIDTH_DP = 420
     private const val MIN_OUTER_MARGIN_DP = 12
     private const val MAX_OUTER_MARGIN_DP = 24
-    private const val MIN_BOTTOM_DOCK_DP = 56
+    /**
+     * Default minimum clearance from the bottom edge, for hosts that pass no bar inset. A host whose
+     * window has no bottom bar (navigation rail) passes a floor of 0 so the mini docks at the bottom.
+     */
+    const val MIN_BOTTOM_DOCK_DP = 56
     private const val CONTROL_GAP_DP = 18
     const val CONTROL_SIDE_DP = 30
     const val CONTROL_PLAY_DP = 34
@@ -96,14 +100,15 @@ object MiniPlayerLayout {
         return minOf(contentPx, cap)
     }
 
-    private fun computeBottomMarginDp(outerMarginDp: Int, bottomInsetDp: Int): Int =
-        outerMarginDp + maxOf(bottomInsetDp, MIN_BOTTOM_DOCK_DP)
+    private fun computeBottomMarginDp(outerMarginDp: Int, bottomInsetDp: Int, bottomFloorDp: Int): Int =
+        outerMarginDp + maxOf(bottomInsetDp, bottomFloorDp)
 
     /** Proportional breathing room, bounded for small phones and wide windows. */
     fun outerMarginDp(screenWidthDp: Int): Int =
         (screenWidthDp / 30f).roundToInt().coerceIn(MIN_OUTER_MARGIN_DP, MAX_OUTER_MARGIN_DP)
 
-    fun computeSpec(screenWidthDp: Int, bottomInsetDp: Int, widthOverrideDp: Int): Spec {
+    fun computeSpec(screenWidthDp: Int, bottomInsetDp: Int, widthOverrideDp: Int,
+        bottomFloorDp: Int = MIN_BOTTOM_DOCK_DP): Spec {
         val widthDp = if (widthOverrideDp == NO_WIDTH_OVERRIDE_DP) {
             defaultWidthDp(screenWidthDp)
         } else {
@@ -114,7 +119,7 @@ object MiniPlayerLayout {
             widthDp = widthDp,
             heightDp = computeHeightDp(widthDp),
             rightMarginDp = outerMarginDp,
-            bottomMarginDp = computeBottomMarginDp(outerMarginDp, bottomInsetDp),
+            bottomMarginDp = computeBottomMarginDp(outerMarginDp, bottomInsetDp, bottomFloorDp),
         )
     }
 

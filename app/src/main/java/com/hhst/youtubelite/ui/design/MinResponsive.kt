@@ -38,10 +38,10 @@ fun rememberNavigationForm(): NavigationForm {
 
 /**
  * Mini-player dock clearance per navigation form, in dp, measured inside the safe-drawing area.
- * Bottom bar: the mini sits above the 56dp bar. Rail: no bottom bar, and the mini keeps off the
- * rail's start-edge column. `MiniPlayerLayout` still keeps its own minimum clearance from the bottom
- * edge ([MiniPlayerFloorDp], pinned by a unit test), so hosts that place the mini in a full-window
- * frame (the watch page) must add that floor themselves to land on the same pixel.
+ * Bottom bar: the mini sits directly above the 56dp bar. Rail: no bottom bar, so the mini docks at
+ * the bottom (navigation-bar inset plus its margin) and keeps off the rail's start-edge column.
+ * `MiniPlayerLayout` keeps its own minimum clearance from the bottom edge ([MiniPlayerFloorDp],
+ * pinned by a unit test); hosts pass [bottomFloorDp] so that floor only applies with a bottom bar.
  */
 object MiniDock {
     const val BarHeightDp = 56
@@ -52,7 +52,10 @@ object MiniDock {
     fun bottomInsetDp(form: NavigationForm): Int = if (form == NavigationForm.Bar) BarHeightDp else 0
     fun startInsetDp(form: NavigationForm): Int = if (form == NavigationForm.Rail) RailWidthDp else 0
 
+    /** The mini-player's minimum bottom clearance: none with the rail (no bar to clear). */
+    fun bottomFloorDp(form: NavigationForm): Int = if (form == NavigationForm.Bar) MiniPlayerFloorDp else 0
+
     /** The bottom inset a full-window host passes so its mini matches the browse host's dock. */
     fun windowBottomInsetDp(form: NavigationForm, safeBottomDp: Int): Int =
-        safeBottomDp + maxOf(bottomInsetDp(form), MiniPlayerFloorDp)
+        safeBottomDp + maxOf(bottomInsetDp(form), bottomFloorDp(form))
 }

@@ -138,6 +138,8 @@ fun MiniPlayerWindow(
     topInsetDp: Int = 0,
     /** End-edge inset (cut-out, side system bar) of the content area the fixed mini docks against. */
     endInsetDp: Int = 0,
+    /** Minimum bottom clearance; 0 when the window has no bottom bar (navigation rail). */
+    bottomFloorDp: Int = MiniPlayerLayout.MIN_BOTTOM_DOCK_DP,
     /** Committed fullscreen swipe → target mode. */
     onFullscreenSwipe: (Boolean) -> Unit = {},
     /** Downward exit restores pre-fullscreen state. */
@@ -168,7 +170,7 @@ fun MiniPlayerWindow(
     val density = LocalDensity.current
     // In-app the mini has one fixed corner and the default size; drop placements older versions saved.
     LaunchedEffect(store) { store.clearLegacyPlacement() }
-    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP)
+    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, bottomFloorDp)
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var measuredParentSize by remember { mutableStateOf(IntSize.Zero) }
     // Effects must use this composition's restX/restY: a size callback can update

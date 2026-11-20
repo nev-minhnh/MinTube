@@ -560,7 +560,7 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                 val miniStore: com.hhst.youtubelite.player.surface.MiniPlayerStore = koinInject()
                 val hostDensity = androidx.compose.ui.platform.LocalDensity.current
                 // The browse host docks inside safeDrawing above its 56 dp
-                // bar (or, with the rail, at the mini-player's own 56 dp floor).
+                // bar (or, with the rail, at the bottom: no floor).
                 // Match both safe edges before handing over, including a saved
                 // mini placement near the top of the window.
                 val miniTopInset = with(hostDensity) {
@@ -583,6 +583,7 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                     bottomInsetDp = miniBottomInset,
                     topInsetDp = miniTopInset,
                     endInsetDp = miniEndInset,
+                    bottomFloorDp = com.hhst.youtubelite.ui.design.MiniDock.bottomFloorDp(miniDock),
                     store = miniStore,
                     showStroke = playerState.controlsVisible,
                     onBackgroundTap = playerViewModel::onToggleControls,

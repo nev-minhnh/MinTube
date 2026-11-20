@@ -165,6 +165,7 @@ abstract class ContentActivity : NativeActivity() {
                                 MiniPlayerWindow(maxWidth.value.toInt(),
                                     com.hhst.youtubelite.ui.design.MiniDock.bottomInsetDp(dock), store, state.controlsVisible,
                                     vm::onToggleControls, onDismiss = vm::onMiniClose,
+                                    bottomFloorDp = com.hhst.youtubelite.ui.design.MiniDock.bottomFloorDp(dock),
                                     initialBounds = com.hhst.youtubelite.navigation.WatchTransition.miniBounds,
                                     animateFromBounds = miniEntryBounds,
                                     entryAnimationReady = miniHostFocused,
