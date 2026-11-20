@@ -4,13 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +34,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
+
+/** The fixed scrim behind on-video status marks. */
+private val Scrim = Color.Black.copy(alpha = 0.5f)
 
 @Composable
 internal fun ShortPlaybackControls(
@@ -119,24 +127,27 @@ internal fun ShortPlaybackControls(
                 }
             })
         if (holding && active) {
-            Text(stringResource(R.string.speed_hold_2x), color = Color.White,
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = 64.dp)
-                    .background(Color.Black.copy(alpha = 0.65f), CircleShape)
-                    .padding(horizontal = 16.dp, vertical = 8.dp).testTag("short-speed-hold"))
+            AppText(stringResource(R.string.speed_hold_2x), MinType.Label,
+                Modifier.align(Alignment.TopCenter).windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(top = TopBarHeight + MinSpace.sm)
+                    .background(Scrim, MinRadius.Full)
+                    .padding(horizontal = MinSpace.lg, vertical = MinSpace.sm).testTag("short-speed-hold"),
+                color = Color.White)
         } else if (error != null && active) {
             com.hhst.youtubelite.player.surface.ErrorOverlay(
                 message = error, onRetry = onRetry, onDetails = onDetails, modifier = Modifier.align(Alignment.Center))
         } else if (notice != null && active) {
-            Text(notice, color = Color.White, textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center).padding(24.dp).testTag("short-access-notice"))
+            AppText(notice, MinType.Body.onVideo(),
+                Modifier.align(Alignment.Center).padding(MinSpace.xxl).testTag("short-access-notice"),
+                color = Color.White, align = TextAlign.Center)
         } else if (buffering && active) {
             CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp,
                 modifier = Modifier.align(Alignment.Center).size(24.dp).testTag("short-buffering"))
         } else if (pauseVisible && active && paused && !buffering) {
             Icon(painterResource(R.drawable.ic_play), contentDescription = null, tint = Color.White,
                 modifier = Modifier.align(Alignment.Center).testTag("short-paused")
-                    .background(Color.Black.copy(alpha = 0.4f), CircleShape)
-                    .padding(12.dp).size(40.dp))
+                    .background(Scrim, MinRadius.Full)
+                    .padding(MinSpace.md).size(40.dp))
         }
     }
 }
