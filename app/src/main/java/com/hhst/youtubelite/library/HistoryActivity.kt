@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -64,6 +65,26 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
         // Cancelled verification keeps the card; a completed one grants one retry.
         if (result.resultCode == RESULT_OK) historyViewModel.verificationCompleted(
             result.data?.getStringExtra(com.hhst.youtubelite.core.TrafficVerificationActivity.EXTRA_CHALLENGE))
+    }
+
+    /**
+     * Device lane only (anonymous): whether recording is paused, read from the local library store.
+     * Null on the account lane and in fixtures, which expose no pause state; both actions stay offered there.
+     */
+    private var devicePaused by androidx.compose.runtime.mutableStateOf<Boolean?>(null)
+    private var deviceLane by androidx.compose.runtime.mutableStateOf(false)
+
+    private fun refreshDevicePaused() {
+        if (com.hhst.youtubelite.data.media.ContentRepositories.fixtures(intent)) return
+        val device = !com.hhst.youtubelite.data.media.MediaSession.signedIn()
+        deviceLane = device
+        if (!device) { devicePaused = null; return }
+        val store = org.koin.java.KoinJavaComponent.getKoin().get<com.hhst.youtubelite.data.media.ContentRepositories>().localLibrary
+        lifecycleScope.launch {
+            // The first read may load the store from disk.
+            val paused = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { store.paused() }
+            if (!com.hhst.youtubelite.data.media.MediaSession.signedIn()) devicePaused = paused
+        }
     }
 
     val shareGateway: com.hhst.youtubelite.share.ShareGateway by lazy { com.hhst.youtubelite.share.ShareGateway(this) }
@@ -115,6 +136,8 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 historyViewModel.actionNotices.collect { notice ->
+                    // A pause/resume write has finished (or failed): re-read the device state.
+                    refreshDevicePaused()
                     renderNotice(notice)
                 }
             }
@@ -129,9 +152,11 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 else finish()
             }
             BackHandler(onBack = back)
+            androidx.compose.runtime.LaunchedEffect(state.overlay) { refreshDevicePaused() }
             HistoryScreen(state, historyViewModel::onAction, onBack = back,
                 modifier = Modifier.fillMaxSize().background(com.hhst.youtubelite.ui.design.DesignTokens.Background)
-                    .windowInsetsPadding(WindowInsets.safeDrawing).imePadding())
+                    .windowInsetsPadding(WindowInsets.safeDrawing).imePadding(),
+                historyPaused = devicePaused == true)
             historyViewModel.saveSheet?.let { sheet ->
                 val sheetState by sheet.state.collectAsStateWithLifecycle()
                 sheetState?.let { current ->
@@ -181,20 +206,17 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 )
             }
             if (state.overlay == LibraryOverlay.ManageHistory && !state.confirmClear) {
+                // Known device state offers only the applicable toggle; unknown (account) offers both.
+                val paused = devicePaused
+                val actions = buildList {
+                    if (paused != true) add(LibraryAction.PauseHistory to MenuSheetItem(AppIcon.Pause, stringResource(R.string.ui_pause_watch_history)))
+                    if (paused != false) add(LibraryAction.ResumeHistory to MenuSheetItem(AppIcon.Play, stringResource(R.string.ui_resume_watch_history)))
+                    add(LibraryAction.RequestClearHistory to MenuSheetItem(AppIcon.Delete, stringResource(R.string.ui_clear_watch_history_2)))
+                }
                 MenuBottomSheet(
-                    items = listOf(
-                        MenuSheetItem(AppIcon.Pause, stringResource(R.string.ui_pause_watch_history)),
-                        MenuSheetItem(AppIcon.Play, stringResource(R.string.ui_resume_watch_history)),
-                        MenuSheetItem(AppIcon.Delete, stringResource(R.string.ui_clear_watch_history_2)),
-                    ),
+                    items = actions.map { it.second },
                     onDismiss = { historyViewModel.onAction(LibraryAction.CloseOverlay) },
-                    onSelect = { index ->
-                        when (index) {
-                            0 -> historyViewModel.onAction(LibraryAction.PauseHistory)
-                            1 -> historyViewModel.onAction(LibraryAction.ResumeHistory)
-                            else -> historyViewModel.onAction(LibraryAction.RequestClearHistory)
-                        }
-                    },
+                    onSelect = { index -> historyViewModel.onAction(actions[index].first) },
                     tag = "history-manage-sheet",
                     paneTitle = stringResource(R.string.a11y_history_settings),
                 )
@@ -229,6 +251,7 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
     override fun onResume() {
         super.onResume()
         syncSession()
+        refreshDevicePaused()
     }
 
     private fun syncSession() {

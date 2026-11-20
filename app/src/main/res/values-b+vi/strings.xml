@@ -762,4 +762,6 @@
     <string name="watch_strip_back_to_top">Về đầu trang</string>
     <string name="watch_strip_now_playing_a11y">Đang phát: %1$s, %2$s. Nhấn đúp để về đầu trang</string>
     <string name="search_field_label">Nội dung tìm kiếm</string>
+    <string name="qa1_history_paused_banner">Lịch sử xem đang tạm dừng. Các video bạn xem trên thiết bị này sẽ không được lưu.</string>
+    <string name="qa1_clear_history_device_body">Lịch sử xem trên thiết bị này sẽ bị xóa. Bạn không thể hoàn tác thao tác này.</string>
 </resources>

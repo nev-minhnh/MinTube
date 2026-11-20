@@ -49,7 +49,9 @@ import com.hhst.youtubelite.ui.design.rememberWindowClass
 private val RedundantHistorySections = setOf("历史记录", "历史", "觀看記錄", "观看记录")
 
 @Composable
-fun HistoryScreen(state: HistoryUiState, onAction: (LibraryAction) -> Unit, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun HistoryScreen(state: HistoryUiState, onAction: (LibraryAction) -> Unit, onBack: () -> Unit, modifier: Modifier = Modifier,
+    /** Device lane only: recording is paused on this device (the account lane exposes no state). */
+    historyPaused: Boolean = false) {
     val appBar = rememberAppBarCollapseState(enabled = state.overlay == LibraryOverlay.None && state.content is HistoryContent.Ready)
     val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
     val window = rememberWindowClass()
@@ -61,6 +63,7 @@ fun HistoryScreen(state: HistoryUiState, onAction: (LibraryAction) -> Unit, onBa
                         modifier = Modifier.testTag("history-manage")) { onAction(LibraryAction.OpenManageHistory) }
                 }))
             }
+            if (historyPaused) HistoryPausedBanner()
             RefreshableContent(value = state, refreshing = state.content == HistoryContent.Loading,
                     onRefresh = { onAction(LibraryAction.Retry) }, modifier = Modifier.weight(1f).fillMaxWidth(),
                     enabled = state.overlay == LibraryOverlay.None && state.content !is HistoryContent.SignedOut, contentKey = Unit, tag = "history-refresh",
@@ -138,5 +141,20 @@ internal fun LibrarySubPageBar(title: String, onBack: () -> Unit, onAction: (Lib
     MinTopBar(title = title, onBack = onBack, tag = "library-subpage-bar") {
         AppIconButton(AppIcon.Search, stringResource(R.string.a11y_search_youtube)) { onAction(LibraryAction.OpenSearch) }
         trailing?.invoke(this)
+    }
+}
+
+/** Shown while device-lane history recording is paused; Resume lives in the manage menu. */
+@Composable
+private fun HistoryPausedBanner() {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = MinSpace.lg, vertical = MinSpace.xs)
+            .background(DesignTokens.Surface, com.hhst.youtubelite.ui.design.MinRadius.Field)
+            .padding(horizontal = MinSpace.lg, vertical = MinSpace.sm).testTag("history-paused-banner"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        com.hhst.youtubelite.ui.design.AppIcon(AppIcon.Pause, Modifier.padding(end = MinSpace.md), color = DesignTokens.Secondary)
+        com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.qa1_history_paused_banner),
+            com.hhst.youtubelite.ui.design.MinType.Body, Modifier.weight(1f), color = DesignTokens.Secondary)
     }
 }
