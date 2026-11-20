@@ -2,92 +2,121 @@ package com.hhst.youtubelite.ui.about
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import com.hhst.youtubelite.ui.components.AppTopAppBar as TopAppBar
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
-import com.hhst.youtubelite.ui.components.ConstrainedPage
-import com.hhst.youtubelite.ui.theme.SettingsTokens
-import com.hhst.youtubelite.ui.theme.settingsAppBarHeight
+import com.hhst.youtubelite.settings.presentation.SettingsGroup
+import com.hhst.youtubelite.settings.presentation.SettingsLayout
+import com.hhst.youtubelite.settings.presentation.SettingsPageFrame
+import com.hhst.youtubelite.settings.presentation.SettingsRow
+import com.hhst.youtubelite.settings.presentation.settingsInset
+import com.hhst.youtubelite.ui.components.AppLinearProgressIndicator
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * About page. Stateless: `AboutActivity` owns cache clearing, the update check and the diagnostic
+ * export; [busy] disables the actions that run through it and [status] is its last result.
+ */
 @Composable
 fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boolean, status: String,
     onSource: () -> Unit, onUpdate: () -> Unit, onRelease: () -> Unit, onClear: () -> Unit, onExport: () -> Unit,
     onSave: () -> Unit = {}, onUpstream: () -> Unit = {}) {
     BackHandler { onClose() }
-    Scaffold(containerColor = MaterialTheme.colorScheme.background, topBar = {
-        TopAppBar(title = { Text(stringResource(R.string.about), style = MaterialTheme.typography.titleLarge) },
-            expandedHeight = settingsAppBarHeight(),
-            navigationIcon = { IconButton(onClick = onClose) { Icon(painterResource(R.drawable.ic_arrow_back), stringResource(R.string.navigate_back)) } })
-    }) { padding ->
-        ConstrainedPage(Modifier.padding(padding), maxWidth = 720.dp) {
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(SettingsTokens.GroupGap)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Image(painterResource(R.drawable.ic_mintube_mark), label, Modifier.size(48.dp), contentScale = ContentScale.Fit)
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text(label, style = com.hhst.youtubelite.ui.design.MinType.Title)
-                        Text(version, fontSize = 12.sp, lineHeight = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-                Text(stringResource(R.string.about_fork_notice), style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp).testTag("about-fork-notice"))
-                AboutRow(stringResource(R.string.about_upstream), onClick = onUpstream, tag = "about-upstream")
-                AboutRow(stringResource(R.string.about_source), onClick = onSource)
-                AboutRow(stringResource(R.string.about_check_update), !busy, onUpdate)
-                AboutRow(stringResource(R.string.about_releases), onClick = onRelease)
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
-                AboutRow(stringResource(R.string.about_clear_cache), !busy, onClear)
-                AboutRow(stringResource(R.string.about_export_logs), !busy, onExport)
-                AboutRow(stringResource(R.string.about_save_logs), !busy, onSave)
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
-                Text(stringResource(R.string.about_credits), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp).testTag("about-credits"))
-                if (busy) Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.Center) {
-                    com.hhst.youtubelite.home.presentation.LoadingSpinner()
-                }
-                if (status.isNotEmpty()) Text(status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(16.dp))
+    SettingsPageFrame(
+        title = stringResource(R.string.about),
+        onBack = onClose,
+        screenTag = "about-screen",
+        topBarTag = "about-topbar",
+        pageTag = "about-page",
+        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
+        footer = { AboutStatus(busy, status) },
+    ) {
+        val inset = settingsInset()
+        Row(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.xl).testTag("about-identity"),
+            verticalAlignment = Alignment.CenterVertically) {
+            Image(painterResource(R.drawable.ic_mintube_mark), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
+            Spacer(Modifier.width(MinSpace.lg))
+            Column(Modifier.weight(1f)) {
+                AppText(label, MinType.Display, Modifier.semantics { heading() })
+                Spacer(Modifier.height(MinSpace.xs))
+                AppText(stringResource(R.string.account_about_version, version), MinType.Body,
+                    Modifier.testTag("about-version"), color = DesignTokens.Secondary)
             }
+        }
+        Column(Modifier.padding(horizontal = inset).fillMaxWidth().clip(MinRadius.Card)
+            .background(DesignTokens.AccentContainer).padding(MinSpace.lg)) {
+            AppText(stringResource(R.string.about_fork_notice), MinType.Body, Modifier.testTag("about-fork-notice"))
+            Spacer(Modifier.height(MinSpace.sm))
+            AppText(stringResource(R.string.about_credits), MinType.Caption, Modifier.testTag("about-credits"),
+                color = DesignTokens.Secondary)
+        }
+
+        SettingsGroup(stringResource(R.string.account_about_project))
+        SettingsRow(stringResource(R.string.about_source), tag = "about-source", icon = AppIcon.Link, onClick = onSource)
+        SettingsRow(stringResource(R.string.about_upstream), tag = "about-upstream", icon = AppIcon.OpenWith, onClick = onUpstream)
+        SettingsRow(stringResource(R.string.account_about_license), stringResource(R.string.account_about_license_name),
+            tag = "about-license", icon = AppIcon.Info)
+
+        SettingsGroup(stringResource(R.string.account_about_updates))
+        SettingsRow(stringResource(R.string.about_check_update), tag = "about-check-update", icon = AppIcon.Refresh,
+            enabled = !busy, onClick = onUpdate)
+        SettingsRow(stringResource(R.string.about_releases), tag = "about-releases", icon = AppIcon.Globe, onClick = onRelease)
+
+        SettingsGroup(stringResource(R.string.account_about_storage))
+        SettingsRow(stringResource(R.string.about_clear_cache), stringResource(R.string.account_about_clear_cache_summary),
+            tag = "about-clear-cache", icon = AppIcon.Delete, enabled = !busy, onClick = onClear)
+
+        SettingsGroup(stringResource(R.string.account_about_diagnostics))
+        Column(Modifier.testTag("about-diagnostics")) {
+            SettingsRow(stringResource(R.string.about_export_logs), stringResource(R.string.account_about_export_summary),
+                tag = "about-export-logs", icon = AppIcon.Share, enabled = !busy, onClick = onExport)
+            SettingsRow(stringResource(R.string.about_save_logs), stringResource(R.string.account_about_save_summary),
+                tag = "about-save-logs", icon = AppIcon.Download, enabled = !busy, onClick = onSave)
         }
     }
 }
 
+/** Result line of the last action, pinned under the list so it is visible wherever the list is scrolled. */
 @Composable
-private fun AboutRow(label: String, enabled: Boolean = true, onClick: () -> Unit, tag: String? = null) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).then(if (tag != null) Modifier.testTag(tag) else Modifier)
-        .clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
-        .padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, fontSize = 16.sp, lineHeight = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else .38f))
+private fun AboutStatus(busy: Boolean, status: String) {
+    if (!busy && status.isEmpty()) return
+    Box(Modifier.fillMaxWidth().background(DesignTokens.Panel), contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = SettingsLayout.MaxWidth).fillMaxWidth().testTag("about-status")
+            .semantics { liveRegion = LiveRegionMode.Polite }) {
+            if (busy) AppLinearProgressIndicator(Modifier.fillMaxWidth().testTag("about-busy-indicator"))
+            else Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+            if (status.isNotEmpty()) AppText(status, MinType.Body,
+                Modifier.padding(horizontal = settingsInset(), vertical = MinSpace.md))
+        }
     }
 }
