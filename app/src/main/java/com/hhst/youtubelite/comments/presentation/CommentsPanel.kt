@@ -831,6 +831,7 @@ private fun ReplyContent(threadId: String, reply: CommentReply, videoId: String?
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun CommentAuthorRow(
     author: CommentAuthor,
@@ -839,18 +840,19 @@ private fun CommentAuthorRow(
     channelId: String,
     onAction: (CommentAction) -> Unit,
 ) {
-    Row(
+    // Flows: at large font scales the age moves under the name instead of squeezing it to "@A...".
+    androidx.compose.foundation.layout.FlowRow(
         Modifier.fillMaxWidth().padding(end = 4.dp).appDescription(R.string.a11y_open_channel, author.handle).clickable(role = Role.Button) {
             if (channelId.isNotEmpty()) onAction(CommentAction.OpenAuthor(channelId))
         }.testTag("comment-$testTagSuffix-open-author"),
+        horizontalArrangement = Arrangement.spacedBy(MinSpace.sm),
     ) {
         AppText(
             author.handle.ifBlank { author.displayName },
             MinType.Caption.copy(fontWeight = FontWeight.Medium),
-            Modifier.weight(1f).testTag("comment-$testTagSuffix-author"),
+            Modifier.testTag("comment-$testTagSuffix-author"),
             maxLines = 1,
         )
-        Spacer(Modifier.width(MinSpace.sm))
         AppText(age, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
     }
 }

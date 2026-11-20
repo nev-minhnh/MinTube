@@ -1,6 +1,5 @@
 package com.hhst.youtubelite.watch.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.hhst.youtubelite.R
@@ -55,8 +55,12 @@ internal fun RelatedChipRow(filter: RelatedFilter, inset: Dp, onSelect: (fromCha
         add(stringResource(R.string.responsive_chip_all))
         if (filter.canFilter) add(stringResource(R.string.responsive_chip_from_channel, filter.channel))
     }
-    // Opaque: in the single-column page the row sticks under the player while the feed scrolls beneath it.
-    Box(modifier.fillMaxWidth().background(DesignTokens.Background).testTag("watch-related-chip-row")) {
+    // Opaque and drawn above the rows: in the single-column page the row sticks under the player while
+    // the feed scrolls beneath it. Its surface carries the page background plus the player glow, so
+    // the light stays continuous while nothing from the list shows through; the bottom gap keeps a
+    // row cut by the header away from the chips.
+    Box(modifier.zIndex(1f).fillMaxWidth().watchGlowBackground().padding(bottom = MinSpace.sm)
+        .testTag("watch-related-chip-row")) {
         FilterChips(
             labels = labels,
             selectedIndex = if (filter.fromChannel) 1 else 0,

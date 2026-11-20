@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
@@ -24,6 +25,7 @@ import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.player.sponsor.SponsorBlockManager
@@ -50,6 +52,13 @@ fun PlayerTimeBar(
     /** Drag released (gesture overlay hides even when the seek is a no-op). */
     onCommit: () -> Unit = {},
     chapterStarts: List<Long> = emptyList(),
+    /**
+     * Horizontal inset of the visible track inside the full-width hit canvas, so the bar lines up
+     * with the control row instead of running edge to edge. Touches in the inset still scrub
+     * (clamped to the track ends); the 48 dp hit height is unchanged.
+     */
+    trackInsetLeft: Dp = 0.dp,
+    trackInsetRight: Dp = 0.dp,
 ) {
     var dragging by remember { mutableStateOf(false) }
     var dragFraction by remember { mutableFloatStateOf(0f) }
@@ -70,13 +79,14 @@ fun PlayerTimeBar(
                     true
                 }
             }
-            .pointerInput(durationMs) {
+            .pointerInput(durationMs, trackInsetLeft, trackInsetRight) {
                 if (durationMs <= 0L) return@pointerInput
                 awaitEachGesture {
                     try {
                         val down = awaitFirstDown()
-                        val width = size.width.toFloat().coerceAtLeast(1f)
-                        fun fractionOf(x: Float) = (x / width).coerceIn(0f, 1f)
+                        val left = trackInsetLeft.toPx()
+                        val width = (size.width - left - trackInsetRight.toPx()).coerceAtLeast(1f)
+                        fun fractionOf(x: Float) = ((x - left) / width).coerceIn(0f, 1f)
                         dragging = true
                         dragFraction = fractionOf(down.position.x)
                         // Preview follows the finger; the seek lands once on
@@ -113,28 +123,33 @@ fun PlayerTimeBar(
         val thickness = PlayerUi.TIME_BAR_THICKNESS_DP.dp.toPx()
         val centerY = size.height / 2f
         val y = centerY - thickness / 2f
-        val barSize = Size(size.width, thickness)
+        val x0 = trackInsetLeft.toPx().coerceAtMost(size.width)
+        val trackWidth = (size.width - x0 - trackInsetRight.toPx()).coerceAtLeast(0f)
+        val barSize = Size(trackWidth, thickness)
 
-        drawRect(PlayerUi.Unplayed, topLeft = Offset(0f, y), size = barSize)
+        drawRect(PlayerUi.Unplayed, topLeft = Offset(x0, y), size = barSize)
         drawRect(
             PlayerUi.Buffered,
-            topLeft = Offset(0f, y),
-            size = Size(size.width * buffered, thickness),
+            topLeft = Offset(x0, y),
+            size = Size(trackWidth * buffered, thickness),
         )
-        drawRect(
-            PlayerUi.brandBrush(size.width),
-            topLeft = Offset(0f, y),
-            size = Size(size.width * played, thickness),
-        )
+        // The brand gradient spans the inset track, not the canvas.
+        translate(left = x0) {
+            drawRect(
+                PlayerUi.brandBrush(trackWidth),
+                topLeft = Offset(0f, y),
+                size = Size(trackWidth * played, thickness),
+            )
+        }
         // Markers last so they stay visible over played and unplayed regions.
         segments.forEach { segment ->
             val range = PlayerUi.segmentRange(segment.startMs, segment.endMs, durationMs,
                 point = segment.category == "poi_highlight") ?: return@forEach
             val point = range.first == range.second
             val width = (if (point) 4.dp.toPx() else
-                (size.width * (range.second - range.first)).coerceAtLeast(2f)).coerceAtMost(size.width)
-            val startX = (size.width * range.first - if (point) width / 2f else 0f)
-                .coerceIn(0f, (size.width - width).coerceAtLeast(0f))
+                (trackWidth * (range.second - range.first)).coerceAtLeast(2f)).coerceAtMost(trackWidth)
+            val startX = x0 + (trackWidth * range.first - if (point) width / 2f else 0f)
+                .coerceIn(0f, (trackWidth - width).coerceAtLeast(0f))
             drawRect(
                 PlayerUi.segmentColor(segment.category),
                 topLeft = Offset(startX, y),
@@ -142,14 +157,14 @@ fun PlayerTimeBar(
             )
         }
         if (durationMs > 0) chapterStarts.distinct().filter { it > 0 && it < durationMs }.forEach { start ->
-            val x = size.width * (start.toFloat() / durationMs)
+            val x = x0 + trackWidth * (start.toFloat() / durationMs)
             drawRect(androidx.compose.ui.graphics.Color.Black, Offset(x - 1.dp.toPx(), y), Size(2.dp.toPx(), thickness))
         }
         val thumbR = if (dragging) 7.dp.toPx() else 5.dp.toPx()
         drawCircle(
             color = PlayerUi.Accent,
             radius = thumbR,
-            center = Offset(size.width * played, centerY),
+            center = Offset(x0 + trackWidth * played, centerY),
         )
     }
 }

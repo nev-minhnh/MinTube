@@ -137,6 +137,8 @@ private fun PlaybackSettings(preferences: Map<String, Boolean>, onToggle: (Strin
         PreferenceKeys.ENABLE_IN_APP_MINI_PLAYER, preferences, onToggle)
     SettingsToggle(stringResource(R.string.settings_remember_position), stringResource(R.string.settings_remember_position_summary),
         PreferenceKeys.REMEMBER_LAST_POSITION, preferences, onToggle)
+    SettingsToggle(stringResource(R.string.glow_setting_title), stringResource(R.string.glow_setting_summary),
+        PreferenceKeys.PLAYER_GLOW, preferences, onToggle)
 }
 
 @Composable

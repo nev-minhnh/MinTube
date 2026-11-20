@@ -10,6 +10,15 @@ import org.junit.Test
 
 class PlayerUiTest {
 
+    @Test fun seekBarInsetFollowsPageOrientationAndFullscreenEdges() {
+        assertEquals(16, PlayerUi.trackInsetDp(fullscreen = false, landscape = false, edgeInsetDp = 0, containerPadDp = 0))
+        assertEquals(24, PlayerUi.trackInsetDp(fullscreen = false, landscape = true, edgeInsetDp = 30, containerPadDp = 0))
+        // Fullscreen: 24 dp past the cutout/gesture edge, minus what the chrome padding already covers.
+        assertEquals(24 + 32 - 32, PlayerUi.trackInsetDp(fullscreen = true, landscape = true, edgeInsetDp = 32, containerPadDp = 32))
+        assertEquals(8, PlayerUi.trackInsetDp(fullscreen = true, landscape = true, edgeInsetDp = 0, containerPadDp = 16))
+        assertEquals(0, PlayerUi.trackInsetDp(fullscreen = false, landscape = false, edgeInsetDp = 0, containerPadDp = 40))
+    }
+
     @Test fun endedPlaybackOffersReplayRegardlessOfRemainingNavigationOrPlayIntent() {
         for (hasNext in listOf(false, true)) {
             val ended = PlayerUiState(

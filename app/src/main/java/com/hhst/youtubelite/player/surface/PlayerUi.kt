@@ -354,6 +354,23 @@ object PlayerUi {
     /** Grows beyond [FULLSCREEN_SIDE_DP] to cover display cutouts / gesture insets. */
     fun fullscreenSideDp(insetDp: Int): Int = maxOf(FULLSCREEN_SIDE_DP, insetDp.coerceAtLeast(0))
 
+    const val TRACK_INSET_PORTRAIT_DP = 16
+    const val TRACK_INSET_WIDE_DP = 24
+
+    /**
+     * Distance of the seek bar (and control row) from the player's edge, inside a container that
+     * already sits [containerPadDp] in from that edge. Portrait page: 16 dp; landscape: 24 dp;
+     * fullscreen: 24 dp plus the cutout/system-gesture edge [edgeInsetDp].
+     */
+    fun trackInsetDp(fullscreen: Boolean, landscape: Boolean, edgeInsetDp: Int, containerPadDp: Int): Int {
+        val total = when {
+            fullscreen -> TRACK_INSET_WIDE_DP + edgeInsetDp.coerceAtLeast(0)
+            landscape -> TRACK_INSET_WIDE_DP
+            else -> TRACK_INSET_PORTRAIT_DP
+        }
+        return (total - containerPadDp.coerceAtLeast(0)).coerceAtLeast(0)
+    }
+
     fun sheetMaxHeightDp(screenHeightDp: Int): Int =
         (screenHeightDp.coerceAtLeast(0) * 3 / 4).coerceIn(200, 520)
 

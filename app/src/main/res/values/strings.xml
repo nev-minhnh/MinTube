@@ -762,4 +762,6 @@
     <string name="responsive_chip_all">All</string>
     <string name="responsive_chip_from_channel">From %1$s</string>
     <string name="responsive_chip_filter_hint">Showing only loaded suggestions from this channel</string>
+    <string name="glow_setting_title">Glow behind player</string>
+    <string name="glow_setting_summary">Soft light in the video\'s colours</string>
 </resources>

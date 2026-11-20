@@ -19,6 +19,8 @@ object PreferenceKeys {
     const val ENABLE_PIP = "enable_pip"
     const val ENABLE_IN_APP_MINI_PLAYER = "enable_in_app_mini_player"
     const val DATA_SAVER = "data_saver"
+    /** Soft light in the video's colours behind the embedded watch-page player. */
+    const val PLAYER_GLOW = "player_glow"
 
     const val SKIP_SPONSORS = "skip_sponsors"
     const val SKIP_SELF_PROMO = "skip_self_promo"
@@ -95,6 +97,7 @@ object PreferenceKeys {
         ENABLE_PIP to true,
         ENABLE_IN_APP_MINI_PLAYER to true,
         DATA_SAVER to false,
+        PLAYER_GLOW to true,
         REMEMBER_RESIZE_MODE to false,
         REMEMBER_PLAYBACK_SPEED to false,
         USE_ORIGINAL_TITLE to false,

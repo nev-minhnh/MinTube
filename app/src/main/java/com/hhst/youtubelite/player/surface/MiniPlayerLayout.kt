@@ -7,6 +7,8 @@ object MiniPlayerLayout {
 
     const val NO_WIDTH_OVERRIDE_DP = -1
     const val CORNER_DP = 16
+    /** Mini progress line inset from the card edges, clear of the [CORNER_DP] rounding. */
+    const val PROGRESS_INSET_DP = 8
     const val STROKE_COLOR = 0x12FFFFFF
     const val SCRIM_COLOR = 0x66000000
     private const val COMPACT_BREAKPOINT_DP = 600
