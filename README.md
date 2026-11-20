@@ -3,7 +3,7 @@
   <p>An unofficial, open-source YouTube client for Android with a calm, redesigned interface.</p>
 
   <p>
-    <img src="https://img.shields.io/badge/Android-7.0%2B-0B8F6A?style=flat-square" alt="Android 7.0 or later">
+    <img src="https://img.shields.io/badge/Android-7.0%2B-0A7EA4?style=flat-square" alt="Android 7.0 or later">
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-596273?style=flat-square" alt="GPL v3 license"></a>
   </p>
 </div>
@@ -15,13 +15,25 @@ issues to Litube.
 
 ## What MinTube changes
 
-- **Redesigned interface, "Mint".** A new design system: mint-green accent, soft ink neutrals, generous rounding,
-  Be Vietnam Pro titles, Material Symbols Rounded icons, one shared bottom navigation bar and one card family across
-  feeds. The plan is in [docs/UI_PLAN.md](docs/UI_PLAN.md).
+- **Redesigned interface.**
+  - Every screen is rebuilt on one design system, with light and dark themes.
+  - Colours: a cyan accent and true-grey neutrals. The dark theme uses the icon's black.
+  - Type and icons: Be Vietnam Pro for titles and Material Symbols Rounded icons.
+  - One shared navigation bar and one card family across feeds.
+  - Every list has loading skeletons, plus empty and error states with a retry button.
+  - The design plan is in [docs/UI_PLAN.md](docs/UI_PLAN.md).
+- **Signature details.** The played part of the seek bar is drawn in the icon's cyan-to-pink gradient.
+- **Phones and tablets.**
+  - Phones stay in portrait. Only fullscreen video rotates.
+  - Tablets rotate freely. In landscape they get a side navigation rail and a two-column watch page: the video and
+    its details on the left, related videos on the right, and each column scrolls on its own.
+  - The playing video stays pinned at the top while you scroll, with a filter row under it.
 - **New name and application ID.** The app is `com.nevminhnh.mintube` (`com.nevminhnh.mintube.debug` for debug
   builds), so it installs side by side with Litube and never replaces it.
-- **New icon.** An adaptive launcher icon with a themed (monochrome) layer.
+- **New icon.** A gradient "m" with a play mark. It is an adaptive launcher icon with a themed (monochrome) layer.
 - **Its own update check.** The About screen points at the MinTube repository and links back to the original project.
+- **Local testing.** All tests run on the developer machine and their results are committed with the code; GitHub
+  Actions only builds and publishes releases (see *Tests and verification*).
 
 Kept on purpose, so existing data keeps working: downloads are still saved under `Downloads/Litube`, and settings
 backups keep the `litube-settings` format, so a Litube backup can be restored in MinTube.
