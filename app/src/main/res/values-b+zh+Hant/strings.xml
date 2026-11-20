@@ -764,4 +764,6 @@
     <string name="watch_strip_back_to_top">Back to top</string>
     <string name="watch_strip_now_playing_a11y">Now playing: %1$s, %2$s. Double tap to go to top</string>
     <string name="search_field_label">Search query</string>
+    <string name="qa1_history_paused_banner">Watch history is paused. Videos you watch on this device are not saved.</string>
+    <string name="qa1_clear_history_device_body">Your watch history will be cleared on this device. This can\'t be undone.</string>
 </resources>

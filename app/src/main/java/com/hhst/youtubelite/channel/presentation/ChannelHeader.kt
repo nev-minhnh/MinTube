@@ -95,6 +95,10 @@ internal object ChannelMetrics {
     /** Lines of the description teaser before "...more". */
     const val DescriptionLines = 2
 
+    /** Landscape: avatar of the compact header row, and the thinnest banner strip still worth drawing. */
+    val LandscapeAvatar = 56.dp
+    val LandscapeMinBanner = 56.dp
+
     /** Longest line of the description and links beside a large avatar. */
     val DetailsMaxWidth = 600.dp
 }
@@ -111,6 +115,14 @@ internal fun ChannelHeader(page: ChannelPage, width: Float, onAction: (ChannelAc
     val profile = page.profile
     val compact = ChannelMetrics.window(width) == WindowClass.Compact
     val inset = ChannelMetrics.inset(width)
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    // Landscape (tablet or phone): a short banner strip and one dense identity row, so the tabs and
+    // the first row of videos stay on screen. The header is a list item and scrolls away with it.
+    val landscape = configuration.screenWidthDp > configuration.screenHeightDp
+    if (landscape) {
+        LandscapeChannelHeader(profile, width, configuration.screenHeightDp, onAction, subscribePending)
+        return
+    }
     Column(Modifier.fillMaxWidth().testTag("channel-header")) {
         profile.banner?.let { banner ->
             Box(Modifier.padding(start = inset, end = inset, top = MinSpace.sm).fillMaxWidth()
@@ -129,6 +141,44 @@ internal fun ChannelHeader(page: ChannelPage, width: Float, onAction: (ChannelAc
         }
         if (compact) Column(Modifier.fillMaxWidth().padding(horizontal = inset)) { ChannelDetails(profile, onAction, subscribePending) }
         Spacer(Modifier.height(MinSpace.sm))
+    }
+}
+
+/**
+ * Landscape header: banner capped at about a sixth of the screen height (dropped when that is too thin
+ * to read), a small avatar, name and stats with a one-line "...more" teaser, and Subscribe at the end.
+ */
+@Composable
+private fun LandscapeChannelHeader(profile: ChannelProfile, width: Float, screenHeight: Int,
+    onAction: (ChannelAction) -> Unit, subscribePending: Boolean) {
+    val inset = ChannelMetrics.inset(width)
+    val bannerHeight = minOf(((width.dp - inset * 2) / ChannelMetrics.bannerAspect(width)), (screenHeight * 0.16f).dp)
+    Column(Modifier.fillMaxWidth().testTag("channel-header")) {
+        if (bannerHeight >= ChannelMetrics.LandscapeMinBanner) profile.banner?.let { banner ->
+            Box(Modifier.padding(start = inset, end = inset, top = MinSpace.xs).fillMaxWidth().height(bannerHeight)
+                .clip(MinRadius.Card).testTag("channel-banner")) {
+                Artwork(banner, Modifier.fillMaxSize())
+            }
+        }
+        Row(Modifier.fillMaxWidth().padding(start = inset, end = inset, top = MinSpace.sm),
+            verticalAlignment = Alignment.CenterVertically) {
+            Artwork(profile.avatar, Modifier.size(ChannelMetrics.LandscapeAvatar).clip(CircleShape).testTag("channel-avatar"))
+            Spacer(Modifier.width(ChannelMetrics.AvatarGap))
+            Column(Modifier.weight(1f)) {
+                AppText(profile.name, MinType.Title, Modifier.fillMaxWidth().testTag("channel-name").semantics { heading() }, maxLines = 1)
+                ChannelIdentity(profile)
+                Box(Modifier.widthIn(max = ChannelMetrics.DetailsMaxWidth)) { ChannelDescription(profile.description, onAction, lines = 1) }
+            }
+            Spacer(Modifier.width(MinSpace.lg))
+            SubscribeButton(
+                subscribed = profile.subscribed == true,
+                onClick = { onAction(ChannelAction.Subscribe) },
+                pending = subscribePending,
+                testTag = "channel-subscribe",
+                channelId = profile.channelId,
+            )
+        }
+        Spacer(Modifier.height(MinSpace.xs))
     }
 }
 
@@ -166,13 +216,13 @@ private fun ChannelDetails(profile: ChannelProfile, onAction: (ChannelAction) ->
  * suffix still fits, so the affordance is never ellipsized away. Opens the About panel.
  */
 @Composable
-private fun ChannelDescription(description: String, onAction: (ChannelAction) -> Unit) {
+private fun ChannelDescription(description: String, onAction: (ChannelAction) -> Unit, lines: Int = ChannelMetrics.DescriptionLines) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val style = MinType.Body.copy(color = DesignTokens.Secondary)
     BoxWithConstraints(Modifier.fillMaxWidth().padding(top = MinSpace.xs).heightIn(min = MinSpace.Touch).testTag("channel-description")
         .clickable(role = Role.Button) { onAction(ChannelAction.OpenFullDescription) }, contentAlignment = Alignment.CenterStart) {
-        val limit = ChannelMetrics.DescriptionLines
+        val limit = lines
         val ink = DesignTokens.Ink
         val text = remember(description, constraints.maxWidth, style, density.fontScale, ink) {
             fun summary(end: Int) = buildAnnotatedString {
