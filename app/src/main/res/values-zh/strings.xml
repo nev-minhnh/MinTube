@@ -763,4 +763,5 @@
     <string name="glow_setting_summary">Soft light in the video\'s colours</string>
     <string name="watch_strip_back_to_top">Back to top</string>
     <string name="watch_strip_now_playing_a11y">Now playing: %1$s, %2$s. Double tap to go to top</string>
+    <string name="search_field_label">Search query</string>
 </resources>

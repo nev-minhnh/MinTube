@@ -99,7 +99,7 @@ internal fun SearchPanel(
     Column(Modifier.fillMaxWidth().graphicsLayer {
         alpha = reveal.value
         translationY = -4.dp.toPx() * (1f - reveal.value)
-    }.background(DesignTokens.Background).testTag("search-overlay").appPaneTitle(R.string.a11y_search_youtube)) {
+    }.background(DesignTokens.Background).testTag("search-overlay").appPaneTitle(R.string.a11y_search)) {
         Row(
             Modifier.fillMaxWidth().heightIn(min = 56.dp).background(DesignTokens.Panel)
                 .padding(start = MinSpace.xs, end = MinSpace.sm, top = MinSpace.xs, bottom = MinSpace.xs),
@@ -114,12 +114,12 @@ internal fun SearchPanel(
             ) {
                 BasicTextField(field, { field = it; onQueryChanged(it.text) },
                     Modifier.weight(1f).padding(vertical = MinSpace.sm).focusRequester(focus).testTag("search-input")
-                        .appDescription(R.string.a11y_search_youtube),
+                        .appDescription(R.string.search_field_label),
                     textStyle = MinType.Body.copy(color = DesignTokens.Ink), singleLine = true, cursorBrush = SolidColor(DesignTokens.Accent),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { submit(query) }),
                     decorationBox = { inner -> Box {
-                        if (query.isEmpty()) AppText(stringResource(R.string.a11y_search_youtube), MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
+                        if (query.isEmpty()) AppText(stringResource(R.string.a11y_search), MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
                         inner()
                     } })
                 if (query.isNotEmpty()) AppIconButton(AppIcon.Close, stringResource(R.string.a11y_clear_search), color = DesignTokens.Secondary) {
