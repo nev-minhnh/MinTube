@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -33,7 +34,7 @@ class HomeLoadingContinuityAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     HomeScreen(HomeUiState(content = content), { actions += it })
                 }
             }

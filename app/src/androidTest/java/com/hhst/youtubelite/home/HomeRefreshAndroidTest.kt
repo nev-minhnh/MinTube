@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -42,7 +43,7 @@ class HomeRefreshAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(state, { action ->
                         if (action == HomeAction.Refresh && !(state.content as HomeContent.Feed).refreshing) {
                             actions += action
@@ -53,8 +54,11 @@ class HomeRefreshAndroidTest {
                 }
             }
         }
+        // The feed runs under the top bar and chip strip; start the pull on the rows below them.
+        val feedTop = compose.onNodeWithTag("home-feed").fetchSemanticsNode().boundsInRoot.top
+        val start = compose.onNodeWithTag("home-chips").fetchSemanticsNode().boundsInRoot.bottom - feedTop + 20f
         compose.onNodeWithTag("home-feed").performTouchInput {
-            swipe(Offset(center.x, 100f), Offset(center.x, 700f))
+            swipe(Offset(center.x, start), Offset(center.x, start + 600f))
         }
         compose.waitForIdle()
         assertEquals(1, actions.count { it == HomeAction.Refresh })
@@ -70,7 +74,7 @@ class HomeRefreshAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(state, { action -> if (action == HomeAction.Refresh) actions += action })
                 }
             }
@@ -90,7 +94,7 @@ class HomeRefreshAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(state, { action ->
                         if (action == HomeAction.Refresh && !(state.content as HomeContent.Feed).refreshing) {
                             actions += action
@@ -113,7 +117,7 @@ class HomeRefreshAndroidTest {
     @Test fun quietRefreshPaintsNoIndicator() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(hostState(refreshing = true, userRefresh = false), {})
                 }
             }
@@ -125,7 +129,7 @@ class HomeRefreshAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(hostState(refreshing = false, userRefresh = false), actions::add)
                 }
             }
@@ -152,7 +156,7 @@ class HomeRefreshAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(hostState(refreshing = false, userRefresh = false), actions::add)
                 }
             }
@@ -172,7 +176,7 @@ class HomeRefreshAndroidTest {
         var state by mutableStateOf(HomeUiState(content = HomeContent.Empty(refreshing = true, userRefresh = true)))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, {}) }
             }
         }
         compose.onNodeWithTag("empty-message").assertIsDisplayed()
@@ -188,7 +192,7 @@ class HomeRefreshAndroidTest {
         var state by mutableStateOf(hostState(refreshing = false, userRefresh = false))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, {}) }
             }
         }
         val topBarBefore = compose.onNodeWithTag("home-topbar").fetchSemanticsNode().boundsInRoot

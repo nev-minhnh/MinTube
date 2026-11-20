@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -18,7 +19,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
+import com.hhst.youtubelite.ui.design.MintColors
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.test.filters.SdkSuppress
@@ -41,21 +44,23 @@ class HomeScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(HomeUiState(content = HomeContent.Loading), {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(HomeUiState(content = HomeContent.Loading), {}) }
             }
         }
         val phone = compose.onNodeWithTag("skeleton-thumb-0", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, phone.left, 0.5f)
-        assertEquals(98f, phone.top, 0.5f)
-        assertEquals(390f, phone.width, 0.5f)
-        assertEquals(219.375f, phone.height, 0.6f)
+        // Mint feed: 16:9 cards inside the 16dp phone inset, 8dp below the chrome.
+        assertEquals(16f, phone.left, 0.5f)
+        assertEquals(112f, phone.top, 0.5f)
+        assertEquals(358f, phone.width, 0.5f)
+        assertEquals(201.375f, phone.height, 0.6f)
         compose.runOnIdle { width = 1280 }
         val wide = compose.onNodeWithTag("skeleton-thumb-0", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         val third = compose.onNodeWithTag("skeleton-thumb-2", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(16f, wide.left, 0.5f)
-        assertEquals(110f, wide.top, 0.5f)
-        assertEquals(404.917f, wide.width, 0.6f)
-        assertEquals(857.833f, third.left, 0.6f)
+        // Three columns inside the 24dp wide inset with 16dp gaps.
+        assertEquals(24f, wide.left, 0.5f)
+        assertEquals(112f, wide.top, 0.5f)
+        assertEquals(400f, wide.width, 0.6f)
+        assertEquals(856f, third.left, 0.6f)
     }
 
     @Test fun shortsAndPostsMatchMeasuredLayout() {
@@ -66,31 +71,35 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState(content = HomeContent.Feed(HomePage(listOf(shelf)))))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(state, {}) }
             }
         }
         fun bounds(id: Int) = compose.onNodeWithTag("short-short-$id").fetchSemanticsNode().boundsInRoot
         val first = bounds(1)
+        // Shorts are one horizontally scrolling shelf of 9:16 cards, not a two-column grid.
         assertEquals(16f, first.left, 0.5f)
-        assertEquals(166f, first.top, 0.5f)
-        assertEquals(175f, first.width, 0.5f)
+        assertEquals(160f, first.top, 0.5f)
+        assertEquals(148f, first.width, 0.5f)
         assertEquals(262.5f, first.height, 0.6f)
-        assertEquals(first.bottom + 8f, bounds(3).top, 0.5f)
+        assertEquals(first.top, bounds(3).top, 0.5f)
         compose.onNodeWithTag("short-short-5").assertDoesNotExist()
         for (w in listOf(599, 600, 840, 1280, 1600)) {
             compose.runOnIdle { width = w }
             val columns = HomeLayout.shortsColumns(w.toFloat())
-            val gap = if (w < 600) 8 else 16
-            val cardWidth = (w - 32f - gap * (columns - 1)) / columns
+            // Fixed card width: 148dp on compact windows, 172dp from 600dp, 12dp apart.
+            val gap = 12f
+            val cardWidth = if (w < 600) 148f else 172f
             assertEquals(cardWidth, bounds(1).width, 1f)
+            assertEquals(bounds(1).right + gap, bounds(2).left, 1f)
             assertEquals(bounds(1).top, bounds(2).top, 0.5f)
             if (w >= 600) assertEquals(bounds(1).top, bounds(columns).top, 0.5f)
         }
         for (w in listOf(390, 1280)) {
             compose.runOnIdle { width = w; state = HomeUiState(content = HomeContent.Feed(HomePage(listOf(post)))) }
             val p = compose.onNodeWithTag("community-post").fetchSemanticsNode().boundsInRoot
-            assertEquals(0f, p.left, 0.5f)
-            assertEquals(w.toFloat(), p.width, 0.5f)
+            // A post spans the row inside the page inset and reads at most 640dp wide.
+            assertEquals(if (w == 390) 16f else 24f, p.left, 0.5f)
+            assertEquals(if (w == 390) 358f else 640f, p.width, 0.5f)
         }
     }
 
@@ -99,7 +108,7 @@ class HomeScreenshotAndroidTest {
         val selected = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, { selected += it }) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { HomeScreen(state, { selected += it }) }
             }
         }
         for (kind in listOf(FeedMenuKind.Short, FeedMenuKind.Shorts, FeedMenuKind.Post, FeedMenuKind.Mix)) {
@@ -114,7 +123,8 @@ class HomeScreenshotAndroidTest {
                 assertEquals(HomeAction.CloseOverlay, selected.last())
             } else {
                 val box = compose.onNodeWithTag("video-menu").fetchSemanticsNode().boundsInRoot
-                assertEquals(13f + kind.actions.size * 48f, box.height, 0.5f)
+                // 20dp handle strip and 8dp under the actions.
+                assertEquals(28f + kind.actions.size * 48f, box.height, 0.5f)
                 compose.onNodeWithText(kind.actions.first().label).performClick()
                 assertEquals(HomeAction.MenuSelected(kind.actions.first()), selected.last())
             }
@@ -128,7 +138,7 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
             }
         }
         val names = listOf(390, 1280).flatMap { w -> listOf("short", "shorts", "post", "mix").map { "menu-$it-$w" } }.toSet()
@@ -152,7 +162,7 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState(content = HomeContent.Failed))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(320.dp, 240.dp)) {
+                TestWindowBox(Modifier.requiredSize(320.dp, 240.dp)) {
                     HomeScreen(state, { if (it == HomeAction.Refresh) state = state.copy(content = HomeContent.Loading) })
                 }
             }
@@ -164,28 +174,59 @@ class HomeScreenshotAndroidTest {
         compose.onNodeWithTag("home-error").assertDoesNotExist()
     }
 
+    /** Pixels within a small tolerance of either theme's value of a palette color. */
+    private fun countNear(bitmap: Bitmap, vararg colors: Long): Int {
+        val targets = colors.map { it.toInt() }
+        var count = 0
+        for (y in 0 until bitmap.height) for (x in 0 until bitmap.width) {
+            val pixel = bitmap.getPixel(x, y)
+            if (targets.any { target -> listOf(0, 8, 16).all { shift -> abs((pixel shr shift and 255) - (target shr shift and 255)) <= 12 } }) count++
+        }
+        return count
+    }
+
     @Test fun loadingIndicatorChangesOverTime() {
         compose.mainClock.autoAdvance = false
         try {
+            var refreshing by mutableStateOf(false)
+            val feed = HomeScenario.Feed.initialContent() as HomeContent.Feed
             compose.setContent {
                 CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                    HomeScreen(HomeUiState(content = HomeContent.Feed(HomePage(emptyList()), append = AppendState.Loading)), {})
+                    TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
+                        HomeScreen(if (refreshing) HomeUiState(content = feed.copy(refreshing = true, userRefresh = true), signedInPreview = true)
+                            else HomeUiState(content = HomeContent.Feed(HomePage(emptyList()), append = AppendState.Loading)), {})
+                    }
                 }
             }
+            // Paging footer: the shared Mint footer draws a 24dp accent arc on the Ghost track.
             compose.mainClock.advanceTimeByFrame()
-            val before = compose.onNodeWithContentDescription("Loading").captureToImage().asAndroidBitmap()
-            assertEquals(32, before.width)
-            assertEquals(32, before.height)
-            assertEquals(0xFF666666.toInt(), before.getPixel(16, 1))
-            assertEquals(0xFFEEEEEE.toInt(), before.getPixel(16, 30))
+            val footer = compose.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate), useUnmergedTree = true)
+            val before = footer.captureToImage().asAndroidBitmap()
+            assertEquals(24, before.width)
+            assertEquals(24, before.height)
+            assertTrue("Footer arc uses the accent", countNear(before, MintColors.LightAccent, MintColors.DarkAccent) > 0)
+            assertTrue("Footer track uses Ghost", countNear(before, MintColors.LightGhost, MintColors.DarkGhost) > 0)
             compose.mainClock.advanceTimeBy(400)
-            val after = compose.onNodeWithContentDescription("Loading").captureToImage().asAndroidBitmap()
+            val after = footer.captureToImage().asAndroidBitmap()
             assertFalse("Loading indicator must rotate", before.sameAs(after))
+
+            // Refresh indicator: the Mint LoadingSpinner, a 32dp ring that turns once every 800ms.
+            compose.runOnIdle { refreshing = true }
+            compose.mainClock.advanceTimeBy(1_000)
+            val spinner = compose.onNode(hasContentDescription("Loading") and hasAnyAncestor(hasTestTag("home-refresh-indicator")),
+                useUnmergedTree = true)
+            val first = spinner.captureToImage().asAndroidBitmap()
+            assertEquals(32, first.width)
+            assertEquals(32, first.height)
+            assertTrue("Spinner arc uses the accent", countNear(first, MintColors.LightAccent, MintColors.DarkAccent) > 0)
+            assertTrue("Spinner track uses Ghost", countNear(first, MintColors.LightGhost, MintColors.DarkGhost) > 0)
             compose.mainClock.advanceTimeBy(400)
-            val cycle = compose.onNodeWithContentDescription("Loading").captureToImage().asAndroidBitmap()
+            assertFalse("Loading spinner must rotate", first.sameAs(spinner.captureToImage().asAndroidBitmap()))
+            compose.mainClock.advanceTimeBy(400)
+            val cycle = spinner.captureToImage().asAndroidBitmap()
             val beforePixels = IntArray(32 * 32)
             val cyclePixels = IntArray(beforePixels.size)
-            before.getPixels(beforePixels, 0, 32, 0, 0, 32, 32)
+            first.getPixels(beforePixels, 0, 32, 0, 0, 32, 32)
             cycle.getPixels(cyclePixels, 0, 32, 0, 0, 32, 32)
             assertTrue("Loading period must be 800ms", beforePixels.indices.all { i ->
                 listOf(0, 8, 16).all { shift -> abs((beforePixels[i] shr shift and 255) - (cyclePixels[i] shr shift and 255)) <= 2 }
@@ -199,7 +240,7 @@ class HomeScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     HomeScreen(HomeUiState(content = HomeScenario.Feed.initialContent(), signedInPreview = true), {})
                 }
             }
@@ -207,41 +248,44 @@ class HomeScreenshotAndroidTest {
         val explore = compose.onNodeWithContentDescription("Explore").fetchSemanticsNode().boundsInRoot
         assertEquals(16f, explore.left, 0.5f)
         assertEquals(56f, explore.top, 0.5f)
-        assertEquals(48f, explore.width, 0.5f)
-        assertEquals(32f, explore.height, 0.5f)
+        // Mint chip strip: the Explore pill and chips in 48dp touch rows.
+        assertEquals(91f, explore.width, 0.5f)
+        assertEquals(48f, explore.height, 0.5f)
         val all = compose.onNodeWithText("All").fetchSemanticsNode().boundsInRoot
-        assertEquals(88f, all.left, 0.5f)
-        assertEquals(48f, all.width, 0.5f)
-        assertEquals(148f, compose.onNodeWithText("Music").fetchSemanticsNode().boundsInRoot.left, 0.5f)
+        assertEquals(115f, all.left, 0.5f)
+        assertEquals(43f, all.width, 0.5f)
+        assertEquals(166f, compose.onNodeWithText("Music").fetchSemanticsNode().boundsInRoot.left, 0.5f)
         val title = "Big Buck Bunny | A short film by the Blender Foundation"
         fun textWidth(): Int {
             val layouts = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText(title).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            compose.onNodeWithText(title, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             return layouts.single().size.width
         }
-        val phoneTitle = compose.onNodeWithText(title).fetchSemanticsNode().boundsInRoot
-        assertEquals(56f, phoneTitle.left, 0.5f)
-        assertEquals(322f, phoneTitle.width, 0.5f)
-        assertEquals(298, textWidth())
+        // The whole Mint card is one button, so the title is read from the unmerged tree.
+        val phoneTitle = compose.onNodeWithText(title, useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        // After the 48dp avatar slot and a 4dp gap; the 48dp overflow ends the row.
+        assertEquals(68f, phoneTitle.left, 0.5f)
+        assertEquals(258f, phoneTitle.width, 0.5f)
+        assertEquals(258, textWidth())
         val menu = compose.onNodeWithContentDescription("More actions for $title").fetchSemanticsNode().boundsInRoot
-        assertEquals(348f, menu.left, 0.5f)
-        assertEquals(40f, menu.width, 0.5f)
+        assertEquals(326f, menu.left, 0.5f)
+        assertEquals(48f, menu.width, 0.5f)
         compose.runOnIdle { width = 1280 }
-        val gridTitle = compose.onNodeWithText(title).fetchSemanticsNode().boundsInRoot
-        assertEquals(60f, gridTitle.left, 0.5f)
-        assertEquals(361.333f, gridTitle.width, 1f)
-        assertEquals(337.333f, textWidth().toFloat(), 1f)
+        val gridTitle = compose.onNodeWithText(title, useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        assertEquals(76f, gridTitle.left, 0.5f)
+        assertEquals(300f, gridTitle.width, 1f)
+        assertEquals(300f, textWidth().toFloat(), 1f)
         compose.runOnIdle { width = 390 }
-        val restoredTitle = compose.onNodeWithText(title).fetchSemanticsNode().boundsInRoot
-        assertEquals(56f, restoredTitle.left, 0.5f)
-        assertEquals(322f, restoredTitle.width, 0.5f)
-        assertEquals(298, textWidth())
+        val restoredTitle = compose.onNodeWithText(title, useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        assertEquals(68f, restoredTitle.left, 0.5f)
+        assertEquals(258f, restoredTitle.width, 0.5f)
+        assertEquals(258, textWidth())
     }
 
     @Test fun feedHeaderFollowsScrollDirection() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(HomeUiState(content = HomeScenario.Feed.initialContent(), signedInPreview = true), {})
                 }
             }
@@ -262,7 +306,7 @@ class HomeScreenshotAndroidTest {
         val post = feed.page.items.filterIsInstance<FeedItem.Post>().single()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     HomeScreen(HomeUiState(content = feed, signedInPreview = true), {})
                 }
             }
@@ -271,20 +315,22 @@ class HomeScreenshotAndroidTest {
         val bounds = compose.onNodeWithTag("community-post").fetchSemanticsNode().boundsInRoot
         val avatar = compose.onNode(hasContentDescription("Go to channel ${post.author}") and hasAnyAncestor(hasTestTag("community-post")))
             .fetchSemanticsNode().boundsInRoot
-        assertEquals(12f, avatar.left, 0.5f)
-        assertEquals(bounds.top + 12, avatar.top, 0.5f)
-        assertEquals(40f, avatar.width, 0.5f)
-        assertEquals(346f, compose.onNodeWithContentDescription("Post actions").fetchSemanticsNode().boundsInRoot.left, 0.5f)
+        // Mint post card: 48dp avatar slot 8dp inside the card, which sits in the 16dp page inset.
+        assertEquals(24f, avatar.left, 0.5f)
+        assertEquals(bounds.top + 8, avatar.top, 0.5f)
+        assertEquals(48f, avatar.width, 0.5f)
+        assertEquals(322f, compose.onNodeWithContentDescription("Post actions").fetchSemanticsNode().boundsInRoot.left, 0.5f)
         val body = compose.onNodeWithText(post.text)
         val layouts = mutableListOf<TextLayoutResult>()
         body.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
-        assertEquals(16.sp, layouts.single().layoutInput.style.fontSize)
-        assertEquals(22.sp, layouts.single().layoutInput.style.lineHeight)
+        // MinType.Body; images sit inside the card's 16dp padding.
+        assertEquals(14.sp, layouts.single().layoutInput.style.fontSize)
+        assertEquals(20.sp, layouts.single().layoutInput.style.lineHeight)
         val image = compose.onNodeWithTag("post-image-post-0").fetchSemanticsNode().boundsInRoot
-        assertEquals(12f, image.left, 0.5f)
-        assertEquals(342f, image.width, 0.5f)
-        assertEquals(342f, image.height, 0.5f)
-        assertEquals(0f, compose.onNodeWithContentDescription("Like post").fetchSemanticsNode().boundsInRoot.left, 0.5f)
+        assertEquals(32f, image.left, 0.5f)
+        assertEquals(310f, image.width, 0.5f)
+        assertEquals(310f, image.height, 0.5f)
+        assertEquals(20f, compose.onNodeWithContentDescription("Like post").fetchSemanticsNode().boundsInRoot.left, 0.5f)
         compose.onNodeWithTag("post-images-post").performScrollToIndex(1)
         compose.onNodeWithText("2/3").assertIsDisplayed()
     }
@@ -305,7 +351,7 @@ class HomeScreenshotAndroidTest {
         val dpr = 3f
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(dpr, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp).background(Color.White).testTag("reference-viewport")) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp).background(Color.White).testTag("reference-viewport")) {
                     HomeScreen(HomeUiState(), {}, Modifier.padding(bottom = 24.dp))
                 }
             }
@@ -322,17 +368,18 @@ class HomeScreenshotAndroidTest {
             assertTrue("Icon edges must be anti-aliased", edgeLevels.size > 32)
         }
         val bounds = compose.onNodeWithTag("empty-message").fetchSemanticsNode().boundsInRoot
-        assertEquals(16f, bounds.left / dpr, 1f)
-        assertEquals(267f, bounds.top / dpr, 1f)
-        assertEquals(358f, bounds.width / dpr, 1f)
-        assertEquals(120f, bounds.height / dpr, 1f)
+        // Mint first-visit empty state.
+        assertEquals(24f, bounds.left / dpr, 1f)
+        assertEquals(88f, bounds.top / dpr, 1f)
+        assertEquals(342f, bounds.width / dpr, 1f)
+        assertEquals(286.333f, bounds.height / dpr, 1f)
         val layouts = mutableListOf<TextLayoutResult>()
         compose.onNodeWithText("Try searching to get started").performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         val title = layouts.single()
         assertEquals(24.sp, title.layoutInput.style.fontSize)
-        assertEquals(32.sp, title.layoutInput.style.lineHeight)
-        assertEquals(FontWeight.Black, title.layoutInput.style.fontWeight)
-        assertEquals(298.583f, (title.getLineRight(0) - title.getLineLeft(0)) / dpr, 1.5f)
+        assertEquals(30.sp, title.layoutInput.style.lineHeight)
+        assertEquals(FontWeight.SemiBold, title.layoutInput.style.fontWeight)
+        assertEquals(335.333f, (title.getLineRight(0) - title.getLineLeft(0)) / dpr, 1.5f)
     }
 
     @Test fun viewportAndStateMatrixMatchesGoldens() {
@@ -342,7 +389,7 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
             }
         }
         val sizes = listOf(320 to 844, 390 to 844, 411 to 844, 600 to 960, 840 to 1000, 1280 to 800, 1600 to 900)
@@ -390,10 +437,10 @@ class HomeScreenshotAndroidTest {
                 if (scene == HomeScenario.PaginationLoading || scene == HomeScenario.PaginationError) resetFeedScroll()
                 if (scene == HomeScenario.Empty && w == 390) {
                     val bounds = compose.onNodeWithTag("empty-message").fetchSemanticsNode().boundsInRoot
-                    assertEquals(16f, bounds.left, 1f)
-                    assertEquals(267f, bounds.top, 1f)
-                    assertEquals(358f, bounds.width, 1f)
-                    assertEquals(120f, bounds.height, 1f)
+                    assertEquals(24f, bounds.left, 1f)
+                    assertEquals(88f, bounds.top, 1f)
+                    assertEquals(342f, bounds.width, 1f)
+                    assertEquals(286f, bounds.height, 1f)
                 }
             }
         }
@@ -425,7 +472,7 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
             }
         }
         val output = File(compose.activity.getExternalFilesDir(null), "home-acceptance").apply { mkdirs() }
@@ -449,27 +496,28 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState(overlay = HomeOverlay.Search))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
             }
         }
         val input = compose.onNodeWithTag("search-input").fetchSemanticsNode().boundsInRoot
-        assertEquals(60f, input.left, 0.5f)
-        assertEquals(238f, input.width, 0.5f)
+        // Mint search panel: pill field and 48dp buttons in a 56dp toolbar, 48dp suggestion rows.
+        assertEquals(68f, input.left, 0.5f)
+        assertEquals(210f, input.width, 0.5f)
         val search = compose.onNodeWithContentDescription("Search").fetchSemanticsNode().boundsInRoot
-        assertEquals(298f, search.left, 0.5f)
-        assertEquals(36f, search.width, 0.5f)
-        assertEquals(32f, search.height, 0.5f)
+        assertEquals(278f, search.left, 0.5f)
+        assertEquals(48f, search.width, 0.5f)
+        assertEquals(48f, search.height, 0.5f)
         val voice = compose.onNodeWithContentDescription("Search with your voice").fetchSemanticsNode().boundsInRoot
-        assertEquals(342f, voice.left, 0.5f)
-        assertEquals(40f, voice.width, 0.5f)
+        assertEquals(334f, voice.left, 0.5f)
+        assertEquals(48f, voice.width, 0.5f)
         compose.runOnIdle { state = state.copy(query = "nature") }
         compose.onNodeWithContentDescription("Search with your voice").assertDoesNotExist()
         val clear = compose.onNodeWithContentDescription("Clear search").fetchSemanticsNode().boundsInRoot
-        assertEquals(296f, clear.left, 0.5f)
-        assertEquals(50f, clear.width, 0.5f)
-        assertEquals(16f, clear.height, 0.5f)
-        assertEquals(48f, compose.onNodeWithTag("suggestion-0").fetchSemanticsNode().boundsInRoot.top, 0.5f)
-        assertEquals(86f, compose.onNodeWithTag("suggestion-1").fetchSemanticsNode().boundsInRoot.top, 0.5f)
+        assertEquals(286f, clear.left, 0.5f)
+        assertEquals(48f, clear.width, 0.5f)
+        assertEquals(48f, clear.height, 0.5f)
+        assertEquals(60f, compose.onNodeWithTag("suggestion-0").fetchSemanticsNode().boundsInRoot.top, 0.5f)
+        assertEquals(108f, compose.onNodeWithTag("suggestion-1").fetchSemanticsNode().boundsInRoot.top, 0.5f)
         val layouts = mutableListOf<TextLayoutResult>()
         compose.onNodeWithText("nature documentary").performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         assertEquals(14.sp, layouts.single().layoutInput.style.fontSize)
@@ -477,11 +525,12 @@ class HomeScreenshotAndroidTest {
         compose.onNodeWithTag("search-input").performImeAction()
         compose.runOnIdle { state = HomeUiState(content = HomeScenario.Feed.initialContent(), signedInPreview = true, overlay = HomeOverlay.Menu("bunny")) }
         val phone = compose.onNodeWithTag("video-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, phone.left, 0.5f)
-        assertEquals(390f, phone.width, 0.5f)
-        assertEquals(13f + FeedMenuKind.Video.actions.size * 48f, phone.height, 0.5f)
+        // Mint sheet: 8dp in from the phone edges, 20dp handle strip and 8dp under the actions.
+        assertEquals(8f, phone.left, 0.5f)
+        assertEquals(374f, phone.width, 0.5f)
+        assertEquals(28f + FeedMenuKind.Video.actions.size * 48f, phone.height, 0.5f)
         assertEquals(820f, phone.bottom, 0.5f)
-        assertEquals(64f, compose.onNodeWithText("Save to Watch later", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.left, 0.5f)
+        assertEquals(72f, compose.onNodeWithText("Save to Watch later", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.left, 0.5f)
         compose.runOnIdle { width = 1280; height = 800 }
         val wide = compose.onNodeWithTag("video-menu").fetchSemanticsNode().boundsInRoot
         assertEquals(440f, wide.left, 0.5f)
@@ -489,8 +538,9 @@ class HomeScreenshotAndroidTest {
         assertEquals(776f, wide.bottom, 0.5f)
         compose.runOnIdle { width = 500; height = 844 }
         val portrait = compose.onNodeWithTag("video-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, portrait.left, 0.5f)
-        assertEquals(500f, portrait.width, 0.5f)
+        // Sheets stop at 480dp and centre in wider portrait windows.
+        assertEquals(10f, portrait.left, 0.5f)
+        assertEquals(480f, portrait.width, 0.5f)
     }
 
     @Test fun overlaysMatchGoldens() {
@@ -500,7 +550,7 @@ class HomeScreenshotAndroidTest {
         var state by mutableStateOf(HomeUiState(overlay = HomeOverlay.Search))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { HomeScreen(state, {}) }
             }
         }
         val output = File(compose.activity.getExternalFilesDir(null), "home-acceptance").apply { mkdirs() }
@@ -528,7 +578,7 @@ class HomeScreenshotAndroidTest {
     @Test fun enlargedTextStaysInsideNavigation() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(320.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(320.dp, 844.dp)) {
                     HomeScreen(HomeUiState(content = HomeScenario.Feed.initialContent(), signedInPreview = true), {})
                 }
             }
@@ -544,8 +594,9 @@ class HomeScreenshotAndroidTest {
         assertTrue("Chip text must fit within one raster pixel", chipLayout.getLineRight(0) <= chipBounds.width + 1f)
         assertTrue(chipLayout.multiParagraph.height <= chipBounds.height + 1f)
         assertTrue(chipBounds.top >= strip.top && chipBounds.bottom <= strip.bottom)
-        assertTrue(strip.height > 48f)
-        assertEquals(28f, compose.onNodeWithText("MinTube", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height, 0.5f)
+        // Enlarged chip text still fits the strip's 48dp touch row.
+        assertEquals(48f, strip.height, 0.5f)
+        assertEquals(45f, compose.onNodeWithText("MinTube", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height, 0.5f)
         HomeDestination.entries.forEach { destination ->
             val tab = compose.onNodeWithTag("nav-${destination.name}").fetchSemanticsNode().boundsInRoot
             val label = compose.onNodeWithText(destination.label, useUnmergedTree = true)

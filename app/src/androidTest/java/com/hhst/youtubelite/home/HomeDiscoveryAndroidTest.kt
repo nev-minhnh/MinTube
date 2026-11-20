@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -30,7 +31,7 @@ class HomeDiscoveryAndroidTest {
         var selected by mutableStateOf("All")
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     val current = if (selected == "Music charts") HomePage(listOf(chart), catalog = HomeCatalog.MusicCharts) else page
                     HomeScreen(HomeUiState(content = HomeContent.Feed(current), selectedChip = selected, chips = HomeCatalog.filters), {
                         actions += it
@@ -54,7 +55,7 @@ class HomeDiscoveryAndroidTest {
         val actions = mutableListOf<HomeAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, scale)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     HomeScreen(HomeUiState(chips = HomeCatalog.filters,
                         content = HomeContent.Feed(page.copy(nextKey = "retry", partialFailure = true),
                         append = AppendState.Failed)), { actions += it })
