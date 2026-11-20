@@ -111,7 +111,8 @@ class ChannelScreenshotAndroidTest {
                 // so every check stays relative to the page origin.
                 val pageLeft = boundsOf("channel-page").left
                 val avatar = boundsOf("channel-avatar")
-                assertEquals("avatar size at $w", if (w < 600) 72f else if (w < 840) 96f else 120f, avatar.width, 1f)
+                // Landscape windows (wider than the 900dp height) use the compact 56dp header row.
+                assertEquals("avatar size at $w", if (w > 900) 56f else if (w < 600) 72f else if (w < 840) 96f else 120f, avatar.width, 1f)
                 val subscribe = boundsOf("channel-subscribe")
                 // The Mint subscribe pill keeps its content width in every window class.
                 assertTrue("compact subscribe at $w: ${subscribe.width}", subscribe.width in 48f..200f)
@@ -161,10 +162,10 @@ class ChannelScreenshotAndroidTest {
         val avatar = boundsOf("channel-avatar")
         val description = boundsOf("channel-description")
         val subscribe = boundsOf("channel-subscribe")
-        // 24dp page inset + 120dp expanded avatar + 16dp gap.
-        assertEquals(160f, description.left, 0.5f)
+        // Landscape header row: 24dp page inset + 56dp avatar + 16dp gap.
+        assertEquals(96f, description.left, 0.5f)
         assertTrue("Description must stay beside the avatar", description.top < avatar.bottom)
-        assertEquals(453f, subscribe.top, 1.5f)
+        assertEquals(230f, subscribe.top, 1.5f)
         val footer = boundsOf("channel-navigation")
         assertEquals(800f, footer.bottom, 0.5f)
         assertEquals(57f, footer.height, 0.5f)
