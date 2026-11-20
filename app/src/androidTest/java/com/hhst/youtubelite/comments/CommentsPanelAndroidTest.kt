@@ -225,8 +225,9 @@ class CommentsPanelAndroidTest {
         assertEquals(65f, bounds("comments-header").height, 0.5f)
         assertEquals(panel.width - 8f, bounds("comments-close").right - panel.left, 0.5f)
         assertEquals(68f, bounds("comments-input").left - panel.left, 0.5f)
-        assertEquals(488f, bounds("comments-input").right - panel.left, 0.5f)
-        assertEquals(480f, bounds("comment-c1-more").right - panel.left, 0.5f)
+        // Input and overflow keep their 12dp and 20dp end insets inside the third-width rail.
+        assertEquals(panel.width - 12f, bounds("comments-input").right - panel.left, 0.5f)
+        assertEquals(panel.width - 20f, bounds("comment-c1-more").right - panel.left, 0.5f)
         assertEquals(bounds("comments-rail").right, panel.right, 0.5f)
         assertEquals(0f, panel.top - bounds("comments-rail").top, 0.5f)
     }
