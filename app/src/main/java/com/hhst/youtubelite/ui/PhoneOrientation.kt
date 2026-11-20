@@ -1,10 +1,7 @@
 package com.hhst.youtubelite.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.pm.ActivityInfo
-import android.provider.Settings
-import android.view.OrientationEventListener
 import com.hhst.youtubelite.ui.design.DeviceClass
 
 /**
@@ -55,28 +52,5 @@ object PhoneOrientation {
         val theme = activity.theme
         return theme.resolveAttribute(android.R.attr.windowIsTranslucent, value, true) && value.data != 0 ||
             theme.resolveAttribute(android.R.attr.windowIsFloating, value, true) && value.data != 0
-    }
-
-    fun systemAutoRotate(context: Context): Boolean =
-        Settings.System.getInt(context.contentResolver, Settings.System.ACCELEROMETER_ROTATION, 0) == 1
-
-    /**
-     * Physical tilt for a portrait-locked phone watch page. The window no longer rotates on its own,
-     * so the sensor (not the configuration) reports landscape; the player decides whether that
-     * enters or leaves fullscreen (`PlayerViewModel.onPhysicalOrientation`).
-     */
-    class Tilt(private val context: Context, private val onTilt: (degrees: Int, systemAutoRotate: Boolean) -> Unit) {
-        private val listener = object : OrientationEventListener(context) {
-            override fun onOrientationChanged(orientation: Int) {
-                if (orientation == ORIENTATION_UNKNOWN) return
-                onTilt(orientation, systemAutoRotate(context))
-            }
-        }
-
-        fun start() {
-            if (listener.canDetectOrientation()) listener.enable()
-        }
-
-        fun stop() = listener.disable()
     }
 }
