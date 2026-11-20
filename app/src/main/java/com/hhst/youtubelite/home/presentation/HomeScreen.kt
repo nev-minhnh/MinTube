@@ -288,7 +288,7 @@ private fun LazyGridScope.homeCards(items: List<FeedItem>, width: Float, live: B
 @Composable
 private fun HomeTopBar(onAction: (HomeAction) -> Unit) {
     Row(Modifier.fillMaxWidth().height(DesignTokens.TopBarHeight).testTag("home-topbar"), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.width(117.dp).fillMaxHeight().clickable(role = Role.Button) {
+        Box(Modifier.widthIn(min = 117.dp).fillMaxHeight().clickable(role = Role.Button) {
             onAction(HomeAction.Navigate(HomeNavigationRequest.Destination(HomeDestination.Home)))
         }.appDescription(R.string.a11y_litube_home), contentAlignment = Alignment.CenterStart) {
             MinTubeBrand(Modifier.padding(start = 12.dp))
