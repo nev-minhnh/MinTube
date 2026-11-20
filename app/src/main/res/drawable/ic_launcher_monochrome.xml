@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Themed-icon layer of the MinTube mark; also the notification glyph. -->
+<!-- MinTube themed-icon layer: same geometry, single colour. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#000000"
-        android:strokeColor="#000000"
-        android:strokeWidth="6"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8.388"
+        android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M42,32 L78,54 L42,76 L53,54 Z" />
+        android:pathData="M36.944,67.666 V48.163 A8.109,8.109 0 0 1 53.161,48.163 V67.666 V48.163 A8.109,8.109 0 0 1 69.378,48.163 V53.685" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M65.184,62.423L65.184,70.462A1.678,1.678 0 0 0 67.731,71.897L74.371,67.878A1.678,1.678 0 0 0 74.371,65.007L67.731,60.988A1.678,1.678 0 0 0 65.184,62.423Z" />
 </vector>

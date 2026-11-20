@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- In-app MinTube mark: mint rounded square with the notched play triangle. -->
+<!-- In-app brand mark (light theme): gradient m + dark-ink triangle on transparent. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="64dp"
     android:height="64dp"
     android:viewportWidth="64"
     android:viewportHeight="64">
     <path
-        android:fillColor="#0B8F6A"
-        android:pathData="M14.4,0H49.6A14.4,14.4 0 0 1 64,14.4V49.6A14.4,14.4 0 0 1 49.6,64H14.4A14.4,14.4 0 0 1 0,49.6V14.4A14.4,14.4 0 0 1 14.4,0Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="5.33"
+        android:strokeWidth="11.447"
+        android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M21.33,12.44 L53.33,32 L21.33,51.56 L31.11,32 Z" />
+        android:pathData="M8.724,50.65 V24.035 A11.066,11.066 0 0 1 30.855,24.035 V50.65 V24.035 A11.066,11.066 0 0 1 52.987,24.035 V31.571">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="4.653" android:startY="17.319"
+                android:endX="52.336" android:endY="43.75">
+                <item android:offset="0.0" android:color="#2EC4F0" />
+                <item android:offset="0.38" android:color="#7B5CFF" />
+                <item android:offset="0.78" android:color="#FF3D86" />
+                <item android:offset="1.0" android:color="#FF8944" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#0F1514"
+        android:pathData="M47.263,43.495L47.263,54.465A2.289,2.289 0 0 0 50.738,56.424L59.801,50.939A2.289,2.289 0 0 0 59.801,47.022L50.738,41.536A2.289,2.289 0 0 0 47.263,43.495Z" />
 </vector>

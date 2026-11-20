@@ -64,7 +64,7 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
         val inset = settingsInset()
         Row(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.xl).testTag("about-identity"),
             verticalAlignment = Alignment.CenterVertically) {
-            Image(painterResource(R.drawable.ic_mintube_mark), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
+            Image(painterResource(com.hhst.youtubelite.ui.design.mintubeMarkRes()), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(MinSpace.lg))
             Column(Modifier.weight(1f)) {
                 AppText(label, MinType.Display, Modifier.semantics { heading() })

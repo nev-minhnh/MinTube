@@ -1,6 +1,18 @@
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_launcher_monochrome"
-    android:insetLeft="-18dp"
-    android:insetTop="-18dp"
-    android:insetRight="-18dp"
-    android:insetBottom="-18dp" />
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification silhouette (single colour): m + play triangle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.145"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M3.572,18.752 V9.116 A4.007,4.007 0 0 1 11.586,9.116 V18.752 V9.116 A4.007,4.007 0 0 1 19.599,9.116 V11.845" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M17.526,16.162L17.526,20.134A0.829,0.829 0 0 0 18.784,20.843L22.066,18.857A0.829,0.829 0 0 0 22.066,17.439L18.784,15.453A0.829,0.829 0 0 0 17.526,16.162Z" />
+</vector>

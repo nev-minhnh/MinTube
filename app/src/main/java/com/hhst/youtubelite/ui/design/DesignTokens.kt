@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.*
+import androidx.compose.ui.graphics.luminance
 import com.hhst.youtubelite.R
 import androidx.annotation.StringRes
 import kotlin.math.ceil
@@ -234,10 +235,15 @@ fun AppIconButton(
     }
 }
 
-/** The MinTube mark: mint rounded square with the notched play triangle. */
+/** Brand mark drawable for the active palette: dark-ink triangle on light, white on dark (follows the in-app theme override). */
+@Composable
+fun mintubeMarkRes(): Int =
+    if (DesignTokens.Ink.luminance() > 0.5f) R.drawable.ic_mintube_mark_dark else R.drawable.ic_mintube_mark
+
+/** The MinTube mark: gradient "m" with a play triangle. */
 @Composable
 fun MinTubeMark(modifier: Modifier = Modifier) {
-    Image(painterResource(R.drawable.ic_mintube_mark), contentDescription = stringResource(R.string.a11y_litube), modifier = modifier)
+    Image(painterResource(mintubeMarkRes()), contentDescription = stringResource(R.string.a11y_litube), modifier = modifier)
 }
 
 /** Mark plus wordmark. Follows the system font scale like every other text. */
