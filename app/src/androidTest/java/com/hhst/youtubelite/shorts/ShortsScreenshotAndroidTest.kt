@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.shorts
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -43,7 +44,7 @@ class ShortsScreenshotAndroidTest {
         val page = ShortsPage(FixtureShortsRepository.sample())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, scale)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(width.dp, height.dp)) {
                     ShortsScreen(ShortsUiState(content = ShortsContent.Ready(page)), {})
                 }
             }
@@ -73,7 +74,8 @@ class ShortsScreenshotAndroidTest {
             assertEquals(48f, b.width, 0.5f)
             assertEquals(48f, b.height, 0.5f)
         }
-        compose.onNodeWithText("Subscribe").assertIsDisplayed()
+        // The pager also composes the next short; check the button on the current page.
+        compose.onNode(hasText("Subscribe") and hasAnyAncestor(hasTestTag("short-page-short-1"))).assertIsDisplayed()
         val channel = compose.onNodeWithTag("short-channel-short-1").fetchSemanticsNode().boundsInRoot
         assertEquals(16f, channel.left, 0.5f)
         // The shared SubscribeButton's 48dp touch target makes the bottom-anchored
