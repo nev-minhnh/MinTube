@@ -49,12 +49,12 @@ internal fun VideoMenu(onAction: (HomeAction) -> Unit, kind: FeedMenuKind = Feed
         tag = "video-menu",
         paneTitle = stringResource(R.string.ui_video_actions),
         header = if (state?.loading == true || state?.failed == true) ({
-            Box(Modifier.fillMaxWidth().height(48.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
                 if (state.loading) Box(Modifier.testTag("home-menu-loading")) { LoadingSpinner() }
-                else AppText(androidx.compose.ui.res.stringResource(R.string.retry), size = 14, line = 20,
-                    modifier = Modifier.testTag("home-menu-retry").clickable(role = Role.Button) {
+                else AppText(stringResource(R.string.retry), MinType.Label,
+                    Modifier.testTag("home-menu-retry").clip(CircleShape).clickable(role = Role.Button) {
                         onAction(HomeAction.OpenMenu(state.itemId, state.kind))
-                    }.padding(horizontal = 16.dp, vertical = 12.dp))
+                    }.padding(horizontal = 20.dp, vertical = 14.dp), color = DesignTokens.AccentText)
             }
         }) else null,
     )
@@ -82,20 +82,20 @@ internal fun MixMenu(onAction: (HomeAction) -> Unit, live: Boolean = false) {
         val margin = if (maxWidth >= 330.dp) 40.dp else 0.dp
         val widthLimit = minOf(362.dp, (maxWidth - margin * 2).coerceAtLeast(0.dp))
         Column(Modifier.widthIn(min = if (maxWidth >= 330.dp) minOf(256.dp, widthLimit) else 0.dp, max = widthLimit).width(IntrinsicSize.Max)
-            .heightIn(max = (maxHeight - margin * 2).coerceAtLeast(0.dp)).clip(RoundedCornerShape(8.dp)).background(DesignTokens.Background)
+            .heightIn(max = (maxHeight - margin * 2).coerceAtLeast(0.dp)).clip(MinRadius.Field).background(DesignTokens.Panel)
             .testTag("mix-menu").appPaneTitle(R.string.ui_mix_actions)
             .verticalScroll(rememberScrollState()).padding(3.dp)) {
             FeedMenuKind.Mix.visibleActions(live).forEach { action ->
                 Box(Modifier.padding(vertical = 3.dp).fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) {
                     onAction(HomeAction.MenuSelected(action))
                 }.padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
-                    AppText(stringResource(action.labelResource), size = 16, line = 22)
+                    AppText(stringResource(action.labelResource), MinType.Subtitle)
                 }
             }
             Box(Modifier.padding(vertical = 3.dp).fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) {
                 onAction(HomeAction.CloseOverlay)
             }.padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.CenterStart) {
-                AppText(stringResource(R.string.cancel), size = 16, line = 22)
+                AppText(stringResource(R.string.cancel), MinType.Subtitle, color = DesignTokens.AccentText)
             }
         }
     }

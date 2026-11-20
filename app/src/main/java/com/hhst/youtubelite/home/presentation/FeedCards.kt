@@ -1,189 +1,184 @@
 package com.hhst.youtubelite.home.presentation
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.hhst.youtubelite.R
+import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
+import com.hhst.youtubelite.home.domain.FeedItem
+import com.hhst.youtubelite.home.domain.FeedMenuKind
+import com.hhst.youtubelite.home.domain.HomeAction
+import com.hhst.youtubelite.home.domain.HomeNavigationRequest
 import com.hhst.youtubelite.post.domain.PostDetailAction
 import com.hhst.youtubelite.post.domain.PostIdentity
 import com.hhst.youtubelite.post.presentation.PostCardInteractions
+import com.hhst.youtubelite.ui.components.PlaylistCard
+import com.hhst.youtubelite.ui.components.ShortCard
+import com.hhst.youtubelite.ui.components.VideoCard
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppIconButton
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.Artwork
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
+import com.hhst.youtubelite.ui.design.ShortsLogo
+import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.watch.domain.VideoRating
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.hhst.youtubelite.R
-import com.hhst.youtubelite.ui.design.*
-import com.hhst.youtubelite.home.domain.*
+import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
-import androidx.compose.ui.res.stringResource
-import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
-import com.hhst.youtubelite.dearrow.VideoArtwork
 
+/** Maps one feed item onto the Mint card family. Thumbnails register with the watch handoff through `videoId`. */
+@Composable
+internal fun FeedCard(item: FeedItem, window: WindowClass, live: Boolean = false, onAction: (HomeAction) -> Unit,
+    postInteractions: PostCardInteractions? = null) {
+    when (item) {
+        is FeedItem.Video -> VideoCard(
+            title = rememberDeArrowTitle(item.id, item.title),
+            metadata = listOf(item.author, item.metadata).filter(String::isNotBlank).joinToString(" · "),
+            artwork = item.artwork,
+            onClick = {
+                WatchProvisionalStore.put(item.toProvisional())
+                onAction(HomeAction.Navigate(HomeNavigationRequest.Watch(item.id)))
+            },
+            modifier = Modifier.testTag("feed-item-${item.id}"),
+            durationLabel = item.duration, live = item.live, progress = item.progress,
+            avatar = item.avatar.orEmpty(),
+            avatarDescription = stringResource(R.string.a11y_go_to_channel, item.author),
+            onAvatarClick = { onAction(HomeAction.Navigate(HomeNavigationRequest.Channel(item.channelId))) },
+            onMenu = { onAction(HomeAction.OpenMenu(item.id)) },
+            menuDescription = stringResource(R.string.a11y_more_actions_for, item.title),
+            videoId = item.id,
+        )
+        is FeedItem.Mix -> VideoCard(
+            title = rememberDeArrowTitle(item.id, item.title),
+            metadata = item.authors,
+            artwork = item.artwork,
+            onClick = {
+                WatchProvisionalStore.put(item.toProvisional())
+                onAction(HomeAction.Navigate(HomeNavigationRequest.Watch(item.id)))
+            },
+            modifier = Modifier.testTag("feed-item-${item.id}"),
+            durationLabel = stringResource(R.string.ui_mix),
+            onMenu = { onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Mix)) },
+            menuDescription = stringResource(R.string.a11y_more_actions_for, item.title),
+            videoId = item.id,
+        )
+        is FeedItem.Playlist -> {
+            val playlist = item.summary
+            PlaylistCard(
+                title = playlist.title, metadata = playlist.owner, artwork = playlist.artwork,
+                onClick = { onAction(HomeAction.Navigate(HomeNavigationRequest.Playlist(playlist.id))) },
+                modifier = Modifier.testTag("feed-item-${item.id}"),
+                countLabel = playlist.countLabel,
+            )
+        }
+        is FeedItem.Shorts -> ShortsShelf(item, window, live, onAction)
+        is FeedItem.Post -> PostCard(item, live, onAction, postInteractions)
+    }
+}
+
+/** Width-based entry kept for callers outside Home (instrumented tests of other features). */
 @Composable
 internal fun FeedCard(item: FeedItem, compact: Boolean, windowWidth: Float, live: Boolean = false, onAction: (HomeAction) -> Unit,
     postInteractions: PostCardInteractions? = null) {
-    when (item) {
-        is FeedItem.Video -> VideoCard(item, compact, onAction)
-        is FeedItem.Mix -> MixCard(item, compact, live, onAction)
-        is FeedItem.Playlist -> {
-            val playlist = item.summary
-            val open = { onAction(HomeAction.Navigate(HomeNavigationRequest.Playlist(playlist.id))) }
-            Column(Modifier.padding(horizontal = if (compact) 12.dp else 0.dp).testTag("feed-item-${item.id}")) {
-                com.hhst.youtubelite.playlist.presentation.PlaylistCover(
-                    playlist, Modifier.fillMaxWidth().aspectRatio(16f / 9f), open)
-                Column(Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = open).padding(top = 8.dp)) {
-                    AppText(playlist.title, size = 16, line = 22, weight = FontWeight.Medium, maxLines = 2)
-                    if (playlist.owner.isNotBlank()) AppText(playlist.owner,
-                        Modifier.padding(top = 2.dp), size = 12, line = 18, color = DesignTokens.Secondary, maxLines = 1)
-                }
+    val window = if (compact) WindowClass.Compact else WindowClass.of(windowWidth.toInt())
+    FeedCard(item, window, live, onAction, postInteractions)
+}
+
+/** Lets a full-span row reach both window edges from inside the padded feed grid. */
+private fun Modifier.bleed(inset: Dp) = layout { measurable, constraints ->
+    if (!constraints.hasBoundedWidth) {
+        val placeable = measurable.measure(constraints)
+        return@layout layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+    val edge = inset.roundToPx()
+    val placeable = measurable.measure(Constraints(
+        minWidth = constraints.maxWidth + edge * 2, maxWidth = constraints.maxWidth + edge * 2,
+        minHeight = constraints.minHeight, maxHeight = constraints.maxHeight,
+    ))
+    layout(constraints.maxWidth, placeable.height) { placeable.place(-edge, 0) }
+}
+
+/** Shorts as one horizontally scrolling shelf: header with the shelf menu, then 9:16 cards. */
+@Composable
+private fun ShortsShelf(item: FeedItem.Shorts, window: WindowClass, live: Boolean, onAction: (HomeAction) -> Unit) {
+    val inset = MinSpace.pageInset(window)
+    val cardWidth = if (window == WindowClass.Compact) 148.dp else 172.dp
+    Column(Modifier.fillMaxWidth().testTag("shorts-shelf")) {
+        Row(Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch), verticalAlignment = Alignment.CenterVertically) {
+            ShortsLogo(Modifier.size(24.dp))
+            AppText(stringResource(R.string.ui_shorts), MinType.Title,
+                Modifier.padding(start = MinSpace.sm).weight(1f).semantics { heading() }, maxLines = 1)
+            if (!live) AppIconButton(AppIcon.More, stringResource(R.string.a11y_shorts_options)) {
+                onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Shorts))
             }
         }
-        is FeedItem.Shorts -> ShortsShelf(item, windowWidth, live, onAction)
-        is FeedItem.Post -> BoxWithConstraints {
-            Box(Modifier.requiredWidth(maxWidth + if (compact) 0.dp else 32.dp)) { PostCard(item, live, onAction, postInteractions) }
+        LazyRow(Modifier.bleed(inset).fillMaxWidth().testTag("shorts-shelf-row"),
+            contentPadding = PaddingValues(horizontal = inset),
+            horizontalArrangement = Arrangement.spacedBy(MinSpace.md)) {
+            items(item.videos) { video ->
+                ShortCard(
+                    title = rememberDeArrowTitle(video.id, video.title),
+                    artwork = video.artwork,
+                    onClick = { onAction(HomeAction.Navigate(HomeNavigationRequest.Shorts(video.id))) },
+                    modifier = Modifier.width(cardWidth).testTag("short-${video.id}"),
+                    metadata = if (video.isNew) stringResource(R.string.ui_new) else null,
+                    onMenu = if (live) null else ({ onAction(HomeAction.OpenMenu(video.id, FeedMenuKind.Short)) }),
+                    menuDescription = stringResource(R.string.a11y_more_actions_for, video.title),
+                    videoId = video.id,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun Artwork(asset: String, modifier: Modifier = Modifier) {
-    com.hhst.youtubelite.ui.design.Artwork(asset, modifier)
-}
-
-@Composable
-private fun Avatar(asset: String, author: String, channelId: String, onAction: (HomeAction) -> Unit, size: Dp = 36.dp, modifier: Modifier = Modifier) {
-    Box(modifier.size(size).clip(CircleShape).clickable(role = Role.Button) {
+private fun Avatar(asset: String, author: String, channelId: String, onAction: (HomeAction) -> Unit, size: Dp = 40.dp) {
+    val label = stringResource(R.string.a11y_go_to_channel, author)
+    Box(Modifier.size(MinSpace.Touch).clip(CircleShape).clickable(role = Role.Button) {
         onAction(HomeAction.Navigate(HomeNavigationRequest.Channel(channelId)))
-    }.testTag("channel-$channelId").semanticsLabel(stringResource(R.string.a11y_go_to_channel , author))) {
-        Artwork(asset, Modifier.fillMaxSize())
+    }.testTag("channel-$channelId").semantics { contentDescription = label }, contentAlignment = Alignment.Center) {
+        Artwork(asset, Modifier.size(size).clip(CircleShape))
     }
 }
 
-private fun Modifier.semanticsLabel(label: String) = this.then(Modifier.semantics { contentDescription = label })
-
-@Composable
-private fun VideoCard(item: FeedItem.Video, compact: Boolean, onAction: (HomeAction) -> Unit) {
-    val openWatch = {
-        com.hhst.youtubelite.watch.domain.WatchProvisionalStore.put(item.toProvisional())
-        onAction(HomeAction.Navigate(HomeNavigationRequest.Watch(item.id)))
-    }
-    Column(Modifier.testTag("feed-item-${item.id}")) {
-        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9).clip(RoundedCornerShape(if (compact) 0.dp else 12.dp))
-            .clickable(role = Role.Button) { openWatch() }
-            .semanticsLabel("${item.title}, ${item.duration}")) {
-            VideoArtwork(item.id, item.artwork, Modifier.fillMaxSize())
-            Box(Modifier.align(Alignment.BottomEnd).padding(8.dp).background(if (item.live) DesignTokens.Red else Color.Black.copy(alpha = 0.75f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 1.dp)) {
-                AppText(item.duration, size = 12, line = 16, weight = FontWeight.Medium, color = Color.White)
-            }
-            item.progress?.let { progress ->
-                Box(Modifier.align(Alignment.BottomStart).fillMaxWidth().height(3.dp).background(Color.Black.copy(alpha = 0.5f))) {
-                    Box(Modifier.fillMaxHeight().fillMaxWidth(progress.coerceIn(0f, 1f)).background(DesignTokens.Red))
-                }
-            }
-        }
-        Row(Modifier.padding(start = if (compact) 12.dp else 0.dp, top = 8.dp), verticalAlignment = Alignment.Top) {
-            Avatar(item.avatar.orEmpty(), item.author, item.channelId, onAction, size = 36.dp)
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.weight(1f)) {
-                Column(Modifier.padding(end = if (compact) 12.dp else 0.dp).clickable(role = Role.Button) { openWatch() }) {
-                    AppText(rememberDeArrowTitle(item.id, item.title), Modifier.padding(end = 24.dp), size = 16, line = 22, weight = FontWeight.Medium, maxLines = 2)
-                    AppText(listOf(item.author, item.metadata).filter(String::isNotBlank).joinToString(" · "), Modifier.padding(top = 2.dp), size = 12, line = 18, color = DesignTokens.Secondary, maxLines = 1)
-                }
-                // Sampled menu anchors: phone right inset 2px, grid +10px overhang, top -6px.
-                AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, item.title),
-                    modifier = Modifier.align(Alignment.TopEnd).offset(x = if (compact) (-2).dp else 10.dp, y = (-6).dp),
-                    diameter = 40.dp) { onAction(HomeAction.OpenMenu(item.id)) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MixCard(item: FeedItem.Mix, compact: Boolean, live: Boolean, onAction: (HomeAction) -> Unit) {
-    Column(Modifier.testTag("feed-item-${item.id}")) {
-        Box(Modifier.padding(horizontal = if (compact) 12.dp else 0.dp).padding(top = if (compact) 10.dp else 0.dp).fillMaxWidth().offset(y = if (compact) 0.dp else (-2).dp)) {
-            if (compact) Box(Modifier.padding(horizontal = 12.dp).fillMaxWidth().aspectRatio(16f / 9).offset(y = (-8).dp).background(Color(item.palette.stackColor).copy(alpha = 0.5f), RoundedCornerShape(12.dp)))
-            Box(Modifier.padding(horizontal = 8.dp).fillMaxWidth().aspectRatio(16f / 9).offset(y = (-5).dp).background(Color(item.palette.stackColor), RoundedCornerShape(12.dp)))
-            Box(Modifier.fillMaxWidth().aspectRatio(16f / 9).clip(RoundedCornerShape(12.dp))
-                .clickable(role = Role.Button) {
-                    com.hhst.youtubelite.watch.domain.WatchProvisionalStore.put(item.toProvisional())
-                    onAction(HomeAction.Navigate(HomeNavigationRequest.Watch(item.id)))
-                }.semanticsLabel(item.title)) {
-                VideoArtwork(item.id, item.artwork, Modifier.fillMaxSize())
-                Row(Modifier.align(Alignment.BottomEnd).padding(8.dp).height(24.dp).background(Color(item.palette.badgeColor), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    AppIcon(AppIcon.Mix, Modifier.size(12.dp), Color.White)
-                    AppText(stringResource(R.string.ui_mix), size = 12, line = 16, color = Color.White)
-                }
-            }
-        }
-        Row(Modifier.padding(start = if (compact) 16.dp else 4.dp, top = 12.dp), verticalAlignment = Alignment.Top) {
-            Box(Modifier.weight(1f)) {
-                Column(Modifier.padding(end = 40.dp)) {
-                    AppText(rememberDeArrowTitle(item.id, item.title), weight = FontWeight.Medium, maxLines = 2, exactLineHeight = 17.5.sp)
-                    AppText(item.authors, Modifier.padding(top = if (compact) 3.dp else 8.dp), size = 12, line = 18, color = DesignTokens.Secondary, maxLines = 2)
-                }
-                AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, item.title),
-                    modifier = Modifier.align(Alignment.TopEnd).offset(y = (-8).dp),
-                    diameter = 40.dp) { onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Mix)) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ShortsShelf(item: FeedItem.Shorts, windowWidth: Float, live: Boolean, onAction: (HomeAction) -> Unit) {
-    val columns = HomeLayout.shortsColumns(windowWidth)
-    val gap = if (windowWidth < 600f) 8.dp else 16.dp
-    val videos = item.videos.take(if (windowWidth < 600f) 4 else columns)
-    Column(Modifier.fillMaxWidth().padding(horizontal = if (windowWidth < 528f) 16.dp else 0.dp)
-        .padding(top = if (windowWidth < 528f) 12.dp else 0.dp).testTag("shorts-shelf")) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            ShortsLogo(Modifier.offset(y = (-1.667).dp))
-            AppText(stringResource(R.string.ui_shorts), Modifier.padding(start = 12.dp).weight(1f), size = 18, line = 26, weight = FontWeight.Bold)
-            if (!live) AppIconButton(AppIcon.More, stringResource(R.string.a11y_shorts_options), diameter = 40.dp) { onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Shorts)) }
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            videos.chunked(columns).forEach { row ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(gap)) {
-                    row.forEach { video ->
-                        Box(Modifier.weight(1f).aspectRatio(2f / 3f).testTag("short-${video.id}")
-                            .clip(RoundedCornerShape(8.dp)).clickable(role = Role.Button) {
-                            onAction(HomeAction.Navigate(HomeNavigationRequest.Shorts(video.id)))
-                        }.semanticsLabel(video.title)) {
-                            VideoArtwork(video.id, video.artwork, Modifier.fillMaxSize())
-                            Box(Modifier.matchParentSize().background(Brush.verticalGradient(0.7f to Color.Transparent, 1f to Color.Black.copy(alpha = 0.6f))))
-                            if (video.isNew) AppText(stringResource(R.string.ui_new), Modifier.padding(5.dp).background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp, vertical = 1.dp),
-                                size = 12, line = 18, weight = FontWeight.Medium, color = Color.White)
-                            if (!live) AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, video.title), modifier = Modifier.align(Alignment.TopEnd), diameter = 40.dp, color = Color.White) { onAction(HomeAction.OpenMenu(video.id, FeedMenuKind.Short)) }
-                            AppText(rememberDeArrowTitle(video.id, video.title), Modifier.align(Alignment.BottomStart).padding(start = 8.dp, end = 8.dp, bottom = 12.dp),
-                                size = 14, line = 20, color = Color.White, maxLines = 2)
-                        }
-                    }
-                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
-                }
-            }
-        }
-    }
-}
-
+/** Community post on a Panel card: author row, text, square image strip, like/dislike and comments. */
 @Composable
 private fun PostCard(item: FeedItem.Post, live: Boolean, onAction: (HomeAction) -> Unit, interactions: PostCardInteractions?) {
     val interaction = interactions?.posts?.get(item.postId)
@@ -193,55 +188,59 @@ private fun PostCard(item: FeedItem.Post, live: Boolean, onAction: (HomeAction) 
         if (interactions != null) interactions.perform(PostIdentity(item.channelId, item.postId), if (liked) PostDetailAction.Like else PostDetailAction.Dislike)
         else onAction(HomeAction.Navigate(HomeNavigationRequest.PostFeedback(item.postId, liked, item.channelId)))
     }
-    Column(Modifier.fillMaxWidth().testTag("community-post")) {
-        Row(Modifier.padding(start = 12.dp, top = 12.dp).fillMaxWidth(), verticalAlignment = Alignment.Top) {
-            Box(Modifier.size(48.dp)) { Avatar(item.artwork, item.author, item.channelId, onAction, size = 40.dp) }
-            Column(Modifier.weight(1f).heightIn(min = 48.dp)) {
-                AppText(item.author, size = 14, line = 20, weight = FontWeight.Medium)
-                AppText(item.age, size = 14, line = 20, color = DesignTokens.Secondary)
+    Column(Modifier.widthIn(max = 640.dp).fillMaxWidth().clip(MinRadius.Card).background(DesignTokens.Panel)
+        .border(1.dp, DesignTokens.Border, MinRadius.Card).testTag("community-post")) {
+        Row(Modifier.padding(start = MinSpace.sm, top = MinSpace.sm, end = MinSpace.xs).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Avatar(item.artwork, item.author, item.channelId, onAction)
+            Column(Modifier.weight(1f).padding(start = MinSpace.xs)) {
+                AppText(item.author, MinType.Body.copy(fontWeight = FontWeight.Medium), maxLines = 1)
+                AppText(item.age, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
             }
-            Box(Modifier.size(width = 44.dp, height = 48.dp)) {
-                if (!live) AppIconButton(AppIcon.More, stringResource(R.string.a11y_post_actions), modifier = Modifier.wrapContentSize(Alignment.TopStart, unbounded = true)) { onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Post)) }
+            if (!live) AppIconButton(AppIcon.More, stringResource(R.string.a11y_post_actions)) {
+                onAction(HomeAction.OpenMenu(item.id, FeedMenuKind.Post))
             }
         }
-        AppText(item.text, Modifier.padding(12.dp).clickable(role = Role.Button) {
+        AppText(item.text, MinType.Body, Modifier.padding(horizontal = MinSpace.lg, vertical = MinSpace.sm).clickable(role = Role.Button) {
             onAction(HomeAction.Navigate(HomeNavigationRequest.OpenPost(item.channelId, item.postId)))
-        }.testTag("post-body-${item.id}"), size = 16, line = 22, maxLines = 3)
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val imageWidth = maxWidth - 48.dp
-            LazyRow(Modifier.testTag("post-images-${item.id}"), contentPadding = PaddingValues(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        }.testTag("post-body-${item.id}"), maxLines = 3)
+        if (item.images.isNotEmpty()) BoxWithConstraints(Modifier.fillMaxWidth()) {
+            // A second image always peeks in, so the strip reads as scrollable.
+            val imageWidth = (maxWidth - 48.dp).coerceAtMost(420.dp)
+            LazyRow(Modifier.testTag("post-images-${item.id}"), contentPadding = PaddingValues(horizontal = MinSpace.lg),
+                horizontalArrangement = Arrangement.spacedBy(MinSpace.md)) {
                 items(item.images.size) { index ->
-                    Box(Modifier.size(imageWidth).clip(RoundedCornerShape(12.dp))
+                    Box(Modifier.size(imageWidth).clip(MinRadius.Field)
                         .clickable(role = Role.Button) {
                             if (interactions?.openImages != null) interactions.openImages.invoke(item.images, index)
                             else onAction(HomeAction.Navigate(HomeNavigationRequest.OpenPost(item.channelId, item.postId)))
                         }.testTag("post-image-${item.id}-$index")) {
                         Artwork(item.images[index], Modifier.fillMaxSize())
-                        if (item.images.size > 1) Box(Modifier.align(Alignment.TopEnd).padding(12.dp).size(36.dp, 24.dp)
-                            .background(Color(0xFF0F0F0F), CircleShape), contentAlignment = Alignment.Center) {
-                            AppText("${index + 1}/${item.images.size}", size = 14, line = 20, color = Color.White)
+                        if (item.images.size > 1) Box(Modifier.align(Alignment.TopEnd).padding(MinSpace.sm)
+                            .background(Color.Black.copy(alpha = 0.75f), MinRadius.Badge).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                            AppText("${index + 1}/${item.images.size}", MinType.Micro, color = Color.White, maxLines = 1)
                         }
                     }
                 }
             }
         }
-        Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            AppIconButton(AppIcon.Like, stringResource(R.string.a11y_like_post), diameter = 40.dp,
+        Row(Modifier.fillMaxWidth().padding(horizontal = MinSpace.xs), verticalAlignment = Alignment.CenterVertically) {
+            AppIconButton(AppIcon.Like, stringResource(R.string.a11y_like_post),
                 modifier = Modifier.testTag("post-like-${item.postId}").semantics { selected = rating == VideoRating.Like },
                 enabled = pending == null, pending = pending == PostDetailAction.Like,
-                background = if (rating == VideoRating.Like) DesignTokens.Red.copy(alpha = 0.12f) else Color.Transparent,
-                color = if (rating == VideoRating.Like) DesignTokens.Red else DesignTokens.Ink) { rate(true) }
-            AppText(interaction?.post?.likes ?: item.likes, Modifier.widthIn(min = 40.dp), size = 14, line = 20)
-            AppIconButton(AppIcon.Dislike, stringResource(R.string.a11y_dislike_post), diameter = 40.dp,
+                background = if (rating == VideoRating.Like) DesignTokens.AccentContainer else Color.Transparent,
+                color = if (rating == VideoRating.Like) DesignTokens.AccentText else DesignTokens.Ink) { rate(true) }
+            AppText(interaction?.post?.likes ?: item.likes, MinType.Label, Modifier.widthIn(min = 32.dp).padding(horizontal = MinSpace.xs))
+            AppIconButton(AppIcon.Dislike, stringResource(R.string.a11y_dislike_post),
                 modifier = Modifier.testTag("post-dislike-${item.postId}").semantics { selected = rating == VideoRating.Dislike },
                 enabled = pending == null, pending = pending == PostDetailAction.Dislike,
-                background = if (rating == VideoRating.Dislike) DesignTokens.Red.copy(alpha = 0.12f) else Color.Transparent,
-                color = if (rating == VideoRating.Dislike) DesignTokens.Red else DesignTokens.Ink) { rate(false) }
+                background = if (rating == VideoRating.Dislike) DesignTokens.AccentContainer else Color.Transparent,
+                color = if (rating == VideoRating.Dislike) DesignTokens.AccentText else DesignTokens.Ink) { rate(false) }
             Spacer(Modifier.weight(1f))
-            Row(Modifier.clickable(role = Role.Button) { onAction(HomeAction.Navigate(HomeNavigationRequest.PostComments(item.postId, item.channelId))) }
-                .padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                AppIcon(AppIcon.Comment)
-                AppText(item.comments, Modifier.padding(start = 6.dp), size = 14, line = 20, weight = FontWeight.Medium)
+            Row(Modifier.heightIn(min = MinSpace.Touch).clip(CircleShape)
+                .clickable(role = Role.Button) { onAction(HomeAction.Navigate(HomeNavigationRequest.PostComments(item.postId, item.channelId))) }
+                .padding(horizontal = MinSpace.md), verticalAlignment = Alignment.CenterVertically) {
+                AppIcon(AppIcon.Comment, Modifier.size(20.dp))
+                AppText(item.comments, MinType.Label, Modifier.padding(start = 6.dp))
             }
         }
     }
