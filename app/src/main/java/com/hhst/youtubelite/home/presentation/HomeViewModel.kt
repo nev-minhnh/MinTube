@@ -110,6 +110,8 @@ class HomeViewModel(
                     state.content !is HomeContent.Empty && state.content !is HomeContent.Loading) return@update state
                 state.copy(content = HomeContent.Feed(HomePage(items = rows), refreshing = true))
             }
+            // Seeded rows keep their channel id, so cached avatars can fill before the live load lands.
+            if ((_state.value.content as? HomeContent.Feed)?.page?.items === rows) fillMissingAvatars(rows)
         }
     }
 
@@ -606,15 +608,17 @@ class HomeViewModel(
      * One shared, cached directory read per channel; a stale application is identity-safe
      * because it only rewrites rows still missing their avatar.
      */
-    private fun fillMissingAvatars(items: List<FeedItem>) {
+    private fun fillMissingAvatars(items: List<FeedItem>, persist: Boolean = false) {
         val directory = avatars ?: return
+        // channelLookup survives the signed-out feedback strip; it only resolves the channel id.
         val missing = items.filterIsInstance<FeedItem.Video>()
-            .filter { it.avatar.isNullOrBlank() && (it.channelId.isNotBlank() || it.menuEndpoint != null) }
+            .filter { it.avatar.isNullOrBlank() && (it.channelId.isNotBlank() || (it.channelLookup ?: it.menuEndpoint) != null) }
             .distinctBy { it.channelId.ifBlank { it.id } }.takeIf { it.isNotEmpty() } ?: return
         avatarJob?.cancel()
         val requestAccount = accountKey()
         val requestFilter = _state.value.selectedChip
         val requestSession = _state.value.sessionGeneration
+        val requestGeneration = generation
         avatarJob = viewModelScope.launch {
             val applyAvatar: (String, String) -> Unit = { channelId, avatar ->
                 _state.update { state ->
@@ -633,7 +637,7 @@ class HomeViewModel(
                     launch {
                         while (true) {
                             val item = missing.getOrNull(next.getAndIncrement()) ?: break
-                            val channelId = item.channelId.takeIf(String::isNotBlank) ?: item.menuEndpoint?.let {
+                            val channelId = item.channelId.takeIf(String::isNotBlank) ?: (item.channelLookup ?: item.menuEndpoint)?.let {
                                 directory.channel(item.id, com.liskovsoft.youtubeapi.videoinfo.V2.MenuEndpoint(it.panelId, it.params))
                             } ?: continue
                             requestedIds += channelId
@@ -647,6 +651,20 @@ class HomeViewModel(
                             directory.avatar(channelId)?.let { applyAvatar(channelId, it) }
                         }
                     }
+                }
+            }
+            // Re-capture the snapshot with the filled avatars so a cold start paints what was shown.
+            val store = snapshots
+            if (persist && store != null && requestGeneration == generation &&
+                requestAccount == accountKey() && requestFilter == _state.value.selectedChip &&
+                requestSession == _state.value.sessionGeneration) {
+                val page = (_state.value.content as? HomeContent.Feed)?.page
+                val filled = page?.items.orEmpty().any {
+                    it is FeedItem.Video && it.channelId in requestedIds && !it.avatar.isNullOrBlank()
+                }
+                if (page != null && page.catalog == null && filled) withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    store.write("home", requestAccount, requestFilter,
+                        page.items.filterIsInstance<FeedItem.Video>(), FeedItem.Video::class.java)
                 }
             }
             val pending = (_state.value.content as? HomeContent.Feed)?.page?.items.orEmpty()
@@ -720,7 +738,7 @@ class HomeViewModel(
                         FeedItem.Video::class.java)
                 }
                 if (requestGeneration != generation) return@launch
-                fillMissingAvatars(combined.items)
+                fillMissingAvatars(combined.items, persist = true)
                 loadMenu()
                 consumePendingRevisionAfterLoad()
             } catch (cancelled: CancellationException) {

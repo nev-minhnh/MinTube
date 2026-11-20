@@ -62,6 +62,8 @@ import com.hhst.youtubelite.ui.design.appDescription
 import androidx.compose.ui.res.stringResource
 import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
 import com.hhst.youtubelite.dearrow.VideoArtwork
+import androidx.compose.ui.zIndex
+import kotlinx.coroutines.launch
 
 @Composable
 fun WatchScreen(
@@ -124,6 +126,7 @@ fun WatchScreen(
                                 onFilter = {},
                                 onAction = onAction,
                                 onCopyLink = onCopyLink,
+                                nowPlaying = !fullscreen,
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -144,6 +147,7 @@ fun WatchScreen(
                             onFilter = { fromChannel = it },
                             onAction = onAction,
                             onCopyLink = onCopyLink,
+                            nowPlaying = !fullscreen,
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -240,6 +244,7 @@ private fun WatchMainBody(
     onFilter: (Boolean) -> Unit,
     onAction: (WatchAction) -> Unit,
     onCopyLink: ((String) -> Unit)?,
+    nowPlaying: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val includeRelated = !WatchLayout.sidebar(viewportWidth, viewportHeight, smallestWidth)
@@ -254,6 +259,17 @@ private fun WatchMainBody(
     val inset = MinSpace.pageInset(window)
     val related = if (includeRelated) filter?.visible.orEmpty() else emptyList()
     val relatedRows = remember(related, columns) { related.chunked(columns) }
+    // "Now playing" strip: shown once the full title block has scrolled under the player, so the
+    // title is never on screen twice; the sticky chip row stacks below it.
+    val ready = state.content as? WatchContent.Ready
+    var titleBlockHeight by remember { mutableIntStateOf(0) }
+    val titleAway by remember(scroll) { derivedStateOf { scroll.titleBlockScrolledAway(titleBlockHeight) } }
+    val motionScale = LocalMotionScale.current
+    val stripProgress by androidx.compose.animation.core.animateFloatAsState(
+        if (nowPlaying && ready != null && titleAway) 1f else 0f,
+        androidx.compose.animation.core.tween(motionDuration(160, motionScale)), label = "watch-now-playing")
+    var stripHeight by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
     Box(modifier.fillMaxWidth().clipToBounds()) {
     LazyColumn(Modifier.fillMaxSize().testTag("watch-scroll"), state = scroll) {
         when (val content = state.content) {
@@ -269,11 +285,14 @@ private fun WatchMainBody(
                     modifier = Modifier.testTag("watch-verification")) else WatchError(onAction)
             }
             is WatchContent.Ready -> {
-                item("metadata") { WatchMetadata(content.page.video, state, inset, onAction, onCopyLink) }
+                item("metadata") { WatchMetadata(content.page.video, state, inset, onAction, onCopyLink) { titleBlockHeight = it } }
                 item("comments") { WatchComments(content.page.video, inset, onAction) }
                 if (includeRelated) {
                     if (filter != null && content.page.related.isNotEmpty()) stickyHeader("related-chips", contentType = "chips") {
-                        RelatedChipRow(filter, inset, onFilter)
+                        RelatedChipRow(filter, inset, onFilter, Modifier.graphicsLayer {
+                            translationY = stickyUnderStripOffset(scroll.layoutInfo.visibleItemsInfo
+                                .firstOrNull { it.key == "related-chips" }?.offset, stripHeight * stripProgress)
+                        })
                     }
                     item("related-start") { RelatedHeader(inset) }
                     if (filtered) item("related-filter-hint") { RelatedFilterHint(inset) }
@@ -285,6 +304,20 @@ private fun WatchMainBody(
                 }
             }
         }
+    }
+    if (ready != null && stripProgress > 0f) {
+        val video = ready.page.video
+        WatchNowPlayingStrip(
+            title = rememberDeArrowTitle(video.id, video.title),
+            channel = video.channel,
+            progress = { stripProgress },
+            inset = inset,
+            onBackToTop = {
+                scope.launch { if (motionScale <= 0f) scroll.scrollToItem(0) else scroll.animateScrollToItem(0) }
+            },
+            onHeightChanged = { stripHeight = it },
+            modifier = Modifier.align(Alignment.TopCenter).zIndex(2f),
+        )
     }
     }
 }

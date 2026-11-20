@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.systemBars
@@ -569,11 +571,18 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                     com.hhst.youtubelite.ui.design.MiniDock.windowBottomInsetDp(miniDock,
                         WindowInsets.safeDrawing.getBottom(this).toDp().value.toInt())
                 }
+                // The browse host pads safeDrawing and the rail at its start edge; the fixed
+                // bottom-start dock here must match it so the handoff does not jump.
+                val miniStartInset = with(hostDensity) {
+                    WindowInsets.safeDrawing.asPaddingValues().calculateStartPadding(
+                        androidx.compose.ui.platform.LocalLayoutDirection.current).value.roundToInt()
+                } + com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(miniDock)
                 val slot = playerSlotBounds.value
                 com.hhst.youtubelite.player.surface.MiniPlayerWindow(
                     screenWidthDp = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp,
                     bottomInsetDp = miniBottomInset,
                     topInsetDp = miniTopInset,
+                    startInsetDp = miniStartInset,
                     store = miniStore,
                     showStroke = playerState.controlsVisible,
                     onBackgroundTap = playerViewModel::onToggleControls,

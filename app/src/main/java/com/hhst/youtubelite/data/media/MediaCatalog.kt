@@ -21,7 +21,8 @@ internal fun MediaItem.feedVideo() = FeedItem.Video(id, title.orEmpty(), author.
     duration.orEmpty(), channelId.orEmpty(), live, progressPercent?.div(100f), avatar = authorThumbnail?.takeIf(String::isNotBlank),
     notInterestedToken = notInterestedToken(),
     dontRecommendToken = dontRecommendToken(),
-    menuEndpoint = menuEndpoint?.let { FeedMenuEndpoint(it.panelId, it.params) }, short = kind == "short")
+    menuEndpoint = menuEndpoint?.let { FeedMenuEndpoint(it.panelId, it.params) }, short = kind == "short",
+    channelLookup = menuEndpoint?.let { FeedMenuEndpoint(it.panelId, it.params) })
 
 internal fun MediaItem.notInterestedToken(): String? =
     actions.firstOrNull { it.kind == MenuActionKind.NotInterested }?.kindToken
@@ -98,6 +99,7 @@ class MediaHomeRepository(private val client: MediaClient,
                 if (item is FeedItem.Video && context.signedIn) item.copy(
                     dontRecommendToken = page.items.firstOrNull { it.id == item.id }?.dontRecommendToken(),
                     feedbackGeneration = context.generation,
+                // Signed out: no feedback capability; channelLookup stays so avatars can still resolve.
                 ) else if (item is FeedItem.Video) item.copy(notInterestedToken = null, dontRecommendToken = null,
                     menuEndpoint = null) else item
             }
