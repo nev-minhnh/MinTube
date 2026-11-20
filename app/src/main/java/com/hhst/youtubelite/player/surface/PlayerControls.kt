@@ -116,10 +116,13 @@ fun PlayerIconButton(
         modifier = modifier
             .size(PlayerUi.TOP_ACTION_DP.dp)
             .clip(CircleShape)
+            // role = Button on the touch target; the glyph's label merges into it, so each control
+            // is one labelled button node in the accessibility tree.
             .then(
                 if (onLongClick != null) {
                     Modifier.combinedClickable(
                         enabled = enabled,
+                        role = Role.Button,
                         interactionSource = interaction,
                         indication = ripple(bounded = false, radius = 24.dp),
                         onClick = { haptic(); onClick() },
@@ -128,6 +131,7 @@ fun PlayerIconButton(
                 } else {
                     Modifier.clickable(
                         enabled = enabled,
+                        role = Role.Button,
                         interactionSource = interaction,
                         indication = ripple(bounded = false, radius = 24.dp),
                         onClick = { haptic(); onClick() },
@@ -230,7 +234,7 @@ fun TopBar(
                     },
                     contentDescription = stringResource(R.string.subtitles),
                     onClick = onSubtitle,
-                    modifier = Modifier.width(40.dp),
+                    modifier = Modifier.width(40.dp).testTag("player-subtitles"),
                     iconSize = sizing.iconDp,
                     onLongClick = onSubtitleStyle,
                     tint = if (state.subtitleEnabled) PlayerUi.Accent else PlayerUi.Icon,
@@ -254,7 +258,7 @@ fun TopBar(
                     icon = R.drawable.ic_settings,
                     contentDescription = stringResource(R.string.more_options),
                     onClick = onMore,
-                    modifier = Modifier.width(40.dp),
+                    modifier = Modifier.width(40.dp).testTag("player-settings"),
                     iconSize = (sizing.iconDp * 5 / 6).coerceAtLeast(20),
                 )
             }
@@ -286,7 +290,7 @@ fun CenterControls(
             contentDescription = stringResource(R.string.action_previous),
             onClick = onPrevious,
             enabled = state.hasPrevious,
-            modifier = Modifier.size(skipSizeDp.dp),
+            modifier = Modifier.size(skipSizeDp.dp).testTag("player-previous"),
             iconSize = iconSize,
         )
         Box(
@@ -294,9 +298,12 @@ fun CenterControls(
                 .padding(horizontal = gapDp.dp)
                 .size(playSizeDp.dp)
                 .clip(CircleShape)
+                .testTag("player-play-pause")
+                // Button role here; the label comes from the glyph (or the spinner's "buffering" node while loading).
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(bounded = false, radius = (playSizeDp / 2).dp),
+                    role = Role.Button,
                     onClick = onPlayPause,
                 ),
             contentAlignment = Alignment.Center,
@@ -317,7 +324,7 @@ fun CenterControls(
             contentDescription = stringResource(R.string.action_next),
             onClick = onNext,
             enabled = state.hasNext,
-            modifier = Modifier.size(skipSizeDp.dp),
+            modifier = Modifier.size(skipSizeDp.dp).testTag("player-next"),
             iconSize = iconSize,
         )
     }
@@ -415,6 +422,7 @@ fun BottomBar(
                         contentDescription = stringResource(R.string.action_fullscreen),
                         onClick = onFullscreen,
                         iconSize = sizing.iconDp,
+                        modifier = Modifier.testTag("player-fullscreen"),
                     )
                 }
             }

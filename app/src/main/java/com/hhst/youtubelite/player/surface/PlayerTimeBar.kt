@@ -20,10 +20,12 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -64,14 +66,18 @@ fun PlayerTimeBar(
     var dragFraction by remember { mutableFloatStateOf(0f) }
     val timeBarDescription = stringResource(R.string.player_time_bar)
     val announcedFraction = PlayerUi.progressFraction(positionState.value, durationMs)
+    val announcedTime = PlayerUi.formatTime(positionState.value) + " / " + PlayerUi.formatTime(durationMs)
 
     Canvas(
         modifier = modifier
             .fillMaxWidth()
             .height(PlayerUi.TIME_BAR_HIT_DP.dp)
+            .testTag("player-time-bar")
             .semantics {
                 contentDescription = timeBarDescription
                 progressBarRangeInfo = ProgressBarRangeInfo(announcedFraction, 0f..1f)
+                // Spoken value of the slider: the time, not a bare percentage.
+                if (durationMs > 0) stateDescription = announcedTime
                 // TalkBack and switch access adjust the bar through SetProgress; the
                 // seek lands directly, the drag preview stays a pointer-only path.
                 if (durationMs > 0) setProgress { target ->
