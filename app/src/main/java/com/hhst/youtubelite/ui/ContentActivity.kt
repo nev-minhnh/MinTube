@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -138,8 +139,12 @@ abstract class ContentActivity : NativeActivity() {
                         val store: MiniPlayerStore = koinInject()
                         // Shared entry: provides LocalAppColors, LocalMotionScale and LocalHideShorts here too.
                         com.hhst.youtubelite.ui.design.AppTheme {
-                            BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-                                MiniPlayerWindow(maxWidth.value.toInt(), 56, store, state.controlsVisible,
+                            // One source with the tab bar and rail: above the bar, or beside the rail.
+                            val dock = com.hhst.youtubelite.ui.design.rememberNavigationForm()
+                            BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
+                                .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp)) {
+                                MiniPlayerWindow(maxWidth.value.toInt(),
+                                    com.hhst.youtubelite.ui.design.MiniDock.bottomInsetDp(dock), store, state.controlsVisible,
                                     vm::onToggleControls, onDismiss = vm::onMiniClose,
                                     initialBounds = com.hhst.youtubelite.navigation.WatchTransition.miniBounds,
                                     animateFromBounds = miniEntryBounds,

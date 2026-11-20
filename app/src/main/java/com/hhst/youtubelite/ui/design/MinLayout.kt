@@ -68,10 +68,6 @@ enum class WindowClass {
 @Composable
 fun rememberWindowClass(): WindowClass = WindowClass.of(LocalConfiguration.current.screenWidthDp)
 
-/** True when a wide window is also wider than tall: the layout may use a start-edge rail. */
+/** True when a wide window is also wider than tall: the layout uses the start-edge rail ([NavigationForm.Rail]). */
 @Composable
-fun rememberWideLandscape(): Boolean {
-    val configuration = LocalConfiguration.current
-    return WindowClass.of(configuration.screenWidthDp) != WindowClass.Compact &&
-        configuration.screenWidthDp > configuration.screenHeightDp
-}
+fun rememberWideLandscape(): Boolean = rememberNavigationForm() == NavigationForm.Rail

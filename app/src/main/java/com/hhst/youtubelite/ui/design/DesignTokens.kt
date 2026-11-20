@@ -95,7 +95,10 @@ fun AppTheme(content: @Composable () -> Unit) {
 fun androidx.activity.ComponentActivity.setAppContent(content: @Composable () -> Unit) {
     setContent {
         AppTheme {
-            Box(Modifier.fillMaxSize().background(DesignTokens.Background)) { content() }
+            Box(Modifier.fillMaxSize().background(DesignTokens.Background)) {
+                // Wide landscape windows move the screen's tab bar to a start-edge rail.
+                com.hhst.youtubelite.ui.components.NavigationFrame(content)
+            }
         }
     }
 }
