@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.watch.chat
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -39,7 +40,7 @@ class LiveChatDiscoveryUiAndroidTest {
         var page by mutableStateOf(base)
         val actions = mutableListOf<WatchAction>()
         compose.setContent { CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-            Box(Modifier.requiredSize(390.dp, 844.dp)) {
+            TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                 WatchScreen(WatchUiState(videoId = "live", content = WatchContent.Ready(page)), actions::add, {},
                     playerSlot = { Box(it) })
             }

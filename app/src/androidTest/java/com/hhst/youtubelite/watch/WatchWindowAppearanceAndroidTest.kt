@@ -13,6 +13,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import com.hhst.youtubelite.player.PlayerViewModel
+import com.hhst.youtubelite.ui.design.MintColors
 import com.hhst.youtubelite.ui.theme.AppAppearance
 import com.hhst.youtubelite.ui.theme.ThemeMode
 import com.hhst.youtubelite.watch.data.WatchScenario
@@ -85,7 +86,11 @@ class WatchWindowAppearanceAndroidTest {
                     }
                 }
 
-                awaitAppearance(Color.BLACK, lightIcons = true)
+                // Outside fullscreen the window backs the page with the Signal page background;
+                // fullscreen playback stays true black.
+                val pageDark = MintColors.DarkBackground.toInt()
+                val pageLight = MintColors.LightBackground.toInt()
+                awaitAppearance(pageDark, lightIcons = true)
                 host.onActivity {
                     val preview = it.theme.obtainStyledAttributes(intArrayOf(android.R.attr.windowDisablePreview))
                     try {
@@ -94,7 +99,7 @@ class WatchWindowAppearanceAndroidTest {
                     } finally { preview.recycle() }
                     AppAppearance.update(ThemeMode.Light)
                 }
-                awaitAppearance(Color.WHITE, lightIcons = false)
+                awaitAppearance(pageLight, lightIcons = false)
                 host.onActivity { player.setFullscreen(true) }
                 awaitAppearance(Color.BLACK, lightIcons = true)
                 // Exercise the real native onResume/onPostResume path that previously restored a white bar over fullscreen playback.
@@ -106,7 +111,7 @@ class WatchWindowAppearanceAndroidTest {
                 host.onActivity { AppAppearance.update(ThemeMode.Light) }
                 awaitAppearance(Color.BLACK, lightIcons = true)
                 host.onActivity { player.setFullscreen(false) }
-                awaitAppearance(Color.WHITE, lightIcons = false)
+                awaitAppearance(pageLight, lightIcons = false)
             }
         } finally {
             instrumentation.runOnMainSync {
