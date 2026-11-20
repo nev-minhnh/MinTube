@@ -153,11 +153,12 @@ object MiniPlayerLayout {
     }
 
     /**
-     * Left edge (absolute px) of the one fixed in-app dock: the bottom-start corner of the content
-     * area, past [startInsetPx] (navigation rail / cut-out) plus the outer margin; mirrored in RTL.
+     * Left edge (absolute px) of the one fixed in-app dock: the bottom-end corner of the content
+     * area (bottom-right in LTR), short of [endInsetPx] (cut-out / system bar on the end side) by the
+     * outer margin; mirrored to the bottom-left in RTL.
      */
-    fun fixedDockLeftPx(parentWidthPx: Float, windowWidthPx: Float, startInsetPx: Float, marginPx: Float, rtl: Boolean): Float =
-        if (rtl) parentWidthPx - startInsetPx - marginPx - windowWidthPx else startInsetPx + marginPx
+    fun fixedDockLeftPx(parentWidthPx: Float, windowWidthPx: Float, endInsetPx: Float, marginPx: Float, rtl: Boolean): Float =
+        if (rtl) endInsetPx + marginPx else parentWidthPx - endInsetPx - marginPx - windowWidthPx
 
     fun hitsCloseTarget(centerX: Float, centerY: Float, left: Float, top: Float, right: Float, bottom: Float): Boolean =
         right > left && bottom > top && centerX >= left && centerX <= right && centerY >= top && centerY <= bottom

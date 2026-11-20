@@ -83,7 +83,7 @@ class BackMiniHandoffAndroidTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val store = GlobalContext.get().get<MiniPlayerStore>()
         // A top-edge placement saved by an older version must be ignored by both hosts: each docks at the
-        // same fixed bottom-start corner, so the handoff keeps the same bounds.
+        // same fixed bottom-end corner, so the handoff keeps the same bounds.
         instrumentation.runOnMainSync { store.writeLegacyPlacement(0, 0f, -10_000f) }
         try {
             checkHandoff(null)

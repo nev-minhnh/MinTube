@@ -112,14 +112,16 @@ class MiniPlayerLayoutTest {
         assertFalse(MiniPlayerLayout.hitsCloseTarget(200f, 800f, 152f, 714f, 248f, 786f))
         assertFalse(MiniPlayerLayout.hitsCloseTarget(200f, 500f, 152f, 714f, 248f, 786f))
     }
-    @Test fun fixedDock_sitsAtTheBottomStartCornerBesideTheRailAndMirrorsInRtl() {
-        // Phone (no rail): margin from the left edge.
-        assertEquals(12f, MiniPlayerLayout.fixedDockLeftPx(360f, 190f, 0f, 12f, rtl = false), 0f)
-        // Tablet landscape: right of an 80px rail.
-        assertEquals(104f, MiniPlayerLayout.fixedDockLeftPx(1280f, 240f, 80f, 24f, rtl = false), 0f)
-        // RTL mirrors to the right edge, inside the rail on that side.
-        assertEquals(158f, MiniPlayerLayout.fixedDockLeftPx(360f, 190f, 0f, 12f, rtl = true), 0f)
-        assertEquals(936f, MiniPlayerLayout.fixedDockLeftPx(1280f, 240f, 80f, 24f, rtl = true), 0f)
+    @Test fun fixedDock_sitsAtTheBottomEndCornerOfTheContentAndMirrorsInRtl() {
+        // Phone: margin from the right edge (owner 2026-11-21: bottom-right, not left).
+        assertEquals(158f, MiniPlayerLayout.fixedDockLeftPx(360f, 190f, 0f, 12f, rtl = false), 0f)
+        // Tablet landscape: the content area already excludes the start rail; right edge of it.
+        assertEquals(1016f, MiniPlayerLayout.fixedDockLeftPx(1280f, 240f, 0f, 24f, rtl = false), 0f)
+        // An end-side cut-out / system bar pushes it in by that inset.
+        assertEquals(968f, MiniPlayerLayout.fixedDockLeftPx(1280f, 240f, 48f, 24f, rtl = false), 0f)
+        // RTL mirrors to the left edge.
+        assertEquals(12f, MiniPlayerLayout.fixedDockLeftPx(360f, 190f, 0f, 12f, rtl = true), 0f)
+        assertEquals(72f, MiniPlayerLayout.fixedDockLeftPx(1280f, 240f, 48f, 24f, rtl = true), 0f)
     }
 
     @Test fun closeTarget_rejectsInvalidOrUnmeasuredTarget() {

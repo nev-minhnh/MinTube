@@ -4,7 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.hhst.youtubelite.core.PreferenceStore
 
 /**
- * The in-app mini-player has one fixed placement (bottom-start corner of the content area) and the
+ * The in-app mini-player has one fixed placement (bottom-end corner of the content area) and the
  * default size, so nothing about it is persisted. Older versions saved a dragged offset and a pinched
  * width; those keys are dropped the first time the store is used so they can never park the window
  * mid-screen.
