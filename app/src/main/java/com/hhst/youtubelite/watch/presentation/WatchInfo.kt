@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -80,15 +81,19 @@ internal fun WatchMetadata(
     inset: Dp,
     onAction: (WatchAction) -> Unit,
     onCopyLink: ((String) -> Unit)?,
+    /** Height of the title block (title, metadata, action row); the "now playing" strip keys off it. */
+    onTitleBlockHeight: (Int) -> Unit = {},
 ) {
     Column(Modifier.fillMaxWidth().testTag("watch-metadata")) {
-        Column(Modifier.fillMaxWidth().padding(start = inset, end = inset, top = MinSpace.md)) {
-            WatchTitle(rememberDeArrowTitle(video.id, video.title), expanded = state.descriptionExpanded)
+        Column(Modifier.fillMaxWidth().onSizeChanged { onTitleBlockHeight(it.height) }) {
+            Column(Modifier.fillMaxWidth().padding(start = inset, end = inset, top = MinSpace.md)) {
+                WatchTitle(rememberDeArrowTitle(video.id, video.title), expanded = state.descriptionExpanded)
+                Spacer(Modifier.height(MinSpace.xs))
+                WatchMetaRow(video.live, video.views, video.age, liveBadgeTag = "watch-live-badge")
+            }
             Spacer(Modifier.height(MinSpace.xs))
-            WatchMetaRow(video.live, video.views, video.age, liveBadgeTag = "watch-live-badge")
+            WatchActionBar(video, state.actionPending, state.pendingVideoAction, state.live, inset, onAction, onCopyLink)
         }
-        Spacer(Modifier.height(MinSpace.xs))
-        WatchActionBar(video, state.actionPending, state.pendingVideoAction, state.live, inset, onAction, onCopyLink)
         WatchChannelRow(video, state.actionPending, state.pendingVideoAction, inset, onAction)
         WatchDescriptionCard(video, state.descriptionExpanded, inset, onAction)
     }

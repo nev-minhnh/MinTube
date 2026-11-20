@@ -759,4 +759,6 @@
     <string name="responsive_chip_filter_hint">Chỉ hiện các đề xuất đã tải từ kênh này</string>
     <string name="glow_setting_title">Ánh sáng nền sau trình phát</string>
     <string name="glow_setting_summary">Ánh sáng dịu theo màu của video</string>
+    <string name="watch_strip_back_to_top">Về đầu trang</string>
+    <string name="watch_strip_now_playing_a11y">Đang phát: %1$s, %2$s. Nhấn đúp để về đầu trang</string>
 </resources>
