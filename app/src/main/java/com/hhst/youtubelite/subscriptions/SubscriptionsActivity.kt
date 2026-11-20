@@ -212,13 +212,12 @@ class SubscriptionsActivity : com.hhst.youtubelite.ui.ContentActivity() {
                         Box(Modifier.fillMaxSize().height(48.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
                             if (state.menuLoading) Box(Modifier.testTag("subscriptions-menu-loading")) {
                                 com.hhst.youtubelite.home.presentation.LoadingSpinner()
-                            } else com.hhst.youtubelite.ui.design.AppText(
-                                androidx.compose.ui.res.stringResource(com.hhst.youtubelite.R.string.retry),
-                                size = 14, line = 20,
-                                modifier = Modifier.testTag("subscriptions-menu-retry")
-                                    .clickable(role = androidx.compose.ui.semantics.Role.Button) {
-                                        subscriptionsViewModel.onAction(SubscriptionsAction.OpenMenu(menu.videoId))
-                                    }.padding(horizontal = 16.dp, vertical = 12.dp),
+                            } else com.hhst.youtubelite.ui.components.MinButton(
+                                stringResource(R.string.retry),
+                                { subscriptionsViewModel.onAction(SubscriptionsAction.OpenMenu(menu.videoId)) },
+                                kind = com.hhst.youtubelite.ui.components.MinButtonKind.Text,
+                                icon = AppIcon.Refresh,
+                                testTag = "subscriptions-menu-retry",
                             )
                         }
                     }) else null,
