@@ -50,7 +50,6 @@ import com.hhst.youtubelite.ui.design.AppText
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
-import com.hhst.youtubelite.ui.design.appDescription
 
 /**
  * Search inside the channel: a search field under the tab row, matching playlists, then video
@@ -168,8 +167,8 @@ private fun ChannelSearchVideoRow(video: ChannelVideo, channel: String, width: F
         onMenu = { onAction(ChannelAction.OpenItemMenu(video.id)) },
         menuDescription = stringResource(R.string.a11y_more_search_actions_for, video.title),
         videoId = video.id,
-        artworkModifier = Modifier.testTag("channel-search-thumb-${video.id}")
-            .appDescription(R.string.a11y_title_duration, video.title, video.duration),
+        thumbnailTag = "channel-search-thumb-${video.id}",
+        thumbnailDescription = stringResource(R.string.a11y_title_duration, video.title, video.duration),
         thumbnailWidth = ChannelMetrics.rowThumbnail(width, LocalDensity.current.fontScale),
     )
 }

@@ -303,7 +303,7 @@ private fun ChannelAvatar(result: SearchResult, onAction: (SearchAction) -> Unit
     Box(Modifier.size(MinSpace.Touch).clip(CircleShape).testTag("search-channel-${result.id}")
         .clickable(role = Role.Button) { onAction(SearchAction.OpenChannel(result.channelId)) }
         .appDescription(R.string.a11y_go_to_channel, result.channel), contentAlignment = Alignment.Center) {
-        Artwork(result.avatar.orEmpty(), Modifier.size(36.dp).clip(CircleShape))
+        com.hhst.youtubelite.ui.components.MinAvatar(result.avatar, result.channel, size = 36.dp)
     }
 }
 

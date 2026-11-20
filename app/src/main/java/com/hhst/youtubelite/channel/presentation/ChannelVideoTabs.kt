@@ -53,7 +53,6 @@ import com.hhst.youtubelite.ui.design.AppText
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
-import com.hhst.youtubelite.ui.design.appDescription
 import com.hhst.youtubelite.ui.design.labelResource
 
 /*
@@ -101,17 +100,18 @@ internal fun ChannelVideoItem(video: ChannelVideo, width: Float, card: Boolean, 
     val title = rememberDeArrowTitle(video.id, video.title)
     val metadata = listOf(video.views, video.age).filter(String::isNotBlank).joinToString(" · ")
     val badge = if (video.live) stringResource(R.string.player_live) else video.duration
-    val thumb = Modifier.testTag("channel-thumb-${video.id}").appDescription(R.string.a11y_title_duration, video.title, video.duration)
+    val thumbTag = "channel-thumb-${video.id}"
+    val thumbLabel = stringResource(R.string.a11y_title_duration, video.title, video.duration)
     val menu = stringResource(R.string.a11y_more_actions_for, video.title)
     val open = { onAction(ChannelAction.OpenVideo(video.id)) }
     val openMenu = { onAction(ChannelAction.OpenItemMenu(video.id)) }
     val tag = Modifier.testTag("channel-video-${video.id}")
     if (card) VideoCard(
         title, metadata, video.artwork, open, tag, durationLabel = badge, live = video.live,
-        onMenu = openMenu, menuDescription = menu, videoId = video.id, artworkModifier = thumb,
+        onMenu = openMenu, menuDescription = menu, videoId = video.id, thumbnailTag = thumbTag, thumbnailDescription = thumbLabel,
     ) else VideoRow(
         title, metadata, video.artwork, open, tag, durationLabel = badge, live = video.live,
-        onMenu = openMenu, menuDescription = menu, videoId = video.id, artworkModifier = thumb,
+        onMenu = openMenu, menuDescription = menu, videoId = video.id, thumbnailTag = thumbTag, thumbnailDescription = thumbLabel,
         thumbnailWidth = ChannelMetrics.rowThumbnail(width, LocalDensity.current.fontScale),
     )
 }

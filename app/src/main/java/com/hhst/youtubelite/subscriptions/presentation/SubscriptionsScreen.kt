@@ -447,7 +447,7 @@ internal fun SubscriptionsVideoCard(item: FeedItem.Video, compact: Boolean, onAc
                 onAction(SubscriptionsAction.OpenChannel(item.channelId))
             }.testTag("subs-channel-${item.channelId}").appDescription(R.string.a11y_go_to_channel, item.author),
                 contentAlignment = Alignment.Center) {
-                SubscriptionsArtwork(item.avatar.orEmpty(), Modifier.size(36.dp).clip(CircleShape))
+                com.hhst.youtubelite.ui.components.MinAvatar(item.avatar, item.author, size = 36.dp)
             }
             Spacer(Modifier.width(MinSpace.xs))
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {

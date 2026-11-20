@@ -340,6 +340,7 @@ private fun ExploreVideoCard(item: FeedItem.Video, modifier: Modifier, onAction:
         avatar = item.avatar.orEmpty(),
         avatarDescription = if (item.channelId.isNotBlank()) stringResource(R.string.a11y_go_to_channel, item.author) else null,
         onAvatarClick = if (item.channelId.isNotBlank()) ({ onAction(ExploreAction.OpenChannel(item.channelId)) }) else null,
+        avatarName = item.author,
         videoId = item.id,
     )
 }

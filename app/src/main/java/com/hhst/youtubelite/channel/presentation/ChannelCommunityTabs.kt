@@ -123,17 +123,14 @@ fun ChannelShortsTab(
 /** The shared Short card; the overflow is drawn here because its tag is part of the channel contract. */
 @Composable
 private fun ChannelShortItem(short: ChannelShort, onAction: (ChannelAction) -> Unit, production: Boolean) {
-    Box(Modifier.fillMaxWidth()) {
-        ShortCard(
-            short.title, short.artwork, { onAction(ChannelAction.OpenShort(short.id)) },
-            Modifier.fillMaxWidth().testTag("channel-short-${short.id}"), metadata = short.views,
-        )
-        // The anonymous page has no short menu; production hides the dead entry.
-        if (!production) AppIconButton(
-            AppIcon.More, stringResource(R.string.a11y_more_actions_for, short.title),
-            Modifier.align(Alignment.TopEnd).testTag("channel-short-menu-${short.id}"), color = Color.White,
-        ) { onAction(ChannelAction.OpenShortMenu(short.id)) }
-    }
+    // The anonymous page has no short menu; production hides the dead entry.
+    ShortCard(
+        short.title, short.artwork, { onAction(ChannelAction.OpenShort(short.id)) },
+        Modifier.fillMaxWidth().testTag("channel-short-${short.id}"), metadata = short.views,
+        onMenu = if (production) null else ({ onAction(ChannelAction.OpenShortMenu(short.id)) }),
+        menuDescription = stringResource(R.string.a11y_more_actions_for, short.title),
+        menuTag = "channel-short-menu-${short.id}",
+    )
 }
 
 @Composable
