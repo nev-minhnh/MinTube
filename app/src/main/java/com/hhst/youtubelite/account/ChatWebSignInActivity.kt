@@ -49,6 +49,7 @@ class ChatWebSignInActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         if (!native.signedIn || expected == null) return finish()
         val colors = ChromeColors.of(this)
         val density = resources.displayMetrics.density

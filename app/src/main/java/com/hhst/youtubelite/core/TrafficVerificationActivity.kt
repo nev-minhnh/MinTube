@@ -29,6 +29,7 @@ class TrafficVerificationActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         val challenge = intent.getStringExtra(EXTRA_CHALLENGE) ?: return finish()
         if (!UrlPolicy.isTrafficChallenge(challenge)) return finish()
         val dark = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES

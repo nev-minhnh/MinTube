@@ -37,6 +37,7 @@ class DownloadSheetActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         (application as com.hhst.youtubelite.App).startMediaRuntime()
         enableEdgeToEdge()
         val videoId = intent.getStringExtra(DownloadUi.EXTRA_VIDEO_ID)

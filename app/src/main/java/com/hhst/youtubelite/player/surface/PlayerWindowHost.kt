@@ -167,10 +167,12 @@ class PlayerWindowHost(
                 entryConfigurationOrientation != act.resources.configuration.orientation) {
                 if (entryConfigurationOrientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE)
                     ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            } else entry ?: orientationBeforeGesture ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        } else orientationBeforeGesture ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED).also {
+            } else entry ?: orientationBeforeGesture ?: com.hhst.youtubelite.ui.PhoneOrientation.baseOrientation(act)
+        } else orientationBeforeGesture ?: com.hhst.youtubelite.ui.PhoneOrientation.baseOrientation(act)).also {
             orientationBeforeGesture = null
         }
+        // Nothing held (first embedded frame, or exit without a captured entry): phones stay in
+        // their portrait lock instead of falling back to UNSPECIFIED; tablets are unchanged.
         if (act.requestedOrientation != orientation) act.requestedOrientation = orientation
         refreshSystemBars(fullscreen)
     }

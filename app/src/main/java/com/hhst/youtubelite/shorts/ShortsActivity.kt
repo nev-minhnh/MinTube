@@ -177,6 +177,7 @@ class ShortsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         tabNavigation = savedInstanceState?.getBoolean("navigation_tab_entry")
             ?: intent.getBooleanExtra(com.hhst.youtubelite.ui.NativeActivity.EXTRA_TAB_NAVIGATION, false)
         tabBackwards = savedInstanceState?.getBoolean("navigation_tab_backward")

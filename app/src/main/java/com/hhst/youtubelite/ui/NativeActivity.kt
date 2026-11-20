@@ -36,6 +36,8 @@ abstract class NativeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Phones are portrait-only outside video fullscreen; tablets rotate freely.
+        PhoneOrientation.lockOnPhone(this)
         applyWindowBackground(darkAppearance())
         navigationAnimation = NavigationAnimation.entries.firstOrNull {
             it.name == savedInstanceState?.getString("navigation_animation")

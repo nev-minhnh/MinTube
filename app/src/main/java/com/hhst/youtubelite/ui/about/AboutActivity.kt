@@ -37,6 +37,7 @@ import org.koin.java.KoinJavaComponent.get
 class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState); enableEdgeToEdge()
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         setContent { AppTheme {
             val scope = rememberCoroutineScope()
             var status by rememberSaveable { mutableStateOf("") }

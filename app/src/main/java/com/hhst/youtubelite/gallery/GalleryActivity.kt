@@ -86,6 +86,7 @@ class GalleryActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState); enableEdgeToEdge()
+        com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
         pendingSave = savedInstanceState?.getString("pending_save")?.let(::File)
             ?.takeIf { it.isFile && it.parentFile == File(cacheDir, "gallery") }
         val urls = intent.getStringArrayListExtra("images").orEmpty()
