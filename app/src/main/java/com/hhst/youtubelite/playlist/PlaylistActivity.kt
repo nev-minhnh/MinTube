@@ -13,8 +13,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.SideEffect
-import androidx.core.view.WindowCompat
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,7 +67,7 @@ class PlaylistActivity : com.hhst.youtubelite.ui.ContentActivity() {
         super.onCreate(savedInstanceState)
         val sources = org.koin.java.KoinJavaComponent.getKoin().get<com.hhst.youtubelite.data.media.ContentRepositories>()
         val fixtures = com.hhst.youtubelite.data.media.ContentRepositories.fixtures(intent)
-        enableEdgeToEdge(SystemBarStyle.dark(0xFF2D4F72.toInt()), SystemBarStyle.light(Color.WHITE, Color.WHITE))
+        enableEdgeToEdge(SystemBarStyle.light(Color.WHITE, Color.WHITE), SystemBarStyle.light(Color.WHITE, Color.WHITE))
         val playlistId = intent.getStringExtra(EXTRA_PLAYLIST_ID)
         if (playlistId.isNullOrBlank() && !fixtures) {
             // No identity and no fixture seam: rendering a default playlist would fabricate content.
@@ -155,11 +153,6 @@ class PlaylistActivity : com.hhst.youtubelite.ui.ContentActivity() {
         setAppContent {
             val state by playlistViewModel.uiState.collectAsStateWithLifecycle()
             playlistViewModel.saveSheet?.let { com.hhst.youtubelite.ui.design.WriteProgressOverlay(it.writes) }
-            val pageColor = (state.content as? PlaylistContent.Ready)?.page?.summary?.accent
-            SideEffect {
-                WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = pageColor == null
-                WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = true
-            }
             val back: () -> Unit = {
                 if (playlistViewModel.saveSheet?.state?.value != null) playlistViewModel.saveSheet?.dismiss()
                 else if (state.overlay != PlaylistOverlay.None) playlistViewModel.onAction(PlaylistAction.CloseOverlay)
@@ -167,8 +160,6 @@ class PlaylistActivity : com.hhst.youtubelite.ui.ContentActivity() {
             }
             BackHandler(onBack = back)
             Box(Modifier.fillMaxSize().background(com.hhst.youtubelite.ui.design.DesignTokens.Background)) {
-                Box(Modifier.fillMaxWidth().windowInsetsTopHeight(WindowInsets.safeDrawing)
-                    .background(pageColor?.let { androidx.compose.ui.graphics.Color(it) } ?: com.hhst.youtubelite.ui.design.DesignTokens.Background))
                 PlaylistScreen(state, playlistViewModel::onAction, back,
                     Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding())
                 playlistViewModel.saveSheet?.let { sheet ->

@@ -40,13 +40,13 @@ internal fun PlaylistCover(playlist: PlaylistSummary, modifier: Modifier, onOpen
     Box(modifier.testTag("playlist-cover-${playlist.id}").clickable(role = Role.Button, onClick = onOpen)
         .semantics { contentDescription = listOfNotNull(playlist.title, playlist.countLabel).joinToString(", ") }) {
         Box(Modifier.padding(horizontal = 8.dp).fillMaxWidth().height(12.dp)
-            .background(Color(playlist.accent).copy(alpha = 0.3f), RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)))
+            .background(DesignTokens.Surface, RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)))
         Box(Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp).fillMaxWidth().height(12.dp)
-            .background(Color(playlist.accent).copy(alpha = 0.6f), RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)))
+            .background(DesignTokens.Ghost, RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)))
         Box(Modifier.padding(top = 8.dp).fillMaxSize().clip(RoundedCornerShape(12.dp))) {
             PlaylistArtwork(playlist.artwork, Modifier.fillMaxSize())
             Row(Modifier.align(Alignment.BottomEnd).padding(8.dp)
-                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                .background(Color.Black.copy(alpha = 0.75f), com.hhst.youtubelite.ui.design.MinRadius.Badge)
                 .padding(horizontal = 4.dp, vertical = 1.dp), verticalAlignment = Alignment.CenterVertically) {
                 AppIcon(AppIcon.Playlist, Modifier.size(12.dp), color = Color.White)
                 Spacer(Modifier.width(4.dp))
