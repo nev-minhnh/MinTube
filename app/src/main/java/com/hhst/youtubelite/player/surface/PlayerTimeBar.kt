@@ -122,7 +122,7 @@ fun PlayerTimeBar(
             size = Size(size.width * buffered, thickness),
         )
         drawRect(
-            PlayerUi.YtRed,
+            PlayerUi.Accent,
             topLeft = Offset(0f, y),
             size = Size(size.width * played, thickness),
         )
@@ -147,7 +147,7 @@ fun PlayerTimeBar(
         }
         val thumbR = if (dragging) 7.dp.toPx() else 5.dp.toPx()
         drawCircle(
-            color = PlayerUi.YtRed,
+            color = PlayerUi.Accent,
             radius = thumbR,
             center = Offset(size.width * played, centerY),
         )

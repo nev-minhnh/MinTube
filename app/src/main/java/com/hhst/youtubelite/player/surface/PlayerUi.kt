@@ -43,7 +43,14 @@ object PlayerUi {
         else -> PlayPauseAction.Play
     }
 
-    val YtRed = Color(0xFFFF0000)
+    /**
+     * On-video chrome is always dark, in both themes: it takes the dark-palette mint accent
+     * (progress, thumb, active toggles) and the dark-palette danger tone for the live marker.
+     */
+    val Accent = Color(com.hhst.youtubelite.ui.design.MintColors.DarkAccent)
+    val Live = Color(com.hhst.youtubelite.ui.design.MintColors.DarkDanger)
+    /** Text and icons on an accent fill of the dark chrome. */
+    val OnAccent = Color(com.hhst.youtubelite.ui.design.MintColors.DarkOnAccent)
     val Icon = Color.White.copy(alpha = 0.92f)
     val Unplayed = Color(0x99FFFFFF)
     val Buffered = Color.White
@@ -58,6 +65,8 @@ object PlayerUi {
      */
     val GlassBg = Color(0x66000000)
     val GlassStroke = Color(0x24FFFFFF)
+    /** Peek strip of a mini-player collapsed to the screen edge. */
+    val MiniEdge = Color(0xE61D2423)
 
     /** Time bar: 2 dp track, 48 dp minimum accessibility hit area, 100 dp edge gradients. */
     const val TIME_BAR_HIT_DP = 48
@@ -91,14 +100,16 @@ object PlayerUi {
     /** Player metadata stays readable above the video without extra font padding. */
     val TitleStyle = TextStyle(
         color = Color.White,
+        fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Display,
         fontSize = 17.sp,
         lineHeight = 23.sp,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
     )
 
     val AuthorStyle = TextStyle(
         color = Author,
+        fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Body,
         fontSize = 13.sp,
         lineHeight = 19.sp,
         platformStyle = PlatformTextStyle(includeFontPadding = false),

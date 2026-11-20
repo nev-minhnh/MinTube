@@ -15,7 +15,7 @@ import com.hhst.youtubelite.ui.components.watchSheetHeight
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.ui.theme.SettingsTokens
 import com.hhst.youtubelite.downloader.ui.DownloadEntries
@@ -205,7 +204,7 @@ internal fun PlayerModalSheet(
         sheetState = sheetState,
         sheetMaxWidth = androidx.compose.ui.unit.Dp.Unspecified,
         containerColor = AppStyle.Panel,
-        shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+        shape = com.hhst.youtubelite.ui.design.MinRadius.Sheet,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 0.dp,
         dragHandle = null,
@@ -389,8 +388,7 @@ private fun <T> OptionSheet(
         Text(
             text = title,
             modifier = Modifier.weight(1f).padding(vertical = 8.dp),
-            fontSize = SettingsTokens.TitleSize.sp,
-            fontWeight = FontWeight.Medium,
+            style = com.hhst.youtubelite.ui.design.MinType.Title,
             color = MaterialTheme.colorScheme.onSurface,
         )
         PlayerIconButton(
@@ -412,6 +410,7 @@ private fun <T> OptionSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = SettingsTokens.RowHeight)
+                    .then(if (isSelected) Modifier.background(com.hhst.youtubelite.ui.design.DesignTokens.Ghost) else Modifier)
                     .clickable(enabled = row.enabled, role = Role.Button) { onPick(row.value) }
                     .padding(start = 24.dp, end = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -420,18 +419,18 @@ private fun <T> OptionSheet(
                 Text(
                     text = row.label,
                     modifier = Modifier.weight(1f),
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp,
-                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
+                    style = com.hhst.youtubelite.ui.design.MinType.Subtitle.copy(
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal),
                     color = when {
                         !row.enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        isSelected -> com.hhst.youtubelite.ui.design.DesignTokens.AccentText
                         else -> MaterialTheme.colorScheme.onSurface
                     },
                 )
                 if (isSelected) Icon(
                     painter = painterResource(R.drawable.ic_check),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
+                    tint = com.hhst.youtubelite.ui.design.DesignTokens.Accent,
                     modifier = Modifier.size(24.dp),
                 )
             }
@@ -459,8 +458,7 @@ private fun MoreRow(icon: Int, label: String, onClick: () -> Unit) {
         )
         Text(
             text = label,
-            fontSize = 16.sp,
-            lineHeight = 22.sp,
+            style = com.hhst.youtubelite.ui.design.MinType.Subtitle.copy(fontWeight = FontWeight.Normal),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )

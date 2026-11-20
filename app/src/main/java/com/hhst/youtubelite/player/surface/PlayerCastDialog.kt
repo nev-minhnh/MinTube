@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -87,7 +88,7 @@ internal fun CastDialog(
                         modifier = Modifier.padding(bottom = 8.dp),
                     )
                     TextButton(onClick = onStop) {
-                        Text(stringResource(R.string.cast_stop), color = PlayerUi.YtRed)
+                        Text(stringResource(R.string.cast_stop), color = com.hhst.youtubelite.ui.design.DesignTokens.Danger)
                     }
                 }
                 Text(
@@ -116,7 +117,7 @@ internal fun CastDialog(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(44.dp)
+                                .heightIn(min = 48.dp)
                                 .clickable { onDevice(device.id) },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -126,7 +127,7 @@ internal fun CastDialog(
                                 ),
                                 contentDescription = null,
                                 tint = if (device.selected) {
-                                    PlayerUi.YtRed
+                                    com.hhst.youtubelite.ui.design.DesignTokens.Accent
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant
                                 },
@@ -137,7 +138,7 @@ internal fun CastDialog(
                             Text(
                                 text = device.name,
                                 color = if (device.selected) {
-                                    PlayerUi.YtRed
+                                    com.hhst.youtubelite.ui.design.DesignTokens.AccentText
                                 } else {
                                     MaterialTheme.colorScheme.onSurface
                                 },
@@ -185,7 +186,7 @@ internal fun CastDialog(
                         if (state.castLinkConnected) {
                             Text(
                                 text = stringResource(R.string.cast_link_connected),
-                                color = PlayerUi.YtRed,
+                                color = com.hhst.youtubelite.ui.design.DesignTokens.AccentText,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp),
                             )
