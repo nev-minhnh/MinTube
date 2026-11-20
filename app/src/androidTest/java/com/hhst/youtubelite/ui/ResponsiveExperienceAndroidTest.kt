@@ -13,15 +13,14 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.extension.ExtensionManager
 import com.hhst.youtubelite.extension.PreferenceKeys
 import com.hhst.youtubelite.settings.presentation.AdvancedScreen
 import com.hhst.youtubelite.settings.presentation.HapticsSettings
 import com.hhst.youtubelite.ui.about.AboutScreen
+import com.hhst.youtubelite.ui.design.MinType
 import com.hhst.youtubelite.ui.theme.AppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,17 +49,19 @@ class ResponsiveExperienceAndroidTest {
         val label = compose.onNodeWithText(compose.activity.getString(R.string.interface_category))
         val results = mutableListOf<TextLayoutResult>()
         label.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(results) }
-        assertEquals(14.sp, results.single().layoutInput.style.fontSize)
-        assertEquals(20.sp, results.single().layoutInput.style.lineHeight)
-        assertEquals(FontWeight.Medium, results.single().layoutInput.style.fontWeight)
+        // Group headers use the shared Mint label style.
+        assertEquals(MinType.Label.fontSize, results.single().layoutInput.style.fontSize)
+        assertEquals(MinType.Label.lineHeight, results.single().layoutInput.style.lineHeight)
+        assertEquals(MinType.Label.fontWeight, results.single().layoutInput.style.fontWeight)
         val row = compose.onNodeWithTag("settings-toggle-${PreferenceKeys.ENABLE_DISPLAY_DISLIKES}")
         row.performScrollTo().assertIsDisplayed()
         assertTrue("Touch target too short", row.fetchSemanticsNode().boundsInRoot.height >= 48f)
         results.clear()
         compose.onNodeWithText(compose.activity.getString(R.string.settings_advanced))
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(results) }
-        assertEquals(20.sp, results.single().layoutInput.style.fontSize)
-        assertEquals(FontWeight.Medium, results.single().layoutInput.style.fontWeight)
+        // The screen title uses the shared Mint title style.
+        assertEquals(MinType.Title.fontSize, results.single().layoutInput.style.fontSize)
+        assertEquals(MinType.Title.fontWeight, results.single().layoutInput.style.fontWeight)
     }
 
     @Test fun aboutRemainsCenteredAndScrollableWithLargeFontOnWideWindow() {

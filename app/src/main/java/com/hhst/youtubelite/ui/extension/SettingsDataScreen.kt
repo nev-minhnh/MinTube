@@ -4,54 +4,37 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import com.hhst.youtubelite.ui.components.AppAlertDialog as AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
-import com.hhst.youtubelite.ui.components.AppTextButton as TextButton
-import com.hhst.youtubelite.ui.components.AppTopAppBar as TopAppBar
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.diagnostics.AppLog
+import com.hhst.youtubelite.diagnostics.DiagnosticOperation
+import com.hhst.youtubelite.diagnostics.DiagnosticOutcome
 import com.hhst.youtubelite.downloader.core.DownloadPrefs
 import com.hhst.youtubelite.extension.ExtensionManager
 import com.hhst.youtubelite.extension.SettingsBackup
 import com.hhst.youtubelite.extension.SettingsBackupData
-import com.hhst.youtubelite.ui.components.ConstrainedPage
-import com.hhst.youtubelite.ui.theme.SettingsTokens
-import com.hhst.youtubelite.ui.theme.settingsAppBarHeight
+import com.hhst.youtubelite.settings.presentation.SettingsGroup
+import com.hhst.youtubelite.settings.presentation.SettingsNote
+import com.hhst.youtubelite.settings.presentation.SettingsPageFrame
+import com.hhst.youtubelite.settings.presentation.SettingsRow
+import com.hhst.youtubelite.ui.components.AppAlertDialog
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinType
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import com.hhst.youtubelite.diagnostics.AppLog
-import com.hhst.youtubelite.diagnostics.DiagnosticOperation
-import com.hhst.youtubelite.diagnostics.DiagnosticOutcome
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsDataScreen(
     onClose: () -> Unit,
@@ -134,141 +117,79 @@ fun SettingsDataScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings_backup_restore), style = MaterialTheme.typography.titleLarge) },
-                navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back),
-                            contentDescription = stringResource(R.string.navigate_back),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
-        },
-    ) { padding ->
-        ConstrainedPage(Modifier.padding(padding), maxWidth = 720.dp) {
-            Column(Modifier.fillMaxSize()) {
-                ActionRow(
-                    icon = R.drawable.ic_share,
-                    title = R.string.settings_export,
-                    summary = R.string.settings_export_summary,
-                    onClick = {
-                        fileOperations[0]?.finish(DiagnosticOutcome.SUPERSEDED, "picker_reopened")
-                        fileOperations[0] = AppLog.operation(AppLog.Category.STORAGE, "settings_export")
-                        exportLauncher.launch("litube-settings.json")
-                    },
-                )
-                ActionRow(
-                    icon = R.drawable.ic_download,
-                    title = R.string.settings_import,
-                    summary = R.string.settings_import_summary,
-                    onClick = {
-                        fileOperations[1]?.finish(DiagnosticOutcome.SUPERSEDED, "picker_reopened")
-                        fileOperations[1] = AppLog.operation(AppLog.Category.STORAGE, "settings_import_read")
-                        importLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain"))
-                    },
-                )
-            }
-        }
+    SettingsPageFrame(
+        title = stringResource(R.string.settings_backup_restore),
+        onBack = onClose,
+        screenTag = "settings-data-screen",
+        topBarTag = "settings-data-topbar",
+        pageTag = "settings-data-page",
+    ) {
+        SettingsNote(stringResource(R.string.account_backup_note), Modifier.testTag("settings-data-note"))
+        SettingsGroup(stringResource(R.string.settings_backup_restore))
+        SettingsRow(
+            title = stringResource(R.string.settings_export),
+            summary = stringResource(R.string.settings_export_summary),
+            tag = "settings-data-export",
+            icon = AppIcon.Share,
+            onClick = {
+                fileOperations[0]?.finish(DiagnosticOutcome.SUPERSEDED, "picker_reopened")
+                fileOperations[0] = AppLog.operation(AppLog.Category.STORAGE, "settings_export")
+                exportLauncher.launch("litube-settings.json")
+            },
+        )
+        SettingsRow(
+            title = stringResource(R.string.settings_import),
+            summary = stringResource(R.string.settings_import_summary),
+            tag = "settings-data-import",
+            icon = AppIcon.Download,
+            onClick = {
+                fileOperations[1]?.finish(DiagnosticOutcome.SUPERSEDED, "picker_reopened")
+                fileOperations[1] = AppLog.operation(AppLog.Category.STORAGE, "settings_import_read")
+                importLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain"))
+            },
+        )
     }
 
     pendingImport?.let { backup ->
-        val scheme = MaterialTheme.colorScheme
-        AlertDialog(
+        AppAlertDialog(
             onDismissRequest = { pendingImport = null },
-            containerColor = com.hhst.youtubelite.ui.theme.AppStyle.Panel,
-            titleContentColor = scheme.onSurface,
-            textContentColor = scheme.onSurfaceVariant,
-            title = { Text(stringResource(R.string.settings_import_confirm_title)) },
-            text = { Text(stringResource(R.string.settings_import_confirm_message)) },
+            modifier = Modifier.testTag("settings-data-confirm"),
+            title = { AppText(stringResource(R.string.settings_import_confirm_title), MinType.Title) },
+            text = {
+                AppText(stringResource(R.string.settings_import_confirm_message), MinType.Body, color = DesignTokens.Secondary)
+            },
             confirmButton = {
-                TextButton(
+                MinButton(
+                    stringResource(R.string.confirm),
                     onClick = {
                         SettingsBackup.apply(backup, manager, downloadPrefs)
                         pendingImport = null
                         importDone = true
                     },
-                ) {
-                    Text(text = stringResource(R.string.confirm), color = scheme.primary)
-                }
+                    testTag = "settings-data-confirm-apply",
+                )
             },
             dismissButton = {
-                TextButton(onClick = { pendingImport = null }) {
-                    Text(text = stringResource(R.string.cancel), color = scheme.onSurfaceVariant)
-                }
+                MinButton(stringResource(R.string.cancel), { pendingImport = null }, kind = MinButtonKind.Text)
             },
         )
     }
 
     if (importDone) {
-        AlertDialog(
+        AppAlertDialog(
             onDismissRequest = { importDone = false },
-            title = { Text(stringResource(R.string.settings_import_done)) },
-            text = { Text(stringResource(R.string.settings_import_reload_message)) },
+            modifier = Modifier.testTag("settings-data-done"),
+            title = { AppText(stringResource(R.string.settings_import_done), MinType.Title) },
+            text = {
+                AppText(stringResource(R.string.settings_import_reload_message), MinType.Body, color = DesignTokens.Secondary)
+            },
             confirmButton = {
-                TextButton(onClick = { importDone = false; onReloadPages() }) {
-                    Text(stringResource(R.string.settings_reload_now))
-                }
+                MinButton(stringResource(R.string.settings_reload_now), { importDone = false; onReloadPages() },
+                    kind = MinButtonKind.Tonal)
             },
             dismissButton = {
-                TextButton(onClick = { importDone = false }) {
-                    Text(stringResource(R.string.settings_reload_later))
-                }
+                MinButton(stringResource(R.string.settings_reload_later), { importDone = false }, kind = MinButtonKind.Text)
             },
         )
-    }
-}
-
-@Composable
-private fun ActionRow(
-    icon: Int,
-    title: Int,
-    summary: Int,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = SettingsTokens.RowHeight)
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(
-                start = SettingsTokens.PageInset,
-                end = SettingsTokens.PageInset,
-                top = SettingsTokens.RowPadding,
-                bottom = SettingsTokens.RowPadding,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(Modifier.size(SettingsTokens.IconSlot), contentAlignment = Alignment.Center) { Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(SettingsTokens.IconSize),
-        ) }
-        Spacer(Modifier.width(SettingsTokens.LabelGap))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(title),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = stringResource(summary),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
     }
 }

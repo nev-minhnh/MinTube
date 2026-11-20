@@ -70,7 +70,8 @@ class AccountSettingsScreenshotAndroidTest {
         assertEquals(0f, phone.left, 0.5f)
         assertEquals(390f, phone.width, 0.5f)
         assertEquals(820f, phone.bottom, 0.5f)
-        assertEquals(13f + 58f + 4 * 48f, phone.height, 0.5f)
+        // Mint header: 48dp avatar inside 8dp vertical padding.
+        assertEquals(13f + 64f + 4 * 48f, phone.height, 0.5f)
         compose.runOnIdle { width = 1280; height = 800 }
         val wide = compose.onNodeWithTag("account-menu").fetchSemanticsNode().boundsInRoot
         assertEquals(440f, wide.left, 0.5f)
@@ -111,8 +112,9 @@ class AccountSettingsScreenshotAndroidTest {
         val row = compose.onNodeWithTag("settings-row-general").fetchSemanticsNode().boundsInRoot
         assertEquals(0f, row.left, 0.5f)
         assertEquals(390f, row.width, 0.5f)
-        assertEquals(88f, row.top, 0.5f)
-        assertEquals(52f, row.height, 0.5f)
+        // 56dp Mint top bar, then the group header (20 + 18 + 8).
+        assertEquals(102f, row.top, 0.5f)
+        assertEquals(56f, row.height, 0.5f)
         compose.runOnIdle { width = 1280; height = 800 }
         val wideRow = compose.onNodeWithTag("settings-row-general").fetchSemanticsNode().boundsInRoot
         assertEquals(280f, wideRow.left, 0.5f)

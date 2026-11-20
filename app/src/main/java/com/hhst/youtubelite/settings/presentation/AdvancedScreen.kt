@@ -1,40 +1,29 @@
 package com.hhst.youtubelite.settings.presentation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
-import com.hhst.youtubelite.extension.ExtensionManager
 import com.hhst.youtubelite.extension.PreferenceKeys
 import com.hhst.youtubelite.ui.components.AppSlider
-import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppText
 import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 
 @Composable
 fun AdvancedScreen(
@@ -47,70 +36,67 @@ fun AdvancedScreen(
     modifier: Modifier = Modifier,
     onGestureChange: (Map<String, Boolean>) -> Unit = { values -> values.forEach { (key, value) -> onToggle(key, value) } },
 ) {
-    Column(modifier.fillMaxSize().background(DesignTokens.Background).testTag("advanced-screen")) {
-        AdvancedTopBar(stringResource(R.string.settings_advanced), onBack)
-        Box(Modifier.fillMaxWidth().weight(1f)) {
-            Column(Modifier.align(Alignment.TopCenter).widthIn(max = 720.dp).fillMaxWidth().fillMaxHeight()
-                .verticalScroll(rememberScrollState()).testTag("advanced-page")) {
-                SettingsGroup(stringResource(R.string.interface_category))
-                HapticsRow(haptics)
-                SettingsToggle(stringResource(R.string.display_dislikes), stringResource(R.string.display_dislikes_summary),
-                    PreferenceKeys.ENABLE_DISPLAY_DISLIKES, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.show_likes), "",
-                    PreferenceKeys.ENABLE_SHOW_LIKES, preferences, onToggle)
+    SettingsPageFrame(
+        title = stringResource(R.string.settings_advanced),
+        onBack = onBack,
+        screenTag = "advanced-screen",
+        topBarTag = "advanced-topbar",
+        pageTag = "advanced-page",
+        modifier = modifier,
+        privateBrowsing = preferences[PreferenceKeys.PRIVATE_BROWSING] == true,
+    ) {
+        SettingsGroup(stringResource(R.string.interface_category))
+        HapticsRow(haptics)
+        SettingsToggle(stringResource(R.string.display_dislikes), stringResource(R.string.display_dislikes_summary),
+            PreferenceKeys.ENABLE_DISPLAY_DISLIKES, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.show_likes), "",
+            PreferenceKeys.ENABLE_SHOW_LIKES, preferences, onToggle)
 
-                SettingsGroup(stringResource(R.string.player))
-                SettingsToggle(stringResource(R.string.remember_quality), "",
-                    PreferenceKeys.REMEMBER_QUALITY, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.remember_playback_speed), "",
-                    PreferenceKeys.REMEMBER_PLAYBACK_SPEED, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.autoplay), "",
-                    PreferenceKeys.ENABLE_AUTOPLAY, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.remember_resize_mode), "",
-                    PreferenceKeys.REMEMBER_RESIZE_MODE, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.use_original_title), "",
-                    PreferenceKeys.USE_ORIGINAL_TITLE, preferences, onToggle)
+        SettingsGroup(stringResource(R.string.player))
+        SettingsToggle(stringResource(R.string.remember_quality), "",
+            PreferenceKeys.REMEMBER_QUALITY, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.remember_playback_speed), "",
+            PreferenceKeys.REMEMBER_PLAYBACK_SPEED, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.autoplay), "",
+            PreferenceKeys.ENABLE_AUTOPLAY, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.remember_resize_mode), "",
+            PreferenceKeys.REMEMBER_RESIZE_MODE, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.use_original_title), "",
+            PreferenceKeys.USE_ORIGINAL_TITLE, preferences, onToggle)
 
-                SettingsGroup(stringResource(R.string.gesture))
-                GestureSettings(preferences, onGestureChange)
+        SettingsGroup(stringResource(R.string.gesture))
+        GestureSettings(preferences, onGestureChange)
 
-                SettingsGroup(stringResource(R.string.sponsorblock))
-                SponsorBlockToggles(preferences, onToggle)
+        SettingsGroup(stringResource(R.string.sponsorblock))
+        SponsorBlockToggles(preferences, onToggle)
 
-                SettingsGroup(stringResource(R.string.dearrow))
-                SettingsToggle(stringResource(R.string.dearrow_replace_titles), stringResource(R.string.dearrow_titles_summary),
-                    PreferenceKeys.DEARROW_TITLES, preferences, onToggle)
-                SettingsToggle(stringResource(R.string.dearrow_replace_thumbnails), stringResource(R.string.dearrow_thumbnails_summary),
-                    PreferenceKeys.DEARROW_THUMBNAILS, preferences, onToggle)
+        SettingsGroup(stringResource(R.string.dearrow))
+        SettingsToggle(stringResource(R.string.dearrow_replace_titles), stringResource(R.string.dearrow_titles_summary),
+            PreferenceKeys.DEARROW_TITLES, preferences, onToggle)
+        SettingsToggle(stringResource(R.string.dearrow_replace_thumbnails), stringResource(R.string.dearrow_thumbnails_summary),
+            PreferenceKeys.DEARROW_THUMBNAILS, preferences, onToggle)
 
-                SettingsGroup(stringResource(R.string.settings_group_system))
-                SettingsRow(stringResource(R.string.settings_backup_restore), tag = "advanced-row-data", onClick = onOpenData)
-                SettingsRow(stringResource(R.string.downloads), tag = "advanced-row-downloads", onClick = onOpenDownloads)
-                Spacer(Modifier.height(24.dp))
-            }
-        }
-    }
-}
-
-@Composable
-private fun AdvancedTopBar(title: String, onBack: () -> Unit) {
-    Row(Modifier.fillMaxWidth().height(DesignTokens.TopBarHeight).testTag("advanced-topbar"),
-        verticalAlignment = Alignment.CenterVertically) {
-        AppIconButton(AppIcon.Back, stringResource(R.string.a11y_back), diameter = 48.dp, onClick = onBack)
-        AppText(title, Modifier.padding(end = 16.dp), size = 20, line = 28, weight = FontWeight.Medium)
+        SettingsGroup(stringResource(R.string.settings_group_system))
+        SettingsRow(stringResource(R.string.settings_backup_restore), stringResource(R.string.account_backup_summary),
+            tag = "advanced-row-data", icon = AppIcon.Refresh, chevron = true, onClick = onOpenData)
+        SettingsRow(stringResource(R.string.downloads), tag = "advanced-row-downloads",
+            icon = AppIcon.Download, chevron = true, onClick = onOpenDownloads)
     }
 }
 
 @Composable
 private fun HapticsRow(haptics: HapticsSettings) {
-    Column(Modifier.fillMaxWidth().heightIn(min = 56.dp)
-        .testTag("settings-toggle-${PreferenceKeys.HAPTIC_STRENGTH}").padding(horizontal = 16.dp, vertical = 8.dp)) {
+    val inset = settingsInset()
+    Column(Modifier.fillMaxWidth().heightIn(min = SettingsLayout.RowMinHeight)
+        .testTag("settings-toggle-${PreferenceKeys.HAPTIC_STRENGTH}")
+        .padding(horizontal = inset, vertical = SettingsLayout.RowVertical)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AppText(stringResource(R.string.haptic_strength), Modifier.weight(1f), size = 14, line = 22)
-            AppText(haptics.strength.toString(), size = 14, line = 20, color = DesignTokens.Secondary)
+            AppText(stringResource(R.string.haptic_strength), MinType.Subtitle, Modifier.weight(1f))
+            Spacer(Modifier.width(MinSpace.md))
+            AppText(haptics.strength.toString(), MinType.Label, color = DesignTokens.AccentText)
         }
         AppSlider(value = haptics.strength.toFloat(), onValueChange = { haptics.onChange(it.toInt()) },
-            valueRange = 0f..100f, modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
+            valueRange = 0f..100f, modifier = Modifier.fillMaxWidth().padding(top = MinSpace.xs))
     }
 }
 
@@ -144,7 +130,7 @@ private fun GestureSettings(preferences: Map<String, Boolean>, onChange: (Map<St
         val (key, title) = windowed
         val selected = (if (preferences[key] == true) 1 else 0) + (if (preferences[full.first] == true) 2 else 0)
         val label = stringResource(title)
-        SettingsRow(label, summary = labels[selected], tag = "gesture-$key", onClick = { editing = key })
+        SettingsRow(label, value = labels[selected], tag = "gesture-$key", onClick = { editing = key })
         if (editing == key) RadioDialog(
             title = label,
             options = labels.mapIndexed { index, text -> text to (index == selected) },
