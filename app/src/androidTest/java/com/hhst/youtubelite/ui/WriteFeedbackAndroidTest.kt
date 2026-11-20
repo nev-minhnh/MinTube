@@ -82,7 +82,9 @@ class WriteFeedbackAndroidTest {
     @Test fun channelHeaderShowsSubscriptionProgress() {
         render { ChannelHeader(FixtureChannelRepository.samplePage(), 390f, {}, subscribePending = true) }
         progressInside("channel-subscribe").assertIsDisplayed()
-        compose.onNodeWithTag("channel-subscribe").assertIsNotEnabled()
+        // The header uses the shared SubscribeButton: its pill under the tag carries the click state.
+        compose.onNode(hasClickAction() and hasAnyAncestor(hasTestTag("channel-subscribe")), useUnmergedTree = true)
+            .assertIsNotEnabled()
     }
 
     @Test fun searchSubscriptionRendersConfirmedMembershipAfterProgress() {
@@ -102,7 +104,9 @@ class WriteFeedbackAndroidTest {
                 content = com.hhst.youtubelite.shorts.domain.ShortsContent.Ready(
                     com.hhst.youtubelite.shorts.domain.ShortsPage(listOf(item))),
                 startItemId = item.id, currentItemId = item.id, ratingsPending = setOf(item.id)), {}) }
-        compose.onNodeWithTag("write-progress", useUnmergedTree = true).assertIsDisplayed()
+        // The Mint rail has Like and Dislike; a pending rating write locks both, the tapped Like shows progress.
+        compose.onNode(hasTestTag("write-progress") and hasAnyAncestor(hasContentDescription("Like ${item.title}")),
+            useUnmergedTree = true).assertIsDisplayed()
         compose.onNodeWithContentDescription("Like ${item.title}").assertIsNotEnabled()
     }
 

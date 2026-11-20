@@ -35,7 +35,7 @@ class PullRefreshAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 AppTheme {
-                    Box(Modifier.requiredSize(390.dp, 760.dp)) {
+                    TestWindowBox(Modifier.requiredSize(390.dp, 760.dp)) {
                         RefreshableContent(body, loading, {
                             refreshes++
                             body = "Loading replacement"

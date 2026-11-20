@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
@@ -38,7 +39,7 @@ class SharedInteractionAndroidTest {
         var screen by mutableIntStateOf(0)
         compose.setContent {
             androidx.compose.runtime.CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp).testTag("dark-root")) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp).testTag("dark-root")) {
                     when (screen) {
                         0 -> com.hhst.youtubelite.home.presentation.HomeScreen(
                             com.hhst.youtubelite.home.domain.HomeUiState(content = com.hhst.youtubelite.home.data.HomeScenario.Feed.initialContent()), {})
@@ -51,14 +52,18 @@ class SharedInteractionAndroidTest {
                 }
             }
         }
-        fun assertDarkText(label: String) {
+        // Dark Signal surfaces: a selected chip is the deep AccentContainer, the subscribe pill the bright Accent.
+        fun assertReadableOn(label: String, surface: Color) {
             val layouts = mutableListOf<TextLayoutResult>()
             compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
-            assertTrue("$label must contrast with its pale selected surface", layouts.single().layoutInput.style.color.red < 0.2f)
+            val text = layouts.single().layoutInput.style.color.luminance()
+            val back = surface.luminance()
+            val contrast = (maxOf(text, back) + 0.05f) / (minOf(text, back) + 0.05f)
+            assertTrue("$label must contrast with its selected surface: $contrast", contrast >= 4.5f)
         }
-        assertDarkText("All")
+        assertReadableOn("All", Color(com.hhst.youtubelite.ui.design.MintColors.DarkAccentContainer))
         compose.runOnIdle { screen = 1 }
-        assertDarkText("Subscribe")
+        assertReadableOn("Subscribe", Color(com.hhst.youtubelite.ui.design.MintColors.DarkAccent))
         compose.runOnIdle { screen = 2 }
         val search = compose.onNodeWithTag("search-overlay").captureToImage().asAndroidBitmap()
         assertTrue("Search toolbar must follow dark appearance", android.graphics.Color.red(search.getPixel(1, 1)) < 80)
@@ -109,7 +114,7 @@ class SharedInteractionAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f), LocalContext provides host) {
                 AppTheme {
-                    Box(Modifier.requiredSize(320.dp, 560.dp).testTag("menu-viewport")
+                    TestWindowBox(Modifier.requiredSize(320.dp, 560.dp).testTag("menu-viewport")
                         .onGloballyPositioned { containerBottom = it.boundsInWindow().bottom.toInt() }) {
                         val items = List(rowCount) { MenuSheetItem(null, "Action $it", "action-$it") }
                         if (fillWatchHeight) MenuBottomSheet(items, {}, {})
@@ -126,7 +131,8 @@ class SharedInteractionAndroidTest {
         fun assertCompact(lastRow: Int) {
             val sheet = compose.onNodeWithTag("video-menu").fetchSemanticsNode().boundsInRoot
             val last = compose.onNodeWithTag("action-$lastRow").fetchSemanticsNode().boundsInRoot
-            assertEquals("No empty panel below the final action", last.bottom, sheet.bottom, 1f)
+            // Only the Mint sheet's 8dp bottom padding follows the final action.
+            assertEquals("No empty panel below the final action", last.bottom + 8f, sheet.bottom, 1f)
             val viewport = compose.onNodeWithTag("menu-viewport").fetchSemanticsNode().boundsInRoot
             assertEquals("The compact menu remains bottom aligned", viewport.bottom - 24f, sheet.bottom, 1f)
         }

@@ -41,7 +41,7 @@ class BrowseSessionAndroidTest {
         var selected = ""
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     when (page) {
                         "playlist" -> PlaylistScreen(PlaylistUiState("WL", signedIn = signedIn), {
                             if (it is PlaylistAction.Destination) selected = it.destination.name

@@ -40,7 +40,7 @@ class RefreshCoverageAndroidTest(private val screen: String) {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 AppTheme {
-                    Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                    TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                         when (screen) {
                             "you-screen" -> YouScreen(LibraryUiState(content = LibraryContent.Failed),
                                 { if (it == LibraryAction.Retry) refreshes++ })
