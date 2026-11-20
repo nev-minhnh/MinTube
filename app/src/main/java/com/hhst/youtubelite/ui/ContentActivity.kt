@@ -2,6 +2,7 @@ package com.hhst.youtubelite.ui
 
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import com.hhst.youtubelite.player.PlaybackSession
 import com.hhst.youtubelite.player.surface.MiniPlayerStore
 import com.hhst.youtubelite.player.surface.MiniPlayerWindow
 import com.hhst.youtubelite.watch.presentation.WatchPlayer
+import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
 
 abstract class ContentActivity : NativeActivity() {
@@ -30,6 +32,16 @@ abstract class ContentActivity : NativeActivity() {
     private var resumedDuringMiniRestore = false
     /** The mini dock area in window pixels (inside the safe area, off the rail); null until laid out. */
     private var miniDockBounds: android.graphics.RectF? = null
+
+    /**
+     * This browse screen is itself in Picture-in-Picture, showing the in-app mini's video full-window.
+     * The watch page has its own PiP ([com.hhst.youtubelite.player.PlaybackActivity]); this one covers
+     * leaving the app from any other screen while the docked mini is playing. Same player, same
+     * surface: the overlay's one [MiniPlayerWindow] just fills the PiP window instead of docking.
+     */
+    private var contentPip by mutableStateOf(false)
+    private var contentPipWasActive = false
+    private val pipPrefs: com.hhst.youtubelite.extension.ExtensionManager by inject()
 
     override fun onStart() {
         val installMini = !ContentRepositories.fixtures(intent) || playbackTest()
@@ -75,9 +87,86 @@ abstract class ContentActivity : NativeActivity() {
         super.onStop()
         com.hhst.youtubelite.navigation.WatchTransition.clearMiniRestore(this)
         resumedDuringMiniRestore = false
+        closeStoppedContentPip()
+    }
+
+    /** True while leaving the app now should turn the playing in-app mini into Picture-in-Picture. */
+    private fun miniPipEligible(): Boolean {
+        if (!com.hhst.youtubelite.core.PipSupport.isSupported(this)) return false
+        if (ContentRepositories.fixtures(intent) && !playbackTest()) return false
+        // The watch page owns PiP while it is pinned; never a second PiP host.
+        if (PlaybackSession.inPip.value) return false
+        val vm = PlaybackSession.player.value ?: return false
+        val state = vm.uiState.value
+        return state.visible && state.mini && (state.isPlaying || state.loading) && !vm.audioOnlyBackground &&
+            vm.currentMediaKind != com.hhst.youtubelite.player.MediaKind.SHORTS &&
+            pipPrefs.isEnabled(com.hhst.youtubelite.extension.PreferenceKeys.ENABLE_PIP)
+    }
+
+    private fun miniPipParams(autoEnter: Boolean): android.app.PictureInPictureParams? {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) return null
+        val state = PlaybackSession.player.value?.uiState?.value
+        val (n, d) = com.hhst.youtubelite.player.surface.PlayerUi.pipAspect(state?.videoWidth ?: 0, state?.videoHeight ?: 0)
+        val builder = android.app.PictureInPictureParams.Builder().setAspectRatio(android.util.Rational(n, d))
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) builder.setAutoEnterEnabled(autoEnter)
+        return builder.build()
+    }
+
+    /**
+     * API 31+: keep the system's auto-enter in step with the mini (Home, recents and app switches then
+     * animate straight into PiP). Off while an in-app navigation or overlay holds [PipAutoEnter] suppression.
+     */
+    private fun syncMiniPip() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S || contentPip) return
+        if (!com.hhst.youtubelite.core.PipSupport.isSupported(this)) return
+        val resumed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        val autoEnter = resumed && !com.hhst.youtubelite.core.PipAutoEnter.isSuppressed() && miniPipEligible()
+        miniPipParams(autoEnter)?.let { params -> runCatching { setPictureInPictureParams(params) } }
+    }
+
+    override fun startActivity(intent: android.content.Intent, options: Bundle?) {
+        super.startActivity(intent, options)
+        // NativeActivity has just taken the navigation PiP hold; push auto-enter off with it.
+        syncMiniPip()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        // API 26-30 have no auto-enter; same leave-hint rules as the watch page.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S ||
+            android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) return
+        if (android.os.SystemClock.elapsedRealtime() < com.hhst.youtubelite.core.PipAutoEnter.legacySuppressUntil) return
+        if (com.hhst.youtubelite.core.PipAutoEnter.isSuppressed() || !miniPipEligible()) return
+        miniPipParams(autoEnter = false)?.let { params -> runCatching { enterPictureInPictureMode(params) } }
+    }
+
+    // The two-arg hook is the framework dispatch path; the one-arg form lacks the config.
+    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: android.content.res.Configuration) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        }
+        contentPip = isInPictureInPictureMode
+        if (isInPictureInPictureMode) {
+            contentPipWasActive = true
+            pipOwner = java.lang.ref.WeakReference(this)
+        } else if (pipOwner?.get() === this) pipOwner = null
+        com.hhst.youtubelite.diagnostics.AppLog.event(com.hhst.youtubelite.diagnostics.AppLog.Category.APP,
+            "content_pip_state", mapOf("active" to isInPictureInPictureMode))
+    }
+
+    /** The PiP window was closed (not expanded): stop the mini like its X button would. */
+    private fun closeStoppedContentPip() {
+        if (!contentPipWasActive || isChangingConfigurations) return
+        if (!isFinishing && getSystemService(android.os.PowerManager::class.java)?.isInteractive == false) return
+        contentPipWasActive = false
+        contentPip = false
+        if (pipOwner?.get() === this) pipOwner = null
+        PlaybackSession.player.value?.takeIf { it.uiState.value.visible && it.uiState.value.mini }?.onMiniClose()
     }
 
     override fun onDestroy() {
+        if (pipOwner?.get() === this) pipOwner = null
         com.hhst.youtubelite.navigation.WatchTransition.clearMiniRestore(this)
         super.onDestroy()
     }
@@ -146,14 +235,23 @@ abstract class ContentActivity : NativeActivity() {
                             (miniComposition?.parent as? android.view.View)?.invalidate()
                         previousCover[0] = cover
                     }
-                    if (state.visible && state.mini && !pip) {
+                    // Keeps auto-PiP in step with play/pause, video size and mini/visible changes.
+                    LaunchedEffect(state.visible, state.mini, state.isPlaying, state.loading, state.videoWidth, state.videoHeight, pip) {
+                        syncMiniPip()
+                    }
+                    // While another screen of this app is in PiP it alone hosts the player.
+                    val otherPip = pipOwner?.get()?.let { it !== this@ContentActivity } == true
+                    if (state.visible && state.mini && !pip && !otherPip) {
                         val store: MiniPlayerStore = koinInject()
                         // Shared entry: provides LocalAppColors, LocalMotionScale and LocalHideShorts here too.
                         com.hhst.youtubelite.ui.design.AppTheme {
                             // One source with the tab bar and rail: above the bar, or beside the rail.
                             val dock = com.hhst.youtubelite.ui.design.rememberNavigationForm()
-                            BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
-                                .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp)
+                            // In this screen's own PiP the one window fills the PiP frame over a black backdrop.
+                            val ownPip = contentPip
+                            BoxWithConstraints((if (ownPip) Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)
+                                else Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
+                                .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp))
                                 .onGloballyPositioned { coordinates ->
                                     val bounds = coordinates.boundsInWindow()
                                     miniDockBounds = android.graphics.RectF(bounds.left, bounds.top, bounds.right, bounds.bottom)
@@ -166,6 +264,7 @@ abstract class ContentActivity : NativeActivity() {
                                     com.hhst.youtubelite.ui.design.MiniDock.bottomInsetDp(dock), store, state.controlsVisible,
                                     vm::onToggleControls, onDismiss = vm::onMiniClose,
                                     bottomFloorDp = com.hhst.youtubelite.ui.design.MiniDock.bottomFloorDp(dock),
+                                    mini = !ownPip, fillsWindow = ownPip, fullscreenSwipeEnabled = !ownPip,
                                     initialBounds = com.hhst.youtubelite.navigation.WatchTransition.miniBounds,
                                     animateFromBounds = miniEntryBounds,
                                     entryAnimationReady = miniHostFocused,
@@ -177,7 +276,7 @@ abstract class ContentActivity : NativeActivity() {
                                             resumedDuringMiniRestore = false
                                         }
                                     }) {
-                                    WatchPlayer(Modifier.fillMaxSize(), vm::onMiniRestore)
+                                    WatchPlayer(Modifier.fillMaxSize(), vm::onMiniRestore, pip = ownPip)
                                 }
                             }
                         }
@@ -188,6 +287,9 @@ abstract class ContentActivity : NativeActivity() {
         findViewById<ViewGroup>(android.R.id.content).addView(overlay,
             ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }
+
+    private fun isInPipNow(): Boolean =
+        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N && isInPictureInPictureMode
 
     private fun playbackTest() = com.hhst.youtubelite.BuildConfig.DEBUG && intent.getBooleanExtra("playback_test", false)
 
@@ -223,12 +325,17 @@ abstract class ContentActivity : NativeActivity() {
         }
         super.onResume()
         com.hhst.youtubelite.navigation.WatchTransition.browseResumed(this)
+        if (!isInPipNow()) contentPipWasActive = false
+        syncMiniPip()
         if (!ContentRepositories.fixtures(intent) || playbackTest()) {
             // Entering PiP can itself resume browse; the pinned activity still owns playback until it exits PiP.
             if (!PlaybackSession.inPip.value) PlaybackSession.player.value?.onBrowseOpened()
         }
     }
 }
+
+/** The browse screen currently in Picture-in-Picture, if any (Compose state: other hosts hide their mini). */
+private var pipOwner by mutableStateOf<java.lang.ref.WeakReference<ContentActivity>?>(null)
 
 /** Clips only the start edge: the other three sides stay open for shadows and drag overshoot. */
 private object StartEdgeClip : androidx.compose.ui.graphics.Shape {
