@@ -10,7 +10,7 @@
         android:strokeWidth="11.447"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M8.724,50.65 V24.035 A11.066,11.066 0 0 1 30.855,24.035 V50.65 M30.855,24.035 A11.066,11.066 0 0 1 52.987,24.035 V31.571">
+        android:pathData="M8.724,50.65 V24.035 A11.066,11.066 0 0 1 30.855,24.035 V50.65 V24.035 A11.066,11.066 0 0 1 52.987,24.035 V31.571">
         <aapt:attr name="android:strokeColor">
             <gradient
                 android:type="linear"
