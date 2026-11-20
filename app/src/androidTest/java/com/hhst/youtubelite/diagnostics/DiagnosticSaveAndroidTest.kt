@@ -7,6 +7,9 @@ import android.content.IntentFilter
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
@@ -41,7 +44,9 @@ class DiagnosticSaveAndroidTest {
             rule.waitUntil(30_000) {
                 runCatching { rule.onNodeWithText(rule.activity.getString(status)).fetchSemanticsNode() }.isSuccess
             }
-            rule.onNodeWithText(rule.activity.getString(status)).performScrollTo().assertIsDisplayed()
+            // The status line is pinned in a footer under the list, visible without scrolling.
+            rule.onNode(hasText(rule.activity.getString(status)) and hasAnyAncestor(hasTestTag("about-status")))
+                .assertIsDisplayed()
         } finally { instrumentation.removeMonitor(monitor) }
     }
 
