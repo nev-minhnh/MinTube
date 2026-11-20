@@ -5,6 +5,9 @@ import com.liskovsoft.youtubeapi.videoinfo.V2.SearchHistoryStore
 import com.liskovsoft.youtubeapi.videoinfo.V2.loadSearchSuggestions
 import com.hhst.youtubelite.core.PreferenceStore
 import com.liskovsoft.youtubeapi.videoinfo.V2.RequestContext
+import com.liskovsoft.youtubeapi.videoinfo.V2.HttpClient
+import com.liskovsoft.youtubeapi.videoinfo.V2.HttpReply
+import com.liskovsoft.youtubeapi.videoinfo.V2.HttpRequest
 import kotlinx.coroutines.CancellationException
 
 class PreferenceSearchHistoryStore(private val kv: PreferenceStore) : SearchHistoryStore {
@@ -15,6 +18,22 @@ class PreferenceSearchHistoryStore(private val kv: PreferenceStore) : SearchHist
         if (entries.isEmpty()) kv.remove(key(account))
         else kv.putString(key(account), entries.joinToString("\n"))
     }
+}
+
+/**
+ * The suggestion endpoint (`client=youtube`) answers JSONP, `window.google.ac.h([...])`, which the
+ * MediaServiceCore parser reads as plain JSON and rejects (`invalid_suggestions`), so every remote
+ * row set was empty. Strip the callback wrapper; plain JSON bodies pass through unchanged.
+ */
+internal fun unwrapJsonp(body: String): String {
+    val trimmed = body.trim()
+    if (trimmed.startsWith("[") || trimmed.startsWith("{") || !trimmed.endsWith(")")) return body
+    val open = trimmed.indexOf('(')
+    return if (open <= 0) body else trimmed.substring(open + 1, trimmed.length - 1)
+}
+
+internal class JsonpUnwrappingClient(private val inner: HttpClient) : HttpClient {
+    override fun execute(request: HttpRequest): HttpReply = inner.execute(request).let { it.copy(body = unwrapJsonp(it.body)) }
 }
 
 /** One rendered search-panel row set: locally-stored history matches first, then server suggestions. */
@@ -51,7 +70,7 @@ class MediaSearchSuggestions(private val client: MediaClient, kv: PreferenceStor
                 if (context.generation != captured.generation || context.accountId != captured.accountId ||
                     context.onBehalfOfUser != captured.onBehalfOfUser || context.signedIn != captured.signedIn)
                     throw CancellationException("Session changed")
-                loadSearchSuggestions(trimmed, context, http).value.orEmpty()
+                loadSearchSuggestions(trimmed, context, JsonpUnwrappingClient(http)).value.orEmpty()
             }
         } catch (cancelled: CancellationException) {
             throw cancelled
