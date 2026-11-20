@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.LayoutDirection
 
 /** Spatial changes share one curve; short control feedback never waits for a page transition. */
 object AppMotion {
-    const val WindowMs = 240
-    const val ContentMs = 140
-    const val ExpandMs = 160
-    const val CollapseMs = 100
+    const val WindowMs = 260
+    const val ContentMs = 160
+    const val ExpandMs = 200
+    const val CollapseMs = 120
     const val ChromeInMs = 100
     const val ChromeOutMs = 80
     private val emphasized = android.view.animation.PathInterpolator(android.graphics.Path().apply {

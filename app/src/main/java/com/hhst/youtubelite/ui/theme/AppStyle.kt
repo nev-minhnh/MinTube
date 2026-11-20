@@ -41,12 +41,13 @@ object AppAppearance {
 
 object AppStyle {
     val Shapes = Shapes(
-        extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(8.dp),
-        medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(12.dp),
-        extraLarge = RoundedCornerShape(16.dp),
+        extraSmall = RoundedCornerShape(8.dp), small = RoundedCornerShape(8.dp),
+        medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(16.dp),
+        extraLarge = RoundedCornerShape(24.dp),
     )
-    val SheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     val MenuShape = RoundedCornerShape(12.dp)
+    val DialogShape = RoundedCornerShape(24.dp)
     /** Sheets, dialogs and popup menus share the neutral panel surface.
      * Grey containers belong to controls and item states inside these panels. */
     val Panel: Color
