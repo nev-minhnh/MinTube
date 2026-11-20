@@ -519,6 +519,15 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                 val panelsCover = state.searchOpen || state.commentsOpen ||
                     state.overlay is WatchOverlay.ItemMenu || state.overlay is WatchOverlay.Save ||
                     state.overlay is WatchOverlay.Feedback
+                val glowColors by com.hhst.youtubelite.watch.presentation.rememberGlowColors(state.videoId,
+                    listOf(state.provisional?.artwork, (state.content as? WatchContent.Ready)?.page?.video?.artwork))
+                com.hhst.youtubelite.watch.presentation.WatchGlowHost(
+                    colors = glowColors,
+                    enabled = glowEnabled.value,
+                    visible = !fullscreen && !playerState.mini && !pip,
+                    slot = { playerSlotBounds.value },
+                    strength = { pageProgress() * (1f - fullscreenProgress) },
+                ) {
                 BoxWithConstraints(Modifier.fillMaxSize()
                     .watchPageContent { pageProgress() * (1f - fullscreenProgress) }
                     .then(if (revealingSource) Modifier.clearAndSetSemantics {} else Modifier)
@@ -544,6 +553,7 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                         keepPlayerSlotInFullscreen = true,
                         onCopyLink = { shareGateway.copyLink(it) },
                     )
+                }
                 }
                 val miniStore: com.hhst.youtubelite.player.surface.MiniPlayerStore = koinInject()
                 val hostDensity = androidx.compose.ui.platform.LocalDensity.current
@@ -699,9 +709,13 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
             playerViewModel.openVideo(watchViewModel.uiState.value.videoId)
         playerViewModel.refreshPipAvailability()
         val prefs = org.koin.java.KoinJavaComponent.getKoin().get<com.hhst.youtubelite.extension.ExtensionManager>()
+        glowEnabled.value = prefs.isEnabled(com.hhst.youtubelite.extension.PreferenceKeys.PLAYER_GLOW)
         watchViewModel.refreshVoteCounts(prefs.isEnabled(com.hhst.youtubelite.extension.PreferenceKeys.ENABLE_SHOW_LIKES),
             prefs.isEnabled(com.hhst.youtubelite.extension.PreferenceKeys.ENABLE_DISPLAY_DISLIKES))
     }
+
+    /** The glow switch lives in Settings; re-read on every resume. */
+    private val glowEnabled = androidx.compose.runtime.mutableStateOf(true)
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

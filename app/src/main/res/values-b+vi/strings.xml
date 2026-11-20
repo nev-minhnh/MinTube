@@ -757,4 +757,6 @@
     <string name="responsive_chip_all">Tất cả</string>
     <string name="responsive_chip_from_channel">Từ %1$s</string>
     <string name="responsive_chip_filter_hint">Chỉ hiện các đề xuất đã tải từ kênh này</string>
+    <string name="glow_setting_title">Ánh sáng nền sau trình phát</string>
+    <string name="glow_setting_summary">Ánh sáng dịu theo màu của video</string>
 </resources>
