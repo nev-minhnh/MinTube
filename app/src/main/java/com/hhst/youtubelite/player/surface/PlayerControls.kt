@@ -53,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -168,6 +169,8 @@ fun TopBar(
     onSubtitleStyle: () -> Unit = {},
     showAuthor: Boolean = true,
     sizing: PlayerUi.ChromeSizing = PlayerUi.CompactChromeSizing,
+    /** Opens the cast dialog; the host passes it only while a cast route exists or a session runs. */
+    onCast: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().testTag("player-topbar")
@@ -208,6 +211,14 @@ fun TopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(0.dp),
         ) {
+            if (onCast != null) PlayerIconButton(
+                icon = if (state.casting) R.drawable.ic_cast_connected else R.drawable.ic_cast,
+                contentDescription = stringResource(R.string.cast),
+                onClick = onCast,
+                modifier = Modifier.width(40.dp).testTag("player-cast"),
+                iconSize = sizing.iconDp,
+                tint = if (state.casting) PlayerUi.Accent else PlayerUi.Icon,
+            )
             Box {
                 PlayerIconButton(
                     icon = if (state.subtitleEnabled) {
@@ -220,7 +231,7 @@ fun TopBar(
                     modifier = Modifier.width(40.dp),
                     iconSize = sizing.iconDp,
                     onLongClick = onSubtitleStyle,
-                    tint = if (state.subtitleEnabled) PlayerUi.YtRed else PlayerUi.Icon,
+                    tint = if (state.subtitleEnabled) PlayerUi.Accent else PlayerUi.Icon,
                 )
                 if (menu == PlayerAnchorMenu.Subtitles && callbacks != null) {
                     PlayerAnchorDropdown(
@@ -411,26 +422,31 @@ private fun PositionText(
     textSizeSp: Int = PlayerUi.CHROME_TEXT_SP,
 ) {
     val positionMs = positionState.value
+    val family = com.hhst.youtubelite.ui.design.MinFonts.Body
     Text(
         text = PlayerUi.formatTime(positionMs),
         color = Color.White,
         fontSize = textSizeSp.sp,
+        fontFamily = family,
+        fontWeight = FontWeight.Medium,
         maxLines = 1,
     )
-    Text(" / ", color = Color.White, fontSize = textSizeSp.sp, maxLines = 1)
+    Text(" / ", color = PlayerUi.Unplayed, fontSize = textSizeSp.sp, fontFamily = family, maxLines = 1)
     if (isLive) {
         Text(
             text = stringResource(R.string.player_live),
-            color = PlayerUi.YtRed,
+            color = PlayerUi.Live,
             fontSize = textSizeSp.sp,
+            fontFamily = family,
             maxLines = 1,
             fontWeight = FontWeight.Medium,
         )
     } else {
         Text(
             text = PlayerUi.formatTime(durationMs),
-            color = Color.White,
+            color = Color.White.copy(alpha = 0.8f),
             fontSize = textSizeSp.sp,
+            fontFamily = family,
             maxLines = 1,
         )
     }
@@ -472,9 +488,11 @@ fun HintOverlay(hintState: State<String?>, enabled: Boolean, modifier: Modifier 
             text = lastText,
             color = Color.White,
             fontSize = PlayerUi.HINT_TEXT_SP.sp,
+            fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Body,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier
-                .background(PlayerUi.HintBg, RoundedCornerShape(12.dp))
-                .padding(horizontal = 10.dp, vertical = 6.dp),
+                .background(PlayerUi.HintBg, CircleShape)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         )
     }
 }
@@ -497,23 +515,30 @@ fun CastStatusBanners(
         if (casting) {
             Row(
                 modifier = Modifier
-                    .background(PlayerUi.HintBg, RoundedCornerShape(12.dp))
-                    .clickable(onClick = onCast)
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                    .testTag("player-cast-banner")
+                    .clip(CircleShape)
+                    .background(PlayerUi.HintBg)
+                    .clickable(role = Role.Button, onClick = onCast)
+                    .heightIn(min = 36.dp)
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_cast),
+                    painter = painterResource(R.drawable.ic_cast_connected),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = PlayerUi.Accent,
                     modifier = Modifier
-                        .padding(end = 6.dp)
-                        .size(16.dp),
+                        .padding(end = 8.dp)
+                        .size(18.dp),
                 )
                 Text(
                     text = stringResource(R.string.casting_to, deviceName ?: ""),
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
+                    fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Body,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -523,8 +548,8 @@ fun CastStatusBanners(
         if (linkUrl != null && linkConnected && !casting) {
             Row(
                 modifier = Modifier
-                    .background(PlayerUi.HintBg, RoundedCornerShape(12.dp))
-                    .padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                    .background(PlayerUi.HintBg, CircleShape)
+                    .padding(start = 14.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -538,7 +563,9 @@ fun CastStatusBanners(
                 Text(
                     text = stringResource(R.string.cast_link_banner),
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
+                    fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Body,
+                    fontWeight = FontWeight.Medium,
                 )
                 PlayerIconButton(
                     icon = R.drawable.ic_close,
@@ -569,7 +596,8 @@ fun ErrorOverlay(
         Text(
             text = title,
             color = Color.White,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
+            fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Display,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
         )
@@ -585,7 +613,7 @@ fun ErrorOverlay(
         TextButton(onClick = onRetry) {
             Text(
                 text = stringResource(R.string.retry),
-                color = PlayerUi.YtRed,
+                color = PlayerUi.Accent,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -626,6 +654,8 @@ fun MiniPlayerChrome(
     onRestore: () -> Unit,
     onQueue: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Drives the accent progress line; read in the draw phase so ticks never recompose the chrome. */
+    positionState: State<Long>? = null,
 ) {
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val playPauseAction = PlayerUi.playPauseAction(state)
@@ -640,7 +670,7 @@ fun MiniPlayerChrome(
         if (collapsedSide != null) {
             Box(Modifier.align(if (collapsedSide == MiniPlayerLayout.CollapsedSide.LEFT) AbsoluteAlignment.CenterRight else AbsoluteAlignment.CenterLeft)
                 .width(MiniPlayerLayout.COLLAPSED_PEEK_DP.dp).fillMaxHeight()
-                .background(Color(0xE6303030))
+                .background(PlayerUi.MiniEdge)
                 .clickable(role = Role.Button, onClickLabel = stringResource(R.string.action_expand_miniplayer),
                     onClick = { handle?.tap?.invoke() })
                 .testTag("mini-expand"), contentAlignment = Alignment.Center) {
@@ -650,6 +680,17 @@ fun MiniPlayerChrome(
             }
         }
         val gap = MiniPlayerLayout.controlGap(maxWidth.value.toInt(), screenWidthDp)
+        if (positionState != null && collapsedSide == null && !state.isLive && state.durationMs > 0) Box(
+            Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.dp).testTag("mini-progress")
+                .clearAndSetSemantics {}
+                .drawBehind {
+                    val played = PlayerUi.progressFraction(positionState.value, state.durationMs)
+                    val start = if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) size.width * (1f - played) else 0f
+                    drawRect(Color.White.copy(alpha = 0.24f))
+                    drawRect(PlayerUi.Accent, topLeft = Offset(start, 0f),
+                        size = androidx.compose.ui.geometry.Size(size.width * played, size.height))
+                },
+        )
         AnimatedVisibility(
             visible = !suppressControls && (state.controlsVisible || playPauseAction == PlayerUi.PlayPauseAction.Loading),
             modifier = if (suppressControls) Modifier.clearAndSetSemantics {} else Modifier,

@@ -758,4 +758,5 @@
     <string name="account_about_diagnostics">Diagnostics</string>
     <string name="account_about_export_summary">Share a ZIP of app logs with another app</string>
     <string name="account_about_save_summary">Save a ZIP of app logs to a location you choose</string>
+    <string name="watch_up_next">Up next</string>
 </resources>

@@ -169,7 +169,7 @@ internal fun QueueSheet(
                         confirmClear = false
                         onClear()
                     }) {
-                        Text(stringResource(R.string.ok), color = PlayerUi.YtRed)
+                        Text(stringResource(R.string.ok), color = com.hhst.youtubelite.ui.design.DesignTokens.Danger)
                     }
                 },
                 dismissButton = {
@@ -271,7 +271,7 @@ private fun QueueRow(
                         text = stringResource(R.string.queue_now_playing),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal,
-                        color = PlayerUi.YtRed,
+                        color = com.hhst.youtubelite.ui.design.DesignTokens.AccentText,
                     )
                 }
                 Text(

@@ -753,4 +753,5 @@
     <string name="account_about_diagnostics">Chẩn đoán</string>
     <string name="account_about_export_summary">Chia sẻ tệp ZIP nhật ký ứng dụng qua một ứng dụng khác</string>
     <string name="account_about_save_summary">Lưu tệp ZIP nhật ký ứng dụng vào vị trí bạn chọn</string>
+    <string name="watch_up_next">Tiếp theo</string>
 </resources>

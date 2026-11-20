@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hhst.youtubelite.ui.design.MinFonts
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.player.GestureUi
 import kotlin.math.abs
@@ -109,7 +110,7 @@ fun GestureOverlays(
 @Composable
 private fun GesturePill(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(24.dp),
+    shape: Shape = CircleShape,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -194,6 +195,7 @@ private fun DoubleTapSeekOverlay(state: GestureUi.DoubleTapSeek, modifier: Modif
                 text = label,
                 color = Color.White,
                 fontSize = 14.sp,
+                fontFamily = MinFonts.Body,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -208,7 +210,7 @@ private fun SpeedHoldOverlay(modifier: Modifier = Modifier) {
         .padding(start = 16.dp, end = 10.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.speed_hold_2x), color = Color.White,
-            fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            fontSize = 14.sp, fontFamily = MinFonts.Body, fontWeight = FontWeight.SemiBold)
         DirectionalArrows(true, phase.asState(), animate)
     }
 }
@@ -217,8 +219,9 @@ private fun SpeedHoldOverlay(modifier: Modifier = Modifier) {
 @Composable
 private fun ScrubBubbleOverlay(state: GestureUi.Scrub, modifier: Modifier = Modifier) {
     val deltaLabel = PlayerUi.offsetHint(state.deltaMs)
-    GesturePill(modifier = modifier, shape = RoundedCornerShape(16.dp)) {
-        Text(deltaLabel, Modifier.testTag("player-seek-offset"), color = Color.White, fontSize = 14.sp)
+    GesturePill(modifier = modifier) {
+        Text(deltaLabel, Modifier.testTag("player-seek-offset"), color = Color.White, fontSize = 14.sp,
+            fontFamily = MinFonts.Body, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -237,9 +240,9 @@ private fun EdgeSliderOverlay(state: GestureUi.EdgeSlider, modifier: Modifier = 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
-                .background(PlayerUi.GlassBg, RoundedCornerShape(16.dp))
-                .border(0.5.dp, PlayerUi.GlassStroke, RoundedCornerShape(16.dp))
-                .padding(horizontal = 6.dp, vertical = 6.dp),
+                .background(PlayerUi.GlassBg, RoundedCornerShape(24.dp))
+                .border(0.5.dp, PlayerUi.GlassStroke, RoundedCornerShape(24.dp))
+                .padding(horizontal = 6.dp, vertical = 10.dp),
         ) {
             Icon(
                 painter = painterResource(icon),
@@ -261,13 +264,14 @@ private fun EdgeSliderOverlay(state: GestureUi.EdgeSlider, modifier: Modifier = 
                             scaleY = fill
                             transformOrigin = TransformOrigin(0.5f, 1f)
                         }
-                        .background(Color.White),
+                        .background(PlayerUi.Accent),
                 )
             }
             Text(
                 text = "$percent%",
                 color = Color.White,
                 fontSize = 13.sp,
+                fontFamily = MinFonts.Body,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
@@ -299,8 +303,8 @@ fun SponsorCountdownCard(
             modifier = Modifier
                 .testTag("player-sponsor-visual")
                 .onSizeChanged { onVisualHeight(it.height) }
-                .background(PlayerUi.HintBg, RoundedCornerShape(10.dp))
-                .padding(start = 14.dp, end = 14.dp, top = 6.dp, bottom = 6.dp),
+                .background(PlayerUi.HintBg, CircleShape)
+                .padding(start = 14.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -308,15 +312,17 @@ fun SponsorCountdownCard(
                 text = stringResource(R.string.sponsor_skip_in, seconds),
                 color = Color.White,
                 fontSize = 13.sp,
+                fontFamily = MinFonts.Body,
             )
             Text(
                 text = cancelLabel,
-                color = Color.White,
+                color = PlayerUi.Accent,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
+                fontFamily = MinFonts.Body,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
-                    .background(Color.White.copy(alpha = 0.16f), RoundedCornerShape(10.dp))
-                    .padding(horizontal = 8.dp, vertical = 3.dp),
+                    .background(Color.White.copy(alpha = 0.12f), CircleShape)
+                    .padding(horizontal = 10.dp, vertical = 3.dp),
             )
         }
     }

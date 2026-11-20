@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -48,6 +49,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -63,6 +65,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
@@ -357,6 +360,7 @@ fun PlayerSurface(
                 onRestore = callbacks::onMiniRestore,
                 onQueue = { sheet = PlayerSheet.Queue },
                 modifier = Modifier.graphicsLayer { alpha = miniChromeAlpha() },
+                positionState = positionState,
             )
         } else {
             Box(
@@ -422,6 +426,11 @@ fun PlayerSurface(
                                 callbacks = callbacks,
                                 showAuthor = showChromeAuthor,
                                 sizing = chromeSizing,
+                                // Discovery only runs while the dialog is open, so a known route
+                                // or a running session is what makes the entry worth a slot.
+                                onCast = if (state.castAvailable || state.casting || state.castDevices.isNotEmpty()) {
+                                    { dialog = PlayerDialog.Cast }
+                                } else null,
                                 modifier = Modifier.align(Alignment.TopCenter).onSizeChanged { topBarHeightPx = it.height },
                             )
                             BottomBar(
@@ -545,9 +554,11 @@ fun PlayerSurface(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = PlayerUi.ZOOM_RESET_BOTTOM_DP.dp)
-                                .background(PlayerUi.HintBg, RoundedCornerShape(12.dp))
+                                .clip(androidx.compose.foundation.shape.CircleShape)
+                                .background(PlayerUi.HintBg)
                                 .clickable(role = Role.Button, onClick = { zoom.reset() })
-                                .padding(horizontal = 14.dp, vertical = 8.dp),
+                                .heightIn(min = 40.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
@@ -559,6 +570,9 @@ fun PlayerSurface(
                             Text(
                                 text = stringResource(R.string.reset),
                                 color = Color.White,
+                                fontSize = 13.sp,
+                                fontFamily = com.hhst.youtubelite.ui.design.MinFonts.Body,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                                 modifier = Modifier.padding(start = 6.dp),
                             )
                         }

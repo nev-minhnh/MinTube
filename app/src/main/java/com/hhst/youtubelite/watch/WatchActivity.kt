@@ -541,6 +541,7 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                         sidebarCovered = state.commentsOpen && !fullscreen && !state.searchOpen,
                         drawBackground = false,
                         keepPlayerSlotInFullscreen = true,
+                        onCopyLink = { shareGateway.copyLink(it) },
                     )
                 }
                 val miniStore: com.hhst.youtubelite.player.surface.MiniPlayerStore = koinInject()

@@ -21,9 +21,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -49,7 +53,14 @@ import com.hhst.youtubelite.ui.design.Artwork
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.PanelTransition
 import com.hhst.youtubelite.ui.design.rememberBottomSheetDrag
-import com.hhst.youtubelite.ui.theme.AppStyle
+import com.hhst.youtubelite.ui.design.ActionProgress
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
+import com.hhst.youtubelite.comments.presentation.MessageRowsSkeleton
+import com.hhst.youtubelite.comments.presentation.PanelStateMessage
 import com.hhst.youtubelite.watch.domain.WatchLayout
 import kotlin.math.roundToInt
 import com.hhst.youtubelite.ui.design.appDescription
@@ -107,8 +118,7 @@ private fun LiveChatSurface(
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
-    val shape = if (compact) RoundedCornerShape(topStart = CommentsLayout.SheetRadius.dp,
-        topEnd = CommentsLayout.SheetRadius.dp) else RectangleShape
+    val shape = if (compact) MinRadius.Sheet else RectangleShape
     val title = stringResource(if (state.replay) R.string.chat_replay else R.string.chat_live)
     val drag = rememberBottomSheetDrag(enabled = compact, onDismiss = onClose)
     Column(
@@ -117,50 +127,62 @@ private fun LiveChatSurface(
             .testTag("live-chat"),
     ) {
         Column(Modifier.fillMaxWidth().then(drag.handleModifier).testTag("live-chat-drag-header")) {
-        if (compact) {
-            Box(Modifier.fillMaxWidth().height(CommentsLayout.HandleStripHeight.dp), contentAlignment = Alignment.BottomCenter) {
-                Box(Modifier.width(CommentsLayout.HandleWidth.dp).height(CommentsLayout.HandleHeight.dp)
-                    .background(Color(0xFFDBDBDB), RoundedCornerShape(2.dp)))
+            if (compact) {
+                Box(Modifier.fillMaxWidth().height(CommentsLayout.HandleStripHeight.dp), contentAlignment = Alignment.BottomCenter) {
+                    Box(Modifier.width(CommentsLayout.HandleWidth.dp).height(CommentsLayout.HandleHeight.dp)
+                        .background(DesignTokens.Ink.copy(alpha = .15f), MinRadius.Full))
+                }
             }
-        }
-        Row(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Spacer(Modifier.weight(1f))
-            AppIconButton(AppIcon.Close, stringResource(R.string.a11y_close_live_chat), Modifier.testTag("live-chat-close"), onClick = onClose)
-        }
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = MinSpace.lg, end = MinSpace.xs),
+                verticalAlignment = Alignment.CenterVertically) {
+                if (!state.replay && !state.ended) {
+                    // Live marker: decorative, the pane title already names the panel.
+                    Box(Modifier.size(8.dp).background(DesignTokens.Danger, CircleShape))
+                    Spacer(Modifier.width(MinSpace.sm))
+                }
+                AppText(title, MinType.Title, Modifier.weight(1f).testTag("live-chat-title"), maxLines = 1)
+                AppIconButton(AppIcon.Close, stringResource(R.string.a11y_close_live_chat), Modifier.testTag("live-chat-close"), onClick = onClose)
+            }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (val content = state.content) {
-                LiveChatContent.Loading -> Box(Modifier.fillMaxSize().testTag("live-chat-loading"),
-                    contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(Modifier.size(28.dp), color = AppStyle.Action, strokeWidth = 3.dp)
+                LiveChatContent.Loading -> Box(Modifier.fillMaxSize().clipToBounds().testTag("live-chat-loading")) {
+                    MessageRowsSkeleton(rows = 8, avatar = 28.dp, startInset = MinSpace.lg)
                 }
-                LiveChatContent.Failed -> Column(Modifier.fillMaxSize().testTag("live-chat-failed").padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center) {
-                    AppText(stringResource(R.string.ui_couldn_t_load_the_chat), size = 14, line = 20, color = DesignTokens.Secondary)
-                    Spacer(Modifier.height(8.dp))
-                    AppText(stringResource(R.string.retry), Modifier.clickable { onAction(LiveChatAction.Retry) }.testTag("live-chat-retry").padding(8.dp),
-                        size = 14, line = 20, weight = FontWeight.Medium, color = AppStyle.Action)
+                LiveChatContent.Failed -> Box(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("live-chat-failed"),
+                    contentAlignment = Alignment.Center) {
+                    PanelStateMessage(
+                        title = stringResource(R.string.ui_couldn_t_load_the_chat),
+                        icon = AppIcon.Error,
+                        error = true,
+                        message = stringResource(R.string.ui_please_try_again),
+                        actionLabel = stringResource(R.string.retry),
+                        actionTag = "live-chat-retry",
+                        onAction = { onAction(LiveChatAction.Retry) },
+                    )
                 }
                 is LiveChatContent.Ready -> {
                     if (content.messages.isEmpty()) {
-                        Box(Modifier.fillMaxSize().testTag("live-chat-empty"), contentAlignment = Alignment.Center) {
-                            AppText(
-                                if (state.replay) stringResource(R.string.chat_replay_empty) else stringResource(R.string.ui_say_hello_in_the_chat),
-                                size = 14, line = 20, color = DesignTokens.Secondary,
+                        Box(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("live-chat-empty"),
+                            contentAlignment = Alignment.Center) {
+                            PanelStateMessage(
+                                title = if (state.replay) stringResource(R.string.chat_replay_empty) else stringResource(R.string.ui_say_hello_in_the_chat),
                             )
                         }
                     }
-                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().testTag("live-chat-list")) {
+                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().testTag("live-chat-list"),
+                        contentPadding = PaddingValues(vertical = MinSpace.sm)) {
                         items(content.messages, key = { it.id }) { message ->
-                            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)
+                            Row(Modifier.fillMaxWidth().padding(horizontal = MinSpace.lg, vertical = 6.dp)
                                 .testTag("live-chat-message")) {
-                                Artwork(message.photo, Modifier.size(24.dp).clip(CircleShape))
-                                Spacer(Modifier.width(10.dp))
-                                Column {
-                                    AppText(message.author, size = 12, line = 16, weight = FontWeight.Medium,
+                                Artwork(message.photo, Modifier.size(28.dp).clip(CircleShape))
+                                Spacer(Modifier.width(MinSpace.md))
+                                Column(Modifier.weight(1f)) {
+                                    AppText(message.author, MinType.Caption.copy(fontWeight = FontWeight.Medium),
                                         color = DesignTokens.Secondary, maxLines = 1)
-                                    AppText(message.text, size = 14, line = 20)
+                                    Spacer(Modifier.height(MinSpace.xxs))
+                                    AppText(message.text, MinType.Body)
                                 }
                             }
                         }
@@ -179,44 +201,63 @@ private fun LiveChatSurface(
             }
         }
         when {
-            state.ended || state.replay -> AppText(stringResource(R.string.chat_ended),
-                Modifier.fillMaxWidth().padding(16.dp).testTag("live-chat-ended"),
-                size = 14, line = 20, color = DesignTokens.Secondary)
+            state.ended || state.replay -> ChatFooterNote(stringResource(R.string.chat_ended), "live-chat-ended")
             state.content !is LiveChatContent.Ready -> Unit
-            state.signedIn && !state.canSend -> AppText(stringResource(R.string.ui_posting_is_unavailable_for_this_chat),
-                Modifier.fillMaxWidth().padding(16.dp).testTag("live-chat-readonly"),
-                size = 14, line = 20, color = DesignTokens.Secondary)
+            state.signedIn && !state.canSend ->
+                ChatFooterNote(stringResource(R.string.ui_posting_is_unavailable_for_this_chat), "live-chat-readonly")
             state.signedIn -> {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+                Row(Modifier.fillMaxWidth().padding(start = MinSpace.lg, end = MinSpace.sm, top = MinSpace.sm, bottom = MinSpace.sm),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.weight(1f).heightIn(min = 36.dp)
-                        .background(DesignTokens.Surface, RoundedCornerShape(18.dp))
-                        .padding(horizontal = 14.dp, vertical = 8.dp)) {
+                    Box(Modifier.weight(1f).heightIn(min = MinSpace.Touch)
+                        .background(DesignTokens.Surface, MinRadius.Dialog)
+                        .padding(horizontal = MinSpace.lg, vertical = MinSpace.md),
+                        contentAlignment = Alignment.CenterStart) {
                         if (state.draft.isEmpty()) {
-                            AppText(stringResource(R.string.ui_chat_publicly), size = 14, line = 20, color = DesignTokens.Secondary)
+                            AppText(stringResource(R.string.ui_chat_publicly), MinType.Body, color = DesignTokens.Secondary)
                         }
                         BasicTextField(state.draft, { onAction(LiveChatAction.DraftChanged(it)) },
                             Modifier.fillMaxWidth().testTag("live-chat-input"),
-                            textStyle = DesignTokens.text(14, 20, FontWeight.Normal, DesignTokens.Ink))
+                            textStyle = MinType.Body.copy(color = DesignTokens.Ink),
+                            cursorBrush = SolidColor(DesignTokens.Accent),
+                            maxLines = 4)
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(MinSpace.xs))
                     val canSend = state.draft.isNotBlank() && !state.sending
-                    Box(Modifier.size(48.dp).testTag("live-chat-send")
-                        .clickable(enabled = canSend, role = androidx.compose.ui.semantics.Role.Button) { onAction(LiveChatAction.Send) }
+                    Box(Modifier.size(MinSpace.Touch).testTag("live-chat-send")
+                        .clickable(enabled = canSend, role = Role.Button) { onAction(LiveChatAction.Send) }
                         .appDescription(R.string.a11y_send_message), contentAlignment = Alignment.Center) {
-                        if (state.sending) com.hhst.youtubelite.ui.design.ActionProgress(color = AppStyle.Action)
-                        else AppIcon(AppIcon.Send, color = if (canSend) AppStyle.Action else DesignTokens.Secondary.copy(alpha = .5f))
+                        Box(Modifier.size(40.dp).background(if (canSend) DesignTokens.Accent else DesignTokens.Surface, CircleShape),
+                            contentAlignment = Alignment.Center) {
+                            if (state.sending) ActionProgress(color = DesignTokens.Accent)
+                            else AppIcon(AppIcon.Send, Modifier.size(20.dp),
+                                color = if (canSend) DesignTokens.OnAccent else DesignTokens.Secondary.copy(alpha = .5f))
+                        }
                     }
                 }
                 state.postingRestriction?.let { reason ->
-                    AppText(reason, Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
-                        .testTag("live-chat-posting-restriction"), size = 14, line = 20, color = DesignTokens.Secondary)
+                    AppText(reason, MinType.Caption, Modifier.fillMaxWidth().padding(horizontal = MinSpace.lg, vertical = MinSpace.xs)
+                        .testTag("live-chat-posting-restriction"), color = DesignTokens.Secondary)
                 }
             }
-            else -> AppText(stringResource(R.string.ui_sign_in_to_join_the_chat),
-                Modifier.fillMaxWidth().clickable { onAction(LiveChatAction.SignIn) }
-                    .testTag("live-chat-signin").padding(16.dp),
-                size = 14, line = 20, weight = FontWeight.Medium, color = AppStyle.Action)
+            else -> {
+                Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+                Row(Modifier.fillMaxWidth().padding(start = MinSpace.lg, end = MinSpace.sm, top = MinSpace.xs, bottom = MinSpace.xs),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    AppText(stringResource(R.string.ui_sign_in_to_join_the_chat), MinType.Body,
+                        Modifier.weight(1f).padding(end = MinSpace.sm), color = DesignTokens.Secondary)
+                    MinButton(stringResource(R.string.ui_sign_in), { onAction(LiveChatAction.SignIn) },
+                        kind = MinButtonKind.Tonal, testTag = "live-chat-signin")
+                }
+            }
         }
     }
+}
+
+/** Closing line under the list: the chat ended or posting is not possible. */
+@Composable
+private fun ChatFooterNote(text: String, tag: String) {
+    Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+    AppText(text, MinType.Body, Modifier.fillMaxWidth().padding(horizontal = MinSpace.lg, vertical = MinSpace.lg).testTag(tag),
+        color = DesignTokens.Secondary, align = TextAlign.Center)
 }

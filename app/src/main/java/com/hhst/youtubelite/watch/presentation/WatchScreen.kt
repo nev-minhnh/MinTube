@@ -56,6 +56,8 @@ import com.hhst.youtubelite.saves.presentation.NewPlaylistSheet
 import com.hhst.youtubelite.saves.presentation.SaveSheetLive
 import com.hhst.youtubelite.saves.presentation.SaveToPlaylistSheet
 import com.hhst.youtubelite.ui.design.*
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
 import com.hhst.youtubelite.watch.domain.*
 import com.hhst.youtubelite.ui.design.appDescription
 import androidx.compose.ui.res.stringResource
@@ -75,6 +77,8 @@ fun WatchScreen(
     drawBackground: Boolean = true,
     /** An overlay host still needs the embedded destination measured after rotation. */
     keepPlayerSlotInFullscreen: Boolean = false,
+    /** Copies the video link through the host's share gateway; the pill hides when the host has none. */
+    onCopyLink: ((String) -> Unit)? = null,
 ) {
     val showPlayer = !fullscreen || keepPlayerSlotInFullscreen
     val mainScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
@@ -110,6 +114,7 @@ fun WatchScreen(
                                 showPlayer = showPlayer,
                                 playerSlot = playerSlot,
                                 onAction = onAction,
+                                onCopyLink = onCopyLink,
                             )
                             if (pinned && showPlayer) {
                                 // The player is fixed over the main column only.
@@ -139,6 +144,7 @@ fun WatchScreen(
                         showPlayer = showPlayer,
                         playerSlot = playerSlot,
                         onAction = onAction,
+                        onCopyLink = onCopyLink,
                     )
                     if (pinned && showPlayer) {
                         Box(
@@ -172,8 +178,8 @@ internal fun WatchVideoMenu(state: WatchUiState, onAction: (WatchAction) -> Unit
             header = if (state.menuLoading || state.menuFailed) ({
                 Box(Modifier.fillMaxWidth().heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
                     if (state.menuLoading) Box(Modifier.testTag("watch-menu-loading")) { com.hhst.youtubelite.home.presentation.LoadingSpinner() }
-                    else AppText(stringResource(R.string.retry), modifier = Modifier.testTag("watch-menu-retry")
-                        .clickable { onAction(WatchAction.RetryMenu) }.padding(12.dp))
+                    else MinButton(stringResource(R.string.retry), { onAction(WatchAction.RetryMenu) },
+                        kind = MinButtonKind.Text, testTag = "watch-menu-retry")
                 }
             }) else null,
         )
@@ -227,7 +233,6 @@ private fun WatchVideoMenuAction.icon(): AppIcon = when (this) {
     WatchVideoMenuAction.NotInterested -> AppIcon.Block
     WatchVideoMenuAction.DontRecommend -> AppIcon.Close
 }
-
 @Composable
 private fun WatchMainBody(
     state: WatchUiState,
@@ -240,11 +245,16 @@ private fun WatchMainBody(
     showPlayer: Boolean,
     playerSlot: @Composable (Modifier) -> Unit,
     onAction: (WatchAction) -> Unit,
+    onCopyLink: ((String) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     if (includeRelated) RelatedPaging(state, scroll, onAction)
-    val columns = if (WatchLayout.relatedVariant(viewportWidth, viewportHeight) == WatchRelatedVariant.Grid)
-        WatchLayout.gridColumns(viewportWidth) else 1
+    // The slot geometry stays on WatchLayout (the overlay player and the panels read it);
+    // only the feed below it follows the Mint window classes.
+    val listRows = WatchLayout.relatedVariant(viewportWidth, viewportHeight) == WatchRelatedVariant.List
+    val window = WindowClass.of(viewportWidth.toInt())
+    val columns = if (listRows) 1 else window.feedColumns
+    val inset = MinSpace.pageInset(window)
     val related = (state.content as? WatchContent.Ready)?.page?.related.orEmpty()
     val relatedRows = remember(related, columns) { related.chunked(columns) }
     Box(modifier.fillMaxSize().clipToBounds()) {
@@ -253,7 +263,8 @@ private fun WatchMainBody(
         when (val content = state.content) {
             WatchContent.Loading -> item("loading") {
                 val known = state.provisional
-                if (known == null) WatchSkeleton(includeRelated) else WatchProvisionalHeader(known)
+                if (known == null) WatchSkeleton(inset) else WatchProvisionalHeader(known, inset)
+                if (includeRelated) RelatedSkeleton(columns, listRows, inset)
             }
             WatchContent.Failed -> item("error") {
                 if (state.verification != null) VerificationCard(state.verification,
@@ -262,15 +273,14 @@ private fun WatchMainBody(
                     modifier = Modifier.testTag("watch-verification")) else WatchError(onAction)
             }
             is WatchContent.Ready -> {
-                item("metadata") { WatchMetadata(content.page.video, state, onAction) }
-                item("comments") { WatchComments(content.page.video, onAction) }
+                item("metadata") { WatchMetadata(content.page.video, state, inset, onAction, onCopyLink) }
+                item("comments") { WatchComments(content.page.video, inset, onAction) }
                 if (includeRelated) {
-                    val grid = columns > 1
-                    item("related-start") { Spacer(Modifier.height(if (grid) 8.dp else 12.dp)) }
+                    item("related-start") { RelatedHeader(inset) }
+                    if (related.isEmpty() && content.page.nextKey == null) item("related-empty") { RelatedEmpty() }
                     items(relatedRows, key = { row -> "related:${row.first().id}" }, contentType = { "related-row" }) { row ->
-                        WatchRelatedFeed(row, viewportWidth, viewportHeight, onAction)
+                        RelatedFeedRow(row, columns, listRows, inset, onAction)
                     }
-                    item("related-end") { Spacer(Modifier.height(8.dp)) }
                     item("pagination") { RelatedFooter(state, onAction) }
                 }
             }
@@ -287,7 +297,7 @@ private fun WatchMainBody(
 }
 
 @Composable
-private fun RelatedPaging(state: WatchUiState, scroll: LazyListState, onAction: (WatchAction) -> Unit) {
+internal fun RelatedPaging(state: WatchUiState, scroll: LazyListState, onAction: (WatchAction) -> Unit) {
     val latestAction by rememberUpdatedState(onAction)
     val cursor = (state.content as? WatchContent.Ready)?.page?.nextKey
     LaunchedEffect(scroll, cursor, state.relatedFailed) {
@@ -299,693 +309,15 @@ private fun RelatedPaging(state: WatchUiState, scroll: LazyListState, onAction: 
 }
 
 @Composable
-private fun RelatedFooter(state: WatchUiState, onAction: (WatchAction) -> Unit) {
-    if (state.relatedLoading) Box(Modifier.fillMaxWidth().height(56.dp).testTag("watch-related-loading"), contentAlignment = Alignment.Center) {
-        androidx.compose.material3.CircularProgressIndicator(Modifier.size(24.dp), color = DesignTokens.Ink, strokeWidth = 2.dp)
+internal fun RelatedFooter(state: WatchUiState, onAction: (WatchAction) -> Unit) {
+    if (state.relatedLoading) Box(Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("watch-related-loading"), contentAlignment = Alignment.Center) {
+        androidx.compose.material3.CircularProgressIndicator(Modifier.size(24.dp), color = DesignTokens.Accent,
+            trackColor = DesignTokens.Ghost, strokeWidth = 2.5.dp)
     }
-    if (state.relatedFailed) Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("watch-related-retry")
-        .clickable { onAction(WatchAction.LoadRelated) }, contentAlignment = Alignment.Center) { AppText(stringResource(R.string.retry)) }
-}
-
-/**
- * Paints the tapped card's known fields while the page read is in flight; unknown
- * slots stay blank, no inert controls render, and the real block replaces this
- * without a full-page reset.
- */
-@Composable
-private fun WatchProvisionalHeader(known: WatchProvisional) {
-    Column(Modifier.fillMaxWidth().testTag("watch-provisional")) {
-        Column(Modifier.padding(horizontal = 3.dp)) {
-            Column(Modifier.padding(start = 13.dp, end = 13.dp, top = 12.dp, bottom = 5.dp)) {
-                WatchTitle(rememberDeArrowTitle(known.videoId, known.title))
-                Spacer(Modifier.height(6.dp))
-                Row(Modifier.fillMaxWidth().heightIn(min = 18.dp).testTag("watch-meta"),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    if (known.live) {
-                        Box(Modifier.padding(end = 8.dp).background(DesignTokens.Red, RoundedCornerShape(2.dp))
-                            .padding(horizontal = 4.dp)) {
-                            AppText(stringResource(R.string.player_live), size = 12, line = 18, weight = FontWeight.Medium, color = Color.White)
-                        }
-                    }
-                    if (known.views.isNotBlank()) AppText(known.views, Modifier.padding(end = 8.dp), size = 12, line = 18, color = DesignTokens.Secondary)
-                    if (!known.live && known.age.isNotBlank()) AppText(known.age, size = 12, line = 18, color = DesignTokens.Secondary)
-                }
-            }
-            Spacer(Modifier.height(3.dp))
-        }
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(48.dp).testTag("watch-action-avatar"), contentAlignment = Alignment.Center) {
-                Artwork(known.avatar.orEmpty(),
-                    Modifier.size(32.dp).clip(CircleShape))
-            }
-            AppText(known.channel, Modifier.weight(1f).padding(end = 8.dp).testTag("watch-channel-name"),
-                size = 14, line = 20, weight = FontWeight.Medium, maxLines = 2)
-        }
-        Spacer(Modifier.height(12.dp))
+    if (state.relatedFailed) Column(Modifier.fillMaxWidth().padding(vertical = MinSpace.sm), horizontalAlignment = Alignment.CenterHorizontally) {
+        AppText(stringResource(R.string.ui_please_try_again), MinType.Caption, color = DesignTokens.Secondary)
+        MinButton(stringResource(R.string.retry), { onAction(WatchAction.LoadRelated) },
+            kind = MinButtonKind.Tonal, icon = AppIcon.Refresh, testTag = "watch-related-retry")
     }
-}
-
-@Composable
-private fun WatchSkeleton(includeRelated: Boolean) {
-    Column(Modifier.fillMaxWidth().testTag("watch-skeleton").clearAndSetSemantics {}) {
-        Column(Modifier.padding(horizontal = 3.dp)) {
-            Column(Modifier.padding(start = 13.dp, end = 13.dp, top = 12.dp, bottom = 5.dp)) {
-                Box(
-                    Modifier.fillMaxWidth(0.72f).height(20.dp)
-                        .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)),
-                )
-                Spacer(Modifier.height(6.dp))
-                Box(
-                    Modifier.width(196.dp).height(12.dp)
-                        .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)),
-                )
-            }
-            Spacer(Modifier.height(3.dp))
-        }
-        Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(32.dp).clip(CircleShape).background(DesignTokens.Ghost))
-            Spacer(Modifier.width(12.dp))
-            Box(Modifier.weight(1f).height(16.dp).background(DesignTokens.Ghost, RoundedCornerShape(2.dp)))
-            Spacer(Modifier.width(24.dp))
-            Box(Modifier.size(78.dp, 32.dp).background(DesignTokens.Ghost, RoundedCornerShape(16.dp)))
-        }
-        Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            repeat(5) { Box(Modifier.weight(1f).height(36.dp).background(DesignTokens.Ghost, RoundedCornerShape(18.dp))) }
-        }
-        Column(Modifier.fillMaxWidth().height(WatchLayout.CommentsSectionHeight.dp)) {
-            Spacer(Modifier.height(8.dp))
-            Box(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                    .height(WatchLayout.CommentsCardHeight.dp)
-                    .clip(RoundedCornerShape(12.dp)).background(DesignTokens.Ghost),
-            )
-        }
-        if (includeRelated) {
-            Column(Modifier.padding(top = 12.dp)) {
-                repeat(4) { index ->
-                    Row(
-                        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Box(
-                            Modifier.width(160.dp).height(90.dp)
-                                .clip(RoundedCornerShape(12.dp)).background(DesignTokens.Ghost),
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Box(
-                                Modifier.fillMaxWidth().height(16.dp)
-                                    .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)),
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Box(
-                                Modifier.width(120.dp).height(14.dp)
-                                    .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WatchError(onAction: (WatchAction) -> Unit) {
-    Column(
-        Modifier.fillMaxWidth().padding(24.dp).testTag("watch-error"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        AppText(stringResource(R.string.ui_something_went_wrong), size = 20, line = 28, weight = FontWeight.Bold)
-        AppText(
-            stringResource(R.string.ui_please_try_again),
-            Modifier.padding(top = 8.dp, bottom = 20.dp),
-            color = DesignTokens.Secondary,
-        )
-        Box(
-            Modifier.clip(CircleShape).background(DesignTokens.Surface)
-                .clickable(role = Role.Button) { onAction(WatchAction.Retry) }
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            AppText(stringResource(R.string.retry), weight = FontWeight.Medium)
-        }
-    }
-}
-
-@Composable
-private fun WatchMetadata(video: WatchVideo, state: WatchUiState, onAction: (WatchAction) -> Unit) {
-    val motionScale = LocalMotionScale.current
-    Column(Modifier.fillMaxWidth().testTag("watch-metadata")) {
-        Column(Modifier.padding(horizontal = 3.dp)) {
-            Column(
-                Modifier.padding(start = 13.dp, end = 13.dp, top = 12.dp, bottom = 5.dp),
-            ) {
-                WatchTitle(rememberDeArrowTitle(video.id, video.title))
-                Spacer(Modifier.height(6.dp))
-                WatchMetaRow(video, state, onAction)
-                androidx.compose.animation.AnimatedVisibility(state.descriptionExpanded,
-                    enter = androidx.compose.animation.expandVertically(androidx.compose.animation.core.tween(motionDuration(AppMotion.ExpandMs, motionScale))),
-                    exit = androidx.compose.animation.shrinkVertically(androidx.compose.animation.core.tween(motionDuration(AppMotion.CollapseMs, motionScale)))) {
-                    Column {
-                    Spacer(Modifier.height(12.dp))
-                    WatchDescription(
-                        video.description,
-                        onTimestamp = { onAction(WatchAction.SeekToTimestamp(it)) },
-                        onLink = { onAction(WatchAction.OpenDescriptionLink(it)) },
-                        modifier = Modifier.fillMaxWidth().testTag("watch-description"),
-                    )
-                    }
-                }
-            }
-            Spacer(Modifier.height(3.dp))
-        }
-        WatchActionBar(video, state.actionPending, state.pendingVideoAction, state.live, onAction)
-    }
-}
-
-@Composable
-private fun WatchTitle(title: String) {
-    BasicText(
-        title,
-        Modifier.fillMaxWidth().testTag("watch-title")
-            .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen).drawWithCache {
-            val fade = Brush.horizontalGradient(0.9f to Color.Black, 1f to Color.Transparent)
-            onDrawWithContent {
-                drawContent()
-                drawRect(fade, blendMode = BlendMode.DstIn)
-            }
-        },
-        style = DesignTokens.text(18, 26, FontWeight.Black),
-        maxLines = 1,
-        overflow = TextOverflow.Clip,
-    )
-}
-
-@Composable
-private fun WatchMetaRow(video: WatchVideo, state: WatchUiState, onAction: (WatchAction) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().heightIn(min = 18.dp).horizontalScroll(rememberScrollState()).testTag("watch-meta"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (video.live) {
-            Box(Modifier.padding(end = 8.dp).background(DesignTokens.Red, RoundedCornerShape(2.dp)).padding(horizontal = 4.dp).testTag("watch-live-badge")) {
-                AppText(stringResource(R.string.player_live), size = 12, line = 18, weight = FontWeight.Medium, color = Color.White)
-            }
-        }
-        if (video.handle.isNotBlank()) AppText(video.handle, Modifier.padding(end = 8.dp), size = 12, line = 18, weight = FontWeight.Medium)
-        if (video.views.isNotBlank()) AppText(video.views, Modifier.padding(end = 8.dp), size = 12, line = 18, color = DesignTokens.Secondary)
-        if (!video.live && video.age.isNotBlank()) AppText(video.age, Modifier.padding(end = 8.dp), size = 12, line = 18, color = DesignTokens.Secondary)
-        AppText(
-            stringResource(R.string.ui_more),
-            Modifier.testTag("watch-more").appDescription(if (state.descriptionExpanded) R.string.ui_show_less else R.string.ui_show_more).clickable(role = Role.Button) { onAction(WatchAction.ToggleDescription) },
-            size = 12,
-            line = 18,
-            weight = FontWeight.Medium,
-        )
-    }
-}
-
-@Composable
-private fun WatchActionBar(video: WatchVideo, pending: Boolean, pendingAction: WatchAction?, live: Boolean, onAction: (WatchAction) -> Unit) {
-    Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(48.dp).testTag("watch-action-avatar").appDescription(R.string.a11y_go_to_channel, video.channel)
-                    .clickable(enabled = video.channelId.isNotBlank(), role = Role.Button) { onAction(WatchAction.OpenChannel(video.channelId)) }, contentAlignment = Alignment.Center) {
-                    Artwork(video.avatar.orEmpty(), Modifier.size(32.dp).clip(CircleShape))
-                }
-                AppText(video.channel, Modifier.weight(1f).padding(end = 8.dp).testTag("watch-channel-name")
-                    .clickable(enabled = video.channelId.isNotBlank(), role = Role.Button) { onAction(WatchAction.OpenChannel(video.channelId)) },
-                    size = 14, line = 20, weight = FontWeight.Medium, maxLines = 2)
-            }
-            SubscribeButton(video.subscribed, { onAction(WatchAction.Subscribe) },
-                Modifier.testTag("watch-action-subscribe"), enabled = video.channelId.isNotBlank() && !pending,
-                pending = pendingAction == WatchAction.Subscribe, onDarkSurface = false, channelId = video.channelId)
-        }
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("watch-actions")
-            .padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            listOf(
-                Triple(AppIcon.Like, stringResource(R.string.ui_like_this_video), WatchAction.Like),
-                Triple(AppIcon.Dislike, stringResource(R.string.ui_dislike_this_video), WatchAction.Dislike),
-                Triple(AppIcon.Download, stringResource(R.string.download), WatchAction.Download),
-                Triple(AppIcon.QueueAdd, stringResource(R.string.add_to_queue), WatchAction.Queue),
-                Triple(AppIcon.Bookmark, stringResource(R.string.comments_composer_save), WatchAction.Save),
-                Triple(AppIcon.OpenWith, stringResource(R.string.open_with), WatchAction.OpenWith),
-                Triple(AppIcon.Share, stringResource(R.string.share), WatchAction.Share),
-                Triple(AppIcon.Report, stringResource(R.string.ui_report), WatchAction.Report),
-            // Report's submission needs a feedback token the page never carries; it hides in production.
-            ).filter { !live || it.third != WatchAction.Report }.forEachIndexed { index, (icon, description, action) ->
-                WatchSlotButton(icon, description,
-                    label = when (index) { 0 -> video.likeCount ?: video.likes.removeSuffix(" likes").takeIf { it.isNotBlank() }; 1 -> video.dislikeCount; else -> null },
-                    selected = (index == 0 && video.rating == VideoRating.Like) || (index == 1 && video.rating == VideoRating.Dislike),
-                    enabled = index > 1 || !pending,
-                    pending = pendingAction == action,
-                    testTag = "watch-action-${listOf("like", "dislike", "download", "queue", "save", "open-with", "share", "report")[index]}",
-                    onClick = { onAction(action) })
-            }
-        }
-    }
-}
-
-@Composable
-private fun WatchSlotButton(
-    icon: AppIcon,
-    description: String,
-    testTag: String,
-    onClick: () -> Unit,
-    label: String? = null,
-    selected: Boolean = false,
-    enabled: Boolean = true,
-    pending: Boolean = false,
-) {
-    val surfaceHeight = with(LocalDensity.current) { maxOf(36.dp, 20.sp.toDp() + 12.dp) }
-    val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
-    val interactions = remember { MutableInteractionSource() }
-    val pressed by interactions.collectIsPressedAsState()
-    Box(
-        Modifier.heightIn(min = surfaceHeight + 12.dp).widthIn(min = 48.dp)
-            .clickable(enabled = enabled, interactionSource = interactions, indication = null, role = Role.Button) { haptic(); onClick() }
-            .semantics { contentDescription = description; this.selected = selected }
-            .testTag(testTag),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(Modifier.heightIn(min = surfaceHeight).clip(RoundedCornerShape(18.dp))
-            .background(if (selected) DesignTokens.Red.copy(alpha = 0.12f) else if (pressed) DesignTokens.Ghost else DesignTokens.Surface)
-            .testTag("$testTag-surface").padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (pending) com.hhst.youtubelite.ui.design.ActionProgress()
-            else AppIcon(icon, Modifier.testTag("$testTag-icon"), color = if (selected) DesignTokens.Red else DesignTokens.Ink)
-            if (!label.isNullOrBlank()) {
-                Spacer(Modifier.width(8.dp))
-                AppText(label, Modifier.testTag("$testTag-count"), size = 14, line = 20, maxLines = 1)
-            }
-        }
-    }
-}
-
-@Composable
-private fun WatchComments(video: WatchVideo, onAction: (WatchAction) -> Unit) {
-    val liveChat = video.live && !video.chatKey.isNullOrBlank()
-    val chatFailed = video.live && video.chatLookupFailed
-    // A live stream without a chat continuation has no usable chat: show the
-    // unavailable card, not an ordinary comments panel.
-    val chatUnavailable = video.live && video.chatKey.isNullOrBlank() && !chatFailed
-    Column(
-        Modifier.fillMaxWidth().testTag("watch-comments").heightIn(min = WatchLayout.CommentsSectionHeight.dp).padding(bottom = 13.dp),
-    ) {
-        Spacer(Modifier.height(8.dp))
-        Box(
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .heightIn(min = WatchLayout.CommentsCardHeight.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(DesignTokens.Surface)
-                .testTag("watch-comments-card")
-                .clickable(enabled = !chatUnavailable, role = Role.Button) {
-                    onAction(if (chatFailed) WatchAction.Retry else WatchAction.OpenComments(video.id))
-                }
-                .padding(12.dp),
-        ) {
-            Column {
-                Row(Modifier.heightIn(min = 20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    AppText(if (video.live) {
-                        stringResource(R.string.chat_live)
-                    } else stringResource(R.string.comments_title), size = 14, line = 20, weight = FontWeight.Medium)
-                    Spacer(Modifier.width(4.dp))
-                    if (!video.live) AppText(video.commentCount, size = 14, line = 20, color = DesignTokens.Secondary)
-                }
-                Spacer(Modifier.height(8.dp))
-                Row(Modifier.heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (!video.live && video.commentsStatus == WatchCommentsStatus.Ready && video.topComment.text.isNotBlank()) {
-                        Artwork(video.topComment.artwork, Modifier.size(24.dp).clip(CircleShape))
-                        Spacer(Modifier.width(12.dp))
-                    }
-                    AppText(when {
-                        liveChat -> stringResource(R.string.chat_join_live)
-                        chatFailed -> stringResource(R.string.chat_load_failed)
-                        chatUnavailable -> stringResource(R.string.chat_unavailable)
-                        else -> when (video.commentsStatus) {
-                            WatchCommentsStatus.Loading -> stringResource(R.string.ui_loading_comments)
-                            WatchCommentsStatus.Empty -> stringResource(R.string.ui_no_comments_yet_2)
-                            WatchCommentsStatus.Disabled -> stringResource(R.string.ui_comments_are_turned_off_2)
-                            WatchCommentsStatus.Failed -> stringResource(R.string.ui_couldn_t_load_comments_tap_to_view)
-                            WatchCommentsStatus.Ready -> video.topComment.text
-                        }
-                    }, Modifier.weight(1f).testTag("watch-comment-preview"), size = 14, line = 20, maxLines = 2)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WatchSidebarPane(state: WatchUiState, viewportWidth: Float, scroll: LazyListState, onAction: (WatchAction) -> Unit) {
-    RelatedPaging(state, scroll, onAction)
-    val paneWidth = WatchLayout.sidebarWidth(viewportWidth)
-    val wide = paneWidth >= WatchLayout.SidebarWideWidth
-    Box(
-        Modifier.width(paneWidth.dp).fillMaxHeight()
-            .padding(top = WatchLayout.TopBarHeight.dp)
-            .testTag("watch-related"),
-    ) {
-        when (val content = state.content) {
-            WatchContent.Loading -> Column(
-                Modifier.fillMaxWidth().padding(start = 8.dp, end = if (wide) 0.dp else 8.dp)
-                    .padding(top = if (wide) 0.dp else 4.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                repeat(3) {
-                    Row(Modifier.fillMaxWidth()) {
-                        SidebarGhostCell(if (wide) 246f else 240f, if (wide) 238f else 240f)
-                        if (wide) SidebarGhostCell(246f, 238f)
-                    }
-                }
-            }
-            WatchContent.Failed -> Unit
-            is WatchContent.Ready -> {
-                val related = content.page.related
-                val rows = remember(related) { related.chunked(2) }
-                if (wide) {
-                    LazyColumn(
-                        Modifier.fillMaxWidth().padding(start = 8.dp),
-                        state = scroll,
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(rows, key = { row -> "related:${row.first().id}" }, contentType = { "related-row" }) { row ->
-                            Row(Modifier.fillMaxWidth()) {
-                                row.forEach { SidebarCell(it, 246f, 238f, onAction) }
-                            }
-                        }
-                        item("pagination") { RelatedFooter(state, onAction) }
-                    }
-                } else {
-                    LazyColumn(
-                        Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp, top = 4.dp),
-                        state = scroll,
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(related, key = { it.id }, contentType = { "related" }) { item ->
-                            SidebarCell(item, 240f, 240f, onAction)
-                        }
-                        item("pagination") { RelatedFooter(state, onAction) }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SidebarCell(item: WatchRelated, cellWidth: Float, thumbWidth: Float, onAction: (WatchAction) -> Unit) {
-    Column(Modifier.width(cellWidth.dp).testTag("watch-related-${item.id}")) {
-        Box(
-            Modifier.padding(top = 2.dp).width(thumbWidth.dp)
-                .height(thumbWidth.dp * 9f / 16f),
-        ) {
-            RelatedThumb(item, Modifier.fillMaxSize(), radius = 12.dp, onAction = onAction)
-        }
-        Spacer(Modifier.height(4.dp))
-        Row(
-            Modifier.fillMaxWidth().padding(end = (cellWidth - thumbWidth).dp),
-            verticalAlignment = Alignment.Top,
-        ) {
-            RelatedDetailsAvatar(item, onAction)
-            Spacer(Modifier.width(12.dp))
-            RelatedText(
-                item,
-                Modifier.weight(1f).padding(top = 8.dp),
-                titleBottomDp = 8f,
-                onAction = onAction,
-            )
-            RelatedKebab(item, onAction)
-        }
-        Spacer(Modifier.height(6.dp))
-    }
-}
-
-@Composable
-private fun SidebarGhostCell(cellWidth: Float, thumbWidth: Float) {
-    Column(Modifier.width(cellWidth.dp)) {
-        Box(
-            Modifier.padding(top = 2.dp).width(thumbWidth.dp).height(thumbWidth.dp * 9f / 16f)
-                .clip(RoundedCornerShape(12.dp)).background(DesignTokens.Ghost),
-        )
-        Spacer(Modifier.height(4.dp))
-        Row(verticalAlignment = Alignment.Top) {
-            Box(Modifier.size(40.dp).clip(CircleShape).background(DesignTokens.Ghost))
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f).padding(top = 8.dp)) {
-                Box(Modifier.fillMaxWidth().height(14.dp).background(DesignTokens.Ghost, RoundedCornerShape(2.dp)))
-                Spacer(Modifier.height(8.dp))
-                Box(Modifier.fillMaxWidth(0.7f).height(12.dp).background(DesignTokens.Ghost, RoundedCornerShape(2.dp)))
-            }
-        }
-        Spacer(Modifier.height(6.dp))
-    }
-}
-
-@Composable
-private fun WatchRelatedFeed(
-    items: List<WatchRelated>,
-    viewportWidth: Float,
-    viewportHeight: Float,
-    onAction: (WatchAction) -> Unit,
-) {
-    when (WatchLayout.relatedVariant(viewportWidth, viewportHeight)) {
-        WatchRelatedVariant.Phone -> PhoneFeed(items, viewportWidth, onAction)
-        WatchRelatedVariant.Grid -> GridFeed(items, viewportWidth, onAction)
-        WatchRelatedVariant.List -> ListFeed(items, onAction)
-        WatchRelatedVariant.Stacked -> StackedFeed(items, viewportWidth, onAction)
-        WatchRelatedVariant.SidebarCompact, WatchRelatedVariant.SidebarWide ->
-            error("Sidebar related layouts render in the pane, not the main feed")
-    }
-}
-
-@Composable
-private fun PhoneFeed(items: List<WatchRelated>, viewportWidth: Float, onAction: (WatchAction) -> Unit) {
-    Column(
-        Modifier.fillMaxWidth().padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items.forEach { item ->
-            Column(Modifier.fillMaxWidth().testTag("watch-related-${item.id}")) {
-                Box(Modifier.fillMaxWidth().height(WatchLayout.phoneCoverHeight(viewportWidth).dp)) {
-                    RelatedThumb(item, Modifier.fillMaxSize(), radius = 0.dp, onAction = onAction)
-                }
-                Spacer(Modifier.height(4.dp))
-                Row(Modifier.fillMaxWidth().padding(start = 12.dp), verticalAlignment = Alignment.Top) {
-                    RelatedDetailsAvatar(item, onAction)
-                    Spacer(Modifier.width(12.dp))
-                    RelatedText(
-                        item,
-                        Modifier.weight(1f).padding(top = 8.dp),
-                        titleBottomDp = 3f,
-                        onAction = onAction,
-                    )
-                    RelatedKebab(item, onAction)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StackedFeed(items: List<WatchRelated>, viewportWidth: Float, onAction: (WatchAction) -> Unit) {
-    Column(
-        Modifier.fillMaxWidth().padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items.forEach { item ->
-            Column(Modifier.fillMaxWidth().testTag("watch-related-${item.id}")) {
-                Box(
-                    Modifier.padding(horizontal = 12.dp).fillMaxWidth()
-                        .height(((viewportWidth - 24f) * 9f / 16f).dp),
-                ) {
-                    RelatedThumb(item, Modifier.fillMaxSize(), radius = 12.dp, onAction = onAction)
-                }
-                Spacer(Modifier.height(4.dp))
-                Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.Top) {
-                    RelatedDetailsAvatar(item, onAction)
-                    Spacer(Modifier.width(12.dp))
-                    RelatedText(
-                        item,
-                        Modifier.weight(1f).padding(top = 8.dp),
-                        titleBottomDp = 3f,
-                        onAction = onAction,
-                    )
-                    RelatedKebab(item, onAction)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ListFeed(items: List<WatchRelated>, onAction: (WatchAction) -> Unit) {
-    Column(
-        Modifier.fillMaxWidth().padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items.forEach { item ->
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = 12.dp)
-                    .testTag("watch-related-${item.id}"),
-                verticalAlignment = Alignment.Top,
-            ) {
-                Box(
-                    Modifier.width(WatchLayout.ListCoverWidth.dp).height(WatchLayout.ListCoverHeight.dp),
-                ) {
-                    RelatedThumb(item, Modifier.fillMaxSize(), radius = 12.dp, onAction = onAction)
-                }
-                Spacer(Modifier.width(12.dp))
-                RelatedText(item, Modifier.weight(1f), titleBottomDp = 3f, onAction = onAction)
-                RelatedKebab(item, onAction)
-            }
-        }
-    }
-}
-
-@Composable
-private fun GridFeed(items: List<WatchRelated>, viewportWidth: Float, onAction: (WatchAction) -> Unit) {
-    val cols = WatchLayout.gridColumns(viewportWidth)
-    val cell = WatchLayout.gridCell(viewportWidth)
-    Column(Modifier.fillMaxWidth()) {
-        items.chunked(cols).forEach { row ->
-            Row(Modifier.fillMaxWidth().padding(start = 8.dp)) {
-                row.forEach { item ->
-                    Column(Modifier.width(cell.dp).testTag("watch-related-${item.id}")) {
-                        Box(
-                            Modifier.padding(horizontal = 8.dp).fillMaxWidth()
-                                .height(((cell - 16f) * 9f / 16f).dp),
-                        ) {
-                            RelatedThumb(item, Modifier.fillMaxSize(), radius = 12.dp, onAction = onAction)
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.Top) {
-                            RelatedDetailsAvatar(item, onAction)
-                            Spacer(Modifier.width(12.dp))
-                            RelatedText(
-                                item,
-                                Modifier.weight(1f).padding(top = 8.dp),
-                                titleBottomDp = 3f,
-                                onAction = onAction,
-                            )
-                            RelatedKebab(item, onAction)
-                        }
-                        Spacer(Modifier.height(12.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun RelatedThumb(
-    item: WatchRelated,
-    modifier: Modifier,
-    radius: Dp,
-    onAction: (WatchAction) -> Unit,
-) {
-    Box(
-        modifier.clip(RoundedCornerShape(radius))
-            .clickable(role = Role.Button) {
-                WatchProvisionalStore.put(item.toProvisional())
-                onAction(WatchAction.OpenRelated(item.id))
-            }
-            .appDescription(R.string.a11y_title_duration, item.title, item.duration)
-            .testTag("watch-thumb-${item.id}"),
-    ) {
-        VideoArtwork(item.id, item.artwork, Modifier.fillMaxSize())
-        item.progress?.let { progress ->
-            Box(Modifier.align(Alignment.BottomStart).fillMaxWidth().height(4.dp).background(Color(0xFF909090))) {
-                Box(Modifier.fillMaxHeight().fillMaxWidth(progress.coerceIn(0f, 1f)).background(DesignTokens.Red))
-            }
-        }
-        Box(
-            Modifier.align(Alignment.BottomEnd).padding(8.dp).testTag("watch-badge-${item.id}")
-                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
-                .padding(horizontal = 4.dp, vertical = 1.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            AppText(item.duration, size = 12, line = 18, weight = FontWeight.Medium, color = Color.White)
-        }
-    }
-}
-
-@Composable
-private fun RelatedText(
-    item: WatchRelated,
-    modifier: Modifier,
-    titleBottomDp: Float,
-    onAction: (WatchAction) -> Unit,
-) {
-    Column(
-        modifier.clickable(role = Role.Button) {
-            WatchProvisionalStore.put(item.toProvisional())
-            onAction(WatchAction.OpenRelated(item.id))
-        },
-    ) {
-        AppText(
-            rememberDeArrowTitle(item.id, item.title),
-            Modifier.fillMaxWidth().testTag("watch-related-title-${item.id}"),
-            size = 14,
-            line = 18,
-            weight = FontWeight.Normal,
-            maxLines = 2,
-            exactLineHeight = 17.5.sp,
-        )
-        Spacer(Modifier.height(titleBottomDp.dp))
-        FlowRow(Modifier.fillMaxWidth()) {
-            listOf(item.channel, item.views, item.age).filter { it.isNotBlank() }.forEachIndexed { index, text ->
-                if (index > 0) BylineSeparator()
-                BylineItem(text)
-            }
-        }
-        item.badge?.let { badge ->
-            Spacer(Modifier.height(4.dp))
-            Box(Modifier.padding(start = 4.dp)) {
-                AppText(badge, size = 12, line = 18, weight = FontWeight.Medium, color = DesignTokens.Secondary)
-            }
-        }
-    }
-}
-
-@Composable
-private fun BylineItem(text: String) {
-    AppText(text, size = 12, line = 14, maxLines = 1, color = DesignTokens.Secondary)
-    Spacer(Modifier.width(4.dp))
-}
-
-@Composable
-private fun BylineSeparator() {
-    AppText("•", size = 12, line = 14, color = DesignTokens.Secondary)
-    Spacer(Modifier.width(4.dp))
-}
-
-@Composable
-private fun RelatedDetailsAvatar(item: WatchRelated, onAction: (WatchAction) -> Unit) {
-    Box(
-        Modifier.size(40.dp).clip(CircleShape)
-            .testTag("watch-avatar-${item.id}")
-        .clickable(role = Role.Button) { onAction(WatchAction.OpenChannel(item.channelId)) }
-            .appDescription(R.string.a11y_go_to_channel, item.channel),
-    ) {
-        Artwork(item.avatar.orEmpty(), Modifier.fillMaxSize())
-    }
-}
-
-@Composable
-private fun RelatedKebab(item: WatchRelated, onAction: (WatchAction) -> Unit) {
-    AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, item.title), diameter = 48.dp) {
-        onAction(WatchAction.OpenItemMenu(item.id))
-    }
-}
-
-@Composable
-private fun Artwork(asset: String, modifier: Modifier = Modifier) {
-    com.hhst.youtubelite.ui.design.Artwork(asset, modifier)
+    Spacer(Modifier.height(MinSpace.lg))
 }
