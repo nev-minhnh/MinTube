@@ -1,26 +1,37 @@
 package com.hhst.youtubelite.search.presentation
-import com.hhst.youtubelite.ui.design.labelResource
-import com.hhst.youtubelite.ui.design.CollapsingAppBar
-import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,38 +40,60 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.core.tween
-import kotlinx.coroutines.flow.distinctUntilChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
-import com.hhst.youtubelite.search.domain.*
-import com.hhst.youtubelite.watch.domain.toProvisional
-import com.hhst.youtubelite.ui.design.*
-import com.hhst.youtubelite.ui.design.appDescription
 import com.hhst.youtubelite.home.presentation.LoadingSpinner
-import androidx.compose.ui.res.stringResource
-import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
-import com.hhst.youtubelite.dearrow.VideoArtwork
+import com.hhst.youtubelite.playlist.presentation.PlaylistSearchList
+import com.hhst.youtubelite.playlist.presentation.PlaylistShareSheet
+import com.hhst.youtubelite.search.domain.SearchAction
+import com.hhst.youtubelite.search.domain.SearchContent
+import com.hhst.youtubelite.search.domain.SearchDestination
+import com.hhst.youtubelite.search.domain.SearchFilters
+import com.hhst.youtubelite.search.domain.SearchOverlay
+import com.hhst.youtubelite.search.domain.SearchResultType
+import com.hhst.youtubelite.search.domain.SearchResultsLayout
+import com.hhst.youtubelite.search.domain.SearchUiState
+import com.hhst.youtubelite.search.domain.SearchUploadDate
+import com.hhst.youtubelite.search.domain.SearchVideoMenuAction
+import com.hhst.youtubelite.ui.components.FilterChip
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
+import com.hhst.youtubelite.ui.components.MinNavigationBar
+import com.hhst.youtubelite.ui.components.PagingFooter
+import com.hhst.youtubelite.ui.components.SearchRows
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppIconButton
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.AppTheme
+import com.hhst.youtubelite.ui.design.CollapsingAppBar
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.LocalHideShorts
+import com.hhst.youtubelite.ui.design.LocalMotionScale
+import com.hhst.youtubelite.ui.design.MenuBottomSheet
+import com.hhst.youtubelite.ui.design.MenuSheetItem
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
+import com.hhst.youtubelite.ui.design.RefreshableContent
+import com.hhst.youtubelite.ui.design.SearchPanel
+import com.hhst.youtubelite.ui.design.SelectField
+import com.hhst.youtubelite.ui.design.VerificationBanner
+import com.hhst.youtubelite.ui.design.VerificationCard
+import com.hhst.youtubelite.ui.design.WindowClass
+import com.hhst.youtubelite.ui.design.labelResource
+import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun SearchResultsScreen(
@@ -68,7 +101,7 @@ fun SearchResultsScreen(
     onAction: (SearchAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    searchRows: com.hhst.youtubelite.ui.components.SearchRows? = null,
+    searchRows: SearchRows? = null,
 ) {
     val appBar = rememberAppBarCollapseState(state.query, enabled = !state.searchOpen && state.overlay == SearchOverlay.None && state.content is SearchContent.Results)
     AppTheme {
@@ -79,8 +112,10 @@ fun SearchResultsScreen(
         BoxWithConstraints(modifier.fillMaxSize().nestedScroll(appBar.connection).background(DesignTokens.Background).testTag("search-results")) {
             val width = maxWidth.value
             val height = maxHeight.value
+            // The available width, not the display: split-screen gets the right layout.
+            val spec = SearchListSpec.of(width, height)
             val listState = rememberLazyListState()
-            val shortsState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+            val shortsState = rememberLazyGridState()
             // A new query or filter starts a new list; restoring the page keeps its scroll.
             var appliedQuery by remember { mutableStateOf(state.query) }
             var appliedFilters by remember { mutableStateOf(state.filters) }
@@ -97,6 +132,10 @@ fun SearchResultsScreen(
             val ready = state.content as? SearchContent.Results
             val rows by rememberUpdatedState(if (state.filters.type == SearchResultType.Shorts)
                 ready?.page?.shorts.orEmpty() else ready?.page?.results.orEmpty())
+            // The mixed list interleaves other rows, so video rows are found by their lazy key.
+            val videoIndex by rememberUpdatedState(remember(ready?.page?.results) {
+                ready?.page?.results.orEmpty().withIndex().associate { (index, result) -> result.id to index }
+            })
             val dispatch by rememberUpdatedState(onAction)
             LaunchedEffect(listState, shortsState, state.query, state.filters) {
                 if (state.filters.type != SearchResultType.All && state.filters.type != SearchResultType.Shorts) return@LaunchedEffect
@@ -105,8 +144,8 @@ fun SearchResultsScreen(
                         val visible = shortsState.layoutInfo.visibleItemsInfo
                         visible.firstOrNull()?.index?.let { it to (visible.lastOrNull()?.index ?: it) }
                     } else {
-                        val visible = listState.layoutInfo.visibleItemsInfo
-                        visible.firstOrNull()?.index?.let { it to (visible.lastOrNull()?.index ?: it) }
+                        val visible = listState.layoutInfo.visibleItemsInfo.mapNotNull { videoIndex[it.key] }
+                        visible.minOrNull()?.let { it to visible.max() }
                     } ?: return@snapshotFlow emptyList<String>()
                     val (first, lastVisible) = range
                     val last = lastVisible + 3
@@ -120,9 +159,9 @@ fun SearchResultsScreen(
                 {
                     if (ready.automaticPagingPaused && !ready.loadingMore && !ready.loadMoreFailed) {
                         Box(Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("search-load-more"), contentAlignment = Alignment.Center) {
-                            com.hhst.youtubelite.home.presentation.PillButton(stringResource(R.string.load_more)) { onAction(SearchAction.LoadMore) }
+                            MinButton(stringResource(R.string.load_more), { onAction(SearchAction.LoadMore) }, kind = MinButtonKind.Tonal)
                         }
-                    } else com.hhst.youtubelite.ui.components.PagingFooter(ready.loadingMore, ready.loadMoreFailed) {
+                    } else PagingFooter(ready.loadingMore, ready.loadMoreFailed) {
                         onAction(if (ready.loadMoreFailed) SearchAction.LoadMore else SearchAction.AutomaticLoadMore)
                     }
                 }
@@ -130,11 +169,14 @@ fun SearchResultsScreen(
             val backgroundHidden = state.searchOpen || state.overlay is SearchOverlay.ItemMenu || state.overlay is SearchOverlay.PlaylistMenu
             Column(Modifier.fillMaxSize().then(if (backgroundHidden) Modifier.clearAndSetSemantics {} else Modifier)) {
                 CollapsingAppBar(appBar) {
-                    SearchTopBar(state.query, onAction, onBack)
+                    Column(Modifier.fillMaxWidth().background(DesignTokens.Background)) {
+                        SearchTopBar(state.query, state.filters, state.filtersOpen, onAction, onBack)
+                        TypeChips(state.filters.type, hideShorts, spec.inset, onAction)
+                    }
                 }
 
                 val motion = LocalMotionScale.current > 0f
-                androidx.compose.animation.AnimatedVisibility(visible = state.filtersOpen,
+                AnimatedVisibility(visible = state.filtersOpen,
                     enter = if (motion) fadeIn(tween(160)) + expandVertically(tween(180)) else EnterTransition.None,
                     exit = if (motion) fadeOut(tween(100)) + shrinkVertically(tween(140)) else ExitTransition.None) {
                     SearchFilterBar(state.filters, onAction)
@@ -144,29 +186,33 @@ fun SearchResultsScreen(
                     enabled = !backgroundHidden && state.overlay == SearchOverlay.None, contentKey = Triple(state.query, state.filters, state.signedInPreview), tag = "search-refresh",
                     canPull = { if (state.filters.type == SearchResultType.Shorts) !shortsState.canScrollBackward else !listState.canScrollBackward }) { state ->
                     when (val content = state.content) {
-                        SearchContent.Loading -> SearchSkeleton(width, height)
+                        SearchContent.Loading -> SearchSkeleton(spec)
                         SearchContent.Failed -> if (state.verification != null) VerificationCard(
                             state.verification,
                             onVerify = { onAction(SearchAction.OpenVerification(state.verification!!.challengeUrl)) },
                             onDismiss = { onAction(SearchAction.DismissVerification) },
                             modifier = Modifier.testTag("search-verification"),
                         ) else SearchFailed(onAction)
-                        is SearchContent.Empty -> SearchNoResults(content.query, state.filters.type)
-                        is SearchContent.Results -> if (state.filters.type == SearchResultType.Playlists)
-                            com.hhst.youtubelite.playlist.presentation.PlaylistSearchList(content.page.playlists, width, height, listState,
+                        is SearchContent.Empty -> SearchNoResults(content.query, state.filters.type, onAction)
+                        is SearchContent.Results -> when (state.filters.type) {
+                            SearchResultType.Playlists -> PlaylistSearchList(content.page.playlists, width, height, listState,
                                 { onAction(SearchAction.OpenPlaylist(it)) }, { onAction(SearchAction.OpenChannel(it)) },
                                 { onAction(SearchAction.OpenPlaylistMenu(it)) }, footer)
-                            else if (state.filters.type == SearchResultType.Channels)
-                                ChannelResultsList(content.page.channels, listState, onAction, footer, state.subscriptions, state.subscriptionsPending)
-                            else if (state.filters.type == SearchResultType.Shorts)
-                                ShortsResultsList(content.page.shorts, shortsState, onAction, footer)
-                            else SearchList(content.page.results, width, height, listState, onAction, footer)
+                            SearchResultType.Channels -> ChannelResultsList(content.page.channels, listState, onAction, footer,
+                                state.subscriptions, state.subscriptionsPending, spec.inset)
+                            SearchResultType.Shorts -> ShortsResultsList(content.page.shorts, shortsState, onAction, footer,
+                                columns = spec.window.feedColumns + 1, inset = spec.inset)
+                            // The page of an "All" search already carries its channels, Shorts and playlists.
+                            SearchResultType.All -> SearchAllList(content.page.results, content.page.channels,
+                                if (hideShorts) emptyList() else content.page.shorts, content.page.playlists,
+                                spec, listState, onAction, state.subscriptions, state.subscriptionsPending, footer)
+                        }
                     }
                     state.verification?.let { challenge ->
                         VerificationBanner(challenge,
                             onVerify = { onAction(SearchAction.OpenVerification(challenge.challengeUrl)) },
                             onDismiss = { onAction(SearchAction.DismissVerification) },
-                            modifier = Modifier.align(Alignment.TopCenter).padding(horizontal = 12.dp, vertical = 8.dp)
+                            modifier = Modifier.align(Alignment.TopCenter).padding(horizontal = spec.inset, vertical = MinSpace.sm)
                                 .testTag("search-verification-banner"))
                     }
                 }
@@ -211,17 +257,17 @@ fun SearchResultsScreen(
                     tag = "search-video-menu",
                     paneTitle = stringResource(R.string.ui_video_actions),
                     header = if (state.menuLoading || state.menuFailed) ({
-                        Box(Modifier.fillMaxWidth().height(48.dp), contentAlignment = Alignment.Center) {
+                        Box(Modifier.fillMaxWidth().heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
                             if (state.menuLoading) Box(Modifier.testTag("search-menu-loading")) { LoadingSpinner() }
-                            else AppText(stringResource(R.string.retry), size = 14, line = 20,
-                                modifier = Modifier.testTag("search-menu-retry").clickable(role = Role.Button) {
+                            else AppText(stringResource(R.string.retry), MinType.Label,
+                                Modifier.testTag("search-menu-retry").clip(CircleShape).clickable(role = Role.Button) {
                                     onAction(SearchAction.OpenItemMenu(menu.videoId))
-                                }.padding(horizontal = 16.dp, vertical = 12.dp))
+                                }.padding(horizontal = 20.dp, vertical = 14.dp), color = DesignTokens.AccentText)
                         }
                     }) else null,
                 )
             }
-            if (state.overlay is SearchOverlay.PlaylistMenu) com.hhst.youtubelite.playlist.presentation.PlaylistShareSheet(
+            if (state.overlay is SearchOverlay.PlaylistMenu) PlaylistShareSheet(
                 { onAction(SearchAction.CloseItemMenu) }, { onAction(SearchAction.SharePlaylist) })
         }
     }
@@ -237,7 +283,20 @@ private fun SearchVideoMenuAction.icon(): AppIcon = when (this) {
     SearchVideoMenuAction.DontRecommend -> AppIcon.Close
 }
 
-/** Inline dual-select strip sampled below the 48-high bar; selections apply immediately. */
+/** Result type as always-visible chips; the same choice (plus upload date) stays in the filter strip. */
+@Composable
+private fun TypeChips(selected: SearchResultType, hideShorts: Boolean, inset: Dp, onAction: (SearchAction) -> Unit) {
+    val types = SearchResultType.entries.filterNot { hideShorts && it == SearchResultType.Shorts }
+    LazyRow(Modifier.fillMaxWidth().testTag("search-type-chips"), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MinSpace.sm), contentPadding = PaddingValues(horizontal = inset)) {
+        items(types, key = { it.name }) { type ->
+            FilterChip(stringResource(type.labelResource), type == selected,
+                { onAction(SearchAction.SelectResultType(type)) }, Modifier.testTag("search-type-chip-${type.name}"))
+        }
+    }
+}
+
+/** Inline dual-select strip below the bar; selections apply immediately. */
 @Composable
 private fun SearchFilterBar(filters: SearchFilters, onAction: (SearchAction) -> Unit) {
     val density = LocalDensity.current
@@ -277,7 +336,7 @@ private fun SearchFilterBar(filters: SearchFilters, onAction: (SearchAction) -> 
                 }
                 Box(
                     Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(1.dp)
-                        .background(DesignTokens.Border.copy(alpha = SearchResultsLayout.FilterDividerAlpha))
+                        .background(DesignTokens.Border)
                         .testTag("search-filter-divider"),
                 )
             }
@@ -285,283 +344,33 @@ private fun SearchFilterBar(filters: SearchFilters, onAction: (SearchAction) -> 
     }
 }
 
+/** Back, the query as a pill that reopens the search panel, then filters, voice and the page menu. */
 @Composable
-private fun SearchTopBar(query: String, onAction: (SearchAction) -> Unit, onBack: () -> Unit) {
-    val fieldHeight = maxOf(32.dp, with(LocalDensity.current) { 22.sp.toDp() })
-    val barHeight = maxOf(SearchResultsLayout.TopBarHeight.dp, fieldHeight)
-    Row(Modifier.fillMaxWidth().height(barHeight).background(DesignTokens.Background)
+private fun SearchTopBar(query: String, filters: SearchFilters, filtersOpen: Boolean, onAction: (SearchAction) -> Unit, onBack: () -> Unit) {
+    val filtered = filtersOpen || filters.uploaded != SearchUploadDate.Anytime
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).background(DesignTokens.Background).padding(horizontal = MinSpace.xs)
         .testTag("search-topbar"), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.width(53.dp), contentAlignment = Alignment.CenterStart) {
-            AppIconButton(AppIcon.Back, stringResource(R.string.a11y_back), onClick = onBack)
-        }
-        Box(Modifier.weight(1f).fillMaxHeight()) {
-            Box(Modifier.align(Alignment.CenterStart).fillMaxWidth().height(fieldHeight)
-                .clip(RoundedCornerShape(32.dp)).background(DesignTokens.Surface).testTag("search-field"))
-            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.weight(1f).fillMaxHeight().testTag("search-query").clickable(role = Role.Button) { onAction(SearchAction.OpenSearch) },
-                    contentAlignment = Alignment.CenterStart) {
-                    AppText(query, Modifier.padding(start = 12.dp).testTag("search-query-label"),
-                        size = 15, line = 22, maxLines = 1)
-                }
-                AppIconButton(AppIcon.Filter, stringResource(R.string.a11y_search_filters), diameter = 48.dp) { onAction(SearchAction.OpenFilters) }
+        AppIconButton(AppIcon.Back, stringResource(R.string.a11y_back), onClick = onBack)
+        Box(Modifier.weight(1f).heightIn(min = MinSpace.Touch).testTag("search-query")
+            .clickable(role = Role.Button) { onAction(SearchAction.OpenSearch) }, contentAlignment = Alignment.CenterStart) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 40.dp).clip(CircleShape).background(DesignTokens.Surface)
+                .testTag("search-field").padding(horizontal = MinSpace.lg), verticalAlignment = Alignment.CenterVertically) {
+                AppIcon(AppIcon.Search, Modifier.size(18.dp), color = DesignTokens.Secondary)
+                Spacer(Modifier.width(MinSpace.sm))
+                AppText(query, MinType.Body, Modifier.weight(1f).testTag("search-query-label"), maxLines = 1)
             }
         }
-        Spacer(Modifier.width(12.dp))
-        Box(Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-            AppIconButton(AppIcon.Voice, stringResource(R.string.a11y_voice_search),
-                modifier = Modifier.wrapContentSize(unbounded = true), diameter = 40.dp) { onAction(SearchAction.VoiceSearch) }
-        }
-        AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_options), diameter = 48.dp) { onAction(SearchAction.OpenPageMenu) }
+        AppIconButton(AppIcon.Filter, stringResource(R.string.a11y_search_filters),
+            background = if (filtered) DesignTokens.AccentContainer else Color.Transparent) { onAction(SearchAction.OpenFilters) }
+        AppIconButton(AppIcon.Voice, stringResource(R.string.a11y_voice_search)) { onAction(SearchAction.VoiceSearch) }
+        AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_options)) { onAction(SearchAction.OpenPageMenu) }
     }
 }
 
 @Composable
 private fun SearchNavigationBar(signedIn: Boolean, onAction: (SearchAction) -> Unit) {
-    com.hhst.youtubelite.ui.components.MinNavigationBar(
+    MinNavigationBar(
         tag = "search", signedIn = signedIn, selected = null,
         onSelect = { tab -> onAction(SearchAction.SelectDestination(SearchDestination.valueOf(tab.name))) },
     )
-}
-
-@Composable
-private fun SearchList(
-    results: List<SearchResult>,
-    width: Float,
-    height: Float,
-    listState: LazyListState,
-    onAction: (SearchAction) -> Unit,
-    footer: (@Composable () -> Unit)? = null,
-) {
-    val viewport = rememberUpdatedState(width to height)
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(
-            Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().testTag("search-results-list"),
-            state = listState,
-            contentPadding = PaddingValues(
-                start = 0.dp, end = 0.dp,
-                top = SearchResultsLayout.listTopInset(width).dp,
-                bottom = 24.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(SearchResultsLayout.itemSpacing(width, height).dp),
-        ) {
-            items(results, key = { it.id }, contentType = { "video" }) { result ->
-                val (itemWidth, itemHeight) = viewport.value
-                Box(if (LocalMotionScale.current > 0f) Modifier.animateItem() else Modifier) {
-                    if (SearchResultsLayout.listLockup(itemWidth, itemHeight)) {
-                        ListResultRow(result, itemWidth, itemHeight, onAction)
-                    } else StackedResultRow(result, itemWidth, itemHeight, onAction)
-                }
-            }
-            if (footer != null) item(key = "pagination") { footer() }
-        }
-    }
-}
-
-@Composable
-private fun ListResultRow(result: SearchResult, width: Float, height: Float, onAction: (SearchAction) -> Unit) {
-    Row(Modifier.fillMaxWidth().heightIn(min = SearchResultsLayout.ListThumbnailHeight.dp)
-        .testTag("search-result-${result.id}").padding(horizontal = 12.dp)) {
-        ResultThumbnail(result,
-            Modifier.width(SearchResultsLayout.ListThumbnailWidth.dp).height(SearchResultsLayout.ListThumbnailHeight.dp),
-            radius = 12.dp, badgeInset = SearchResultsLayout.ListBadgeInset.dp, onAction)
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f).padding(end = 12.dp)) {
-            Row(Modifier.fillMaxWidth()) {
-                ResultText(result, Modifier.weight(1f), onAction)
-                ResultMenu(result, SearchResultsLayout.menuSize(width, height).dp, onAction)
-            }
-            ChannelAvatar(result, Modifier, onAction)
-        }
-    }
-}
-
-@Composable
-private fun StackedResultRow(result: SearchResult, width: Float, height: Float, onAction: (SearchAction) -> Unit) {
-    Column(Modifier.fillMaxWidth().testTag("search-result-${result.id}")) {
-        ResultThumbnail(result,
-            Modifier.fillMaxWidth().padding(horizontal = SearchResultsLayout.stackedThumbnailInset(width, height).dp)
-                .height(SearchResultsLayout.stackedThumbnailHeight(width, height).dp),
-            radius = SearchResultsLayout.stackedThumbnailRadius(width, height).dp,
-            badgeInset = SearchResultsLayout.BadgeInset.dp, onAction)
-        Spacer(Modifier.height(4.dp))
-        Row(Modifier.fillMaxWidth().heightIn(min = SearchResultsLayout.DetailsMinHeight.dp)
-            .padding(start = SearchResultsLayout.detailsStart(width).dp, end = SearchResultsLayout.detailsEnd(width, height).dp),
-            verticalAlignment = Alignment.Top) {
-            ChannelAvatar(result, Modifier.padding(top = 8.dp), onAction)
-            Spacer(Modifier.width(12.dp))
-            ResultText(result, Modifier.weight(1f).padding(top = 8.dp), onAction)
-            ResultMenu(result, SearchResultsLayout.stackedMenuSize(width, height).dp, onAction)
-        }
-    }
-}
-
-@Composable
-private fun ResultThumbnail(
-    result: SearchResult,
-    modifier: Modifier,
-    radius: Dp,
-    badgeInset: Dp,
-    onAction: (SearchAction) -> Unit,
-) {
-    Box(modifier.testTag("search-thumb-${result.id}").clip(RoundedCornerShape(radius))
-        .clickable(role = Role.Button) {
-            com.hhst.youtubelite.watch.domain.WatchProvisionalStore.put(result.toProvisional())
-            onAction(SearchAction.OpenResult(result.id))
-        }
-        .appDescription(R.string.a11y_title_duration, result.title, result.duration)) {
-        VideoArtwork(result.id, result.artwork, Modifier.fillMaxSize())
-        result.progress?.let { progress ->
-            Box(Modifier.align(Alignment.BottomStart).fillMaxWidth().height(4.dp).background(Color(0xFF909090))) {
-                Box(Modifier.fillMaxHeight().fillMaxWidth(progress.coerceIn(0f, 1f)).background(DesignTokens.Red))
-            }
-        }
-        if (result.duration.isNotBlank()) Box(Modifier.align(Alignment.BottomEnd).padding(badgeInset).testTag("search-badge-${result.id}")
-            .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
-            .padding(horizontal = 4.dp, vertical = 1.dp), contentAlignment = Alignment.Center) {
-            AppText(result.duration, size = 12, line = 18, weight = FontWeight.Medium, color = Color.White)
-        }
-    }
-}
-
-@Composable
-private fun ResultText(result: SearchResult, modifier: Modifier, onAction: (SearchAction) -> Unit) {
-    Column(modifier.testTag("search-text-${result.id}").clickable(role = Role.Button) {
-        com.hhst.youtubelite.watch.domain.WatchProvisionalStore.put(result.toProvisional())
-        onAction(SearchAction.OpenResult(result.id))
-    }) {
-        AppText(rememberDeArrowTitle(result.id, result.title), Modifier.fillMaxWidth().testTag("search-title-${result.id}"),
-            size = 14, line = 18, weight = FontWeight.Normal, maxLines = 2, exactLineHeight = 17.5.sp)
-        Spacer(Modifier.height(3.dp))
-        // Only non-empty fields join: a missing view count or date must not leave
-        // orphan separators ("ROSÉ • •"). All fields blank renders nothing.
-        val byline = listOf(result.channel, result.views, result.age).filter(String::isNotBlank)
-        Row(Modifier.fillMaxWidth().testTag("search-byline-${result.id}")) {
-            byline.forEachIndexed { index, part ->
-                if (index > 0) BylineSeparator()
-                BylineItem(part)
-            }
-        }
-        result.badge?.let { badge ->
-            Spacer(Modifier.height(4.dp))
-            Box(Modifier.padding(start = 4.dp)) {
-                AppText(badge, size = 12, line = 18, weight = FontWeight.Medium, color = DesignTokens.Secondary)
-            }
-        }
-    }
-}
-
-@Composable
-private fun BylineItem(text: String) {
-    AppText(text, size = 12, line = 14, maxLines = 1)
-    Spacer(Modifier.width(4.dp))
-}
-
-@Composable
-private fun BylineSeparator() {
-    AppText("•", size = 12, line = 14)
-    Spacer(Modifier.width(4.dp))
-}
-
-@Composable
-private fun ChannelAvatar(result: SearchResult, modifier: Modifier, onAction: (SearchAction) -> Unit) {
-    Box(modifier.size(40.dp).clip(CircleShape).testTag("search-channel-${result.id}")
-        .clickable(role = Role.Button) { onAction(SearchAction.OpenChannel(result.channelId)) }
-        .appDescription(R.string.a11y_go_to_channel, result.channel)) {
-        Artwork(result.avatar.orEmpty(), Modifier.fillMaxSize())
-    }
-}
-
-@Composable
-private fun ResultMenu(result: SearchResult, size: Dp, onAction: (SearchAction) -> Unit) {
-    AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, result.title), diameter = size) {
-        onAction(SearchAction.OpenItemMenu(result.id))
-    }
-}
-
-@Composable
-private fun Artwork(asset: String, modifier: Modifier = Modifier) {
-    com.hhst.youtubelite.ui.design.Artwork(asset, modifier)
-}
-
-@Composable
-private fun SearchSkeleton(width: Float, height: Float) {
-    val viewport = rememberUpdatedState(width to height)
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(
-            Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().testTag("search-skeleton").clearAndSetSemantics {},
-            contentPadding = PaddingValues(
-                start = 0.dp, end = 0.dp,
-                top = SearchResultsLayout.listTopInset(width).dp, bottom = 24.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(6) { index ->
-                val (width, height) = viewport.value
-                val list = SearchResultsLayout.listLockup(width, height)
-                val thumbnail: @Composable () -> Unit = {
-                    Box(Modifier
-                        .width(if (list) SearchResultsLayout.ListThumbnailWidth.dp else SearchResultsLayout.stackedThumbnailWidth(width, height).dp)
-                        .height(if (list) SearchResultsLayout.ListThumbnailHeight.dp else SearchResultsLayout.stackedThumbnailHeight(width, height).dp)
-                        .clip(RoundedCornerShape(if (list) 12.dp else SearchResultsLayout.stackedThumbnailRadius(width, height).dp))
-                        .background(DesignTokens.Ghost).testTag("skeleton-thumb-$index"))
-                }
-                val text: @Composable () -> Unit = {
-                    Column(Modifier.fillMaxWidth()) {
-                        Box(Modifier.widthIn(max = 300.dp).fillMaxWidth().height(16.dp)
-                            .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)).testTag("skeleton-title-$index"))
-                        Spacer(Modifier.height(8.dp))
-                        Box(Modifier.width(120.dp).height(16.dp)
-                            .background(DesignTokens.Ghost, RoundedCornerShape(2.dp)).testTag("skeleton-byline-$index"))
-                    }
-                }
-                if (list) Row(Modifier.fillMaxWidth().testTag("skeleton-card-$index").padding(horizontal = 12.dp)) {
-                    thumbnail()
-                    Spacer(Modifier.width(12.dp))
-                    Box(Modifier.weight(1f).padding(end = 12.dp)) { text() }
-                } else Column(Modifier.fillMaxWidth().testTag("skeleton-card-$index")) {
-                    Box(Modifier.fillMaxWidth().padding(horizontal = SearchResultsLayout.stackedThumbnailInset(width, height).dp)) { thumbnail() }
-                    Box(Modifier.fillMaxWidth().padding(start = 12.dp, top = 12.dp, end = 12.dp)) { text() }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SearchMessage(tag: String, content: @Composable ColumnScope.() -> Unit) {
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
-            .heightIn(min = maxHeight).padding(24.dp).testTag(tag),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            content = content)
-    }
-}
-
-@Composable
-private fun SearchNoResults(query: String, type: SearchResultType) {
-    SearchMessage("search-empty") {
-        AppText(stringResource(R.string.ui_no_results_found), size = 20, line = 28, weight = FontWeight.Bold)
-        val message = when (type) {
-            SearchResultType.Playlists -> R.string.ui_search_no_playlists
-            SearchResultType.Shorts -> R.string.ui_search_no_shorts
-            SearchResultType.Channels -> R.string.ui_search_no_channels
-            SearchResultType.All -> R.string.ui_search_no_videos
-        }
-        AppText(stringResource(message, query), Modifier.padding(top = 8.dp),
-            size = 14, line = 20, color = DesignTokens.Secondary, align = TextAlign.Center)
-    }
-}
-
-@Composable
-private fun SearchFailed(onAction: (SearchAction) -> Unit) {
-    SearchMessage("search-error") {
-        AppText(stringResource(R.string.ui_something_went_wrong), size = 20, line = 28, weight = FontWeight.Bold)
-        AppText(stringResource(R.string.ui_please_try_again), Modifier.padding(top = 8.dp, bottom = 20.dp), color = DesignTokens.Secondary)
-        Box(Modifier.clip(CircleShape).background(DesignTokens.Surface)
-            .clickable(role = Role.Button) { onAction(SearchAction.Retry) }
-            .padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
-            AppText(stringResource(R.string.retry), weight = FontWeight.Medium)
-        }
-    }
 }
