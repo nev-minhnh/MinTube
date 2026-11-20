@@ -708,28 +708,6 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
         watchWindowFocused = hasFocus
     }
 
-    /**
-     * A phone watch page is portrait-locked, so the window no longer rotates when the device is
-     * tilted. The sensor reports the tilt instead and the player's existing auto-fullscreen rule
-     * decides (landscape + system auto-rotate enters; tilting back leaves an auto-entered session).
-     * Tablets rotate their window and keep their two-column landscape page.
-     */
-    private val phoneTilt by lazy {
-        com.hhst.youtubelite.ui.PhoneOrientation.Tilt(this) { degrees, autoRotate ->
-            playerViewModel.onPhysicalOrientation(degrees, autoRotate, inPip.value)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (com.hhst.youtubelite.ui.PhoneOrientation.isPhone(this)) phoneTilt.start()
-    }
-
-    override fun onStop() {
-        phoneTilt.stop()
-        super.onStop()
-    }
-
     private fun applyWatchWindowBackground(color: Int) {
         if (appliedWindowColor == color) return
         appliedWindowColor = color
