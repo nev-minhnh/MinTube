@@ -242,7 +242,8 @@ fun NavigationFrame(reserveRail: Boolean = false, content: @Composable () -> Uni
                 }
                 host.covers.lastOrNull()?.let { cover ->
                     val dismiss = cover.onDismiss
-                    Box(Modifier.matchParentSize().graphicsLayer { alpha = cover.alpha() }.background(cover.color)
+                    // Inside the safe area, like the screen's own scrim beside it.
+                    Box(Modifier.matchParentSize().windowInsetsPadding(railInsets).graphicsLayer { alpha = cover.alpha() }.background(cover.color)
                         .then(if (dismiss != null) Modifier.clickable(interactionSource = null, indication = null, onClick = dismiss)
                         else Modifier.pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } })
                         .testTag("navigation-rail-cover"))

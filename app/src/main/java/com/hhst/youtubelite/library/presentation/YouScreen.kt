@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -142,8 +143,12 @@ private fun LibraryList(listState: LazyListState, content: LibraryContent.Ready,
             Column(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.sm),
                 verticalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
                 tiles.chunked(columns).forEach { line ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
-                        line.forEach { (row, icon, action) -> LibraryRowItem(row, icon, Modifier.weight(1f)) { onAction(action) } }
+                    // Tiles of one line share a height when a label wraps (large font scales).
+                    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min),
+                        horizontalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
+                        line.forEach { (row, icon, action) ->
+                            LibraryRowItem(row, icon, Modifier.weight(1f).fillMaxHeight()) { onAction(action) }
+                        }
                         repeat(columns - line.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }

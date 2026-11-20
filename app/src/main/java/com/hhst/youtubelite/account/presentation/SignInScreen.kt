@@ -199,8 +199,21 @@ private fun CodeStep(code: String) {
         .padding(horizontal = MinSpace.lg, vertical = MinSpace.xl),
         horizontalAlignment = Alignment.CenterHorizontally) {
         val spoken = code.toList().joinToString(" ")
-        AppText(code, CodeStyle, Modifier.testTag("signin-code").semantics { contentDescription = spoken },
-            align = TextAlign.Center)
+        // The code never wraps: at large font scales or on narrow cards it shrinks to fit one line.
+        androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+            val available = constraints.maxWidth
+            val style = remember(code, available, measurer) {
+                val natural = measurer.measure(code, CodeStyle, maxLines = 1, softWrap = false).size.width
+                if (natural <= available || natural == 0) CodeStyle else {
+                    val factor = available.toFloat() / natural * 0.98f
+                    CodeStyle.copy(fontSize = CodeStyle.fontSize * factor, lineHeight = CodeStyle.lineHeight * factor,
+                        letterSpacing = CodeStyle.letterSpacing * factor)
+                }
+            }
+            AppText(code, style, Modifier.testTag("signin-code").semantics { contentDescription = spoken },
+                maxLines = 1, align = TextAlign.Center)
+        }
         Spacer(Modifier.height(MinSpace.sm))
         MinButton(
             stringResource(if (copied) R.string.copied else R.string.ui_copy_code),
