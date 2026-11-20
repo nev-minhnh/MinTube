@@ -136,8 +136,10 @@ fun MiniPlayerWindow(
     embeddedLeftDp: Int = 0,
     embeddedWidthDp: Int = screenWidthDp,
     topInsetDp: Int = 0,
-    /** Start-edge inset (rail, cut-out) of the content area the fixed mini docks beside. */
-    startInsetDp: Int = 0,
+    /** End-edge inset (cut-out, side system bar) of the content area the fixed mini docks against. */
+    endInsetDp: Int = 0,
+    /** Minimum bottom clearance; 0 when the window has no bottom bar (navigation rail). */
+    bottomFloorDp: Int = MiniPlayerLayout.MIN_BOTTOM_DOCK_DP,
     /** Committed fullscreen swipe → target mode. */
     onFullscreenSwipe: (Boolean) -> Unit = {},
     /** Downward exit restores pre-fullscreen state. */
@@ -168,7 +170,7 @@ fun MiniPlayerWindow(
     val density = LocalDensity.current
     // In-app the mini has one fixed corner and the default size; drop placements older versions saved.
     LaunchedEffect(store) { store.clearLegacyPlacement() }
-    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP)
+    val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, bottomFloorDp)
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var measuredParentSize by remember { mutableStateOf(IntSize.Zero) }
     // Effects must use this composition's restX/restY: a size callback can update
@@ -236,9 +238,9 @@ fun MiniPlayerWindow(
     val widthPx = with(density) { spec.widthDp.dp.toPx() }
     val heightPx = with(density) { spec.heightDp.dp.toPx() }
     val edgeMarginPx = with(density) { spec.rightMarginDp.dp.toPx() }
-    // One fixed dock: bottom-start corner, beside the rail/cut-out, above the bar (mirrored in RTL).
+    // One fixed dock: bottom-end corner of the content area, above the bar (mirrored in RTL).
     val restX = if (parentSize.width > 0) MiniPlayerLayout.fixedDockLeftPx(parentSize.width.toFloat(), widthPx,
-        with(density) { startInsetDp.dp.toPx() }, edgeMarginPx, rtl) else 0f
+        with(density) { endInsetDp.dp.toPx() }, edgeMarginPx, rtl) else 0f
     val restY = if (parentSize.height > 0) {
         parentSize.height - with(density) { spec.bottomMarginDp.dp.toPx() } - heightPx
     } else 0f

@@ -43,9 +43,9 @@ class ResponsiveLayoutTest {
         // window and passes one number. Both must give MiniPlayerLayout the same bottom margin.
         for (form in NavigationForm.entries) for (safeBottom in listOf(0, 24, 48)) {
             val browse = safeBottom + MiniPlayerLayout.computeSpec(1280, MiniDock.bottomInsetDp(form),
-                MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP).bottomMarginDp
+                MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, MiniDock.bottomFloorDp(form)).bottomMarginDp
             val watch = MiniPlayerLayout.computeSpec(1280, MiniDock.windowBottomInsetDp(form, safeBottom),
-                MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP).bottomMarginDp
+                MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, MiniDock.bottomFloorDp(form)).bottomMarginDp
             assertEquals("$form / $safeBottom", browse, watch)
         }
         // The floor MiniDock mirrors is MiniPlayerLayout's own minimum bottom clearance.
@@ -53,5 +53,19 @@ class ResponsiveLayoutTest {
             MiniPlayerLayout.computeSpec(360, MiniDock.MiniPlayerFloorDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP).bottomMarginDp,
             MiniPlayerLayout.computeSpec(360, 0, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP).bottomMarginDp,
         )
+    }
+
+    @Test fun railMiniDocksAtTheBottomAndBarMiniSitsAboveTheBar() {
+        // Rail (tablet landscape): no bar to clear, so only the outer margin above the safe bottom
+        // (the host pads the navigation-bar inset), not the 56dp floor (owner 2026-11-21).
+        val rail = MiniPlayerLayout.computeSpec(1200, MiniDock.bottomInsetDp(NavigationForm.Rail),
+            MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, MiniDock.bottomFloorDp(NavigationForm.Rail))
+        assertEquals(rail.rightMarginDp, rail.bottomMarginDp)
+        assertEquals(48, MiniDock.windowBottomInsetDp(NavigationForm.Rail, 48))
+        // Bar: directly above the 56dp bar.
+        val bar = MiniPlayerLayout.computeSpec(360, MiniDock.bottomInsetDp(NavigationForm.Bar),
+            MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP, MiniDock.bottomFloorDp(NavigationForm.Bar))
+        assertEquals(MiniDock.BarHeightDp + bar.rightMarginDp, bar.bottomMarginDp)
+        assertEquals(48 + MiniDock.BarHeightDp, MiniDock.windowBottomInsetDp(NavigationForm.Bar, 48))
     }
 }

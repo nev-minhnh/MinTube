@@ -102,7 +102,10 @@ internal fun WatchNowPlayingStrip(
                 AppIconButton(AppIcon.ChevronUp, stringResource(R.string.watch_strip_back_to_top),
                     Modifier.testTag("watch-now-playing-top"), onClick = onBackToTop)
             }
-            Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+            // The Border token is translucent: on its own the 1dp line let the list scrolled beneath it
+            // show through as a stray dash. Draw it on the strip's opaque surface instead.
+            Box(Modifier.fillMaxWidth().height(1.dp).watchGlowBackground().background(DesignTokens.Border)
+                .testTag("watch-now-playing-hairline"))
         }
         // Soft fade onto the content below so the edge reads in both themes.
         Spacer(Modifier.fillMaxWidth().height(8.dp).background(Brush.verticalGradient(listOf(shadow, Color.Transparent))))

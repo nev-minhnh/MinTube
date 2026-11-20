@@ -354,11 +354,11 @@ class WindowTransitionAndroidTest {
             }
         } }
         compose.waitForIdle()
-        // The legacy offset is dropped; the mini sits at the fixed bottom-start dock.
+        // The legacy offset is dropped; the mini sits at the fixed bottom-end dock.
         assertFalse(store.hasLegacyPlacement())
         val initial = compose.onNodeWithTag("window").fetchSemanticsNode().boundsInRoot
         val margin = MiniPlayerLayout.outerMarginDp(screenWidth) * compose.density.density
-        assertEquals(margin, initial.left, 1.5f)
+        assertEquals(screenWidth * compose.density.density - margin, initial.right, 1.5f)
         compose.runOnIdle { mini = false; pip = true }
         compose.waitForIdle()
         compose.runOnIdle { pip = false }

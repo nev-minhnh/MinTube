@@ -104,7 +104,7 @@ class PlayerInteractionAndroidTest {
         speed.assertDoesNotExist()
     }
 
-    // Fixed in-app mini (owner 2026-11-21): one bottom-start dock, default size, nothing persisted.
+    // Fixed in-app mini (owner 2026-11-21): one bottom-end dock, default size, nothing persisted.
     @Test fun landscapeMiniResizesAndRemembersBothDocks() {
         compose.activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         compose.waitForIdle()
@@ -128,7 +128,8 @@ class PlayerInteractionAndroidTest {
         val docked = compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot
         val density = compose.density.density
         assertEquals(MiniPlayerLayout.defaultWidthDp(screenWidth) * density, docked.width, 1.5f)
-        assertEquals(MiniPlayerLayout.outerMarginDp(screenWidth) * density, docked.left, 1.5f)
+        val host = compose.onRoot().fetchSemanticsNode().boundsInRoot
+        assertEquals(host.right - MiniPlayerLayout.outerMarginDp(screenWidth) * density, docked.right, 1.5f)
         compose.runOnIdle { handle!!.begin(); handle!!.pinchScale(1.2f); handle!!.end(true) }
         compose.waitForIdle()
         assertEquals(docked, compose.onNodeWithTag("mini-viewport").fetchSemanticsNode().boundsInRoot)
@@ -204,13 +205,13 @@ class PlayerInteractionAndroidTest {
         assertEquals(1, attached)
         compose.runOnIdle { mini = true }
         compose.waitForIdle()
-        // The legacy placement is ignored: default width at the bottom-start corner.
+        // The legacy placement is ignored: default width at the bottom-end corner.
         assertFalse(store.hasLegacyPlacement())
         val density = compose.density.density
         val root = compose.onNodeWithTag("mini-root").fetchSemanticsNode().boundsInRoot
         val docked = compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot
         assertEquals(MiniPlayerLayout.defaultWidthDp(411) * density, docked.width, 1.5f)
-        assertEquals(root.left + MiniPlayerLayout.outerMarginDp(411) * density, docked.left, 1.5f)
+        assertEquals(root.right - MiniPlayerLayout.outerMarginDp(411) * density, docked.right, 1.5f)
         compose.runOnIdle { handle!!.begin(); handle!!.dragFromStart(-120f, -50f); handle!!.end(true) }
         compose.waitForIdle()
         assertEquals(docked, compose.onNodeWithTag("player-window").fetchSemanticsNode().boundsInRoot)
