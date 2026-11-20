@@ -26,5 +26,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "litube"
+rootProject.name = "mintube"
 include(":app")
