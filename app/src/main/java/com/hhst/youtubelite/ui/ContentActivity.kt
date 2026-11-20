@@ -136,7 +136,8 @@ abstract class ContentActivity : NativeActivity() {
                     }
                     if (state.visible && state.mini && !pip) {
                         val store: MiniPlayerStore = koinInject()
-                        com.hhst.youtubelite.ui.theme.AppTheme {
+                        // Shared entry: provides LocalAppColors, LocalMotionScale and LocalHideShorts here too.
+                        com.hhst.youtubelite.ui.design.AppTheme {
                             BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                                 MiniPlayerWindow(maxWidth.value.toInt(), 56, store, state.controlsVisible,
                                     vm::onToggleControls, onDismiss = vm::onMiniClose,

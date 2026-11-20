@@ -545,7 +545,7 @@ class HomeScreenshotAndroidTest {
         assertTrue(chipLayout.multiParagraph.height <= chipBounds.height + 1f)
         assertTrue(chipBounds.top >= strip.top && chipBounds.bottom <= strip.bottom)
         assertTrue(strip.height > 48f)
-        assertEquals(28f, compose.onNodeWithText("Litube", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height, 0.5f)
+        assertEquals(28f, compose.onNodeWithText("MinTube", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height, 0.5f)
         HomeDestination.entries.forEach { destination ->
             val tab = compose.onNodeWithTag("nav-${destination.name}").fetchSemanticsNode().boundsInRoot
             val label = compose.onNodeWithText(destination.label, useUnmergedTree = true)

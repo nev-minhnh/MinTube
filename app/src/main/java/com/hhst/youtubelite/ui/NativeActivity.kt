@@ -166,7 +166,8 @@ abstract class NativeActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = !dark
         }
         window.statusBarColor = android.graphics.Color.TRANSPARENT
-        window.navigationBarColor = if (dark) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+        window.navigationBarColor = (if (dark) com.hhst.youtubelite.ui.design.MintColors.DarkPanel
+            else com.hhst.youtubelite.ui.design.MintColors.LightPanel).toInt()
     }
 
     private fun darkAppearance(): Boolean = com.hhst.youtubelite.ui.theme.AppAppearance.dark ?:
@@ -181,7 +182,8 @@ abstract class NativeActivity : ComponentActivity() {
         val translucent = theme.resolveAttribute(android.R.attr.windowIsTranslucent, attribute, true) && attribute.data != 0
         val floating = theme.resolveAttribute(android.R.attr.windowIsFloating, attribute, true) && attribute.data != 0
         if (!translucent && !floating) window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(
-            if (dark) android.graphics.Color.BLACK else android.graphics.Color.WHITE))
+            (if (dark) com.hhst.youtubelite.ui.design.MintColors.DarkBackground
+                else com.hhst.youtubelite.ui.design.MintColors.LightBackground).toInt()))
     }
 
     override fun onDestroy() {

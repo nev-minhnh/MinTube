@@ -47,7 +47,8 @@ import kotlin.math.ceil
 object DesignTokens {
     // Colors resolve through the shared palette so every screen follows one theme entry.
     val Background: Color @Composable get() = LocalAppColors.current.background
-    val Panel: Color @Composable get() = com.hhst.youtubelite.ui.theme.AppStyle.Panel
+    /** Bars, sheets, cards. Same value as `MaterialTheme.colorScheme.surface`. */
+    val Panel: Color @Composable get() = LocalAppColors.current.panel
     val Ink: Color @Composable get() = LocalAppColors.current.ink
     val Secondary: Color @Composable get() = LocalAppColors.current.secondary
     /** Grey inset containers (chips, fields, cards); use [Panel] for an overlay's body. */
@@ -58,7 +59,16 @@ object DesignTokens {
     val Scrim: Color @Composable get() = LocalAppColors.current.scrim
     val MenuScrim: Color @Composable get() = LocalAppColors.current.menuScrim
     val StateLayer: Color @Composable get() = LocalAppColors.current.stateLayer
-    val Red: Color @Composable get() = LocalAppColors.current.red
+    /** Brand accent: fills, icons, text of 18sp or more. Use [AccentText] for small text. */
+    val Accent: Color @Composable get() = LocalAppColors.current.accent
+    val OnAccent: Color @Composable get() = LocalAppColors.current.onAccent
+    val AccentContainer: Color @Composable get() = LocalAppColors.current.accentContainer
+    /** Accent tone that keeps 4.5:1 for body-size text on every neutral container. */
+    val AccentText: Color @Composable get() = LocalAppColors.current.accentText
+    val Danger: Color @Composable get() = LocalAppColors.current.danger
+    val OnDanger: Color @Composable get() = LocalAppColors.current.onDanger
+    @Deprecated("The brand accent is mint, not red. Use Accent (or Danger for errors and live badges).", ReplaceWith("DesignTokens.Accent"))
+    val Red: Color @Composable get() = LocalAppColors.current.accent
     val Link: Color @Composable get() = LocalAppColors.current.link
     val Font = FontFamily(
         Font(R.font.roboto_regular, FontWeight.Normal), Font(R.font.roboto_medium, FontWeight.Medium),
@@ -76,19 +86,11 @@ object DesignTokens {
     )
 }
 
-/** The one theme entry: follows the appearance setting and shares the color palette. */
+/** The one theme entry: follows the appearance setting; palette and motion come from the shared theme. */
 @Composable
 fun AppTheme(content: @Composable () -> Unit) {
     val darkTheme = com.hhst.youtubelite.ui.theme.AppAppearance.dark ?: androidx.compose.foundation.isSystemInDarkTheme()
-    val context = LocalContext.current
-    // Re-read on every resume: the system animator scale may change while the process lives.
-    val motion = remember { mutableStateOf(readMotionScale(context.contentResolver)) }
-    androidx.lifecycle.compose.LifecycleResumeEffect(Unit) {
-        motion.value = readMotionScale(context.contentResolver)
-        onPauseOrDispose { }
-    }
-    CompositionLocalProvider(LocalAppColors provides if (darkTheme) DarkAppPalette else LightAppPalette,
-        LocalMotionScale provides motion.value, LocalHideShorts provides rememberHideShorts()) {
+    CompositionLocalProvider(LocalHideShorts provides rememberHideShorts()) {
         com.hhst.youtubelite.ui.theme.AppTheme(darkTheme = darkTheme) { content() }
     }
 }
@@ -151,7 +153,7 @@ fun Modifier.headerShadow() = drawWithCache {
 @Composable
 fun ShortsLogo(modifier: Modifier = Modifier) {
     Box(modifier.size(24.dp)) {
-        AppIcon(AppIcon.ShortsBody, color = DesignTokens.Red)
+        AppIcon(AppIcon.ShortsBody, color = DesignTokens.Accent)
         AppIcon(AppIcon.ShortsPlay, color = Color.White)
     }
 }

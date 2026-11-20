@@ -16,16 +16,16 @@
     <style name="Theme.App.Dialog.Light" parent="android:style/Theme.Material.Light.Dialog.Alert">
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:colorBackgroundFloating">#FFFFFF</item>
-        <item name="android:textColorPrimary">#0F0F0F</item>
-        <item name="android:textColorSecondary">#606060</item>
-        <item name="android:colorAccent">#0F0F0F</item>
+        <item name="android:textColorPrimary">#101514</item>
+        <item name="android:textColorSecondary">#56615E</item>
+        <item name="android:colorAccent">#087456</item>
     </style>
     <style name="Theme.App.Dialog.Dark" parent="android:style/Theme.Material.Dialog.Alert">
-        <item name="android:colorBackground">#000000</item>
-        <item name="android:colorBackgroundFloating">#000000</item>
-        <item name="android:textColorPrimary">#F1F1F1</item>
-        <item name="android:textColorSecondary">#AAAAAA</item>
-        <item name="android:colorAccent">#F1F1F1</item>
+        <item name="android:colorBackground">#141918</item>
+        <item name="android:colorBackgroundFloating">#141918</item>
+        <item name="android:textColorPrimary">#EDF2F0</item>
+        <item name="android:textColorSecondary">#A3AFAB</item>
+        <item name="android:colorAccent">#4FD8AE</item>
     </style>
 
     <style name="Theme.App.DownloadSheet" parent="Theme.App">
@@ -46,11 +46,11 @@
     <style name="Theme.App.Shorts" parent="Theme.App.Shorts.Base" />
 
     <style name="Theme.App.Home" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/panel</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:colorAccent">#0F0F0F</item>
+        <item name="android:colorAccent">@color/primary</item>
     </style>
 
     <!-- windowDisablePreview: a theme-only preview would insert a white frame before our first draw. -->

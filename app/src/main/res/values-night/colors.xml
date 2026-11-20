@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FFFFFF</color>
-    <color name="on_primary">#000000</color>
-    <color name="secondary">#AAAAAA</color>
-    <color name="on_secondary">#000000</color>
-    <color name="background">#000000</color>
-    <color name="window_icon_color">#FFFFFF</color>
-    <color name="window_icon_variant">#AAAAAA</color>
+    <!-- Mint palette, dark. Mirrors ui/design/AppPalette.kt. -->
+    <color name="primary">#4FD8AE</color>
+    <color name="on_primary">#06231A</color>
+    <color name="secondary">#A3AFAB</color>
+    <color name="on_secondary">#141918</color>
+    <color name="background">#0D1110</color>
+    <color name="panel">#141918</color>
+    <color name="ink">#EDF2F0</color>
+    <color name="window_icon_color">#EDF2F0</color>
+    <color name="window_icon_variant">#A3AFAB</color>
 </resources>

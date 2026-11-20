@@ -47,14 +47,18 @@ object AppStyle {
     )
     val SheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     val MenuShape = RoundedCornerShape(12.dp)
-    /** Sheets, dialogs and popup menus share the page's neutral black/white surface.
+    /** Sheets, dialogs and popup menus share the neutral panel surface.
      * Grey containers belong to controls and item states inside these panels. */
     val Panel: Color
         @Composable get() = MaterialTheme.colorScheme.surface
+    /** Text-safe action color (text buttons, inline actions): keeps 4.5:1 on neutral containers. */
     val Action: Color
-        @Composable get() = LocalActionColors.current?.foreground ?: MaterialTheme.colorScheme.onSurface
+        @Composable get() = LocalActionColors.current?.foreground ?: com.hhst.youtubelite.ui.design.LocalAppColors.current.accentText
+    /** Fill color of selection controls and progress (switch, checkbox, radio, slider). */
+    val ActionFill: Color
+        @Composable get() = LocalActionColors.current?.foreground ?: MaterialTheme.colorScheme.primary
     val OnAction: Color
-        @Composable get() = LocalActionColors.current?.background ?: MaterialTheme.colorScheme.surface
+        @Composable get() = LocalActionColors.current?.background ?: MaterialTheme.colorScheme.onPrimary
 }
 
 private data class ActionColors(val foreground: Color, val background: Color)
