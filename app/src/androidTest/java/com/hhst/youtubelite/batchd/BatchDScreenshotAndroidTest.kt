@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.batchd
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -48,7 +49,7 @@ class BatchDScreenshotAndroidTest {
         var draft by mutableStateOf(NewPlaylistDraft("Movies", "A long description ".repeat(100)))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(320.dp, 240.dp)) {
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(320.dp, 240.dp)) {
                     NewPlaylistSheet(draft, {}, { draft = it }, {})
                 }
             }
@@ -65,7 +66,7 @@ class BatchDScreenshotAndroidTest {
         val playlists = listOf(SavePlaylist("LL", "Liked videos"))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).background(Color.White).testTag("batchd-scene")) {
                     if (form) NewPlaylistSheet(
                         draft = draft,
@@ -82,8 +83,9 @@ class BatchDScreenshotAndroidTest {
             }
         }
         var sheet = compose.onNodeWithTag("save-to-playlist").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, sheet.width, 0.5f)
-        assertEquals(0f, sheet.left, 0.5f)
+        // Mint sheets float 8dp in from the window edges on phones.
+        assertEquals(374f, sheet.width, 0.5f)
+        assertEquals(8f, sheet.left, 0.5f)
         assertEquals(820f, sheet.bottom, 0.5f)
         val row = compose.onNodeWithTag("save-menu-watch-later").fetchSemanticsNode().boundsInRoot
         assertEquals(48f, row.height, 0.5f)
@@ -114,14 +116,14 @@ class BatchDScreenshotAndroidTest {
             .mapIndexed { index, label -> FeedbackReason(label, "feedback-reason-$index") }
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).background(Color.White).testTag("batchd-scene")) {
                     FeedbackSheet("Tell us why", reasons, onDismiss = {}, onSelect = {})
                 }
             }
         }
         val sheet = compose.onNodeWithTag("feedback-sheet").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, sheet.width, 0.5f)
+        assertEquals(374f, sheet.width, 0.5f)
         assertEquals(820f, sheet.bottom, 0.5f)
         assertEquals(3, compose.onAllNodesWithTag("feedback-reason-0").fetchSemanticsNodes().size +
             compose.onAllNodesWithTag("feedback-reason-1").fetchSemanticsNodes().size +
@@ -136,7 +138,7 @@ class BatchDScreenshotAndroidTest {
         var height by mutableIntStateOf(844)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).testTag("batchd-scene")) {
                     PostImageViewer(
                         images = listOf("bunny", "dream", "sintel"),
