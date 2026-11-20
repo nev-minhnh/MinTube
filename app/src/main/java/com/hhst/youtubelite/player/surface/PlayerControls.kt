@@ -680,6 +680,9 @@ fun MiniPlayerChrome(
             }
         }
         val gap = MiniPlayerLayout.controlGap(maxWidth.value.toInt(), screenWidthDp)
+        // 48dp-wide touch boxes on the same drawn icons; see MiniTouchTargets for the height rule.
+        val miniHeightDp = maxHeight.value
+        fun touchHeight(drawnDp: Int) = MiniTouchTargets.touchHeightDp(drawnDp, miniHeightDp).dp
         if (positionState != null && collapsedSide == null && !state.isLive && state.durationMs > 0) Box(
             Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.dp).testTag("mini-progress")
                 .clearAndSetSemantics {}
@@ -731,7 +734,7 @@ fun MiniPlayerChrome(
                     enabled = !suppressControls,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .size(40.dp),
+                        .miniTouchBox(MiniTouchTargets.RESTORE_DP.dp, touchHeight(MiniTouchTargets.RESTORE_DP)),
                     iconSize = 20,
                 )
                 Row(
@@ -745,7 +748,7 @@ fun MiniPlayerChrome(
                         contentDescription = stringResource(R.string.action_previous),
                         onClick = onPrevious,
                         enabled = state.hasPrevious && !suppressControls,
-                        modifier = Modifier.size(MiniPlayerLayout.CONTROL_SIDE_DP.dp),
+                        modifier = Modifier.miniTouchBox(MiniPlayerLayout.CONTROL_SIDE_DP.dp, touchHeight(MiniPlayerLayout.CONTROL_SIDE_DP)),
                         iconSize = 20,
                     )
                     Spacer(Modifier.width(gap.dp))
@@ -755,7 +758,7 @@ fun MiniPlayerChrome(
                         loading = playPauseAction == PlayerUi.PlayPauseAction.Loading,
                         onClick = onPlayPause,
                         enabled = !suppressControls,
-                        modifier = Modifier.size(MiniPlayerLayout.CONTROL_PLAY_DP.dp),
+                        modifier = Modifier.miniTouchBox(MiniPlayerLayout.CONTROL_PLAY_DP.dp, touchHeight(MiniPlayerLayout.CONTROL_PLAY_DP)),
                         iconSize = 24,
                     )
                     Spacer(Modifier.width(gap.dp))
@@ -764,7 +767,7 @@ fun MiniPlayerChrome(
                         contentDescription = stringResource(R.string.action_next),
                         onClick = onNext,
                         enabled = state.hasNext && !suppressControls,
-                        modifier = Modifier.size(MiniPlayerLayout.CONTROL_SIDE_DP.dp),
+                        modifier = Modifier.miniTouchBox(MiniPlayerLayout.CONTROL_SIDE_DP.dp, touchHeight(MiniPlayerLayout.CONTROL_SIDE_DP)),
                         iconSize = 20,
                     )
                 }
