@@ -48,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.foundation.layout.systemGestures
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -164,6 +166,18 @@ fun PlayerSurface(
     // Already inside the fullscreen chrome inset; add only enough to keep the
     // countdown 12 dp from the safe edge, not the gesture rail's 12%.
     val sponsorEnd = (maxOf(12, rightInsetDp) - chromeRight).coerceAtLeast(0)
+    // Seek bar and control row inset: 16 dp in a portrait page, 24 dp in landscape/fullscreen,
+    // where the cutout and system-gesture edges are added (sidePad already covers part of them).
+    val gestureLeftDp = with(density) { WindowInsets.systemGestures.getLeft(this, layoutDir).toDp().value.toInt() }
+    val gestureRightDp = with(density) { WindowInsets.systemGestures.getRight(this, layoutDir).toDp().value.toInt() }
+    val landscape = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val fullscreenChrome = state.fullscreen && !pip
+    val trackInsetStart = PlayerUi.trackInsetDp(fullscreenChrome, landscape,
+        if (layoutDir == LayoutDirection.Rtl) maxOf(rightInsetDp, gestureRightDp) else maxOf(leftInsetDp, gestureLeftDp),
+        if (layoutDir == LayoutDirection.Rtl) chromeRight else chromeLeft)
+    val trackInsetEnd = PlayerUi.trackInsetDp(fullscreenChrome, landscape,
+        if (layoutDir == LayoutDirection.Rtl) maxOf(leftInsetDp, gestureLeftDp) else maxOf(rightInsetDp, gestureRightDp),
+        if (layoutDir == LayoutDirection.Rtl) chromeLeft else chromeRight)
     val sidePad = if (chromeLeft > 0 || chromeRight > 0) {
         Modifier.padding(start = chromeLeft.dp, end = chromeRight.dp)
     } else {
@@ -446,6 +460,8 @@ fun PlayerSurface(
                                 compact = compactChrome,
                                 sizing = chromeSizing,
                                 onTrackAnchor = { trackClearancePx = it },
+                                insetStartDp = trackInsetStart,
+                                insetEndDp = trackInsetEnd,
                                 modifier = Modifier.align(Alignment.BottomCenter).onSizeChanged { bottomBarHeightPx = it.height },
                             )
                         }

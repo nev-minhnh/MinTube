@@ -52,6 +52,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
@@ -344,6 +346,9 @@ fun BottomBar(
     compact: Boolean = false,
     sizing: PlayerUi.ChromeSizing = PlayerUi.CompactChromeSizing,
     onTrackAnchor: (Int) -> Unit = {},
+    /** Inset of the time bar and the control row from this bar's edges (see [PlayerUi.trackInsetDp]). */
+    insetStartDp: Int = 8,
+    insetEndDp: Int = 8,
 ) {
     val trackMeasurements = remember { IntArray(2) }
     fun reportTrackAnchor() = onTrackAnchor((trackMeasurements[0] - trackMeasurements[1]).coerceAtLeast(0))
@@ -357,6 +362,8 @@ fun BottomBar(
             onSeek = onSeek,
             onPreview = { target -> callbacks?.onTimeBarPreview(target) },
             onCommit = { callbacks?.onTimeBarCommit() },
+            trackInsetLeft = (if (LocalLayoutDirection.current == LayoutDirection.Rtl) insetEndDp else insetStartDp).dp,
+            trackInsetRight = (if (LocalLayoutDirection.current == LayoutDirection.Rtl) insetStartDp else insetEndDp).dp,
             // Shares the 48 dp slot's lower half with the controls row; the visible
             // track sits at the halved slot's bottom edge. onGloballyPositioned must
             // precede the layout modifier — after it, size.height would be the full
@@ -372,9 +379,11 @@ fun BottomBar(
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val chipMaxWidth = maxWidth * 0.4f
             FlowRow(
+                // The time text starts on the track's start; the last 48 dp button's icon ends on its end.
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(start = insetStartDp.dp,
+                        end = (insetEndDp - (PlayerUi.TOP_ACTION_DP - sizing.iconDp) / 2).coerceAtLeast(0).dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(Modifier.heightIn(min = PlayerUi.BOTTOM_ROW_DP.dp).align(Alignment.CenterVertically),
@@ -680,11 +689,15 @@ fun MiniPlayerChrome(
             }
         }
         val gap = MiniPlayerLayout.controlGap(maxWidth.value.toInt(), screenWidthDp)
-        // 48dp-wide touch boxes on the same drawn icons; see MiniTouchTargets for the height rule.
+        // 48dp touch boxes on the same drawn icons; see MiniTouchTargets for the height rule.
         val miniHeightDp = maxHeight.value
         fun touchHeight(drawnDp: Int) = MiniTouchTargets.touchHeightDp(drawnDp, miniHeightDp).dp
         if (positionState != null && collapsedSide == null && !state.isLive && state.durationMs > 0) Box(
-            Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.dp).testTag("mini-progress")
+            // Inset from the card's rounded corners; the gradient maps over the inset width.
+            Modifier.align(Alignment.BottomStart).fillMaxWidth()
+                .padding(start = MiniPlayerLayout.PROGRESS_INSET_DP.dp, end = MiniPlayerLayout.PROGRESS_INSET_DP.dp,
+                    bottom = MiniPlayerLayout.PROGRESS_INSET_DP.dp / 2)
+                .height(2.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(1.dp)).testTag("mini-progress")
                 .clearAndSetSemantics {}
                 .drawBehind {
                     val played = PlayerUi.progressFraction(positionState.value, state.durationMs)
