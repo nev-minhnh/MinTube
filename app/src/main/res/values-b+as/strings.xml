@@ -727,4 +727,9 @@
     <string name="signin_error_connection">কোনো সংযোগ নাই। নে\'টৱৰ্ক পৰীক্ষা কৰক আৰু পুনৰ চেষ্টা কৰক।</string>
     <string name="signin_error_refused">ইউটিউবে চাইন ইন কৰিবলৈ নাকচ কৰিলে। আকৌ এবাৰ চেষ্টা কৰক।</string>
     <string name="signin_error_failed">চাইন-ইন বিফল হ\'ল। আকৌ এবাৰ চেষ্টা কৰক।</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

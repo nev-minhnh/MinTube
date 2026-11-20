@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
 
 /**
- * The one subscribe control: Watch and Shorts share this pill's geometry,
+ * The one subscribe control, in the shape of a [MinButton]: accent fill while not subscribed,
+ * a quiet tonal pill once subscribed. Watch and Shorts share this pill's geometry,
  * typography, pending/disabled states and 48dp touch target; only the surface
  * colors differ. A pending or disabled button ignores taps so an in-flight
  * write can never be double-submitted.
@@ -50,7 +51,7 @@ fun SubscribeButton(
     ) {
         Box(
             Modifier
-                .clip(RoundedCornerShape(20.dp))
+                .clip(CircleShape)
                 .background(colors.background)
                 .clickable(enabled = interactive, role = Role.Button) { haptic(); subscriptionAction() }
                 .heightIn(min = 40.dp)
@@ -72,7 +73,8 @@ private class SubscribeColors(val background: Color, val foreground: Color)
 @Composable
 private fun subscribeColors(subscribed: Boolean, onDarkSurface: Boolean): SubscribeColors = when {
     onDarkSurface && subscribed -> SubscribeColors(Color.White.copy(alpha = 0.25f), Color.White)
-    onDarkSurface -> SubscribeColors(Color(0xFF0F0F0F), Color.White)
-    subscribed -> SubscribeColors(DesignTokens.Ink.copy(alpha = 0.12f), DesignTokens.Ink)
-    else -> SubscribeColors(DesignTokens.Ink, DesignTokens.Background)
+    // Player and Shorts surfaces keep their fixed dark palette.
+    onDarkSurface -> SubscribeColors(Color.White, Color(MintColors.LightInk))
+    subscribed -> SubscribeColors(DesignTokens.Surface, DesignTokens.Ink)
+    else -> SubscribeColors(DesignTokens.Accent, DesignTokens.OnAccent)
 }

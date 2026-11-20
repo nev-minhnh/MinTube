@@ -727,4 +727,9 @@
     <string name="ui_something_went_wrong_please_try_again">Terjadi kesalahan. Coba lagi.</string>
     <string name="chat_message_character_limit">Pesan dibatasi hingga %1$d karakter.</string>
     <string name="playlist_action_entry_limit">Playlist ini melebihi batas %1$d entri; tindakan hanya akan diterapkan pada %2$d entri pertama.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

@@ -300,38 +300,11 @@ private fun HomeTopBar(onAction: (HomeAction) -> Unit) {
 
 @Composable
 private fun HomeBottomBar(signedIn: Boolean, onAction: (HomeAction) -> Unit, avatar: String? = null) {
-    val haptic = rememberHapticAction(com.hhst.youtubelite.core.HapticsController.Event.TAB)
-    Column(Modifier.fillMaxWidth().testTag("home-navigation")) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.NavigationDivider))
-        Row(Modifier.fillMaxWidth().height(DesignTokens.BottomBarHeight)) {
-            val destinations = if (signedIn) HomeDestination.entries else listOf(HomeDestination.Home, HomeDestination.Shorts, HomeDestination.You)
-            destinations.filterNot { LocalHideShorts.current && it == HomeDestination.Shorts }.forEach { destination ->
-                Column(Modifier.weight(1f).fillMaxHeight()
-                    .selectable(destination == HomeDestination.Home, role = Role.Tab) {
-                        haptic()
-                        onAction(HomeAction.Navigate(HomeNavigationRequest.Destination(destination)))
-                    }.testTag("nav-${destination.name}"),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    if (signedIn && destination == HomeDestination.You) {
-                        if (avatar.isNullOrBlank()) {
-                            Image(
-                                painterResource(R.drawable.sample_bunny),
-                                contentDescription = null, modifier = Modifier.size(24.dp).clip(CircleShape),
-                                contentScale = ContentScale.Crop,
-                            )
-                        } else {
-                            com.hhst.youtubelite.ui.design.Artwork(avatar,
-                                modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-                        }
-                    } else AppIcon(when (destination) {
-                        HomeDestination.Home -> AppIcon.Home; HomeDestination.Shorts -> AppIcon.Shorts
-                        HomeDestination.Subscriptions -> AppIcon.Subscriptions; HomeDestination.You -> AppIcon.You
-                    })
-                    AppText(stringResource(destination.labelResource), size = 11, line = 14, maxLines = 1)
-                }
-            }
-        }
-    }
+    com.hhst.youtubelite.ui.components.MinNavigationBar(
+        tag = "home", signedIn = signedIn, selected = com.hhst.youtubelite.ui.components.MainTab.Home,
+        onSelect = { tab -> onAction(HomeAction.Navigate(HomeNavigationRequest.Destination(HomeDestination.valueOf(tab.name)))) },
+        avatarAsset = avatar, tabTag = { "nav-${it.name}" },
+    )
 }
 
 @Composable

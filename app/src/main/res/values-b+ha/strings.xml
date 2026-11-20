@@ -727,4 +727,9 @@
     <string name="signin_error_failed">Shiga ya gaza. Sake gwadawa.</string>
     <string name="ui_couldn_t_load_more_shorts_tap_to_retry">An kasa loda ƙarin bidiyoyin Shorts. Taɓa don sake gwadawa.</string>
     <string name="ui_search_no_shorts">Ba a sami bidiyoyin Shorts da suka dace da \"%1$s\" ba.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

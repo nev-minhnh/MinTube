@@ -104,7 +104,7 @@ fun AppAlertDialog(
     icon: (@Composable () -> Unit)? = null,
     title: (@Composable () -> Unit)? = null,
     text: (@Composable () -> Unit)? = null,
-    shape: Shape = AppStyle.MenuShape,
+    shape: Shape = AppStyle.DialogShape,
     containerColor: Color = AppStyle.Panel,
     tonalElevation: Dp = 0.dp,
     titleContentColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -114,13 +114,13 @@ fun AppAlertDialog(
     Dialog(onDismissRequest, properties = properties) {
         BoxWithConstraints {
             Surface(modifier.widthIn(min = 280.dp, max = 560.dp).fillMaxWidth().heightIn(max = maxHeight),
-                shape = shape, color = containerColor, tonalElevation = tonalElevation) {
-                Column(Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 8.dp)) {
+                shape = shape, color = containerColor, tonalElevation = tonalElevation, shadowElevation = 6.dp) {
+                Column(Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 12.dp)) {
                     CompositionLocalProvider(LocalContentColor provides titleContentColor) {
-                        icon?.let { Box(Modifier.padding(bottom = 8.dp).align(Alignment.CenterHorizontally)) { it() } }
+                        icon?.let { Box(Modifier.padding(bottom = 12.dp).align(Alignment.CenterHorizontally)) { it() } }
                         title?.let {
-                            Box(Modifier.padding(bottom = if (text != null) 8.dp else 0.dp)) {
-                                ProvideTextStyle(MaterialTheme.typography.bodyMedium, it)
+                            Box(Modifier.padding(bottom = if (text != null) 12.dp else 0.dp)) {
+                                ProvideTextStyle(com.hhst.youtubelite.ui.design.MinType.Title, it)
                             }
                         }
                     }
@@ -131,7 +131,7 @@ fun AppAlertDialog(
                             }
                         }
                     }
-                    FlowRow(Modifier.fillMaxWidth().padding(top = 4.dp),
+                    FlowRow(Modifier.fillMaxWidth().padding(top = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
                         dismissButton?.invoke()
                         confirmButton()
@@ -146,7 +146,7 @@ fun AppAlertDialog(
 fun AppRadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier = Modifier) {
     val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
     RadioButton(selected, onClick?.let { { if (!selected) haptic(); it() } }, modifier,
-        colors = RadioButtonDefaults.colors(selectedColor = AppStyle.Action,
+        colors = RadioButtonDefaults.colors(selectedColor = AppStyle.ActionFill,
             unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant))
 }
 
@@ -155,23 +155,23 @@ fun AppCheckbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier, enabled: Boolean = true) {
     val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
     Checkbox(checked, onCheckedChange?.let { callback -> { next -> haptic(); callback(next) } }, modifier, enabled,
-        colors = CheckboxDefaults.colors(checkedColor = AppStyle.Action,
+        colors = CheckboxDefaults.colors(checkedColor = AppStyle.ActionFill,
             uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant, checkmarkColor = AppStyle.OnAction))
 }
 
 @Composable
-fun AppLinearProgressIndicator(modifier: Modifier = Modifier, color: Color = AppStyle.Action,
+fun AppLinearProgressIndicator(modifier: Modifier = Modifier, color: Color = AppStyle.ActionFill,
     trackColor: Color = MaterialTheme.colorScheme.outlineVariant) =
     LinearProgressIndicator(modifier = modifier.height(2.dp), color = color, trackColor = trackColor,
         strokeCap = StrokeCap.Butt, gapSize = 0.dp)
 
 @Composable
 fun AppLinearProgressIndicator(progress: () -> Float, modifier: Modifier = Modifier,
-    color: Color = AppStyle.Action, trackColor: Color = MaterialTheme.colorScheme.outlineVariant) =
+    color: Color = AppStyle.ActionFill, trackColor: Color = MaterialTheme.colorScheme.outlineVariant) =
     LinearProgressIndicator(progress = progress, modifier = modifier.height(2.dp), color = color,
         trackColor = trackColor, strokeCap = StrokeCap.Butt, gapSize = 0.dp, drawStopIndicator = {})
 
-/** Web-sized pill and thumb, with an independent 48 dp touch area. */
+/** Compact pill and thumb in the accent color, with an independent 48 dp touch area. */
 @Composable
 fun AppSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier, enabled: Boolean = true) {
@@ -180,17 +180,17 @@ fun AppSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?,
     val fraction by animateFloatAsState(if (checked) 1f else 0f,
         animationSpec = if (com.hhst.youtubelite.ui.design.LocalMotionScale.current > 0f) spring() else snap(), label = "switch")
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val track = (if (checked) AppStyle.Action else MaterialTheme.colorScheme.onSurfaceVariant)
+    val track = (if (checked) AppStyle.ActionFill else MaterialTheme.colorScheme.onSurfaceVariant)
         .copy(alpha = if (enabled) 1f else .38f)
-    val thumb = if (checked) AppStyle.OnAction else Color.White
+    val thumb = if (checked) AppStyle.OnAction else MaterialTheme.colorScheme.surface
     Box(modifier.size(48.dp).then(if (onCheckedChange == null) Modifier else
         Modifier.toggleable(value = checked, enabled = enabled, role = Role.Switch,
             onValueChange = { haptic(); onCheckedChange(it) })), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(36.dp, 20.dp)) {
+        Canvas(Modifier.size(40.dp, 24.dp)) {
             drawRoundRect(track, cornerRadius = CornerRadius(size.height / 2))
-            val radius = 8.dp.toPx()
+            val radius = 9.dp.toPx()
             drawCircle(thumb.copy(alpha = if (enabled) 1f else .38f), radius,
-                Offset(10.dp.toPx() + (if (rtl) 1f - fraction else fraction) * 16.dp.toPx(), size.height / 2))
+                Offset(12.dp.toPx() + (if (rtl) 1f - fraction else fraction) * 16.dp.toPx(), size.height / 2))
         }
     }
 }
@@ -201,8 +201,8 @@ fun AppSwitch(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?,
 fun AppSlider(value: Float, onValueChange: (Float) -> Unit, modifier: Modifier = Modifier,
     enabled: Boolean = true, valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0, onValueChangeFinished: (() -> Unit)? = null,
-    colors: SliderColors = SliderDefaults.colors(thumbColor = AppStyle.Action,
-        activeTrackColor = AppStyle.Action, inactiveTrackColor = MaterialTheme.colorScheme.outline)) {
+    colors: SliderColors = SliderDefaults.colors(thumbColor = AppStyle.ActionFill,
+        activeTrackColor = AppStyle.ActionFill, inactiveTrackColor = MaterialTheme.colorScheme.outline)) {
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val opacity = if (enabled) 1f else .38f
     val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
@@ -213,15 +213,16 @@ fun AppSlider(value: Float, onValueChange: (Float) -> Unit, modifier: Modifier =
             changed = false
             onValueChangeFinished?.invoke()
         }, colors = colors,
-        thumb = { Box(Modifier.size(12.dp).background(colors.thumbColor.copy(alpha = opacity), CircleShape)) },
+        thumb = { Box(Modifier.size(16.dp).background(colors.thumbColor.copy(alpha = opacity), CircleShape)) },
         track = { state ->
-            Canvas(Modifier.fillMaxWidth().height(2.dp)) {
+            Canvas(Modifier.fillMaxWidth().height(4.dp)) {
                 val fraction = ((state.value - valueRange.start) /
                     (valueRange.endInclusive - valueRange.start).coerceAtLeast(.001f)).coerceIn(0f, 1f)
-                drawRect(colors.inactiveTrackColor.copy(alpha = opacity))
-                drawRect(colors.activeTrackColor.copy(alpha = opacity),
+                val round = CornerRadius(size.height / 2)
+                drawRoundRect(colors.inactiveTrackColor.copy(alpha = opacity), cornerRadius = round)
+                drawRoundRect(colors.activeTrackColor.copy(alpha = opacity),
                     topLeft = Offset(if (rtl) size.width * (1 - fraction) else 0f, 0f),
-                    size = Size(size.width * fraction, size.height))
+                    size = Size(size.width * fraction, size.height), cornerRadius = round)
             }
         })
 }
@@ -229,6 +230,6 @@ fun AppSlider(value: Float, onValueChange: (Float) -> Unit, modifier: Modifier =
 @Composable
 fun AppSheetHandle(modifier: Modifier = Modifier) {
     Box(modifier.fillMaxWidth().height(24.dp), contentAlignment = Alignment.Center) {
-        Box(Modifier.size(32.dp, 4.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = .15f), RoundedCornerShape(2.dp)))
+        Box(Modifier.size(36.dp, 4.dp).background(MaterialTheme.colorScheme.onSurface.copy(alpha = .2f), RoundedCornerShape(2.dp)))
     }
 }

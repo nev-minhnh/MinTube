@@ -727,4 +727,9 @@
     <string name="ui_something_went_wrong_please_try_again">ستونزه رامنځته شوه. بیا هڅه وکړئ.</string>
     <string name="chat_message_character_limit">پیغام تر %1$d تورو پورې محدود دی.</string>
     <string name="playlist_action_entry_limit">دا پلې‌لېست د %1$d توکو له حد څخه اوښتی؛ کړنه به پر لومړیو %2$d توکو ترسره شي.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

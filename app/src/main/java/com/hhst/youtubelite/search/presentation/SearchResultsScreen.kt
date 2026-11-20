@@ -317,31 +317,10 @@ private fun SearchTopBar(query: String, onAction: (SearchAction) -> Unit, onBack
 
 @Composable
 private fun SearchNavigationBar(signedIn: Boolean, onAction: (SearchAction) -> Unit) {
-    val destinations = if (signedIn) SearchDestination.entries else listOf(
-        SearchDestination.Home, SearchDestination.Shorts, SearchDestination.You,
+    com.hhst.youtubelite.ui.components.MinNavigationBar(
+        tag = "search", signedIn = signedIn, selected = null,
+        onSelect = { tab -> onAction(SearchAction.SelectDestination(SearchDestination.valueOf(tab.name))) },
     )
-    Column(Modifier.fillMaxWidth().testTag("search-navigation")) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.NavigationDivider))
-        Row(Modifier.fillMaxWidth().height(SearchResultsLayout.NavigationHeight.dp)) {
-            destinations.filterNot { LocalHideShorts.current && it == SearchDestination.Shorts }.forEach { destination ->
-                Column(Modifier.weight(1f).fillMaxHeight()
-                    .clickable(role = Role.Tab) { onAction(SearchAction.SelectDestination(destination)) }
-                    .testTag("search-nav-${destination.name}"),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    if (signedIn && destination == SearchDestination.You) {
-                        Image(painterResource(R.drawable.sample_bunny), contentDescription = null,
-                            modifier = Modifier.size(24.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-                    } else AppIcon(when (destination) {
-                        SearchDestination.Home -> AppIcon.HomeOutline
-                        SearchDestination.Shorts -> AppIcon.Shorts
-                        SearchDestination.Subscriptions -> AppIcon.Subscriptions
-                        SearchDestination.You -> AppIcon.You
-                    })
-                    AppText(stringResource(destination.labelResource), size = 11, line = 14, maxLines = 1)
-                }
-            }
-        }
-    }
 }
 
 @Composable

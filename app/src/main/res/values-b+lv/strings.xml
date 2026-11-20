@@ -727,4 +727,9 @@
     <string name="ui_something_went_wrong_please_try_again">Radās kļūda. Mēģiniet vēlreiz.</string>
     <string name="chat_message_character_limit">Ziņojumā var būt ne vairāk kā %1$d rakstzīmes.</string>
     <string name="playlist_action_entry_limit">Šis atskaņošanas saraksts pārsniedz %1$d ierakstu ierobežojumu; darbība tiks piemērota pirmajiem %2$d ierakstiem.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

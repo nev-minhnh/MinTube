@@ -727,4 +727,9 @@
     <string name="signin_error_connection">Kò sí ìsopọ̀. Ṣàyẹ̀wò nẹ́tíwọ́ọ̀kì kí o sì tún gbìyànjú.</string>
     <string name="signin_error_refused">YouTube kọ wíwọlé. Tún gbìyànjú.</string>
     <string name="signin_error_failed">Wíwọlé kò yọrí sí rere. Tún gbìyànjú.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

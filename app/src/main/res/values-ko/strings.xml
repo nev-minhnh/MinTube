@@ -727,4 +727,9 @@
     <string name="signin_error_connection">연결되어 있지 않습니다. 네트워크를 확인하고 다시 시도하세요.</string>
     <string name="signin_error_refused">YouTube에서 로그인을 거부했습니다. 다시 시도하세요.</string>
     <string name="signin_error_failed">로그인하지 못했습니다. 다시 시도하세요.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

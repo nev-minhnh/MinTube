@@ -727,4 +727,9 @@
     <string name="signin_error_connection">இணைப்பு இல்லை. பிணையத்தைச் சரிபார்த்து மீண்டும் முயலுங்கள்.</string>
     <string name="signin_error_refused">YouTube உள்நுழைவை மறுத்துவிட்டது. மீண்டும் முயலுங்கள்.</string>
     <string name="signin_error_failed">உள்நுழைய முடியவில்லை. மீண்டும் முயலுங்கள்.</string>
+    <string name="state_offline_title">You\'re offline</string>
+    <string name="state_offline_message">Check your connection and try again.</string>
+    <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
+    <string name="about_upstream">Original project: Litube</string>
+    <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
 </resources>

@@ -727,4 +727,9 @@
     <string name="signin_error_connection">Không có kết nối. Hãy kiểm tra mạng rồi thử lại.</string>
     <string name="signin_error_refused">YouTube đã từ chối yêu cầu đăng nhập. Hãy thử lại.</string>
     <string name="signin_error_failed">Đăng nhập không thành công. Hãy thử lại.</string>
+    <string name="state_offline_title">Bạn đang ngoại tuyến</string>
+    <string name="state_offline_message">Hãy kiểm tra kết nối rồi thử lại.</string>
+    <string name="about_fork_notice">MinTube là bản fork của Litube 4.0.0 do HydeYYHH phát triển, phát hành theo giấy phép GPL-3.0</string>
+    <string name="about_upstream">Dự án gốc: Litube</string>
+    <string name="about_credits">Xây dựng dựa trên MediaServiceCore, SmartTube và NewTube.</string>
 </resources>

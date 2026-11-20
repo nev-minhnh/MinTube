@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import com.hhst.youtubelite.ui.components.watchSheetHost
 import androidx.compose.ui.platform.LocalContext
@@ -62,20 +63,22 @@ data class MenuSheetItem(val icon: AppIcon?, val label: String, val tag: String?
 
 object MenuSheetLayout {
     const val WidthWideShort = 400f
+    /** Sheets never grow wider than this; wider windows center them. */
+    const val MaxWidth = 480f
     const val BottomInset = 24f
-    const val Corner = 12f
+    const val Corner = 24f
     const val RowHeight = 48f
     const val RowStart = 22f
     const val RowVertical = 2f
     const val IconGap = 18f
-    const val HandleStrip = 13f
-    const val HandleWidth = 40f
+    const val HandleStrip = 20f
+    const val HandleWidth = 36f
     const val HandleHeight = 4f
 
     /** Compact sheets span the window; landscape sheets keep a readable width. */
     fun sheetWidth(width: Float, height: Float): Float =
         if (width >= 416f && width > height && (width * 9f >= height * 13f || width >= 931f)) WidthWideShort
-        else width.coerceAtLeast(0f)
+        else width.coerceIn(0f, MaxWidth)
 }
 
 @Composable
@@ -150,7 +153,9 @@ fun MenuBottomSheet(
                 .width(sheetWidth ?: MenuSheetLayout.sheetWidth(maxWidth.value, maxHeight.value).dp)
                 .graphicsLayer {
                     translationY = (1f - progress.value) * (size.height + bottomPadding.toPx()) + drag
-                }.clip(RoundedCornerShape(MenuSheetLayout.Corner.dp))
+                }.padding(horizontal = if (maxWidth.value <= MenuSheetLayout.MaxWidth) 8.dp else 0.dp)
+                .shadow(8.dp, RoundedCornerShape(MenuSheetLayout.Corner.dp))
+                .clip(RoundedCornerShape(MenuSheetLayout.Corner.dp))
                 .background(DesignTokens.Panel)
                 .testTag(tag).semantics {
                     this.paneTitle = paneTitle
@@ -188,11 +193,11 @@ fun MenuBottomSheet(
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 Box(
-                    Modifier.padding(bottom = 1.dp).size(MenuSheetLayout.HandleWidth.dp, MenuSheetLayout.HandleHeight.dp)
-                        .background(DesignTokens.Ink.copy(alpha = 0.15f), CircleShape),
+                    Modifier.padding(bottom = 6.dp).size(MenuSheetLayout.HandleWidth.dp, MenuSheetLayout.HandleHeight.dp)
+                        .background(DesignTokens.Ink.copy(alpha = 0.2f), CircleShape),
                 )
             }
-            Column(Modifier.verticalScroll(rememberScrollState()).testTag("menu-actions")) {
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(bottom = 8.dp).testTag("menu-actions")) {
                 header?.invoke()
                 items.forEachIndexed { index, item ->
                     Row(

@@ -54,12 +54,9 @@ fun <T> SelectField(
     Box {
         Row(
             Modifier.width(width.dp).height(chipHeight).testTag(tag)
-                .clip(RoundedCornerShape(8.dp))
-                .background(if (dark) DesignTokens.Surface else Color(0xFFF1F1F1))
-                .border(
-                    1.dp, DesignTokens.Border.copy(alpha = 0.2f),
-                    RoundedCornerShape(8.dp),
-                )
+                .clip(MinRadius.Field)
+                .background(DesignTokens.Surface)
+                .border(1.dp, DesignTokens.Border, MinRadius.Field)
                 .clickable(role = Role.Button) { expanded = true }
                 .semantics { contentDescription = selectedLabel }
                 .padding(start = 11.dp, end = 5.dp),

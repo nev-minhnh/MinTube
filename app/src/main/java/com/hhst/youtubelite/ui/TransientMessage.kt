@@ -28,11 +28,13 @@ fun Activity.showMessage(text: CharSequence) {
             setTextColor(Color.WHITE)
             maxLines = 3
             maxWidth = minOf(dp(560), resources.displayMetrics.widthPixels - dp(32))
-            setPadding(dp(16), dp(10), dp(16), dp(10))
+            setPadding(dp(20), dp(12), dp(20), dp(12))
             background = GradientDrawable().apply {
-                setColor(Color.rgb(48, 48, 48))
-                cornerRadius = dp(20).toFloat()
+                // Inverse pill: the dark Ghost tone reads on both themes.
+                setColor(com.hhst.youtubelite.ui.design.MintColors.DarkGhost.toInt())
+                cornerRadius = dp(24).toFloat()
             }
+            elevation = dp(6).toFloat()
             importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_YES
             accessibilityLiveRegion = android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE
         }

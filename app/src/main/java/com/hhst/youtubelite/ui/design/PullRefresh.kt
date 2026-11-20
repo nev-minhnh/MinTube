@@ -152,14 +152,14 @@ fun BoxScope.PullRefreshIndicator(state: PullRefreshState, tag: String, anchor: 
             scaleX = scale
             scaleY = scale
         }.size(40.dp).testTag(tag), shape = CircleShape,
-        color = DesignTokens.Background, shadowElevation = 3.dp) {
+        color = DesignTokens.Panel, shadowElevation = 4.dp) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Crossfade(state.busy, animationSpec = tween(120), label = "refresh-indicator") { busy ->
                 Box(Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                     if (busy) LoadingSpinner()
                     else AppIcon(AppIcon.Refresh, Modifier.size(24.dp).graphicsLayer {
                         rotationZ = state.progress * 180f
-                    })
+                    }, color = DesignTokens.Accent)
                 }
             }
         }
