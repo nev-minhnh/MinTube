@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,7 +68,8 @@ fun YouScreen(state: LibraryUiState, onAction: (LibraryAction) -> Unit, modifier
         val listState = rememberLibraryListState()
         Column(Modifier.fillMaxSize().then(if (state.overlay != LibraryOverlay.None) Modifier.clearAndSetSemantics {} else Modifier)) {
             CollapsingAppBar(appBar) {
-                YouTopBar(state.signedIn, privateBrowsing, onAction)
+                // The host reads the preference on resume; the live listener catches a change made while You is open.
+                YouTopBar(state.signedIn, privateBrowsing || com.hhst.youtubelite.account.presentation.rememberPrivateBrowsing(), onAction)
             }
             RefreshableContent(value = state, refreshing = state.content == LibraryContent.Loading,
                     onRefresh = { onAction(LibraryAction.Retry) }, modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -141,8 +143,12 @@ private fun LibraryList(listState: LazyListState, content: LibraryContent.Ready,
             Column(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.sm),
                 verticalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
                 tiles.chunked(columns).forEach { line ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
-                        line.forEach { (row, icon, action) -> LibraryRowItem(row, icon, Modifier.weight(1f)) { onAction(action) } }
+                    // Tiles of one line share a height when a label wraps (large font scales).
+                    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min),
+                        horizontalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
+                        line.forEach { (row, icon, action) ->
+                            LibraryRowItem(row, icon, Modifier.weight(1f).fillMaxHeight()) { onAction(action) }
+                        }
                         repeat(columns - line.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }

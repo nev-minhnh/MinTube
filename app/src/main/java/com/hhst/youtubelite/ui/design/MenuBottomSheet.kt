@@ -138,6 +138,8 @@ fun MenuBottomSheet(
             .background(DesignTokens.MenuScrim).clickable(enabled = dismissEnabled) { finish() }
             .appDescription(R.string.a11y_close_menu),
     )
+    com.hhst.youtubelite.ui.components.CoverNavigationRail(DesignTokens.MenuScrim, { progress.value },
+        if (dismissEnabled) ({ finish() }) else null)
     val watchHost = LocalContext.current.watchSheetHost()
     var containerBottom by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
     val localDensity = LocalDensity.current

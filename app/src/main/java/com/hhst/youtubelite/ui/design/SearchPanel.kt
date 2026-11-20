@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,8 +62,6 @@ internal fun SearchPanel(
     if (field.text != query) field = TextFieldValue(query, TextRange(query.length))
     val keyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    val fieldHeight = maxOf(32.dp, with(LocalDensity.current) { 22.sp.toDp() })
-    val toolbarHeight = maxOf(48.dp, fieldHeight)
     val motionScale = LocalMotionScale.current
     val reveal = remember { Animatable(if (motionScale <= 0f) 1f else 0f) }
     val scope = rememberCoroutineScope()
@@ -91,69 +90,85 @@ internal fun SearchPanel(
         reveal.animateTo(1f, tween(motionDuration(100, motionScale), easing = LinearOutSlowInEasing))
     }
     DisposableEffect(Unit) { onDispose { keyboard?.hide() } }
-    Box(Modifier.fillMaxSize().padding(top = toolbarHeight).graphicsLayer { alpha = reveal.value }
+    val submit: (String) -> Unit = { text -> keyboard?.hide(); onSubmit(text) }
+    // The scrim also covers a navigation rail, which sits outside this screen's bounds.
+    com.hhst.youtubelite.ui.components.CoverNavigationRail(DesignTokens.Scrim, { reveal.value }, close)
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = reveal.value }
         .background(DesignTokens.Scrim)
         .clickable(onClick = close).appDescription(R.string.a11y_close_search))
     Column(Modifier.fillMaxWidth().graphicsLayer {
         alpha = reveal.value
         translationY = -4.dp.toPx() * (1f - reveal.value)
     }.background(DesignTokens.Background).testTag("search-overlay").appPaneTitle(R.string.a11y_search_youtube)) {
-        Row(Modifier.fillMaxWidth().height(toolbarHeight).background(DesignTokens.Panel), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth().heightIn(min = 56.dp).background(DesignTokens.Panel)
+                .padding(start = MinSpace.xs, end = MinSpace.sm, top = MinSpace.xs, bottom = MinSpace.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             AppIconButton(AppIcon.Back, stringResource(R.string.a11y_back), onClick = close, modifier = Modifier.testTag("search-panel-back"))
-            Row(Modifier.weight(1f).height(fieldHeight).clip(RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp))
-                .background(DesignTokens.Surface).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            // One pill: the field, a clear button while there is text, and the submit button.
+            Row(
+                Modifier.weight(1f).heightIn(min = MinSpace.Touch).clip(MinRadius.Full).background(DesignTokens.Surface)
+                    .padding(start = MinSpace.lg),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 BasicTextField(field, { field = it; onQueryChanged(it.text) },
-                    Modifier.weight(1f).focusRequester(focus).testTag("search-input").appDescription(R.string.a11y_search_youtube),
-                    textStyle = DesignTokens.text(15, 22), singleLine = true, cursorBrush = SolidColor(DesignTokens.Accent),
+                    Modifier.weight(1f).padding(vertical = MinSpace.sm).focusRequester(focus).testTag("search-input")
+                        .appDescription(R.string.a11y_search_youtube),
+                    textStyle = MinType.Body.copy(color = DesignTokens.Ink), singleLine = true, cursorBrush = SolidColor(DesignTokens.Accent),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { keyboard?.hide(); onSubmit(query) }),
-                    decorationBox = { inner -> Box { if (query.isEmpty()) AppText(stringResource(R.string.a11y_search_youtube), size = 15, line = 22, color = DesignTokens.Secondary); inner() } })
-                if (query.isNotEmpty()) Box(Modifier.size(50.dp, 16.dp).clickable(role = Role.Button) {
+                    keyboardActions = KeyboardActions(onSearch = { submit(query) }),
+                    decorationBox = { inner -> Box {
+                        if (query.isEmpty()) AppText(stringResource(R.string.a11y_search_youtube), MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
+                        inner()
+                    } })
+                if (query.isNotEmpty()) AppIconButton(AppIcon.Close, stringResource(R.string.a11y_clear_search), color = DesignTokens.Secondary) {
                     onQueryChanged(""); focus.requestFocus(); keyboard?.show()
-                }.appDescription(R.string.a11y_clear_search).padding(start = 8.dp, end = 26.dp)) { AppIcon(AppIcon.Close, Modifier.size(16.dp)) }
+                }
+                AppIconButton(AppIcon.Search, stringResource(R.string.a11y_search)) { submit(query) }
             }
-            Box(Modifier.size(36.dp, fieldHeight).clip(RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp)).background(DesignTokens.Surface)
-                .clickable(role = Role.Button) { keyboard?.hide(); onSubmit(query) }
-                .appDescription(R.string.a11y_search), contentAlignment = Alignment.CenterStart) { AppIcon(AppIcon.Search) }
-            Spacer(Modifier.width(8.dp))
-            if (query.isEmpty()) Box(Modifier.padding(start = 4.dp, end = 12.dp).size(32.dp).background(DesignTokens.Surface, CircleShape), contentAlignment = Alignment.Center) {
-                AppIconButton(AppIcon.Voice, stringResource(R.string.a11y_voice_search), modifier = Modifier.wrapContentSize(unbounded = true), diameter = 40.dp) { onVoiceSearch() }
-            }
+            if (query.isEmpty()) AppIconButton(AppIcon.Voice, stringResource(R.string.a11y_voice_search),
+                Modifier.padding(start = MinSpace.sm), background = DesignTokens.Surface) { onVoiceSearch() }
         }
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).testTag("search-suggestions")) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(vertical = MinSpace.xs).testTag("search-suggestions")) {
             history.forEachIndexed { index, entry ->
-                Row(Modifier.fillMaxWidth().heightIn(min = 37.dp).clickable(role = Role.Button) {
-                    keyboard?.hide(); onSubmit(entry)
-                }.testTag("history-$index"), verticalAlignment = Alignment.CenterVertically) {
-                    AppIcon(AppIcon.History, Modifier.padding(start = 12.dp).size(18.dp), color = DesignTokens.Secondary)
-                    BasicText(entry, Modifier.weight(1f).padding(horizontal = 8.dp), style = DesignTokens.text(14, 17), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    if (onRemoveHistory != null) Box(Modifier.size(37.dp).clickable(role = Role.Button) {
+                SearchPanelRow(AppIcon.History, AnnotatedString(entry), { submit(entry) }, Modifier.testTag("history-$index")) {
+                    if (onRemoveHistory != null) AppIconButton(AppIcon.Close,
+                        stringResource(R.string.a11y_remove_from_search_history, entry), color = DesignTokens.Secondary) {
                         onRemoveHistory(entry)
-                    }.appDescription(R.string.a11y_remove_from_search_history, entry), contentAlignment = Alignment.Center) {
-                        AppIcon(AppIcon.Close, Modifier.size(14.dp))
                     }
                 }
-                Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border.copy(alpha = 0.05f)))
             }
             suggestions.forEachIndexed { index, suggestion ->
-                Row(Modifier.fillMaxWidth().heightIn(min = 37.dp).clickable(role = Role.Button) {
-                    keyboard?.hide(); onSubmit(suggestion)
-                }.testTag("suggestion-$index"), verticalAlignment = Alignment.CenterVertically) {
-                    val prefixQuery = query.trim()
-                    val text = buildAnnotatedString {
-                        val prefix = if (suggestion.startsWith(prefixQuery, ignoreCase = true)) prefixQuery.length else suggestion.length
-                        append(suggestion.take(prefix))
-                        withStyle(SpanStyle(fontWeight = FontWeight.Medium)) { append(suggestion.drop(prefix)) }
-                    }
-                    BasicText(text, Modifier.weight(1f).padding(horizontal = 8.dp), style = DesignTokens.text(14, 17), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Box(Modifier.size(37.dp).clickable(role = Role.Button) {
+                val prefixQuery = query.trim()
+                val text = buildAnnotatedString {
+                    val prefix = if (suggestion.startsWith(prefixQuery, ignoreCase = true)) prefixQuery.length else suggestion.length
+                    append(suggestion.take(prefix))
+                    withStyle(SpanStyle(fontWeight = FontWeight.Medium)) { append(suggestion.drop(prefix)) }
+                }
+                SearchPanelRow(AppIcon.Search, text, { submit(suggestion) }, Modifier.testTag("suggestion-$index")) {
+                    // Fill-in arrow: puts the suggestion in the field to keep typing.
+                    AppIconButton(AppIcon.ArrowUpLeft, stringResource(R.string.a11y_use_suggestion, suggestion), color = DesignTokens.Secondary) {
                         onQueryChanged(suggestion); focus.requestFocus(); keyboard?.show()
-                    }.appDescription(R.string.a11y_use_suggestion, suggestion).padding(end = 4.dp), contentAlignment = Alignment.CenterEnd) {
-                        AppIcon(AppIcon.ArrowUpLeft, Modifier.size(20.dp), color = DesignTokens.Secondary)
                     }
                 }
-                if (index < suggestions.lastIndex) Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border.copy(alpha = 0.05f)))
             }
         }
+    }
+}
+
+/** A 48dp history or suggestion row: leading glyph, up to two lines of text, one trailing action. */
+@Composable
+private fun SearchPanelRow(icon: AppIcon, text: AnnotatedString, onClick: () -> Unit, modifier: Modifier,
+    trailing: @Composable () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch).clickable(role = Role.Button, onClick = onClick).then(modifier)
+            .padding(start = MinSpace.lg, end = MinSpace.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AppIcon(icon, Modifier.size(20.dp), color = DesignTokens.Secondary)
+        BasicText(text, Modifier.weight(1f).padding(horizontal = MinSpace.lg, vertical = MinSpace.sm),
+            style = MinType.Body.copy(color = DesignTokens.Ink), maxLines = 2, overflow = TextOverflow.Ellipsis)
+        trailing()
     }
 }

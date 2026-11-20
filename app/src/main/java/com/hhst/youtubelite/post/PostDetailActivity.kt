@@ -167,7 +167,7 @@ class PostDetailActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by postDetailViewModel.uiState.collectAsStateWithLifecycle()
             val commentsState by postCommentsViewModel.uiState.collectAsStateWithLifecycle()
             WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true

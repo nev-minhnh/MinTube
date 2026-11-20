@@ -36,6 +36,9 @@ import com.hhst.youtubelite.ui.components.AppCheckbox as Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.hhst.youtubelite.ui.components.AppLinearProgressIndicator as LinearProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import com.hhst.youtubelite.ui.components.AppSlider as Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -181,6 +184,10 @@ fun DownloadManagerScreen(
         topBar = {
             CollapsingAppBar(appBar) {
                 MinTopBar(
+                    // Edge to edge: the bar keeps below the status bar (Scaffold pads only the content).
+                    modifier = Modifier.windowInsetsPadding(
+                        androidx.compose.foundation.layout.WindowInsets.safeDrawing.only(
+                            androidx.compose.foundation.layout.WindowInsetsSides.Top + androidx.compose.foundation.layout.WindowInsetsSides.Horizontal)),
                     title = when (dest) {
                         DownloadDest.Settings -> stringResource(R.string.download_settings)
                         DownloadDest.History -> stringResource(R.string.download_history)

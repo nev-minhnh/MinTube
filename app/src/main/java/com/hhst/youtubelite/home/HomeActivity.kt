@@ -128,7 +128,7 @@ class HomeActivity : com.hhst.youtubelite.ui.ContentActivity() {
         // A deferred parent may have missed identity notifications before its VM existed.
         if (!fixtures) refreshHomeSession()
         if (fixtures && intent.hasExtra(EXTRA_SIGNED_IN)) homeViewModel.setSignedInPreview(intent.getBooleanExtra(EXTRA_SIGNED_IN, false))
-        setAppContent {
+        setAppContent(navigationRail = true) {
             LaunchedEffect(fixtures, lifecycle) {
                 if (fixtures) return@LaunchedEffect
                 lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {

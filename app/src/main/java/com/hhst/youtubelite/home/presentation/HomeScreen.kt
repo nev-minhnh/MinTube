@@ -362,6 +362,8 @@ private fun HomeTopBar(avatar: String?, onAction: (HomeAction) -> Unit) {
         }.appDescription(R.string.a11y_litube_home).padding(horizontal = MinSpace.md), contentAlignment = Alignment.CenterStart) {
             MinTubeBrand()
         }
+        com.hhst.youtubelite.ui.components.PrivateBrowsingBadge(
+            com.hhst.youtubelite.account.presentation.rememberPrivateBrowsing(), compact = true)
         Spacer(Modifier.weight(1f))
         AppIconButton(AppIcon.Search, stringResource(R.string.a11y_search_youtube)) { onAction(HomeAction.OpenSearch) }
         MinAvatarButton(avatar, stringResource(R.string.browse_home_account), {

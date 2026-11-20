@@ -119,7 +119,7 @@ class SearchResultsActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by searchViewModel.uiState.collectAsStateWithLifecycle()
             com.hhst.youtubelite.ui.design.WriteProgressOverlay(searchViewModel.writes)
             searchViewModel.saveSheet?.let { com.hhst.youtubelite.ui.design.WriteProgressOverlay(it.writes) }

@@ -46,6 +46,7 @@ import com.hhst.youtubelite.home.domain.HomeNavigationRequest
 import com.hhst.youtubelite.post.domain.PostDetailAction
 import com.hhst.youtubelite.post.domain.PostIdentity
 import com.hhst.youtubelite.post.presentation.PostCardInteractions
+import com.hhst.youtubelite.ui.components.MinAvatar
 import com.hhst.youtubelite.ui.components.PlaylistCard
 import com.hhst.youtubelite.ui.components.ShortCard
 import com.hhst.youtubelite.ui.components.VideoCard
@@ -81,6 +82,8 @@ internal fun FeedCard(item: FeedItem, window: WindowClass, live: Boolean = false
             avatar = item.avatar.orEmpty(),
             avatarDescription = stringResource(R.string.a11y_go_to_channel, item.author),
             onAvatarClick = { onAction(HomeAction.Navigate(HomeNavigationRequest.Channel(item.channelId))) },
+            avatarName = item.author,
+            avatarTestTag = "channel-${item.channelId}",
             onMenu = { onAction(HomeAction.OpenMenu(item.id)) },
             menuDescription = stringResource(R.string.a11y_more_actions_for, item.title),
             videoId = item.id,
@@ -174,7 +177,7 @@ private fun Avatar(asset: String, author: String, channelId: String, onAction: (
     Box(Modifier.size(MinSpace.Touch).clip(CircleShape).clickable(role = Role.Button) {
         onAction(HomeAction.Navigate(HomeNavigationRequest.Channel(channelId)))
     }.testTag("channel-$channelId").semantics { contentDescription = label }, contentAlignment = Alignment.Center) {
-        Artwork(asset, Modifier.size(size).clip(CircleShape))
+        MinAvatar(asset, author, size = size)
     }
 }
 

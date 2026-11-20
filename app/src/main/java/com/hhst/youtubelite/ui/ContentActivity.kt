@@ -5,6 +5,9 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -25,6 +28,8 @@ abstract class ContentActivity : NativeActivity() {
     private var miniComposition: ComposeView? = null
     private var miniHostFocused by mutableStateOf(false)
     private var resumedDuringMiniRestore = false
+    /** The mini dock area in window pixels (inside the safe area, off the rail); null until laid out. */
+    private var miniDockBounds: android.graphics.RectF? = null
 
     override fun onStart() {
         val installMini = !ContentRepositories.fixtures(intent) || playbackTest()
@@ -98,6 +103,12 @@ abstract class ContentActivity : NativeActivity() {
                 getLocationInWindow(position)
                 val saved = canvas.save()
                 canvas.translate(-position[0].toFloat(), -position[1].toFloat())
+                // The handoff picture never covers the navigation rail either.
+                miniDockBounds?.let { dock ->
+                    val far = 1_000_000f
+                    if (layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL) canvas.clipRect(-far, -far, dock.right, far)
+                    else canvas.clipRect(dock.left, -far, far, far)
+                }
                 val bounds = cover.bounds.run { android.graphics.RectF(left, top, right, bottom) }
                 val radius = com.hhst.youtubelite.player.surface.MiniPlayerLayout.CORNER_DP * resources.displayMetrics.density
                 clip.reset()
@@ -142,7 +153,15 @@ abstract class ContentActivity : NativeActivity() {
                             // One source with the tab bar and rail: above the bar, or beside the rail.
                             val dock = com.hhst.youtubelite.ui.design.rememberNavigationForm()
                             BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
-                                .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp)) {
+                                .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp)
+                                .onGloballyPositioned { coordinates ->
+                                    val bounds = coordinates.boundsInWindow()
+                                    miniDockBounds = android.graphics.RectF(bounds.left, bounds.top, bounds.right, bounds.bottom)
+                                }
+                                // The mini (also mid-entry from the watch page, or folded to the start
+                                // edge) is clipped, drawing and touch, at the dock's start edge, so it
+                                // never lies over the rail.
+                                .graphicsLayer { clip = true; shape = StartEdgeClip }) {
                                 MiniPlayerWindow(maxWidth.value.toInt(),
                                     com.hhst.youtubelite.ui.design.MiniDock.bottomInsetDp(dock), store, state.controlsVisible,
                                     vm::onToggleControls, onDismiss = vm::onMiniClose,
@@ -207,5 +226,19 @@ abstract class ContentActivity : NativeActivity() {
             // Entering PiP can itself resume browse; the pinned activity still owns playback until it exits PiP.
             if (!PlaybackSession.inPip.value) PlaybackSession.player.value?.onBrowseOpened()
         }
+    }
+}
+
+/** Clips only the start edge: the other three sides stay open for shadows and drag overshoot. */
+private object StartEdgeClip : androidx.compose.ui.graphics.Shape {
+    override fun createOutline(
+        size: androidx.compose.ui.geometry.Size,
+        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+        density: androidx.compose.ui.unit.Density,
+    ): androidx.compose.ui.graphics.Outline {
+        val far = 1_000_000f
+        return androidx.compose.ui.graphics.Outline.Rectangle(
+            if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Ltr) androidx.compose.ui.geometry.Rect(0f, -far, far, far)
+            else androidx.compose.ui.geometry.Rect(-far, -far, size.width, far))
     }
 }

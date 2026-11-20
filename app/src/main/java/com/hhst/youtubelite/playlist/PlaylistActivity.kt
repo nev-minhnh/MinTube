@@ -150,7 +150,7 @@ class PlaylistActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by playlistViewModel.uiState.collectAsStateWithLifecycle()
             playlistViewModel.saveSheet?.let { com.hhst.youtubelite.ui.design.WriteProgressOverlay(it.writes) }
             val back: () -> Unit = {

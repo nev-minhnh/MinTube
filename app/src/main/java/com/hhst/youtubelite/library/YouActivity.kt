@@ -145,7 +145,7 @@ class YouActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by youViewModel.uiState.collectAsStateWithLifecycle()
             com.hhst.youtubelite.ui.design.WriteProgressOverlay(youViewModel.writes)
             youViewModel.saveSheet?.let { com.hhst.youtubelite.ui.design.WriteProgressOverlay(it.writes) }

@@ -237,7 +237,8 @@ enum class StateKind { Empty, Error, Offline }
 
 /**
  * Full-area state: icon, headline, one line of help and up to two actions.
- * The caller owns the action; nothing here retries or loads.
+ * The caller owns the action; nothing here retries or loads. [compact] is the panel/sheet size
+ * (56dp disc, Subtitle headline, tighter padding) for states inside a sheet or a section.
  */
 @Composable
 fun StateMessage(
@@ -255,31 +256,33 @@ fun StateMessage(
     secondaryActionLabel: String? = null,
     onSecondaryAction: (() -> Unit)? = null,
     tag: String = "state-message",
+    compact: Boolean = false,
 ) {
+    val textWidth = if (compact) 360.dp else 480.dp
     Column(
-        modifier.fillMaxWidth().padding(horizontal = MinSpace.xxl, vertical = MinSpace.xxxl).testTag(tag),
+        modifier.fillMaxWidth().padding(horizontal = MinSpace.xxl, vertical = if (compact) MinSpace.lg else MinSpace.xxxl).testTag(tag),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            Modifier.size(72.dp).background(
+            Modifier.size(if (compact) 56.dp else 72.dp).background(
                 if (kind == StateKind.Empty) DesignTokens.AccentContainer else DesignTokens.Surface, CircleShape,
             ),
             contentAlignment = Alignment.Center,
         ) {
-            AppIcon(icon, Modifier.size(32.dp), color = when (kind) {
+            AppIcon(icon, Modifier.size(if (compact) 24.dp else 32.dp), color = when (kind) {
                 StateKind.Empty -> DesignTokens.AccentText
                 StateKind.Error -> DesignTokens.Danger
                 StateKind.Offline -> DesignTokens.Secondary
             })
         }
-        Spacer(Modifier.height(MinSpace.xl))
-        AppText(title, MinType.Display, Modifier.widthIn(max = 480.dp).semantics { heading() }, align = TextAlign.Center)
+        Spacer(Modifier.height(if (compact) MinSpace.md else MinSpace.xl))
+        AppText(title, if (compact) MinType.Subtitle else MinType.Display, Modifier.widthIn(max = textWidth).semantics { heading() }, align = TextAlign.Center)
         if (message != null) {
-            Spacer(Modifier.height(MinSpace.sm))
-            AppText(message, MinType.Body, Modifier.widthIn(max = 480.dp), color = DesignTokens.Secondary, align = TextAlign.Center)
+            Spacer(Modifier.height(if (compact) MinSpace.xs else MinSpace.sm))
+            AppText(message, MinType.Body, Modifier.widthIn(max = textWidth), color = DesignTokens.Secondary, align = TextAlign.Center)
         }
         if (actionLabel != null && onAction != null) {
-            Spacer(Modifier.height(MinSpace.xl))
+            Spacer(Modifier.height(if (compact) MinSpace.md else MinSpace.xl))
             MinButton(actionLabel, onAction, testTag = "$tag-action")
         }
         if (secondaryActionLabel != null && onSecondaryAction != null) {
@@ -348,10 +351,15 @@ fun MinTopBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (onBack != null) AppIconButton(AppIcon.Back, backDescription, Modifier.testTag("$tag-back"), onClick = onBack)
-        if (title == null) MinTubeBrand()
-        else AppText(title, MinType.Title, Modifier.weight(1f, fill = false).semantics { heading() }, maxLines = 1)
-        if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
-        Spacer(Modifier.weight(1f))
+        if (title == null) {
+            MinTubeBrand()
+            if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
+            Spacer(Modifier.weight(1f))
+        } else Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+            // The title takes all the room the actions leave (a second weighted spacer used to halve it).
+            AppText(title, MinType.Title, Modifier.weight(1f, fill = false).semantics { heading() }, maxLines = 1)
+            if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
+        }
         actions()
     }
 }

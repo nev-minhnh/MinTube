@@ -30,7 +30,6 @@ import com.hhst.youtubelite.R
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.AppText
-import com.hhst.youtubelite.ui.design.Artwork
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
@@ -94,7 +93,8 @@ internal fun PostAuthorRow(
                 .then(if (avatarDescription != null) Modifier.semantics { contentDescription = avatarDescription } else Modifier),
             contentAlignment = Alignment.TopStart,
         ) {
-            Artwork(avatar, Modifier.size(PostMetrics.Avatar).clip(CircleShape).then(if (avatarTag != null) Modifier.testTag(avatarTag) else Modifier))
+            com.hhst.youtubelite.ui.components.MinAvatar(avatar, name,
+                if (avatarTag != null) Modifier.testTag(avatarTag) else Modifier, size = PostMetrics.Avatar)
         }
         Spacer(Modifier.width(PostMetrics.NameStart - PostMetrics.AvatarSlot))
         Column(

@@ -360,6 +360,8 @@ private fun SearchTopBar(query: String, filters: SearchFilters, filtersOpen: Boo
                 AppText(query, MinType.Body, Modifier.weight(1f).testTag("search-query-label"), maxLines = 1)
             }
         }
+        com.hhst.youtubelite.ui.components.PrivateBrowsingBadge(
+            com.hhst.youtubelite.account.presentation.rememberPrivateBrowsing(), Modifier.padding(start = MinSpace.xs), compact = true)
         AppIconButton(AppIcon.Filter, stringResource(R.string.a11y_search_filters),
             background = if (filtered) DesignTokens.AccentContainer else Color.Transparent) { onAction(SearchAction.OpenFilters) }
         AppIconButton(AppIcon.Voice, stringResource(R.string.a11y_voice_search)) { onAction(SearchAction.VoiceSearch) }

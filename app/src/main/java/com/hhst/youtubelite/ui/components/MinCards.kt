@@ -28,6 +28,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import com.hhst.youtubelite.ui.YoutubeThumb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.dearrow.VideoArtwork
@@ -52,6 +55,46 @@ import com.hhst.youtubelite.ui.design.MinType
 @Composable
 private fun CardArtwork(artwork: String, videoId: String?, modifier: Modifier) {
     if (videoId != null) VideoArtwork(videoId, artwork, modifier) else Artwork(artwork, modifier)
+}
+
+/**
+ * A tagged or labelled thumbnail is its own button (same action as the card), so its tag and spoken
+ * label stay a separate node instead of merging into the card.
+ */
+private fun thumbnailButton(tag: String?, description: String?, onClick: () -> Unit): Modifier =
+    if (tag == null && description == null) Modifier
+    else Modifier.clickable(role = Role.Button, onClick = onClick)
+        .then(if (tag != null) Modifier.testTag(tag) else Modifier)
+        .then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier)
+
+/**
+ * Round channel avatar. A missing avatar (feeds often omit it, and the shared avatar directory
+ * fills it in later or never) and a loading one show the channel's initial on a tinted disc
+ * instead of an empty grey circle.
+ */
+@Composable
+fun MinAvatar(asset: String?, name: String, modifier: Modifier = Modifier, size: Dp = 36.dp) {
+    val shaped = modifier.size(size).clip(CircleShape)
+    val url = asset?.trim().orEmpty()
+    when {
+        url.startsWith("https://") || url.startsWith("//") -> YoutubeThumb(
+            if (url.startsWith("//")) "https:$url" else url, shaped,
+            placeholderColor = DesignTokens.AccentContainer,
+        ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { AvatarInitial(name, size) } }
+        url.isNotBlank() -> Artwork(url, shaped)
+        else -> Box(shaped.background(DesignTokens.AccentContainer), contentAlignment = Alignment.Center) { AvatarInitial(name, size) }
+    }
+}
+
+@Composable
+private fun AvatarInitial(name: String, size: Dp) {
+    val initial = name.trim().let { text ->
+        if (text.isEmpty()) "" else text.substring(0, text.offsetByCodePoints(0, 1)).uppercase()
+    }
+    if (initial.isEmpty()) return
+    // The disc has a fixed size, so the letter follows the disc, not the font scale.
+    val fontSize = with(LocalDensity.current) { (size * 0.42f).toSp() }
+    AppText(initial, MinType.Label.copy(fontSize = fontSize, lineHeight = fontSize), color = DesignTokens.AccentText, maxLines = 1)
 }
 
 /** Duration or LIVE label in the bottom-end corner of a thumbnail. */
@@ -96,9 +139,17 @@ fun VideoCard(
     videoId: String? = null,
     artworkModifier: Modifier = Modifier,
     fullBleed: Boolean = false,
+    /** Channel name: the avatar shows its initial while the image is missing or loading. */
+    avatarName: String = "",
+    /** Test tag on the avatar's touch target, e.g. `channel-<id>`. */
+    avatarTestTag: String? = null,
+    thumbnailTag: String? = null,
+    /** Spoken label of the thumbnail node, e.g. "title, duration". */
+    thumbnailDescription: String? = null,
 ) {
     Column(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)) {
-        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(if (fullBleed) RectangleShape else MinRadius.Card)) {
+        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(if (fullBleed) RectangleShape else MinRadius.Card)
+            .then(thumbnailButton(thumbnailTag, thumbnailDescription, onClick))) {
             CardArtwork(artwork, videoId, artworkModifier.fillMaxSize())
             if (!durationLabel.isNullOrBlank()) DurationBadge(durationLabel, live)
             if (progress != null) ThumbnailProgress(progress)
@@ -108,9 +159,10 @@ fun VideoCard(
                 Box(
                     Modifier.size(MinSpace.Touch).clip(CircleShape)
                         .then(if (onAvatarClick != null) Modifier.clickable(role = Role.Button, onClick = onAvatarClick) else Modifier)
-                        .then(if (avatarDescription != null) Modifier.semantics { contentDescription = avatarDescription } else Modifier),
+                        .then(if (avatarDescription != null) Modifier.semantics { contentDescription = avatarDescription } else Modifier)
+                        .then(if (avatarTestTag != null) Modifier.testTag(avatarTestTag) else Modifier),
                     contentAlignment = Alignment.Center,
-                ) { Artwork(avatar, Modifier.size(36.dp).clip(CircleShape)) }
+                ) { MinAvatar(avatar, avatarName, size = 36.dp) }
                 Spacer(Modifier.width(MinSpace.xs))
             }
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {
@@ -140,9 +192,13 @@ fun VideoRow(
     videoId: String? = null,
     artworkModifier: Modifier = Modifier,
     thumbnailWidth: Dp = 160.dp,
+    thumbnailTag: String? = null,
+    /** Spoken label of the thumbnail node, e.g. "title, duration". */
+    thumbnailDescription: String? = null,
 ) {
     Row(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick), verticalAlignment = Alignment.Top) {
-        Box(Modifier.width(thumbnailWidth).aspectRatio(16f / 9f).clip(MinRadius.Field)) {
+        Box(Modifier.width(thumbnailWidth).aspectRatio(16f / 9f).clip(MinRadius.Field)
+            .then(thumbnailButton(thumbnailTag, thumbnailDescription, onClick))) {
             CardArtwork(artwork, videoId, artworkModifier.fillMaxSize())
             if (!durationLabel.isNullOrBlank()) DurationBadge(durationLabel, live)
             if (progress != null) ThumbnailProgress(progress)
@@ -169,6 +225,8 @@ fun ShortCard(
     menuDescription: String = "",
     videoId: String? = null,
     artworkModifier: Modifier = Modifier,
+    /** Test tag on the overflow button. */
+    menuTag: String? = null,
 ) {
     Box(modifier.aspectRatio(9f / 16f).clip(MinRadius.Card).clickable(role = Role.Button, onClick = onClick)) {
         CardArtwork(artwork, videoId, artworkModifier.fillMaxSize())
@@ -178,7 +236,8 @@ fun ShortCard(
             AppText(title, MinType.Body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium), color = Color.White, maxLines = 2)
             if (!metadata.isNullOrBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs), color = Color.White.copy(alpha = 0.85f), maxLines = 1)
         }
-        if (onMenu != null) AppIconButton(AppIcon.More, menuDescription, Modifier.align(Alignment.TopEnd), color = Color.White, onClick = onMenu)
+        if (onMenu != null) AppIconButton(AppIcon.More, menuDescription,
+            Modifier.align(Alignment.TopEnd).then(if (menuTag != null) Modifier.testTag(menuTag) else Modifier), color = Color.White, onClick = onMenu)
     }
 }
 
@@ -197,7 +256,7 @@ fun ChannelRow(
         modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(role = Role.Button, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Artwork(avatar, Modifier.size(avatarSize).clip(CircleShape))
+        MinAvatar(avatar, name, size = avatarSize)
         Spacer(Modifier.width(MinSpace.md))
         Column(Modifier.weight(1f)) {
             AppText(name, MinType.Subtitle, maxLines = 1)
