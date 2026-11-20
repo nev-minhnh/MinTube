@@ -202,17 +202,17 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
             if (state.overlay == LibraryOverlay.ManageHistory && state.confirmClear) {
                 com.hhst.youtubelite.ui.components.AppAlertDialog(
                     onDismissRequest = { historyViewModel.onAction(LibraryAction.CloseOverlay) },
-                    title = { androidx.compose.material3.Text(stringResource(R.string.ui_clear_watch_history)) },
-                    text = { androidx.compose.material3.Text(stringResource(R.string.ui_your_watch_history_will_be_cleared_on_this_account_this_can_t_be_undon)) },
+                    title = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_clear_watch_history), com.hhst.youtubelite.ui.design.MinType.Title) },
+                    text = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_your_watch_history_will_be_cleared_on_this_account_this_can_t_be_undon)) },
                     confirmButton = {
                         com.hhst.youtubelite.ui.components.AppTextButton(
                             onClick = { historyViewModel.onAction(LibraryAction.ConfirmClearHistory) },
-                        ) { androidx.compose.material3.Text(stringResource(R.string.ui_clear)) }
+                        ) { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_clear), color = com.hhst.youtubelite.ui.design.DesignTokens.Danger) }
                     },
                     dismissButton = {
                         com.hhst.youtubelite.ui.components.AppTextButton(
                             onClick = { historyViewModel.onAction(LibraryAction.CloseOverlay) },
-                        ) { androidx.compose.material3.Text(stringResource(R.string.cancel)) }
+                        ) { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.cancel)) }
                     },
                 )
             }
