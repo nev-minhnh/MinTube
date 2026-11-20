@@ -267,7 +267,7 @@ fun SingleVideoConfirmSheet(
         dragHandle = null,
         contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
         tonalElevation = 0.dp, shape = MinRadius.Sheet) {
-        Column(Modifier.fillMaxWidth().watchSheetHeight()) { AppSheetHandle(); body() }
+        Column(Modifier.fillMaxWidth().downloadOptionsSheetHeight()) { AppSheetHandle(); body() }
     }
     picker?.let { kind ->
         val options = when (kind) { "quality" -> qualityOptions; "audio" -> audioOptions; else -> subOptions }
@@ -289,6 +289,21 @@ fun SingleVideoConfirmSheet(
             picker = null
         }
     }
+}
+
+/**
+ * The options sheet opens tall instead of being confined below the watch player: about 75% of the
+ * window on phones, the full window height (capped at 640dp) on wider windows. Quality, audio track,
+ * subtitles and size then show without dragging; the rest stays behind "More options" and the body scrolls.
+ */
+@Composable
+private fun Modifier.downloadOptionsSheetHeight(): Modifier {
+    val windowHeight = with(androidx.compose.ui.platform.LocalDensity.current) {
+        androidx.compose.ui.platform.LocalWindowInfo.current.containerSize.height.toDp()
+    }
+    if (windowHeight <= 0.dp) return this
+    val compact = com.hhst.youtubelite.ui.design.rememberWindowClass() == com.hhst.youtubelite.ui.design.WindowClass.Compact
+    return height(if (compact) windowHeight * 0.75f else minOf(windowHeight, 640.dp))
 }
 
 @Composable
