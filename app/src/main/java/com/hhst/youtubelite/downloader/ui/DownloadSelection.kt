@@ -15,13 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.testTag
+import androidx.compose.foundation.background
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.downloader.core.DownloadTarget
 import com.hhst.youtubelite.downloader.core.RemoveMode
 import com.hhst.youtubelite.ui.components.AppCheckbox
-import com.hhst.youtubelite.ui.components.AppTextButton
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 
 internal fun DownloadItemUiState.target(): DownloadTarget =
     itemId?.let(DownloadTarget::Item) ?: DownloadTarget.Task(taskId)
@@ -48,25 +54,28 @@ internal fun SelectableDownloads(
     }
     BackHandler(selecting) { keys = emptyList() }
     if (selecting) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().background(DesignTokens.AccentContainer).testTag("download-selection-bar")
+            .padding(horizontal = MinSpace.xs), verticalAlignment = Alignment.CenterVertically) {
             val selectAll = stringResource(R.string.download_select_all)
             AppCheckbox(selected.size == downloads.size, { all ->
                 keys = if (all) downloads.map { it.selectionKey } else emptyList()
-            }, Modifier.semantics { contentDescription = selectAll })
-            Text(stringResource(R.string.download_selected_count, selected.size, downloads.size), Modifier.weight(1f))
-            AppTextButton(onClick = { keys = emptyList() }) { Text(stringResource(R.string.cancel)) }
+            }, Modifier.size(MinSpace.Touch).semantics { contentDescription = selectAll })
+            Text(stringResource(R.string.download_selected_count, selected.size, downloads.size), Modifier.weight(1f),
+                style = MinType.Label, color = DesignTokens.Ink)
+            MinButton(stringResource(R.string.cancel), { keys = emptyList() }, kind = MinButtonKind.Text)
         }
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp)) {
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = MinSpace.sm),
+            horizontalArrangement = Arrangement.spacedBy(MinSpace.xs)) {
             val bulkActions = listOf(DownloadRowAction.PAUSE, DownloadRowAction.RESUME,
                 DownloadRowAction.CANCEL, DownloadRowAction.RETRY, DownloadRowAction.REDOWNLOAD, DownloadRowAction.DELETE)
             bulkActions.forEach { action ->
                 val eligible = selected.filter {
                     (action == DownloadRowAction.DELETE || !it.skipped) && action in DownloadPresentation.actionsFor(it)
                 }
-                if (eligible.isNotEmpty()) AppTextButton(onClick = {
+                if (eligible.isNotEmpty()) MinButton(actionLabel(action), {
                     if (action == DownloadRowAction.DELETE) deleting = eligible.toList()
                     else { eligible.forEach { onAction(it, action) }; keys = emptyList() }
-                }) { Text(actionLabel(action)) }
+                }, kind = MinButtonKind.Text, danger = action == DownloadRowAction.DELETE)
             }
         }
         DownloadHairline()

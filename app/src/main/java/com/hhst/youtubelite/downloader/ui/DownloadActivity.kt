@@ -10,7 +10,6 @@ import com.hhst.youtubelite.core.PipAutoEnter
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import com.hhst.youtubelite.ui.theme.AppTheme
-import com.hhst.youtubelite.ui.theme.NeutralControls
 import org.koin.androidx.compose.koinViewModel
 
 class DownloadActivity : ComponentActivity() {
@@ -27,14 +26,14 @@ class DownloadActivity : ComponentActivity() {
         enableEdgeToEdge()
         val batchId = intent.getStringExtra(DownloadUi.EXTRA_BATCH_ID)
         setContent {
-            AppTheme { NeutralControls {
+            AppTheme {
                 DownloadManagerScreen(
                     viewModel = koinViewModel(),
                     initialBatchId = batchId,
                     newBatchRequests = batchEvents,
                     onClose = { finish() },
                 )
-            } }
+            }
         }
     }
 

@@ -21,17 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import com.hhst.youtubelite.ui.components.AppLinearProgressIndicator as LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,18 +44,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
-import com.hhst.youtubelite.ui.theme.AppStyle
-import com.hhst.youtubelite.ui.theme.SettingsTokens
 import com.hhst.youtubelite.core.HapticsController
 import com.hhst.youtubelite.downloader.core.DownloadPhase
 import com.hhst.youtubelite.downloader.core.DownloadStatus
 import com.hhst.youtubelite.downloader.resolve.DownloadUnavailableReason
 import com.hhst.youtubelite.ui.YoutubeThumb
+import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.ui.design.AppIconButton
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 import org.koin.compose.koinInject
 
 /** Real thumbnail with the placeholder box as the load-failure fallback. */
@@ -68,10 +67,12 @@ fun DownloadThumbnail(url: String?, modifier: Modifier = Modifier) {
         url = url,
         modifier = modifier
             .aspectRatio(DownloadTokens.ThumbAspect)
-            .clip(RoundedCornerShape(12.dp)),
+            .clip(MinRadius.Field)
+            .background(DesignTokens.Surface),
     )
 }
 
+/** The primary action of the download sheets: a full-width Mint primary pill (Accent fill). */
 @Composable
 fun DownloadCapsuleButton(
     text: String,
@@ -82,19 +83,22 @@ fun DownloadCapsuleButton(
     iconRes: Int = 0,
 ) {
     val desc = contentDescription ?: text
+    val haptic = com.hhst.youtubelite.ui.design.rememberHapticAction()
     Button(
-        onClick = onClick,
+        onClick = { haptic(); onClick() },
         enabled = enabled,
         modifier = modifier
             .heightIn(min = DownloadTokens.MinTouch)
             .semantics { this.contentDescription = desc },
-        shape = CircleShape,
+        shape = MinRadius.Full,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.onSurface,
-            contentColor = MaterialTheme.colorScheme.surface,
+            containerColor = DesignTokens.Accent,
+            contentColor = DesignTokens.OnAccent,
+            disabledContainerColor = DesignTokens.Surface,
+            disabledContentColor = DesignTokens.Secondary,
         ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+        contentPadding = PaddingValues(horizontal = MinSpace.xl, vertical = MinSpace.sm),
     ) {
         if (iconRes != 0) {
             Icon(
@@ -102,12 +106,16 @@ fun DownloadCapsuleButton(
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(MinSpace.sm))
         }
-        Text(text, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp)
+        Text(text, style = MinType.Label, color = LocalContentColor.current)
     }
 }
 
+/**
+ * A Mint chip: a 32dp pill inside a 48dp target, AccentContainer when selected. It keeps the
+ * tab role and `selected` semantics that the manager filters and the media toggle expose.
+ */
 @Composable
 fun DownloadFilterChip(
     selected: Boolean,
@@ -123,22 +131,19 @@ fun DownloadFilterChip(
         contentAlignment = Alignment.Center,
     ) {
         Box(Modifier.heightIn(min = if (compact) 32.dp else 36.dp)
-            .background(if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceVariant,
-                if (capsule) CircleShape else RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 6.dp), contentAlignment = Alignment.Center) {
-            Text(label, fontSize = 14.sp, lineHeight = 20.sp,
-                color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium)
+            .clip(MinRadius.Full)
+            .background(if (selected) DesignTokens.AccentContainer else DesignTokens.Surface)
+            .padding(horizontal = if (capsule) MinSpace.lg else MinSpace.md, vertical = MinSpace.xs),
+            contentAlignment = Alignment.Center) {
+            Text(label, style = MinType.Label,
+                color = if (selected) DesignTokens.AccentText else DesignTokens.Ink)
         }
     }
 }
 
 @Composable
 fun DownloadHairline() {
-    HorizontalDivider(
-        thickness = 0.5.dp,
-        color = MaterialTheme.colorScheme.outline.copy(alpha = DownloadTokens.DIVIDER_ALPHA),
-    )
+    HorizontalDivider(thickness = 1.dp, color = DesignTokens.Border)
 }
 
 @Composable
@@ -158,14 +163,14 @@ fun DownloadItemRow(
             .heightIn(min = DownloadTokens.MinTouch)
             .combinedClickable(onClick = { if (selectionMode) haptic(); onOpen() }, onLongClick = onLongClick)
             .semantics { if (selectionMode) this.selected = selected }
-            .background(if (selected) MaterialTheme.colorScheme.surfaceVariant else androidx.compose.ui.graphics.Color.Transparent)
-            .padding(horizontal = DownloadTokens.PageInset, vertical = 8.dp),
+            .background(if (selected) DesignTokens.Ghost else androidx.compose.ui.graphics.Color.Transparent)
+            .padding(start = DownloadTokens.PageInset, end = MinSpace.xs, top = MinSpace.sm, bottom = MinSpace.sm),
     ) {
         val stacked = maxWidth < 320.dp || LocalDensity.current.fontScale > 1.3f
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                DownloadThumbnail(item.thumbnailUrl, Modifier.width(if (stacked) 96.dp else 112.dp))
-                Spacer(Modifier.width(8.dp))
+                DownloadThumbnail(item.thumbnailUrl, Modifier.width(if (stacked) 96.dp else 120.dp))
+                Spacer(Modifier.width(MinSpace.md))
                 Column(Modifier.weight(1f)) {
                     Text(
                         text = item.title,
@@ -173,10 +178,8 @@ fun DownloadItemRow(
                         modifier = overflowMarquee(),
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = SettingsTokens.BodySize.sp,
-                        lineHeight = SettingsTokens.BodyLine.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MinType.Body,
+                        color = DesignTokens.Ink,
                     )
                     Text(
                         text = item.author.orEmpty(),
@@ -184,45 +187,35 @@ fun DownloadItemRow(
                         minLines = 1,
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MinType.Caption,
+                        color = DesignTokens.Secondary,
                     )
                     if (!stacked) DownloadRowDetails(item, stacked = false)
                 }
-                if (selectionMode) AppCheckbox(selected, { onOpen() })
+                if (selectionMode) AppCheckbox(selected, { onOpen() }, Modifier.size(DownloadTokens.MinTouch))
                 val actions = DownloadPresentation.actionsFor(item)
                 val moreLabel = stringResource(R.string.download_more_actions)
                 if (!selectionMode) Box {
-                    IconButton(
-                        onClick = { moreExpanded = true },
-                        modifier = Modifier
-                            .width(DownloadTokens.RowActionWidth).height(DownloadTokens.MinTouch)
-                            .semantics { contentDescription = moreLabel },
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_more),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(DownloadTokens.Icon),
-                        )
-                    }
+                    AppIconButton(AppIcon.More, moreLabel,
+                        Modifier.width(DownloadTokens.RowActionWidth).height(DownloadTokens.MinTouch)) { moreExpanded = true }
                     DropdownMenu(
                         expanded = moreExpanded,
                         onDismissRequest = { moreExpanded = false },
                         modifier = Modifier.widthIn(min = 200.dp, max = 280.dp).heightIn(max = 360.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        containerColor = AppStyle.Panel,
-                        shadowElevation = 4.dp,
+                        shape = MinRadius.Field,
+                        containerColor = DesignTokens.Panel,
+                        shadowElevation = 8.dp,
                         tonalElevation = 0.dp,
                     ) {
                         actions.forEach { action ->
                             val label = actionLabel(action)
+                            // Delete is the one destructive entry; it reads in Danger.
+                            val tint = if (action == DownloadRowAction.DELETE) DesignTokens.Danger else DesignTokens.Ink
                             DropdownMenuItem(
-                                text = { Text(label) },
+                                text = { Text(label, style = MinType.Body, color = tint) },
                                 leadingIcon = {
                                     Icon(painterResource(actionIcon(action)), contentDescription = null,
-                                        modifier = Modifier.size(DownloadTokens.Icon), tint = MaterialTheme.colorScheme.onSurface)
+                                        modifier = Modifier.size(DownloadTokens.Icon), tint = tint)
                                 },
                                 onClick = {
                                     moreExpanded = false
@@ -236,7 +229,7 @@ fun DownloadItemRow(
                 }
             }
             if (stacked) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(MinSpace.sm))
                 DownloadRowDetails(item, stacked = true)
             }
         }
@@ -256,6 +249,12 @@ private fun DownloadRowDetails(item: DownloadItemUiState, stacked: Boolean) {
     }
     val progressText = DownloadPresentation.progressText(item.status, item.progressBytes, item.expectedBytes)
     val failure = DownloadPresentation.failureReason(item)?.let { failureCopy(it) }
+    // A finished or failed row reads its state in color; everything else stays secondary.
+    val phaseColor = when (phase) {
+        PhaseCopy.COMPLETE -> DesignTokens.AccentText
+        PhaseCopy.FAILED, PhaseCopy.FILE_NOT_FOUND -> DesignTokens.Danger
+        else -> DesignTokens.Secondary
+    }
     Column(Modifier.fillMaxWidth()) {
         val meta = listOf(kind, quality, size).filter { it.isNotBlank() }.joinToString(" · ")
         // Preserve normal row height across status changes; stacked rows grow with their text.
@@ -265,9 +264,8 @@ private fun DownloadRowDetails(item: DownloadItemUiState, stacked: Boolean) {
             minLines = 1,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f),
-            lineHeight = 16.sp,
+            style = MinType.Caption,
+            color = DesignTokens.Secondary,
         )
         Text(
             text = if (stacked) phaseText else listOf(meta, phaseText).filter { it.isNotBlank() }.joinToString(" · "),
@@ -275,9 +273,8 @@ private fun DownloadRowDetails(item: DownloadItemUiState, stacked: Boolean) {
             minLines = 1,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-            lineHeight = 16.sp,
+            style = MinType.Caption,
+            color = if (stacked) phaseColor else DesignTokens.Secondary,
         )
         if (!stacked || failure != null || !progressText.isNullOrBlank()) Text(
             text = failure ?: progressText.orEmpty(),
@@ -285,25 +282,23 @@ private fun DownloadRowDetails(item: DownloadItemUiState, stacked: Boolean) {
             minLines = 1,
             maxLines = 1,
             overflow = TextOverflow.Clip,
-            fontSize = 12.sp,
-            color = if (failure != null) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-            lineHeight = 16.sp,
+            style = MinType.Caption,
+            color = if (failure != null) DesignTokens.Danger else DesignTokens.Secondary,
         )
-        Box(Modifier.fillMaxWidth().padding(top = 6.dp).height(2.dp)) {
+        Box(Modifier.fillMaxWidth().padding(top = 6.dp).height(3.dp)) {
             if (DownloadPresentation.isActivePhase(item.phase) &&
                 item.status != DownloadStatus.FAILED && item.status != DownloadStatus.CANCELLED &&
                 (item.status == DownloadStatus.RUNNING || item.progressBytes > 0L)) {
                 val fraction = if (item.phase == DownloadPhase.TRANSFER) {
                     DownloadPresentation.progressFraction(item.progressBytes, item.expectedBytes)
                 } else null
-                val barModifier = Modifier.fillMaxWidth().height(2.dp).clip(RoundedCornerShape(1.dp))
+                val barModifier = Modifier.fillMaxWidth().height(3.dp).clip(MinRadius.Full)
                 if (fraction != null) {
                     LinearProgressIndicator(progress = { fraction }, modifier = barModifier,
-                        trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.16f))
+                        color = DesignTokens.Accent, trackColor = DesignTokens.Ghost)
                 } else if (item.status == DownloadStatus.RUNNING) {
                     LinearProgressIndicator(modifier = barModifier,
-                        trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.16f))
+                        color = DesignTokens.Accent, trackColor = DesignTokens.Ghost)
                 }
             }
         }
