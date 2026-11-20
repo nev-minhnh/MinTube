@@ -4,7 +4,10 @@
     android:tint="?attr/colorControlNormal"
     android:viewportWidth="960"
     android:viewportHeight="960">
-    <path
-        android:fillColor="@android:color/white"
-        android:pathData="M144,672L144,600L672,600L672,672L144,672ZM216,516L216,444L744,444L744,516L216,516ZM288,360L288,288L816,288L816,360L288,360Z" />
+    <!-- Material Symbols Rounded: clear_all. Apache-2.0. -->
+    <group android:translateY="960">
+        <path
+            android:fillColor="@android:color/white"
+            android:pathData="M160-280q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360h480q17 0 28.5 11.5T680-320q0 17-11.5 28.5T640-280H160Zm80-160q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Zm80-160q-17 0-28.5-11.5T280-640q0-17 11.5-28.5T320-680h480q17 0 28.5 11.5T840-640q0 17-11.5 28.5T800-600H320Z" />
+    </group>
 </vector>

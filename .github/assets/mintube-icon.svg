@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <title>MinTube</title>
+  <rect width="64" height="64" rx="14.4" fill="#0B8F6A"/>
+  <path d="M21.33,12.44 L53.33,32.00 L21.33,51.56 L31.11,32.00 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.33" stroke-linejoin="round"/>
+</svg>

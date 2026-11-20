@@ -187,7 +187,7 @@ private fun SubscriptionsTopBar(width: Float, selectedChannel: Boolean, onAction
             modifier = Modifier.testTag("subscriptions-back-to-all")) { onAction(SubscriptionsAction.SelectChannel(null)) }
         else Box(Modifier.width(if (width < 600f) 53.dp else 48.dp).height(DesignTokens.TopBarHeight)
             .clickable(role = Role.Button) { onAction(SubscriptionsAction.Destination(MainTab.Home)) }, contentAlignment = Alignment.Center) {
-            LitubeMark(Modifier.size(24.dp))
+            MinTubeMark(Modifier.size(24.dp))
         }
         AppText(stringResource(R.string.subscriptions_title), Modifier.weight(1f).testTag("subscriptions-title"), size = 20, line = 28,
             weight = FontWeight.Bold, maxLines = 1)

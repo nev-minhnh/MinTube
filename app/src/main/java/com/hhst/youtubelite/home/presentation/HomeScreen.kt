@@ -291,7 +291,7 @@ private fun HomeTopBar(onAction: (HomeAction) -> Unit) {
         Box(Modifier.width(117.dp).fillMaxHeight().clickable(role = Role.Button) {
             onAction(HomeAction.Navigate(HomeNavigationRequest.Destination(HomeDestination.Home)))
         }.appDescription(R.string.a11y_litube_home), contentAlignment = Alignment.CenterStart) {
-            LitubeBrand(Modifier.padding(start = 12.dp))
+            MinTubeBrand(Modifier.padding(start = 12.dp))
         }
         Spacer(Modifier.weight(1f))
         AppIconButton(AppIcon.Search, stringResource(R.string.a11y_search_youtube)) { onAction(HomeAction.OpenSearch) }
@@ -371,7 +371,7 @@ private fun EmptyHome(content: HomeContent.Empty, showTools: Boolean, wide: Bool
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("home-empty"), horizontalAlignment = Alignment.CenterHorizontally) {
         if (showTools) {
             Spacer(Modifier.height(if (wide) 76.dp else 60.dp))
-            LitubeMark(Modifier.size(width = 80.dp, height = 55.dp))
+            MinTubeMark(Modifier.size(56.dp))
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth().padding(horizontal = 23.dp), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {

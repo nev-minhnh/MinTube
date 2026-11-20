@@ -157,12 +157,10 @@ fun Modifier.headerShadow() = drawWithCache {
     onDrawBehind { drawImage(shadow, topLeft = androidx.compose.ui.geometry.Offset(-origin, -origin)) }
 }
 
+/** Shorts shelf marker: the filled Shorts glyph in the brand accent. */
 @Composable
 fun ShortsLogo(modifier: Modifier = Modifier) {
-    Box(modifier.size(24.dp)) {
-        AppIcon(AppIcon.ShortsBody, color = DesignTokens.Accent)
-        AppIcon(AppIcon.ShortsPlay, color = Color.White)
-    }
+    AppIcon(AppIcon.ShortsFilled, modifier, color = DesignTokens.Accent)
 }
 
 /** Localized content description for plain tap targets; keeps a11y labels out of code strings. */
@@ -233,17 +231,18 @@ fun AppIconButton(
     }
 }
 
+/** The MinTube mark: mint rounded square with the notched play triangle. */
 @Composable
-fun LitubeMark(modifier: Modifier = Modifier) {
-    Image(painterResource(R.drawable.ic_litube_mark), contentDescription = stringResource(R.string.a11y_litube), modifier = modifier)
+fun MinTubeMark(modifier: Modifier = Modifier) {
+    Image(painterResource(R.drawable.ic_mintube_mark), contentDescription = stringResource(R.string.a11y_litube), modifier = modifier)
 }
 
+/** Mark plus wordmark. Follows the system font scale like every other text. */
 @Composable
-fun LitubeBrand(modifier: Modifier = Modifier) {
-    // Follows the system font scale like every other text.
+fun MinTubeBrand(modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        LitubeMark(Modifier.size(28.dp))
-        Spacer(Modifier.width(6.dp))
+        MinTubeMark(Modifier.size(28.dp))
+        Spacer(Modifier.width(8.dp))
         AppText(stringResource(R.string.app_name), MinType.Wordmark, maxLines = 1)
     }
 }
