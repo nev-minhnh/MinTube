@@ -191,22 +191,23 @@ class CommentsPanelAndroidTest {
         // 5px design gap; Compose's line box for 12/14 text rounds 1px taller than the CSS box.
         assertEquals(5f, body.top - author.bottom, 1.5f)
         assertEquals(14f, textLayout("comment-c1-body").layoutInput.style.fontSize.value, 0.01f)
-        assertEquals(17.5f, textLayout("comment-c1-body").layoutInput.style.lineHeight.value, 0.01f)
+        // Mint Body style: 14/20.
+        assertEquals(20f, textLayout("comment-c1-body").layoutInput.style.lineHeight.value, 0.01f)
 
         val like = bounds("comment-c1-like")
         assertEquals(62f, like.left - panel.left, 0.5f)
-        assertEquals(40f, like.height, 0.5f)
-        // 3px after the body; the 16px glyph is centred in a 24px box inside this 40px row.
+        assertEquals(48f, like.height, 0.5f)
+        // 3px after the body; the 18px glyph is centred in a 24px box inside this 48px touch row.
         assertEquals(body.bottom + 3f, like.top, 0.5f)
 
         val more = bounds("comment-c1-more")
         assertEquals(370f, more.right - panel.left, 0.5f)
-        assertEquals(40f, more.width, 0.5f)
+        assertEquals(48f, more.width, 0.5f)
 
         val toggle = bounds("comment-c1-reply-toggle")
         assertEquals(62f, toggle.left - panel.left, 0.5f)
         assertEquals(378f, toggle.right - panel.left, 0.5f)
-        assertEquals(40f, toggle.height, 0.5f)
+        assertEquals(48f, toggle.height, 0.5f)
     }
 
     @Test fun dockedRailMatchesTheSampledWidePanel() {

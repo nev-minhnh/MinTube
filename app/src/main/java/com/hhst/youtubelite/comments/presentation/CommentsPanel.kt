@@ -5,7 +5,6 @@ import com.hhst.youtubelite.ui.design.labelResource
 import androidx.compose.foundation.Image
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.gestures.Orientation
@@ -76,6 +75,11 @@ import com.hhst.youtubelite.ui.design.MenuBottomSheet
 import com.hhst.youtubelite.ui.design.MenuSheetItem
 import com.hhst.youtubelite.ui.design.MenuSheetLayout
 import com.hhst.youtubelite.ui.design.messageCardShadow
+import com.hhst.youtubelite.ui.design.MinRadius
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
+import com.hhst.youtubelite.ui.components.MinButton
+import com.hhst.youtubelite.ui.components.MinButtonKind
 import com.hhst.youtubelite.watch.domain.WatchLayout
 import androidx.compose.runtime.snapshotFlow
 import com.hhst.youtubelite.ui.design.appDescription
@@ -217,8 +221,7 @@ private fun CommentsSurface(
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
     DisposableEffect(Unit) { onDispose { focusManager.clearFocus() } }
 
-    val shape = if (compact) RoundedCornerShape(topStart = CommentsLayout.SheetRadius.dp, topEnd = CommentsLayout.SheetRadius.dp)
-    else RectangleShape
+    val shape = if (compact) MinRadius.Sheet else RectangleShape
     val modal = state.overlay is CommentsOverlay.ThreadMenu || state.overlay is CommentsOverlay.ReplyMenu ||
         state.overlay is CommentsOverlay.Composer || state.overlay is CommentsOverlay.DeleteConfirm
     BoxWithConstraints(modifier) {
@@ -250,12 +253,14 @@ private fun CommentsSurface(
                     )
                     if (state.refreshing) {
                         androidx.compose.material3.LinearProgressIndicator(Modifier.align(Alignment.BottomCenter)
-                            .fillMaxWidth().height(2.dp).testTag("comments-refreshing"))
+                            .fillMaxWidth().height(2.dp).testTag("comments-refreshing"),
+                            color = DesignTokens.Accent, trackColor = Color.Transparent)
                     }
                     if (state.actionPending && state.overlay !is CommentsOverlay.Composer && state.overlay !is CommentsOverlay.DeleteConfirm &&
                         state.pendingAction !is CommentNavigationRequest.LikeComment && state.pendingAction !is CommentNavigationRequest.DislikeComment) {
                         androidx.compose.material3.LinearProgressIndicator(Modifier.align(Alignment.BottomCenter)
-                            .fillMaxWidth().height(2.dp).testTag("comment-action-progress"))
+                            .fillMaxWidth().height(2.dp).testTag("comment-action-progress"),
+                            color = DesignTokens.Accent, trackColor = Color.Transparent)
                     }
                     }
                     CommentsBody(state = state, listState = listState, onAction = onAction)
@@ -373,22 +378,21 @@ private fun CommentComposerSheet(
                 BasicTextField(
                     draft, onDraft,
                     Modifier.weight(1f).heightIn(min = CommentsLayout.InputHeight.dp)
-                        .clip(RoundedCornerShape(CommentsLayout.InputRadius.dp))
-                        .border(1.dp, DesignTokens.Border.copy(alpha = CommentsLayout.DividerAlpha),
-                            RoundedCornerShape(CommentsLayout.InputRadius.dp))
-                        .padding(horizontal = CommentsLayout.InputTextInset.dp, vertical = 8.dp)
+                        .clip(MinRadius.Field)
+                        .background(DesignTokens.Surface)
+                        .padding(horizontal = MinSpace.md, vertical = MinSpace.sm)
                         .focusRequester(focus)
                         .testTag("comment-composer-input")
                         .semantics { contentDescription = if (editing) editHintText else hintText },
                     maxLines = 6,
                     readOnly = pending,
-                    textStyle = DesignTokens.text(14, 20),
-                    cursorBrush = SolidColor(DesignTokens.Ink),
+                    textStyle = MinType.Body.copy(color = DesignTokens.Ink),
+                    cursorBrush = SolidColor(DesignTokens.Accent),
                     decorationBox = { inner ->
-                        Box {
+                        Box(contentAlignment = Alignment.CenterStart) {
                             if (draft.isEmpty()) AppText(
                                 if (reply) stringResource(R.string.ui_add_a_reply) else stringResource(R.string.ui_add_a_comment),
-                                size = 14, line = 20, color = DesignTokens.Secondary,
+                                MinType.Body, color = DesignTokens.Secondary,
                             )
                             inner()
                         }
@@ -400,18 +404,19 @@ private fun CommentComposerSheet(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ComposerAction(cancelText, "comment-composer-cancel", enabled = !pending, onClick = onCancel)
-                Spacer(Modifier.width(8.dp))
-                ComposerAction(
+                MinButton(cancelText, onCancel, kind = MinButtonKind.Text, enabled = !pending, testTag = "comment-composer-cancel")
+                Spacer(Modifier.width(MinSpace.sm))
+                MinButton(
                     when {
                         pending -> sendingText
                         editing -> saveText
                         else -> submitText
                     },
-                    "comment-composer-submit",
-                    enabled = draft.isNotBlank() && !pending,
+                    onSubmit,
+                    icon = if (editing) null else AppIcon.Send,
+                    enabled = draft.isNotBlank() || pending,
                     pending = pending,
-                    onClick = onSubmit,
+                    testTag = "comment-composer-submit",
                 )
             }
         }
@@ -437,52 +442,23 @@ private fun DeleteCommentSheet(ownComment: Boolean, pending: Boolean, onCancel: 
         ) {
             AppText(
                 if (ownComment) stringResource(R.string.ui_delete_comment) else stringResource(R.string.ui_delete_reply),
-                Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                size = 18, line = 26, weight = FontWeight.Bold,
+                MinType.Title, Modifier.padding(start = MinSpace.lg, end = MinSpace.lg, top = MinSpace.lg),
             )
             AppText(
                 stringResource(R.string.ui_this_action_cannot_be_undone),
-                Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp),
-                size = 14, line = 20, color = DesignTokens.Secondary,
+                MinType.Body, Modifier.padding(start = MinSpace.lg, end = MinSpace.lg, top = MinSpace.xs),
+                color = DesignTokens.Secondary,
             )
             Row(
                 Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ComposerAction(cancelText, "comment-delete-cancel", enabled = !pending, onClick = onCancel)
-                Spacer(Modifier.width(8.dp))
-                ComposerAction(deleteText, "comment-delete-confirm", enabled = !pending, pending = pending, onClick = onDelete, destructive = true)
+                MinButton(cancelText, onCancel, kind = MinButtonKind.Text, enabled = !pending, testTag = "comment-delete-cancel")
+                Spacer(Modifier.width(MinSpace.sm))
+                MinButton(deleteText, onDelete, icon = AppIcon.Delete, pending = pending, danger = true, testTag = "comment-delete-confirm")
             }
         }
-    }
-}
-
-@Composable
-private fun ComposerAction(
-    label: String,
-    tag: String,
-    enabled: Boolean = true,
-    destructive: Boolean = false,
-    pending: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Box(
-        Modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(8.dp))
-            .clickable(role = Role.Button, enabled = enabled) { if (enabled) onClick() }
-            .testTag(tag).padding(horizontal = 12.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (pending) com.hhst.youtubelite.ui.design.ActionProgress()
-        else AppText(
-            label,
-            size = 14, line = 20, weight = FontWeight.Medium,
-            color = when {
-                !enabled -> DesignTokens.Secondary.copy(alpha = 0.5f)
-                destructive -> DesignTokens.Red
-                else -> DesignTokens.Ink
-            },
-        )
     }
 }
 
@@ -511,12 +487,11 @@ private fun CommentsHeader(
         val measurer = rememberTextMeasurer()
         val chipTopText = stringResource(R.string.comments_sort_chip_top)
         val chipNewestText = stringResource(R.string.comments_sort_chip_newest)
-        val titleWidth = measurer.measure(count, DesignTokens.text(
-            CommentsLayout.titleSize(panelWidth, docked).toInt(), CommentsLayout.titleLine(panelWidth, docked).toInt(), FontWeight.Bold,
-        )).size.width
+        val titleWidth = measurer.measure(count, MinType.Title).size.width
         val label = if (sort == CommentSort.Top) chipTopText else chipNewestText
-        val sortWidth = measurer.measure(label, DesignTokens.text(14, 20, FontWeight.Medium)).size.width
-        val sortHeight = with(density) { maxOf(40.dp, 20.sp.toDp() + 8.dp) }
+        // Pill = label + sort glyph (18) + gap (6) + horizontal padding (2 x 12).
+        val sortWidth = measurer.measure(label, MinType.Label).size.width + with(density) { 48.dp.roundToPx() }
+        val sortHeight = with(density) { maxOf(MinSpace.Touch, 18.sp.toDp() + 16.dp) }
         val headerHeight = with(density) { maxOf(CommentsLayout.HeaderHeight.dp, 20.sp.toDp() + 16.dp) }
         val stacked = showSort && titleWidth + sortWidth + 2 + with(density) { 100.dp.roundToPx() } > constraints.maxWidth
         Box(Modifier.fillMaxWidth().height(headerHeight + if (stacked) maxOf(48.dp, sortHeight + 8.dp) else 0.dp).testTag("comments-header")) {
@@ -525,7 +500,7 @@ private fun CommentsHeader(
                     .padding(start = CommentsLayout.HeaderPaddingStart.dp, end = CommentsLayout.CloseEndInset.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                AppText(count, Modifier.weight(1f).testTag("comments-count"), size = 14, line = 20, color = DesignTokens.Secondary)
+                AppText(count, MinType.Body, Modifier.weight(1f).testTag("comments-count"), color = DesignTokens.Secondary)
                 if (showSort && !stacked) {
                     SortControl(label, onSort)
                     Spacer(Modifier.width(8.dp))
@@ -536,20 +511,29 @@ private fun CommentsHeader(
             if (stacked) Box(Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 8.dp)) {
                 SortControl(label, onSort)
             }
-            Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(1.dp)
-                .background(DesignTokens.Border.copy(alpha = CommentsLayout.DividerAlpha)))
+            Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(1.dp).background(DesignTokens.Border))
         }
     }
 }
 
 @Composable
 private fun SortControl(label: String, onClick: () -> Unit) {
-    val height = with(LocalDensity.current) { maxOf(40.dp, 20.sp.toDp() + 8.dp) }
+    // 32dp tonal pill inside a 48dp hit area, like the filter chips.
     Box(
-        Modifier.heightIn(min = height).clip(RoundedCornerShape(20.dp)).clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 12.dp).testTag("comments-sort").appDescription(R.string.a11y_sort_comments),
+        Modifier.heightIn(min = MinSpace.Touch).clip(MinRadius.Full).clickable(role = Role.Button, onClick = onClick)
+            .testTag("comments-sort").appDescription(R.string.a11y_sort_comments),
         contentAlignment = Alignment.Center,
-    ) { AppText(label, size = 14, line = 20, weight = FontWeight.Medium) }
+    ) {
+        Row(
+            Modifier.heightIn(min = 32.dp).clip(MinRadius.Full).background(DesignTokens.Surface)
+                .padding(horizontal = MinSpace.md, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AppIcon(AppIcon.Sort, Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            AppText(label, MinType.Label, maxLines = 1)
+        }
+    }
 }
 
 @Composable
@@ -557,9 +541,9 @@ private fun SortMenu(selected: CommentSort, onSelect: (CommentSort) -> Unit, mod
     val topCommentsText = stringResource(R.string.comments_sort_top)
     val newestFirstText = stringResource(R.string.comments_sort_newest)
     Column(
-        modifier.width(200.dp).messageCardShadow().background(DesignTokens.Panel, RoundedCornerShape(12.dp))
+        modifier.width(220.dp).messageCardShadow().clip(MinRadius.Field).background(DesignTokens.Panel)
             .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp).testTag("comments-sort-menu")
+            .padding(vertical = MinSpace.sm).testTag("comments-sort-menu")
             .appPaneTitle(R.string.a11y_sort_comments),
     ) {
         SortMenuRow(topCommentsText, selected == CommentSort.Top, "comments-sort-top") { onSelect(CommentSort.Top) }
@@ -570,14 +554,18 @@ private fun SortMenu(selected: CommentSort, onSelect: (CommentSort) -> Unit, mod
 @Composable
 private fun SortMenuRow(label: String, selected: Boolean, tag: String, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp).testTag(tag),
+        Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch)
+            .then(if (selected) Modifier.background(DesignTokens.Ghost) else Modifier)
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { this.selected = selected }
+            .padding(horizontal = MinSpace.lg, vertical = MinSpace.sm).testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AppText(
-            label, size = 14, line = 20,
-            weight = if (selected) FontWeight.Medium else FontWeight.Normal,
+            label, if (selected) MinType.Label else MinType.Body, Modifier.weight(1f),
+            color = if (selected) DesignTokens.AccentText else DesignTokens.Ink,
         )
+        if (selected) AppIcon(AppIcon.Check, Modifier.size(18.dp), color = DesignTokens.Accent)
     }
 }
 
@@ -595,15 +583,18 @@ private fun ColumnScope.CommentsBody(state: CommentsUiState, listState: LazyList
             if (content != CommentsContent.Disabled) Simplebox(onAction)
             val messageMinHeight = (bodyHeight - if (content == CommentsContent.Disabled) 0.dp else 89.dp).coerceAtLeast(48.dp)
             when (content) {
-                CommentsContent.Loading -> Box(
-                    Modifier.fillMaxWidth().heightIn(min = messageMinHeight), contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(Modifier.size(20.dp).testTag("comments-loading"),
-                        color = DesignTokens.Secondary, strokeWidth = 2.dp)
+                CommentsContent.Loading -> {
+                    val loadingText = stringResource(R.string.ui_loading_comments)
+                    MessageRowsSkeleton(
+                        Modifier.heightIn(min = messageMinHeight).testTag("comments-loading")
+                            .clearAndSetSemantics { contentDescription = loadingText },
+                        startInset = CommentsLayout.CommentStartInset.dp,
+                    )
                 }
-                CommentsContent.Failed -> MessageBlock(stringResource(R.string.ui_something_went_wrong_while_loading_comments), messageMinHeight, onRetry = { onAction(CommentAction.Retry) })
+                CommentsContent.Failed -> MessageBlock(stringResource(R.string.ui_something_went_wrong_while_loading_comments), messageMinHeight,
+                    error = true, help = stringResource(R.string.ui_please_try_again), onRetry = { onAction(CommentAction.Retry) })
                 CommentsContent.Empty -> MessageBlock(stringResource(R.string.ui_no_comments_yet), messageMinHeight)
-                CommentsContent.Disabled -> MessageBlock(stringResource(R.string.ui_comments_are_turned_off), messageMinHeight)
+                CommentsContent.Disabled -> MessageBlock(stringResource(R.string.ui_comments_are_turned_off), messageMinHeight, icon = AppIcon.Block)
                 is CommentsContent.Ready -> Unit
             }
         }
@@ -611,32 +602,26 @@ private fun ColumnScope.CommentsBody(state: CommentsUiState, listState: LazyList
 }
 
 @Composable
-private fun MessageBlock(message: String, minHeight: Dp, onRetry: (() -> Unit)? = null) {
-    val retryText = stringResource(R.string.retry)
+private fun MessageBlock(
+    message: String, minHeight: Dp, icon: AppIcon = AppIcon.Comment, error: Boolean = false,
+    help: String? = null, onRetry: (() -> Unit)? = null,
+) {
     Box(Modifier.fillMaxWidth().heightIn(min = minHeight), contentAlignment = Alignment.Center) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            AppText(
-                message,
-                Modifier.testTag(if (onRetry != null) "comments-error" else "comments-message"),
-                size = 14, line = 20, color = DesignTokens.Secondary,
-            )
-            if (onRetry != null) {
-                Spacer(Modifier.height(8.dp))
-                Box(
-                    Modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(20.dp)).clickable(role = Role.Button, onClick = onRetry)
-                        .padding(horizontal = 16.dp).testTag("comments-retry"),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    AppText(retryText, size = 14, line = 20, weight = FontWeight.Medium, color = Color(0xFF065FD4))
-                }
-            }
-        }
+        PanelStateMessage(
+            title = message,
+            icon = if (error) AppIcon.Error else icon,
+            error = error,
+            message = help,
+            titleTag = if (onRetry != null) "comments-error" else "comments-message",
+            actionLabel = if (onRetry != null) stringResource(R.string.retry) else null,
+            actionTag = "comments-retry",
+            onAction = onRetry,
+        )
     }
 }
 
 @Composable
 private fun Simplebox(onAction: (CommentAction) -> Unit) {
-    val retryText = stringResource(R.string.retry)
     Column(Modifier.fillMaxWidth().testTag("comments-simplebox")) {
         Row(
             Modifier.fillMaxWidth().heightIn(min = CommentsLayout.SimpleboxHeight.dp)
@@ -647,15 +632,15 @@ private fun Simplebox(onAction: (CommentAction) -> Unit) {
             Spacer(Modifier.width(CommentsLayout.AvatarGap.dp))
             Box(
                 Modifier.weight(1f).heightIn(min = CommentsLayout.InputHeight.dp)
-                    .clip(RoundedCornerShape(CommentsLayout.InputRadius.dp))
-                    .border(1.dp, DesignTokens.Border.copy(alpha = CommentsLayout.DividerAlpha), RoundedCornerShape(CommentsLayout.InputRadius.dp))
+                    .clip(MinRadius.Field)
+                    .background(DesignTokens.Surface)
                     .clickable(role = Role.Button) { onAction(CommentAction.Compose) }
                     .testTag("comments-input")
                     .appDescription(R.string.a11y_add_comment)
-                    .padding(start = CommentsLayout.InputTextInset.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                    .padding(horizontal = MinSpace.md, vertical = MinSpace.sm),
                 contentAlignment = Alignment.CenterStart,
             ) {
-                AppText(stringResource(R.string.ui_add_a_comment), size = 14, line = 20, color = DesignTokens.Secondary)
+                AppText(stringResource(R.string.ui_add_a_comment), MinType.Body, color = DesignTokens.Secondary)
             }
         }
         Divider()
@@ -691,8 +676,8 @@ private fun ThreadList(content: CommentsContent.Ready, expanded: Set<String>, li
                     item(key = "reply-status:${thread.id}", contentType = "reply-status") {
                         Column(Modifier.fillMaxWidth().padding(start = CommentsLayout.ReplyToggleStart.dp, end = 20.dp)
                             .then(if (thread.replies.isEmpty()) Modifier.testTag("comment-${thread.id}-replies") else Modifier)) {
-                            if (thread.repliesLoading && thread.replies.isEmpty()) AppText(stringResource(R.string.ui_loading_replies), size = 12, line = 18)
-                            if (thread.repliesFailed) AppText(stringResource(R.string.ui_couldn_t_load_replies_tap_below_to_retry), size = 12, line = 18)
+                            if (thread.repliesLoading && thread.replies.isEmpty()) AppText(stringResource(R.string.ui_loading_replies), MinType.Caption, color = DesignTokens.Secondary)
+                            if (thread.repliesFailed) AppText(stringResource(R.string.ui_couldn_t_load_replies_tap_below_to_retry), MinType.Caption, color = DesignTokens.Danger)
                         }
                     }
                 }
@@ -729,26 +714,21 @@ private fun ListFooter(content: CommentsContent.Ready, onAction: (CommentAction)
     val loadMoreFailedText = stringResource(R.string.comments_load_more_failed)
     when {
         content.loadingMore || content.threads.isEmpty() && content.nextCursor != null && !content.loadMoreFailed -> Box(
-            Modifier.fillMaxWidth().height(56.dp).testTag("comments-footer-loading"),
+            Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("comments-footer-loading"),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator(
-                Modifier.size(20.dp), color = DesignTokens.Secondary, strokeWidth = 2.dp,
+                Modifier.size(20.dp), color = DesignTokens.Accent, strokeWidth = 2.dp,
             )
         }
         content.loadMoreFailed -> Row(
-            Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp).testTag("comments-footer-error"),
+            Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = MinSpace.lg, end = MinSpace.sm).testTag("comments-footer-error"),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AppText(loadMoreFailedText, Modifier.weight(1f), size = 14, line = 20, color = DesignTokens.Secondary)
-            Box(
-                Modifier.height(40.dp).clip(RoundedCornerShape(20.dp))
-                    .clickable(role = Role.Button) { onAction(CommentAction.LoadMore) }
-                    .padding(horizontal = 16.dp).testTag("comments-footer-retry"),
-                contentAlignment = Alignment.Center,
-            ) { AppText(retryText, size = 14, line = 20, weight = FontWeight.Medium) }
+            AppText(loadMoreFailedText, MinType.Body, Modifier.weight(1f), color = DesignTokens.Secondary)
+            MinButton(retryText, { onAction(CommentAction.LoadMore) }, kind = MinButtonKind.Text, testTag = "comments-footer-retry")
         }
-        else -> Spacer(Modifier.height(16.dp))
+        else -> Spacer(Modifier.height(MinSpace.lg))
     }
 }
 
@@ -774,12 +754,11 @@ private fun ExpandedRepliesFooter(thread: CommentThread, onAction: (CommentActio
     Column(Modifier.fillMaxWidth()) {
         if (thread.repliesNextCursor != null && !thread.repliesFailed) {
             Box(Modifier.fillMaxWidth().padding(start = CommentsLayout.ReplyToggleStart.dp, end = 20.dp)
-                .heightIn(min = 40.dp).clip(RoundedCornerShape(8.dp))
+                .heightIn(min = MinSpace.Touch).clip(MinRadius.Badge)
                 .clickable(enabled = !thread.repliesLoading, role = Role.Button) { onAction(CommentAction.LoadMoreReplies(thread.id)) }
                 .testTag("comment-${thread.id}-replies-more"), contentAlignment = Alignment.CenterStart) {
-                if (thread.repliesLoading) CircularProgressIndicator(Modifier.size(16.dp), color = DesignTokens.Secondary, strokeWidth = 2.dp)
-                else AppText(stringResource(R.string.show_more_replies), size = 13, line = 18,
-                    weight = FontWeight.Medium, color = DesignTokens.Secondary)
+                if (thread.repliesLoading) CircularProgressIndicator(Modifier.size(16.dp), color = DesignTokens.Accent, strokeWidth = 2.dp)
+                else AppText(stringResource(R.string.show_more_replies), MinType.Label, color = DesignTokens.Secondary)
             }
         }
         Spacer(Modifier.height(4.dp))
@@ -866,17 +845,12 @@ private fun CommentAuthorRow(
     ) {
         AppText(
             author.handle.ifBlank { author.displayName },
+            MinType.Caption.copy(fontWeight = FontWeight.Medium),
             Modifier.weight(1f).testTag("comment-$testTagSuffix-author"),
-            size = CommentsLayout.AuthorSize.toInt(),
-            line = CommentsLayout.AuthorLine.toInt(),
             maxLines = 1,
         )
-        AppText(
-            age,
-            size = CommentsLayout.AgeSize.toInt(),
-            line = CommentsLayout.AgeLine.toInt(),
-            maxLines = 1,
-        )
+        Spacer(Modifier.width(MinSpace.sm))
+        AppText(age, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
     }
 }
 
@@ -895,59 +869,64 @@ private fun CommentActions(
     onReply: () -> Unit,
     onMore: () -> Unit,
 ) {
-    Row(Modifier.fillMaxWidth().height(CommentsLayout.ActionRowHeight.dp), verticalAlignment = Alignment.CenterVertically) {
-        Row(Modifier.weight(1f).offset(x = (-6).dp).horizontalScroll(rememberScrollState())) {
-            CountedAction(AppIcon.Like, likes, stringResource(R.string.ui_like_1_s , description), "$tagPrefix-like", onLike,
+    Row(Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.weight(1f).offset(x = (-6).dp).horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically) {
+            CountedAction(AppIcon.Like, AppIcon.LikeFilled, likes, stringResource(R.string.ui_like_1_s , description), "$tagPrefix-like", onLike,
                 enabled, rating == VideoRating.Like, (pending as? CommentNavigationRequest.LikeComment)?.commentId == commentId)
-            Spacer(Modifier.width(7.dp))
-            PlainAction(AppIcon.Dislike, stringResource(R.string.ui_dislike_1_s , description), "$tagPrefix-dislike", onDislike,
+            PlainAction(AppIcon.Dislike, AppIcon.DislikeFilled, stringResource(R.string.ui_dislike_1_s , description), "$tagPrefix-dislike", onDislike,
                 enabled, rating == VideoRating.Dislike, (pending as? CommentNavigationRequest.DislikeComment)?.commentId == commentId)
-            Spacer(Modifier.width(7.dp))
             if (replyCount != null) {
-                CountedAction(AppIcon.Comment, replyCount.toString(), stringResource(R.string.ui_reply_to_1_s , description), "$tagPrefix-reply", onReply, enabled)
+                CountedAction(AppIcon.Comment, AppIcon.Comment, replyCount.toString(), stringResource(R.string.ui_reply_to_1_s , description), "$tagPrefix-reply", onReply, enabled)
             } else {
-                PlainAction(AppIcon.Comment, stringResource(R.string.ui_reply_to_1_s , description), "$tagPrefix-reply", onReply, enabled)
+                PlainAction(AppIcon.Comment, AppIcon.Comment, stringResource(R.string.ui_reply_to_1_s , description), "$tagPrefix-reply", onReply, enabled)
             }
         }
         Box(
-            Modifier.size(CommentsLayout.KebabTarget.dp).clip(CircleShape)
+            Modifier.size(MinSpace.Touch).clip(CircleShape)
                 .clickable(enabled = enabled, role = Role.Button, onClick = onMore)
                 .testTag("$tagPrefix-more")
                 .appDescription(R.string.a11y_more_actions_for, description),
             contentAlignment = Alignment.Center,
-        ) { AppIcon(AppIcon.More, Modifier.size(CommentsLayout.KebabIcon.dp)) }
+        ) { AppIcon(AppIcon.More, Modifier.size(20.dp), color = DesignTokens.Secondary) }
     }
 }
 
+/** Icon plus count; 48dp tall hit area, the glyph starts on the comment text edge. */
 @Composable
-private fun CountedAction(icon: AppIcon, count: String, description: String, tag: String, onClick: () -> Unit,
+private fun CountedAction(icon: AppIcon, selectedIcon: AppIcon, count: String, description: String, tag: String, onClick: () -> Unit,
     enabled: Boolean = true, selected: Boolean = false, pending: Boolean = false) {
     Row(
-        Modifier.height(CommentsLayout.ActionRowHeight.dp).clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .testTag(tag).semantics { contentDescription = description; this.selected = selected },
+        Modifier.heightIn(min = MinSpace.Touch).widthIn(min = MinSpace.Touch).clip(MinRadius.Full)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .testTag(tag).semantics { contentDescription = description; this.selected = selected }
+            .padding(start = 6.dp, end = MinSpace.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             if (pending) com.hhst.youtubelite.ui.design.ActionProgress()
-            else AppIcon(icon, Modifier.size(CommentsLayout.ActionIcon.dp), color = if (selected) DesignTokens.Red else DesignTokens.Ink)
+            else AppIcon(if (selected) selectedIcon else icon, Modifier.size(18.dp),
+                color = if (selected) DesignTokens.Accent else DesignTokens.Ink)
         }
-        Spacer(Modifier.width(1.dp))
-        AppText(count, size = CommentsLayout.ActionCountSize.toInt(), line = 13, color = DesignTokens.Secondary)
+        if (count.isNotBlank()) {
+            Spacer(Modifier.width(MinSpace.xs))
+            AppText(count, MinType.Caption, color = if (selected) DesignTokens.AccentText else DesignTokens.Secondary, maxLines = 1)
+        }
     }
 }
 
 @Composable
-private fun PlainAction(icon: AppIcon, description: String, tag: String, onClick: () -> Unit,
+private fun PlainAction(icon: AppIcon, selectedIcon: AppIcon, description: String, tag: String, onClick: () -> Unit,
     enabled: Boolean = true, selected: Boolean = false, pending: Boolean = false) {
     Box(
-        Modifier.height(CommentsLayout.ActionRowHeight.dp).clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+        Modifier.size(MinSpace.Touch).clip(CircleShape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .testTag(tag).semantics { contentDescription = description; this.selected = selected },
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-            if (pending) com.hhst.youtubelite.ui.design.ActionProgress()
-            else AppIcon(icon, Modifier.size(CommentsLayout.ActionIcon.dp), color = if (selected) DesignTokens.Red else DesignTokens.Ink)
-        }
+        if (pending) com.hhst.youtubelite.ui.design.ActionProgress()
+        else AppIcon(if (selected) selectedIcon else icon, Modifier.size(18.dp),
+            color = if (selected) DesignTokens.Accent else DesignTokens.Ink)
     }
 }
 
@@ -955,18 +934,20 @@ private fun PlainAction(icon: AppIcon, description: String, tag: String, onClick
 private fun RepliesToggle(label: String, tag: String, onClick: () -> Unit) {
     Box(
         Modifier.fillMaxWidth().padding(start = CommentsLayout.ReplyToggleStart.dp, end = 12.dp)
-            .heightIn(min = CommentsLayout.ReplyToggleHeight.dp)
+            .heightIn(min = MinSpace.Touch)
+            .clip(MinRadius.Badge)
             .clickable(role = Role.Button, onClick = onClick)
-            .testTag(tag),
+            .testTag(tag)
+            .padding(horizontal = 6.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
-        AppText(label, size = 14, line = 20, weight = FontWeight.Medium)
+        AppText(label, MinType.Label, color = DesignTokens.AccentText)
     }
 }
 
 @Composable
 private fun Divider() {
-    Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border.copy(alpha = CommentsLayout.DividerAlpha)))
+    Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
 }
 
 @Composable

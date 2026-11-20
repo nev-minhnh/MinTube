@@ -8,7 +8,7 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.sp
+import com.hhst.youtubelite.ui.design.MinType
 import com.hhst.youtubelite.comments.domain.*
 import com.hhst.youtubelite.ui.design.DesignTokens
 
@@ -34,6 +34,6 @@ internal fun CommentRichBody(body: String, runs: List<CommentTextRun>, videoId: 
         }
     }
     SelectionContainer(modifier) {
-        BasicText(text, style = DesignTokens.text(14, 18).copy(lineHeight = 17.5.sp))
+        BasicText(text, style = MinType.Body.copy(color = DesignTokens.Ink))
     }
 }
