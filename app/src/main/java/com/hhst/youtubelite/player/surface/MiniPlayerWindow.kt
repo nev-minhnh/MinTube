@@ -167,7 +167,7 @@ fun MiniPlayerWindow(
     val haptics: HapticsController = koinInject()
     val density = LocalDensity.current
     // In-app the mini has one fixed corner and the default size; drop placements older versions saved.
-    remember(store) { store.clearLegacyPlacement() }
+    LaunchedEffect(store) { store.clearLegacyPlacement() }
     val spec = MiniPlayerLayout.computeSpec(screenWidthDp, bottomInsetDp, MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP)
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     var measuredParentSize by remember { mutableStateOf(IntSize.Zero) }
