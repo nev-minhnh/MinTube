@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.*
@@ -40,78 +42,77 @@ object ChannelAboutLayout {
     }
 }
 
+/**
+ * The About sheet: description, links when the channel has any, and the details the live mapping
+ * fills (only non-blank rows are drawn, so nothing is a placeholder). A bottom sheet on phones and
+ * portrait tablets, a panel docked at the end edge on wide landscape windows.
+ */
 @Composable
 fun ChannelAboutPanel(profile: ChannelProfile, width: Float, height: Float, onAction: (ChannelAction) -> Unit,
     scroll: ScrollState = rememberScrollState()) {
     val docked = ChannelAboutLayout.docked(width, height)
     val top = ChannelAboutLayout.top(width, height)
     val square = width > height && (width >= 931 || width * 9 >= height * 13)
-    val headingSize = if (width < 600) 18 else 20
-    val headingLine = if (width < 600) 24 else 28
+    val inset = MinSpace.pageInset(WindowClass.of(ChannelAboutLayout.panelWidth(width, height).toInt()))
     PanelTransition(fromBottom = !docked, onDismiss = { onAction(ChannelAction.CloseOverlay) },
         scrim = { scrimMotion, close ->
             Box(Modifier.fillMaxSize().then(scrimMotion).background(DesignTokens.Scrim)
                 .clickable(role = Role.Button) { close() }.testTag("channel-about-scrim"))
         }) { panelMotion, close ->
     val drag = rememberBottomSheetDrag(enabled = !docked, onDismiss = close)
+    val corner = if (square) 0.dp else MinRadius.lg
     Column(Modifier.offset(x = if (docked) (width - ChannelAboutLayout.panelWidth(width, height)).dp else 0.dp, y = top.dp)
         .height((height - top).dp).width(ChannelAboutLayout.panelWidth(width, height).dp)
         .then(panelMotion)
         .then(drag.panelModifier)
-        .clip(RoundedCornerShape(topStart = if (square) 0.dp else 12.dp, topEnd = if (square) 0.dp else 12.dp))
-        .background(DesignTokens.Background).pointerInput(Unit) { detectTapGestures {} }
+        .clip(RoundedCornerShape(topStart = corner, topEnd = corner))
+        .background(DesignTokens.Panel).pointerInput(Unit) { detectTapGestures {} }
         .appPaneTitle(R.string.download_size_estimate, profile.name).testTag("channel-about-panel")) {
         Column(Modifier.fillMaxWidth().then(drag.handleModifier).testTag("channel-about-drag-header")) {
-        Box(Modifier.fillMaxWidth().height(12.dp).padding(top = 8.dp), contentAlignment = Alignment.TopCenter) {
-            if (!square) Box(Modifier.size(40.dp, 4.dp).background(DesignTokens.Ink.copy(alpha = .15f), RoundedCornerShape(4.dp)))
+            Box(Modifier.fillMaxWidth().padding(top = MinSpace.sm), contentAlignment = Alignment.TopCenter) {
+                if (!square) Box(Modifier.size(32.dp, 4.dp).background(DesignTokens.Ghost, CircleShape))
+            }
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = inset, end = MinSpace.xs), verticalAlignment = Alignment.CenterVertically) {
+                AppText(profile.name, MinType.Title, Modifier.weight(1f).semantics { heading() }, maxLines = 2)
+                AppIconButton(AppIcon.Close, stringResource(R.string.a11y_close_channel_details)) { close() }
+            }
         }
-        Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(start = 12.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Spacer(Modifier.weight(1f))
-            AppIconButton(AppIcon.Close, stringResource(R.string.a11y_close_channel_details), diameter = 48.dp) { close() }
-        }
-        }
-        Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.NavigationDivider))
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll).padding(horizontal = 12.dp).testTag("channel-about-content")) {
-            Spacer(Modifier.height(16.dp))
-            AboutHeading(stringResource(R.string.video_description), headingSize, headingLine)
-            Spacer(Modifier.height(12.dp))
-            AppText(profile.fullDescription, size = 14, line = 20)
+        Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll).padding(horizontal = inset).testTag("channel-about-content")) {
+            if (profile.fullDescription.isNotBlank()) {
+                AboutHeading(stringResource(R.string.video_description))
+                AppText(profile.fullDescription, MinType.Body)
+            }
             if (profile.links.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                AboutHeading(stringResource(R.string.ui_links), headingSize, headingLine)
-                Spacer(Modifier.height(12.dp))
+                AboutHeading(stringResource(R.string.ui_links))
                 profile.links.forEach { link ->
-                    Column(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(start = 40.dp, bottom = 8.dp)
-                        .clickable(role = Role.Button) { onAction(ChannelAction.OpenLink("https://$link")) }) {
-                        AppText(link, size = 14, line = 20, weight = FontWeight.Medium)
-                        Spacer(Modifier.height(4.dp))
-                        AppText(link, size = 14, line = 20, color = Color(0xFF065FD4))
+                    Row(Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch).clip(MinRadius.Field)
+                        .clickable(role = Role.Button) { onAction(ChannelAction.OpenLink("https://$link")) }
+                        .padding(vertical = MinSpace.xs), verticalAlignment = Alignment.CenterVertically) {
+                        AppIcon(AppIcon.Link, Modifier.size(20.dp), color = DesignTokens.Secondary)
+                        Spacer(Modifier.width(MinSpace.lg))
+                        AppText(link, MinType.Body, Modifier.weight(1f), color = DesignTokens.Link, maxLines = 2)
                     }
                 }
             }
-            Spacer(Modifier.height(16.dp))
-            AboutHeading(stringResource(R.string.ui_more_info), headingSize, headingLine)
-            Spacer(Modifier.height(12.dp))
+            AboutHeading(stringResource(R.string.ui_more_info))
             val details = listOf(AppIcon.Globe to profile.canonicalUrl.removePrefix("https://"), AppIcon.Globe to profile.country,
                 AppIcon.Info to profile.joined, AppIcon.Audience to profile.subscribers, AppIcon.VideoOutline to profile.videoCount, AppIcon.Trending to profile.views)
             details.filter { it.second.isNotEmpty() }.forEachIndexed { index, (icon, value) ->
-                Row(Modifier.fillMaxWidth().heightIn(min = 40.dp).testTag("channel-about-detail-$index"), verticalAlignment = Alignment.Top) {
-                    AppIcon(icon, modifier = Modifier.testTag("channel-about-detail-icon-$index"))
-                    Spacer(Modifier.width(15.dp))
-                    AppText(value, Modifier.weight(1f).padding(top = 2.dp).testTag("channel-about-detail-value-$index"), size = 14, line = 20,
-                        maxLines = if (LocalDensity.current.fontScale > 1.3f) 2 else 1)
+                Row(Modifier.fillMaxWidth().heightIn(min = MinSpace.Touch).testTag("channel-about-detail-$index"), verticalAlignment = Alignment.CenterVertically) {
+                    AppIcon(icon, modifier = Modifier.size(20.dp).testTag("channel-about-detail-icon-$index"), color = DesignTokens.Secondary)
+                    Spacer(Modifier.width(MinSpace.lg))
+                    AppText(value, MinType.Body, Modifier.weight(1f).testTag("channel-about-detail-value-$index"),
+                        maxLines = if (LocalDensity.current.fontScale > 1.3f) 3 else 2)
                 }
             }
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(MinSpace.xxxl))
         }
     }
     }
 }
 
 @Composable
-private fun AboutHeading(text: String, size: Int, line: Int, modifier: Modifier = Modifier) {
-    // Barlow Semi Condensed SemiBold (SIL OFL 1.1): static cut, no variation axes.
-    val family = remember(size) { FontFamily(Font(R.font.barlow_semicondensed, FontWeight.SemiBold)) }
-    BasicText(text, modifier, style = DesignTokens.text(size, line, FontWeight.SemiBold).copy(fontFamily = family),
-        maxLines = 2, overflow = TextOverflow.Ellipsis)
+private fun AboutHeading(text: String) {
+    AppText(text, MinType.Subtitle, Modifier.fillMaxWidth().padding(top = MinSpace.xl, bottom = MinSpace.sm).semantics { heading() }, maxLines = 2)
 }
