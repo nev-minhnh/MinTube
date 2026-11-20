@@ -67,7 +67,8 @@ fun YouScreen(state: LibraryUiState, onAction: (LibraryAction) -> Unit, modifier
         val listState = rememberLibraryListState()
         Column(Modifier.fillMaxSize().then(if (state.overlay != LibraryOverlay.None) Modifier.clearAndSetSemantics {} else Modifier)) {
             CollapsingAppBar(appBar) {
-                YouTopBar(state.signedIn, privateBrowsing, onAction)
+                // The host reads the preference on resume; the live listener catches a change made while You is open.
+                YouTopBar(state.signedIn, privateBrowsing || com.hhst.youtubelite.account.presentation.rememberPrivateBrowsing(), onAction)
             }
             RefreshableContent(value = state, refreshing = state.content == LibraryContent.Loading,
                     onRefresh = { onAction(LibraryAction.Retry) }, modifier = Modifier.weight(1f).fillMaxWidth(),
