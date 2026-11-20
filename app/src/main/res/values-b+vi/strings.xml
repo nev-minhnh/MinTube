@@ -732,4 +732,7 @@
     <string name="about_fork_notice">MinTube là bản fork của Litube 4.0.0 do HydeYYHH phát triển, phát hành theo giấy phép GPL-3.0</string>
     <string name="about_upstream">Dự án gốc: Litube</string>
     <string name="about_credits">Xây dựng dựa trên MediaServiceCore, SmartTube và NewTube.</string>
+    <string name="shorts_dislike">Không thích</string>
+    <string name="shorts_empty_message">Hãy quay lại sau giây lát hoặc thử lại.</string>
+    <string name="shorts_progress">Tiến trình phát</string>
 </resources>

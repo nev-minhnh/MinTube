@@ -466,7 +466,12 @@ class ShortsActivity : ComponentActivity() {
                 // Surface resets and same-video recovery must not cover a real retained frame.
                 isVideoReady = { playerState.videoId == it && playerState.hasRenderedVideoFrame },
                 onSwipeStart = if (fixtures) null else playerViewModel::holdShortsForSwipe,
-                onSwipeCancel = if (fixtures) null else playerViewModel::resumeShortsAfterSwipe)
+                onSwipeCancel = if (fixtures) null else playerViewModel::resumeShortsAfterSwipe,
+                onBack = { onBackPressedDispatcher.onBackPressed() },
+                playbackProgress = if (fixtures) null else { itemId ->
+                    if (playerState.videoId == itemId) com.hhst.youtubelite.shorts.presentation.ShortProgressBar(
+                        positionMs = { playerViewModel.positionState.value }, durationMs = playerState.durationMs)
+                })
             if (state.overlay is ShortsOverlay.Comments && activeComments != null) {
                 Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout)).testTag("comments-panel-host")) {
                     CommentsPanel(

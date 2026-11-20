@@ -732,4 +732,7 @@
     <string name="about_fork_notice">MinTube is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0</string>
     <string name="about_upstream">Original project: Litube</string>
     <string name="about_credits">Built on MediaServiceCore, SmartTube and NewTube.</string>
+    <string name="shorts_dislike">Dislike</string>
+    <string name="shorts_empty_message">Check back in a moment or try again.</string>
+    <string name="shorts_progress">Playback progress</string>
 </resources>

@@ -6,15 +6,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.player.surface.PlayerModalSheet
+import com.hhst.youtubelite.ui.design.AppText
+import com.hhst.youtubelite.ui.design.DesignTokens
+import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.MinType
 
 @Composable
 internal fun ShortsDescriptionSheet(
@@ -26,27 +28,13 @@ internal fun ShortsDescriptionSheet(
     PlayerModalSheet(onDismiss = onDismiss) {
         Column(
             Modifier.fillMaxWidth().heightIn(max = 480.dp).verticalScroll(rememberScrollState())
-                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
+                .padding(start = MinSpace.xl, end = MinSpace.xl, bottom = MinSpace.xxl),
         ) {
-            Text(
-                title,
-                fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            AppText(title, MinType.Subtitle, Modifier.semantics { heading() })
             author?.takeIf { it.isNotBlank() }?.let {
-                Text(
-                    it,
-                    Modifier.padding(top = 4.dp),
-                    fontSize = 13.sp, lineHeight = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                AppText(it, MinType.Caption, Modifier.padding(top = MinSpace.xs), color = DesignTokens.Secondary)
             }
-            Text(
-                description,
-                Modifier.padding(top = 12.dp).testTag("shorts-description"),
-                fontSize = 14.sp, lineHeight = 20.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            AppText(description, MinType.Body, Modifier.padding(top = MinSpace.md).testTag("shorts-description"))
         }
     }
 }

@@ -55,18 +55,23 @@ class ShortsScreenshotAndroidTest {
         compose.runOnIdle { width = 390; height = 844 }
         fun bounds(description: String) =
             compose.onNodeWithContentDescription(description).fetchSemanticsNode().boundsInRoot
+        // 48dp targets: the overflow sits 4dp inside the top-end corner, level with the top bar.
         val more = bounds("More actions for A whole world in a single frame")
-        assertEquals(342f, more.left, 0.5f)
-        assertEquals(8f, more.top, 0.5f)
-        assertEquals(40f, more.width, 0.5f)
-        assertEquals(40f, more.height, 0.5f)
+        assertEquals(338f, more.left, 0.5f)
+        assertEquals(4f, more.top, 0.5f)
+        assertEquals(48f, more.width, 0.5f)
+        assertEquals(48f, more.height, 0.5f)
         val like = bounds("Like A whole world in a single frame")
+        val dislike = bounds("Dislike A whole world in a single frame")
         val comments = bounds("Comments for A whole world in a single frame")
         val share = bounds("Share A whole world in a single frame")
-        for ((b, top) in listOf(like to 576f, comments to 644f, share to 712f)) {
-            assertEquals(338f, b.left, 0.5f)
+        // 64dp rail 4dp from the end edge; each action is a 48dp disc plus a 16dp label, 8dp apart,
+        // and the rail ends 16dp above the bottom edge, level with the title.
+        for ((b, top) in listOf(like to 548f, dislike to 620f, comments to 692f, share to 764f)) {
+            assertEquals(330f, b.left, 0.5f)
             assertEquals(top, b.top, 0.5f)
-            assertEquals(40f, b.height, 0.5f)
+            assertEquals(48f, b.width, 0.5f)
+            assertEquals(48f, b.height, 0.5f)
         }
         compose.onNodeWithText("Subscribe").assertIsDisplayed()
         val channel = compose.onNodeWithTag("short-channel-short-1").fetchSemanticsNode().boundsInRoot
@@ -84,6 +89,7 @@ class ShortsScreenshotAndroidTest {
         compose.runOnIdle { width = 390; height = 844; scale = 2f }
         for (label in listOf(
             "rail-label-Like A whole world in a single frame",
+            "rail-label-Dislike A whole world in a single frame",
             "rail-label-Comments for A whole world in a single frame",
             "rail-label-Share A whole world in a single frame",
         )) {
@@ -103,6 +109,8 @@ class ShortsScreenshotAndroidTest {
         }
         compose.onNodeWithTag("short-more-${item.id}").assertIsDisplayed().performClick()
         assertEquals(com.hhst.youtubelite.shorts.domain.ShortsAction.OpenMenu(item.id), actions.last())
+        compose.onNodeWithContentDescription("Dislike ${item.title}").assertIsDisplayed().performClick()
+        assertEquals(com.hhst.youtubelite.shorts.domain.ShortsAction.Dislike(item.id), actions.last())
     }
 
     private val output: File
