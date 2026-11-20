@@ -57,10 +57,15 @@ private fun CardArtwork(artwork: String, videoId: String?, modifier: Modifier) {
     if (videoId != null) VideoArtwork(videoId, artwork, modifier) else Artwork(artwork, modifier)
 }
 
-/** Thumbnail node modifier: the caller's [artworkModifier] plus the optional tag and spoken label. */
-private fun thumbnailModifier(artworkModifier: Modifier, tag: String?, description: String?): Modifier = artworkModifier
-    .then(if (tag != null) Modifier.testTag(tag) else Modifier)
-    .then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier)
+/**
+ * A tagged or labelled thumbnail is its own button (same action as the card), so its tag and spoken
+ * label stay a separate node instead of merging into the card.
+ */
+private fun thumbnailButton(tag: String?, description: String?, onClick: () -> Unit): Modifier =
+    if (tag == null && description == null) Modifier
+    else Modifier.clickable(role = Role.Button, onClick = onClick)
+        .then(if (tag != null) Modifier.testTag(tag) else Modifier)
+        .then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier)
 
 /**
  * Round channel avatar. A missing avatar (feeds often omit it, and the shared avatar directory
@@ -143,8 +148,9 @@ fun VideoCard(
     thumbnailDescription: String? = null,
 ) {
     Column(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)) {
-        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(if (fullBleed) RectangleShape else MinRadius.Card)) {
-            CardArtwork(artwork, videoId, thumbnailModifier(artworkModifier, thumbnailTag, thumbnailDescription).fillMaxSize())
+        Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(if (fullBleed) RectangleShape else MinRadius.Card)
+            .then(thumbnailButton(thumbnailTag, thumbnailDescription, onClick))) {
+            CardArtwork(artwork, videoId, artworkModifier.fillMaxSize())
             if (!durationLabel.isNullOrBlank()) DurationBadge(durationLabel, live)
             if (progress != null) ThumbnailProgress(progress)
         }
@@ -191,8 +197,9 @@ fun VideoRow(
     thumbnailDescription: String? = null,
 ) {
     Row(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick), verticalAlignment = Alignment.Top) {
-        Box(Modifier.width(thumbnailWidth).aspectRatio(16f / 9f).clip(MinRadius.Field)) {
-            CardArtwork(artwork, videoId, thumbnailModifier(artworkModifier, thumbnailTag, thumbnailDescription).fillMaxSize())
+        Box(Modifier.width(thumbnailWidth).aspectRatio(16f / 9f).clip(MinRadius.Field)
+            .then(thumbnailButton(thumbnailTag, thumbnailDescription, onClick))) {
+            CardArtwork(artwork, videoId, artworkModifier.fillMaxSize())
             if (!durationLabel.isNullOrBlank()) DurationBadge(durationLabel, live)
             if (progress != null) ThumbnailProgress(progress)
         }

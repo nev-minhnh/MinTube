@@ -351,10 +351,15 @@ fun MinTopBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (onBack != null) AppIconButton(AppIcon.Back, backDescription, Modifier.testTag("$tag-back"), onClick = onBack)
-        if (title == null) MinTubeBrand()
-        else AppText(title, MinType.Title, Modifier.weight(1f, fill = false).semantics { heading() }, maxLines = 1)
-        if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
-        Spacer(Modifier.weight(1f))
+        if (title == null) {
+            MinTubeBrand()
+            if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
+            Spacer(Modifier.weight(1f))
+        } else Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+            // The title takes all the room the actions leave (a second weighted spacer used to halve it).
+            AppText(title, MinType.Title, Modifier.weight(1f, fill = false).semantics { heading() }, maxLines = 1)
+            if (privateBrowsing) PrivateBrowsingBadge(true, Modifier.padding(start = MinSpace.sm), compact = true)
+        }
         actions()
     }
 }
