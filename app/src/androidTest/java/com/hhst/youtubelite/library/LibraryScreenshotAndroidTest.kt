@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.library
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -42,7 +43,7 @@ class LibraryScreenshotAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
                 key(scene) {
-                    Box(Modifier.requiredSize(320.dp, 240.dp)) {
+                    TestWindowBox(Modifier.requiredSize(320.dp, 240.dp)) {
                         when (scene) {
                             0 -> YouScreen(LibraryUiState(content = LibraryContent.Failed), { if (it == LibraryAction.Retry) retries++ })
                             else -> SubscriptionsScreen(SubscriptionsUiState(content = SubscriptionsContent.Failed), { if (it == SubscriptionsAction.Retry) retries++ })
@@ -67,7 +68,7 @@ class LibraryScreenshotAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 key(width, if (playlists != CollectionUiState()) "playlists" else if (history != HistoryUiState()) "history" else "you") {
-                Box(Modifier.requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                     if (history == HistoryUiState() && playlists == CollectionUiState()) YouScreen(you, {})
                     if (history != HistoryUiState()) HistoryScreen(history, {}, {})
                     if (playlists != CollectionUiState()) {
@@ -106,7 +107,7 @@ class LibraryScreenshotAndroidTest {
         var subscriptions by mutableStateOf(SubscriptionsUiState())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                     key(width) {
                         SubscriptionsScreen(subscriptions, {})
                     }
