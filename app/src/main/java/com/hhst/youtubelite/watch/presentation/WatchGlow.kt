@@ -47,15 +47,31 @@ object GlowPalette {
     const val SAMPLE_WIDTH = 32
     const val SAMPLE_HEIGHT = 18
 
-    private const val SATURATION_BOOST = 1.2f
-    private const val MAX_SATURATION = 0.85f
-    private const val MIN_LIGHTNESS = 0.30f
-    private const val MAX_LIGHTNESS = 0.62f
+    /** Below this HSL saturation a colour counts as grey and stays grey. */
+    const val GREY_SATURATION = 0.08f
+    /** Vibrance: any real hue lands in [MIN_SATURATION, MAX_SATURATION]. */
+    const val MIN_SATURATION = 0.55f
+    const val MAX_SATURATION = 0.75f
+    const val MIN_LIGHTNESS = 0.45f
+    const val MAX_LIGHTNESS = 0.60f
+    /** Peak glow alpha right under the player. */
+    const val DARK_PEAK = 0.60f
+    const val LIGHT_PEAK = 0.28f
+    /** WCAG ratio the page's Ink must keep on the glow at its peak (title text sits on it). */
+    const val MIN_CONTRAST = 4.5
+
+    private val DARK_BACKGROUND = com.hhst.youtubelite.ui.design.MintColors.DarkBackground.toInt()
+    private val DARK_INK = com.hhst.youtubelite.ui.design.MintColors.DarkInk.toInt()
+    private val LIGHT_BACKGROUND = com.hhst.youtubelite.ui.design.MintColors.LightBackground.toInt()
+    private val LIGHT_INK = com.hhst.youtubelite.ui.design.MintColors.LightInk.toInt()
+
+    fun background(dark: Boolean) = if (dark) DARK_BACKGROUND else LIGHT_BACKGROUND
+    fun ink(dark: Boolean) = if (dark) DARK_INK else LIGHT_INK
+    fun peak(dark: Boolean) = if (dark) DARK_PEAK else LIGHT_PEAK
 
     /**
-     * Left-edge (first quarter), centre (middle quarter) and right-edge (last quarter) averages of
-     * an ARGB pixel array, with saturation boosted slightly and lightness clamped so the glow shows
-     * on a near-black page without turning neon on a light one. Null for an empty/short array.
+     * Raw left-edge (first quarter), centre (middle quarter) and right-edge (last quarter) averages
+     * of an ARGB pixel array; [forTheme] turns them into glow colours. Null for an empty/short array.
      */
     fun extract(pixels: IntArray, width: Int, height: Int): GlowColors? {
         if (width < 4 || height < 1 || pixels.size < width * height) return null
@@ -67,13 +83,19 @@ object GlowPalette {
                 val p = pixels[y * width + x]
                 r += (p shr 16) and 0xFF; g += (p shr 8) and 0xFF; b += p and 0xFF; n++
             }
-            return tune(((r / n).toInt() shl 16) or ((g / n).toInt() shl 8) or (b / n).toInt())
+            return (0xFF shl 24) or ((r / n).toInt() shl 16) or ((g / n).toInt() shl 8) or (b / n).toInt()
         }
         return GlowColors(average(0, quarter), average(centerStart, centerStart + quarter), average(width - quarter, width))
     }
 
-    /** Opaque RGB -> boosted, clamped opaque RGB. */
-    fun tune(rgb: Int): Int {
+    fun forTheme(raw: GlowColors, dark: Boolean) = GlowColors(tune(raw.left, dark), tune(raw.center, dark), tune(raw.right, dark))
+
+    /**
+     * Vibrance boost (any hue to 0.55-0.75 saturation, greys stay grey), lightness clamped to
+     * 0.45-0.6, then lightness nudged (darker on a dark page, lighter on a light one) until the
+     * page's Ink keeps [MIN_CONTRAST] on the glow at its peak alpha.
+     */
+    fun tune(rgb: Int, dark: Boolean): Int {
         val r = ((rgb shr 16) and 0xFF) / 255f
         val g = ((rgb shr 8) and 0xFF) / 255f
         val b = (rgb and 0xFF) / 255f
@@ -90,7 +112,33 @@ object GlowPalette {
                 else -> (r - g) / d + 4f
             } / 6f
         }
-        return hsl(h, min(MAX_SATURATION, s * SATURATION_BOOST), l.coerceIn(MIN_LIGHTNESS, MAX_LIGHTNESS))
+        val sat = if (s < GREY_SATURATION) s else min(MAX_SATURATION, MIN_SATURATION + 0.4f * s)
+        var light = l.coerceIn(MIN_LIGHTNESS, MAX_LIGHTNESS)
+        var out = hsl(h, sat, light)
+        repeat(60) {
+            if (inkContrast(out, dark) >= MIN_CONTRAST) return out
+            light = (light + if (dark) -0.01f else 0.01f).coerceIn(0f, 1f)
+            out = hsl(h, sat, light)
+        }
+        return out
+    }
+
+    /** Contrast of the page Ink over the glow colour composited at its peak alpha on the page background. */
+    fun inkContrast(glow: Int, dark: Boolean): Double = contrast(ink(dark), blend(background(dark), glow, peak(dark)))
+
+    fun blend(under: Int, over: Int, alpha: Float): Int {
+        fun ch(shift: Int) = ((((under shr shift) and 0xFF) * (1f - alpha) + ((over shr shift) and 0xFF) * alpha) + 0.5f).toInt()
+        return (0xFF shl 24) or (ch(16) shl 16) or (ch(8) shl 8) or ch(0)
+    }
+
+    fun luminance(rgb: Int): Double {
+        fun lin(v: Int): Double { val c = v / 255.0; return if (c <= 0.04045) c / 12.92 else Math.pow((c + 0.055) / 1.055, 2.4) }
+        return 0.2126 * lin((rgb shr 16) and 0xFF) + 0.7152 * lin((rgb shr 8) and 0xFF) + 0.0722 * lin(rgb and 0xFF)
+    }
+
+    fun contrast(a: Int, b: Int): Double {
+        val la = luminance(a); val lb = luminance(b)
+        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
     }
 
     private fun hsl(h: Float, s: Float, l: Float): Int {
@@ -177,48 +225,52 @@ class WatchGlowPaint internal constructor(
     private val strength: () -> Float,
 ) {
     /**
-     * Paints the glow into this draw scope, whose top-left sits at [origin] in root coordinates.
-     * Horizontally it stays inside the player's own column (tablet two-column layout included);
-     * vertically it eases out over [GlowAboveDp] above and [GlowBelowDp] below the slot.
+     * Paints the glow into this draw scope, whose top-left sits at [origin] in root coordinates:
+     * one soft layer around the slot, coloured left -> centre -> right across the player's width,
+     * fading smoothly over [GlowBelowDp] below, [GlowAboveDp] above and [GlowSideDp] to the start
+     * side. It never spreads past the player's right edge, so in the tablet two-column layout it
+     * stays inside the player's column.
      */
     fun draw(scope: DrawScope, origin: Offset) = with(scope) {
-        val rect = slot() ?: return@with
+        val rect = slot()?.translate(-origin.x, -origin.y) ?: return@with
         val alpha = strength()
         if (alpha <= 0.001f || rect.width <= 0f || rect.height <= 0f) return@with
-        val top = rect.top - origin.y
-        val bottom = rect.bottom - origin.y
-        val l = (rect.left - origin.x).coerceAtLeast(0f)
-        val r = (rect.right - origin.x).coerceAtMost(size.width)
-        if (r <= l) return@with
-        val colors = Brush.horizontalGradient(listOf(left.value, this@WatchGlowPaint.center.value, right.value),
-            startX = rect.left - origin.x, endX = rect.right - origin.x)
-        val above = min(GlowAboveDp.dp.toPx(), max(0f, top))
-        if (above > 0f) band(l, r, top - above, top, colors, alpha, Brush.verticalGradient(
-            0f to Color.Transparent, 0.5f to Color.Black.copy(alpha = 0.2f), 1f to Color.Black.copy(alpha = 0.6f),
-            startY = top - above, endY = top))
+        val above = min(GlowAboveDp.dp.toPx(), max(0f, rect.top + origin.y))
         val below = GlowBelowDp.dp.toPx()
-        band(l, r, bottom, bottom + below, colors, alpha, Brush.verticalGradient(
-            0f to Color.Black.copy(alpha = 0.85f), 0.25f to Color.Black.copy(alpha = 0.5f),
-            0.5f to Color.Black.copy(alpha = 0.22f), 0.75f to Color.Black.copy(alpha = 0.07f), 1f to Color.Transparent,
-            startY = bottom, endY = bottom + below))
-    }
-
-    /** Colour band masked by a vertical alpha ramp ([BlendMode.DstIn]) in its own small layer. */
-    private fun DrawScope.band(l: Float, r: Float, t: Float, b: Float, colors: Brush, alpha: Float, mask: Brush) {
-        val top = max(t, 0f); val bottom = min(b, size.height)
-        if (bottom <= top) return
-        val bounds = Rect(l, top, r, bottom)
+        val side = min(GlowSideDp.dp.toPx(), max(0f, rect.left + origin.x))
+        val y0 = rect.top - above
+        val y1 = rect.bottom + below
+        val x0 = rect.left - side
+        val bounds = Rect(max(x0, 0f), max(y0, 0f), min(rect.right, size.width), min(y1, size.height))
+        if (bounds.width <= 0f || bounds.height <= 0f) return@with
+        val total = y1 - y0
+        fun at(y: Float) = ((y - y0) / total).coerceIn(0f, 1f)
+        fun ink(a: Float) = Color.Black.copy(alpha = a)
+        // Eased (roughly quadratic) fall-off: no visible band edge anywhere.
+        val vertical = Brush.verticalGradient(
+            0f to Color.Transparent,
+            at(rect.top) to ink(0.55f),
+            at(rect.bottom) to ink(1f),
+            at(rect.bottom + below * 0.10f) to ink(0.86f),
+            at(rect.bottom + below * 0.25f) to ink(0.62f),
+            at(rect.bottom + below * 0.45f) to ink(0.34f),
+            at(rect.bottom + below * 0.65f) to ink(0.14f),
+            at(rect.bottom + below * 0.85f) to ink(0.035f),
+            1f to Color.Transparent,
+            startY = y0, endY = y1,
+        )
+        val colors = Brush.horizontalGradient(listOf(left.value, this@WatchGlowPaint.center.value, right.value),
+            startX = rect.left, endX = rect.right)
         val canvas = drawContext.canvas
         canvas.saveLayer(bounds, androidx.compose.ui.graphics.Paint().apply { this.alpha = alpha })
         drawRect(colors, bounds.topLeft, bounds.size)
-        drawRect(mask, bounds.topLeft, bounds.size, blendMode = BlendMode.DstIn)
+        drawRect(vertical, bounds.topLeft, bounds.size, blendMode = BlendMode.DstIn)
+        if (side > 0f) drawRect(Brush.horizontalGradient(
+            0f to Color.Transparent, 0.6f to ink(0.45f), 1f to ink(1f), startX = x0, endX = rect.left),
+            bounds.topLeft, bounds.size, blendMode = BlendMode.DstIn)
         canvas.restore()
     }
 }
-
-/** Peak strength: full effect on a dark page, a subtle tint on a light one. */
-internal const val GlowDarkAlpha = 0.45f
-internal const val GlowLightAlpha = 0.18f
 
 /**
  * Provides [LocalWatchGlow] and paints the glow behind the page. [visible] is false in fullscreen,
@@ -234,13 +286,15 @@ fun WatchGlowHost(
     content: @Composable () -> Unit,
 ) {
     val dark = DesignTokens.Background.luminance() < 0.5f
-    val peak = if (dark) GlowDarkAlpha else GlowLightAlpha
+    val peak = GlowPalette.peak(dark)
+    // Raw thumbnail averages are cached per video; the theme decides boost, clamp and contrast guard.
+    val tuned = remember(colors, dark) { colors?.let { GlowPalette.forTheme(it, dark) } }
     // Opening another video recomputes once and crossfades old -> new (no fade at animator scale 0).
     val fade = tween<Color>(600)
     val clear = Color.Transparent
-    val left = animateColorAsState(colors?.left?.let(::Color) ?: clear, fade, label = "glow-left")
-    val center = animateColorAsState(colors?.center?.let(::Color) ?: clear, fade, label = "glow-center")
-    val right = animateColorAsState(colors?.right?.let(::Color) ?: clear, fade, label = "glow-right")
+    val left = animateColorAsState(tuned?.left?.let(::Color) ?: clear, fade, label = "glow-left")
+    val center = animateColorAsState(tuned?.center?.let(::Color) ?: clear, fade, label = "glow-center")
+    val right = animateColorAsState(tuned?.right?.let(::Color) ?: clear, fade, label = "glow-right")
     val on = enabled && visible
     val currentOn = androidx.compose.runtime.rememberUpdatedState(on)
     val currentPeak = androidx.compose.runtime.rememberUpdatedState(peak)
@@ -276,5 +330,6 @@ fun Modifier.watchGlowBackground(): Modifier {
         }
 }
 
-const val GlowAboveDp = 40
-const val GlowBelowDp = 96
+const val GlowAboveDp = 48
+const val GlowBelowDp = 160
+const val GlowSideDp = 40
