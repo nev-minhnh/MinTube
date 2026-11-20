@@ -732,4 +732,17 @@
     <string name="about_fork_notice">MinTube là bản fork của Litube 4.0.0 do HydeYYHH phát triển, phát hành theo giấy phép GPL-3.0</string>
     <string name="about_upstream">Dự án gốc: Litube</string>
     <string name="about_credits">Xây dựng dựa trên MediaServiceCore, SmartTube và NewTube.</string>
+    <string name="account_mini_player_summary">Tiếp tục phát video trong trình phát thu nhỏ khi bạn xem nội dung khác</string>
+    <string name="account_backup_summary">Xuất hoặc nhập cài đặt của bạn</string>
+    <string name="account_backup_note">Bản sao lưu gồm các tùy chọn, cường độ rung và tùy chọn tải xuống. Giao diện, ngôn ngữ, tài khoản và lịch sử không được đưa vào.</string>
+    <string name="account_about_version">Phiên bản %1$s</string>
+    <string name="account_about_project">Dự án</string>
+    <string name="account_about_license">Giấy phép</string>
+    <string name="account_about_license_name">Giấy phép Công cộng GNU phiên bản 3.0</string>
+    <string name="account_about_updates">Cập nhật</string>
+    <string name="account_about_storage">Bộ nhớ</string>
+    <string name="account_about_clear_cache_summary">Xóa ảnh và dữ liệu trang đã lưu tạm. Tài khoản, video đã tải xuống và lịch sử được giữ nguyên.</string>
+    <string name="account_about_diagnostics">Chẩn đoán</string>
+    <string name="account_about_export_summary">Chia sẻ tệp ZIP nhật ký ứng dụng qua một ứng dụng khác</string>
+    <string name="account_about_save_summary">Lưu tệp ZIP nhật ký ứng dụng vào vị trí bạn chọn</string>
 </resources>
