@@ -41,6 +41,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import com.hhst.youtubelite.core.HapticsController
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppText
@@ -151,6 +158,8 @@ class NavigationRailHost internal constructor() {
     private var owner: Any? = null
     internal var request by mutableStateOf<NavigationRailRequest?>(null)
         private set
+    /** Overlays of the screen that also cover the rail ([CoverNavigationRail]); the last one is on top. */
+    internal val covers = mutableStateListOf<NavigationRailCover>()
 
     internal fun offer(owner: Any, request: NavigationRailRequest) {
         this.owner = owner
@@ -166,25 +175,81 @@ class NavigationRailHost internal constructor() {
 
 val LocalNavigationRailHost = staticCompositionLocalOf<NavigationRailHost?> { null }
 
+/** One overlay's scrim over the rail. */
+internal class NavigationRailCover {
+    var color by mutableStateOf(Color.Transparent)
+    var alpha by mutableStateOf<() -> Float>({ 1f })
+    var onDismiss by mutableStateOf<(() -> Unit)?>(null)
+}
+
+/**
+ * Call from inside a screen overlay (sheet scrim, full-screen panel) so the overlay also covers the
+ * start-edge rail, which sits outside the screen's own bounds: the rail is drawn under the same
+ * [color] (times [alpha], read at draw time so an animated scrim stays in step) and a tap on it calls
+ * [onDismiss]; without [onDismiss] the cover only swallows touches. Does nothing outside a rail.
+ */
+@Composable
+fun CoverNavigationRail(color: Color, alpha: () -> Float = { 1f }, onDismiss: (() -> Unit)? = null) {
+    val host = LocalNavigationRailHost.current ?: return
+    val cover = remember { NavigationRailCover() }
+    SideEffect {
+        cover.color = color
+        cover.alpha = alpha
+        cover.onDismiss = onDismiss
+    }
+    DisposableEffect(host, cover) {
+        cover.color = color
+        cover.alpha = alpha
+        cover.onDismiss = onDismiss
+        host.covers += cover
+        onDispose { host.covers -= cover }
+    }
+}
+
 /**
  * Hosts a whole screen. In a [NavigationForm.Rail] window, the tabs of the screen's
  * [MinNavigationBar] move to a start-edge rail and the screen sits to its right; the screen keeps
  * its composition (and scroll state) when the rail appears or goes. Screens without a bar are drawn
  * edge to edge as before.
+ *
+ * Screens often compose their bar during layout (inside `BoxWithConstraints`), one frame after the
+ * frame itself. A host that always shows a bar passes [reserveRail] so the rail column is laid out
+ * from the very first frame (its tabs join as soon as the bar offers them) instead of the screen
+ * drawing full width for one frame and then jumping right. The reservation lapses after two frames
+ * if no bar turns up.
  */
 @Composable
-fun NavigationFrame(content: @Composable () -> Unit) {
+fun NavigationFrame(reserveRail: Boolean = false, content: @Composable () -> Unit) {
     val host = remember { NavigationRailHost() }
-    val rail = host.request.takeIf { rememberNavigationForm() == NavigationForm.Rail }
+    val railForm = rememberNavigationForm() == NavigationForm.Rail
+    var reserving by remember(railForm) { mutableStateOf(reserveRail && railForm) }
+    if (reserving) LaunchedEffect(railForm) {
+        withFrameNanos { }
+        withFrameNanos { }
+        reserving = false
+    }
+    val rail = host.request.takeIf { railForm }
+    val railShown = rail != null || reserving
+    val railInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
     CompositionLocalProvider(LocalNavigationRailHost provides host) {
         Row(Modifier.fillMaxSize()) {
-            if (rail != null) Box(Modifier.fillMaxHeight().background(DesignTokens.Panel)) {
-                MinNavigationRail(rail.tag, rail.signedIn, rail.selected, rail.onSelect,
-                    Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)),
-                    avatarAsset = rail.avatarAsset, tabTag = rail.tabTag)
+            if (railShown) Box(Modifier.fillMaxHeight().background(DesignTokens.Panel)) {
+                if (rail != null) MinNavigationRail(rail.tag, rail.signedIn, rail.selected, rail.onSelect,
+                    Modifier.windowInsetsPadding(railInsets), avatarAsset = rail.avatarAsset, tabTag = rail.tabTag)
+                else Row(Modifier.windowInsetsPadding(railInsets).fillMaxHeight()) {
+                    Spacer(Modifier.width(MinNavigation.RailWidth - 1.dp))
+                    Box(Modifier.width(1.dp).fillMaxHeight().background(DesignTokens.NavigationDivider))
+                }
+                host.covers.lastOrNull()?.let { cover ->
+                    val dismiss = cover.onDismiss
+                    Box(Modifier.matchParentSize().graphicsLayer { alpha = cover.alpha() }.background(cover.color)
+                        .then(if (dismiss != null) Modifier.clickable(interactionSource = null, indication = null, onClick = dismiss)
+                        else Modifier.pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } })
+                        .testTag("navigation-rail-cover"))
+                }
             }
             Box(Modifier.weight(1f).fillMaxHeight().then(
-                if (rail != null) Modifier.consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)) else Modifier,
+                if (railShown) Modifier.consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)) else Modifier,
             )) { content() }
         }
     }

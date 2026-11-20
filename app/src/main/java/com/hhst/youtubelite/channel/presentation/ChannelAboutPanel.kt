@@ -58,6 +58,7 @@ fun ChannelAboutPanel(profile: ChannelProfile, width: Float, height: Float, onAc
         scrim = { scrimMotion, close ->
             Box(Modifier.fillMaxSize().then(scrimMotion).background(DesignTokens.Scrim)
                 .clickable(role = Role.Button) { close() }.testTag("channel-about-scrim"))
+            com.hhst.youtubelite.ui.components.CoverNavigationRail(DesignTokens.Scrim, onDismiss = close)
         }) { panelMotion, close ->
     val drag = rememberBottomSheetDrag(enabled = !docked, onDismiss = close)
     val corner = if (square) 0.dp else MinRadius.lg

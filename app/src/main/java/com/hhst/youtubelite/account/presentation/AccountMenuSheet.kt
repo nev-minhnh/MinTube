@@ -130,6 +130,7 @@ fun AccountSwitchSheet(
     val privateBrowsing = rememberPrivateBrowsing()
     Box(Modifier.fillMaxSize().background(DesignTokens.MenuScrim).clickable { onDismiss() }
         .testTag("account-switch-scrim").appDescription(R.string.a11y_close_menu))
+    com.hhst.youtubelite.ui.components.CoverNavigationRail(DesignTokens.MenuScrim, onDismiss = onDismiss)
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         val shape = RoundedCornerShape(MenuSheetLayout.Corner.dp)
         Column(

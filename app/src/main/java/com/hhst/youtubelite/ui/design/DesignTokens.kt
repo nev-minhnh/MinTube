@@ -93,12 +93,16 @@ fun AppTheme(content: @Composable () -> Unit) {
     }
 }
 
-fun androidx.activity.ComponentActivity.setAppContent(content: @Composable () -> Unit) {
+/**
+ * [navigationRail]: the screen always shows a tab bar, so a wide landscape window lays out the rail
+ * from the first frame (see `NavigationFrame`).
+ */
+fun androidx.activity.ComponentActivity.setAppContent(navigationRail: Boolean = false, content: @Composable () -> Unit) {
     setContent {
         AppTheme {
             Box(Modifier.fillMaxSize().background(DesignTokens.Background)) {
                 // Wide landscape windows move the screen's tab bar to a start-edge rail.
-                com.hhst.youtubelite.ui.components.NavigationFrame(content)
+                com.hhst.youtubelite.ui.components.NavigationFrame(navigationRail, content)
             }
         }
     }

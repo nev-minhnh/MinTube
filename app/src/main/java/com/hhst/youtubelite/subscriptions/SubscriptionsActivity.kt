@@ -127,7 +127,7 @@ class SubscriptionsActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by subscriptionsViewModel.uiState.collectAsStateWithLifecycle()
             com.hhst.youtubelite.ui.design.WriteProgressOverlay(subscriptionsViewModel.writes)
             subscriptionsViewModel.saveSheet?.let { com.hhst.youtubelite.ui.design.WriteProgressOverlay(it.writes) }

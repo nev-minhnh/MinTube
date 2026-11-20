@@ -78,6 +78,7 @@ private fun FeedMenuAction.icon(): AppIcon = when (this) {
 internal fun MixMenu(onAction: (HomeAction) -> Unit, live: Boolean = false) {
     Box(Modifier.fillMaxSize().background(DesignTokens.Scrim).clickable { onAction(HomeAction.CloseOverlay) }
         .appDescription(R.string.a11y_close_menu))
+    com.hhst.youtubelite.ui.components.CoverNavigationRail(DesignTokens.Scrim, onDismiss = { onAction(HomeAction.CloseOverlay) })
     BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val margin = if (maxWidth >= 330.dp) 40.dp else 0.dp
         val widthLimit = minOf(362.dp, (maxWidth - margin * 2).coerceAtLeast(0.dp))

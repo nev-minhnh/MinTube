@@ -152,7 +152,7 @@ class ChannelActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 }
             }
         }
-        setAppContent {
+        setAppContent(navigationRail = true) {
             val state by channelViewModel.uiState.collectAsStateWithLifecycle()
             val back = { if (state.overlay != ChannelOverlay.None) channelViewModel.onAction(ChannelAction.CloseOverlay) else finish() }
             BackHandler(onBack = back)
