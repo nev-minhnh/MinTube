@@ -39,6 +39,12 @@ sealed interface FeedItem {
         @kotlinx.serialization.Transient val feedbackGeneration: Long? = null,
         @kotlinx.serialization.Transient val menuEndpoint: FeedMenuEndpoint? = null,
         val short: Boolean = false,
+        /**
+         * Read-only channel lookup key (the card's lazy menu endpoint). Unlike [menuEndpoint] it is
+         * never stripped for signed-out sessions: it only resolves the channel id for avatars and
+         * never unlocks the feedback menu.
+         */
+        @kotlinx.serialization.Transient val channelLookup: FeedMenuEndpoint? = null,
     ) : FeedItem
     data class Mix(override val id: String, val title: String, val authors: String, val artwork: String, val palette: ThumbnailPalette) : FeedItem
     data class Playlist(val summary: com.hhst.youtubelite.playlist.domain.PlaylistSummary) : FeedItem {

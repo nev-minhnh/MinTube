@@ -53,6 +53,49 @@ class HomeViewModelTest {
         } finally { directory.dispose() }
     }
 
+    @Test fun signedOutHomeRowStillLooksUpItsChannelAndAvatarButExposesNoFeedback() = runTest {
+        val menu = """{"content":{"engagementPanelSectionListRenderer":{"content":{"listViewModel":{"listItems":[{"listItemViewModel":{"onTap":{"innertubeCommand":{"browseEndpoint":{"browseId":"UCanon"}}}}}]}}}}}"""
+        val artwork = "https://yt3.googleusercontent.com/anon-avatar"
+        val header = """{"header":{"musicVisualHeaderRenderer":{"foregroundThumbnail":{"musicThumbnailRenderer":{"thumbnail":{"thumbnails":[{"url":"$artwork"}]}}}}}}"""
+        val paths = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val http = okhttp3.OkHttpClient.Builder().addInterceptor { chain ->
+            paths += chain.request().url.encodedPath
+            val body = if (chain.request().url.encodedPath.endsWith("get_panel")) menu else header
+            okhttp3.Response.Builder().request(chain.request()).protocol(okhttp3.Protocol.HTTP_1_1)
+                .code(200).message("test").body(body.toResponseBody()).build()
+        }.build()
+        val directory = com.hhst.youtubelite.data.media.MediaAvatarDirectory(com.hhst.youtubelite.data.media.MediaClient(http))
+        try {
+            // The shape MediaHomeRepository publishes for a signed-out lazy-menu tile.
+            val card = FeedItem.Video("anon", "Title", "Author", "", "", "", "",
+                channelLookup = FeedMenuEndpoint("panel", "anon"))
+            var menuReads = 0
+            val repo = object : HomeRepository {
+                override suspend fun loadHome(filter: String, continuation: String?) = HomePage(listOf(card))
+                override suspend fun menu(video: FeedItem.Video): FeedItem.Video { menuReads++; return video }
+            }
+            val vm = HomeViewModel(repo, SavedStateHandle(), loadOnStart = true, avatars = directory)
+            runCurrent()
+            runBlocking { withTimeout(5_000) {
+                directory.channel(card.id, com.liskovsoft.youtubeapi.videoinfo.V2.MenuEndpoint("panel", card.id))
+                directory.avatar("UCanon")
+            } }
+            runCurrent()
+            val row = (vm.uiState.value.content as HomeContent.Feed).page.items.single() as FeedItem.Video
+            assertEquals("UCanon", row.channelId)
+            assertEquals(artwork, row.avatar)
+            assertTrue(paths.any { it.endsWith("get_panel") })
+            // The lookup key never unlocks feedback: no endpoint, no tokens, no menu read.
+            assertNull(row.menuEndpoint)
+            assertNull(row.notInterestedToken)
+            assertNull(row.dontRecommendToken)
+            assertFalse(FeedMenuAction.NotInterested in FeedMenuKind.Video.productionActions(false, row))
+            vm.onAction(HomeAction.OpenMenu(row.id))
+            advanceUntilIdle()
+            assertEquals(0, menuReads)
+        } finally { directory.dispose() }
+    }
+
     @Test fun signedInHomeLoadsFeedbackWithoutAnInlineMenuEndpoint() = runTest {
         val card = menuVideo().copy(menuEndpoint = null)
         var reads = 0

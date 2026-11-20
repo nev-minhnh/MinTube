@@ -41,6 +41,21 @@ class MediaHomeRepositoryTest {
             .exceptionOrNull() is SignInRequiredException)
         assertTrue(calls.none { it.url.encodedPath.endsWith("/feedback") })
     }
+    @Test fun signedOutLazyMenuTilesKeepTheChannelLookupButNoFeedbackMenu() = runBlocking {
+        val tile = """{"contents":[{"tileRenderer":{"contentId":"lazy-video","contentType":"TILE_CONTENT_TYPE_VIDEO","header":{"tileHeaderRenderer":{"thumbnail":{"thumbnails":[{"url":"https://i.ytimg.com/vi/lazy-video/hq.jpg"}]}}},"metadata":{"tileMetadataRenderer":{"title":{"simpleText":"Lazy menu video"}}},"onSelectCommand":{"watchEndpoint":{"videoId":"lazy-video"}},"onLongPressCommand":{"showEngagementPanelEndpoint":{"identifier":{"tag":"panel-tag"},"globalConfiguration":{"params":"panel-params"}}}}}]}"""
+        val http = OkHttpClient.Builder().addInterceptor { chain ->
+            Response.Builder().request(chain.request()).protocol(okhttp3.Protocol.HTTP_1_1).code(200).message("OK")
+                .body(tile.toResponseBody("application/json".toMediaType())).build()
+        }.build()
+        val video = MediaHomeRepository(MediaClient(http) { session }).loadHome("All").items
+            .filterIsInstance<FeedItem.Video>().single { it.id == "lazy-video" }
+        assertEquals("", video.channelId)
+        assertEquals(FeedMenuEndpoint("panel-tag", "panel-params"), video.channelLookup)
+        assertNull(video.menuEndpoint)
+        assertNull(video.notInterestedToken)
+        assertNull(video.dontRecommendToken)
+        assertNull(video.feedbackGeneration)
+    }
     @Test fun signedInFeedbackUsesTheAuthenticatedEndpointAndKeepsServerOrder() = runBlocking {
         signIn()
         val repo = repository()
