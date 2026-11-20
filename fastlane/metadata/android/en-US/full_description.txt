@@ -1,4 +1,4 @@
-An unofficial, open-source YouTube client for Android.
+MinTube is an unofficial, open-source YouTube client for Android with a calm, redesigned interface. It is a fork of Litube 4.0.0 by HydeYYHH, licensed under GPL-3.0, and installs side by side with it.
 
 <b>Features</b>
 * <b>Browse YouTube.</b> Explore your home feed, search for videos, and browse channels, playlists, Shorts, and your library.

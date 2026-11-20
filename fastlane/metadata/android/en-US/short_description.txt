@@ -1,1 +1,1 @@
-An unofficial, open-source YouTube client for Android.
+Unofficial open-source YouTube client with a calm, redesigned interface.

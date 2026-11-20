@@ -82,9 +82,10 @@ class AboutActivity : ComponentActivity() {
             }
             AboutScreen(applicationInfo.loadLabel(packageManager).toString(), version, { finish() }, busy, status,
                 onSource = { openUrl(SOURCE) },
+                onUpstream = { openUrl(UPSTREAM) },
                 onUpdate = { action("check_update") {
                     val latest = withContext(Dispatchers.IO) {
-                        val request = Request.Builder().url("https://api.github.com/repos/HydeYYHH/litube/releases/latest")
+                        val request = Request.Builder().url("https://api.github.com/repos/nev-minhnh/MinTube/releases/latest")
                             .header("Accept", "application/vnd.github+json").build()
                         get<OkHttpClient>(OkHttpClient::class.java).newCall(request).execute().use { response ->
                             check(response.isSuccessful) { "HTTP ${response.code}" }
@@ -172,5 +173,9 @@ class AboutActivity : ComponentActivity() {
         runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
             .onFailure { Toast.makeText(this, R.string.application_not_found, Toast.LENGTH_SHORT).show() }
     }
-    companion object { private const val SOURCE = "https://github.com/HydeYYHH/litube" }
+    companion object {
+        private const val SOURCE = "https://github.com/nev-minhnh/MinTube"
+        /** The project MinTube is forked from (Litube 4.0.0, GPL-3.0). */
+        private const val UPSTREAM = "https://github.com/HydeYYHH/litube"
+    }
 }

@@ -1,36 +1,35 @@
 <div align="center">
-  <h1><img src=".github/assets/litube-icon.svg" alt="Litube icon" width="80" height="68"><br>Litube</h1>
-<p>An unofficial, open-source YouTube client for Android.</p>
+  <h1><img src=".github/assets/mintube-icon.svg" alt="MinTube icon" width="80" height="80"><br>MinTube</h1>
+  <p>An unofficial, open-source YouTube client for Android with a calm, redesigned interface.</p>
 
   <p>
-    <!-- Restore the F-Droid badge when its package is updated to v4.
-    <a href="https://f-droid.org/packages/com.hhst.litube/"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
-    -->
-    <a href="https://github.com/HydeYYHH/litube/releases"><img src=".github/assets/download-github.svg" alt="Get it on GitHub" width="206" height="80"></a>
-  </p>
-
-  <p>
-    <img src="https://img.shields.io/badge/version-v4.0.0-C71C3A?style=flat-square" alt="Litube v4.0.0">
-    <img src="https://img.shields.io/badge/Android-7.0%2B-3DDC84?style=flat-square" alt="Android 7.0 or later">
+    <img src="https://img.shields.io/badge/Android-7.0%2B-0B8F6A?style=flat-square" alt="Android 7.0 or later">
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-596273?style=flat-square" alt="GPL v3 license"></a>
   </p>
 </div>
 
-Built on a [fork of MediaServiceCore](https://github.com/HydeYYHH/MediaServiceCore), the YouTube engine used by [SmartTube](https://github.com/yuliskov/SmartTube), and inspired by [NewTube](https://github.com/aleixrodriala/newtube). Our thanks to the maintainers and contributors of both projects for the work, code, and ideas that make Litube possible.
+**MinTube is a fork of [Litube](https://github.com/HydeYYHH/litube) 4.0.0 by HydeYYHH, licensed under GPL-3.0.**
+The playback, extraction, download and account code is Litube's; MinTube changes the interface and the app identity.
+MinTube is not affiliated with YouTube or Google, and it is not the upstream project: please do not report MinTube
+issues to Litube.
 
-Browse videos and Shorts, follow your favorite channels, and organize your playlists in an Android interface built with Jetpack Compose. Watch videos, listen in the background, or save your favorites for offline playback.
+## What MinTube changes
 
-## Previews
+- **Redesigned interface, "Mint".** A new design system: mint-green accent, soft ink neutrals, generous rounding,
+  Be Vietnam Pro titles, Material Symbols Rounded icons, one shared bottom navigation bar and one card family across
+  feeds. The plan is in [docs/UI_PLAN.md](docs/UI_PLAN.md).
+- **New name and application ID.** The app is `com.nevminhnh.mintube` (`com.nevminhnh.mintube.debug` for debug
+  builds), so it installs side by side with Litube and never replaces it.
+- **New icon.** An adaptive launcher icon with a themed (monochrome) layer.
+- **Its own update check.** The About screen points at the MinTube repository and links back to the original project.
 
-<p align="center">
-  <a href=".github/assets/screenshots/v4-home.png"><img src=".github/assets/screenshots/v4-home.png" alt="Home" title="Home" height="420"></a>
-  &nbsp;
-  <a href=".github/assets/screenshots/v4-search.png"><img src=".github/assets/screenshots/v4-search.png" alt="Search" title="Search" height="420"></a>
-  &nbsp;
-  <a href=".github/assets/screenshots/v4-playback.png"><img src=".github/assets/screenshots/v4-playback.png" alt="Playback" title="Playback" height="420"></a>
-  &nbsp;
-  <a href=".github/assets/screenshots/v4-subscriptions.png"><img src=".github/assets/screenshots/v4-subscriptions.png" alt="Subscriptions" title="Subscriptions" height="420"></a>
-</p>
+Kept on purpose, so existing data keeps working: downloads are still saved under `Downloads/Litube`, and settings
+backups keep the `litube-settings` format, so a Litube backup can be restored in MinTube.
+
+## Screenshots
+
+New screenshots live in [`docs/screens/`](docs/screens/). They are added once the redesigned screens have been
+verified on a device.
 
 ## Features
 
@@ -41,30 +40,15 @@ Browse videos and Shorts, follow your favorite channels, and organize your playl
 - **Multiple accounts, all in one.** Easily switch between your anonymous account and multiple signed-in accounts.
 - **Make it yours.** Customize SponsorBlock, playback gestures, themes, and language. Enable DeArrow for alternative titles and thumbnails.
 
-## Downloads
-
-Get APKs and release notes from [GitHub Releases](https://github.com/HydeYYHH/litube/releases), or [build the app from source](#build-from-source).
-
 **Requirements:** Android **7.0 / API 24** or later and an up-to-date **Android System WebView**. Picture-in-picture requires Android **8.0 / API 26** or later and a compatible device.
-
-## Milestones
-
-| Release | Milestone |
-| --- | --- |
-| [v1](https://github.com/HydeYYHH/litube/releases/tag/v1.4.9)<br>`2025-02` | **The start of our journey**<br>A lightweight WebView client with ad blocking, background playback and downloads. |
-| [v2](https://github.com/HydeYYHH/litube/releases/tag/v2.0.0)<br>`2026-01` | **Playback and downloads**<br>Added native Media3 player, NewPipe-based stream extraction, picture-in-picture, and a download manager while keeping YouTube's web interface. |
-| [v3](https://github.com/HydeYYHH/litube/releases/tag/v3.0.0)<br>`2026-10` | **A Kotlin rewrite**<br>Rebuilt the app with Kotlin and Jetpack Compose, reworking player and downloader while keeping WebView-based browsing. |
-| [v4.0.0](https://github.com/HydeYYHH/litube/releases)<br>`2026-11` | **Native browsing**<br>Replaced WebView browsing with native Compose screens and [MediaServiceCore](https://github.com/HydeYYHH/MediaServiceCore), bringing anonymous and signed-in accounts together with the Media3 player and download system. |
 
 ## Build from source
 
-Use **JDK 21**, **Android SDK Platform 36**, and **Build Tools 36.0.0** to match the CI environment. The repository includes a **Gradle 8.11.1** wrapper.
-
-Clone the v4 branch:
+Use **JDK 21**, **Android SDK Platform 36**, and **Build Tools 36.0.0**. The repository includes a **Gradle 8.11.1** wrapper.
 
 ```sh
-git clone --branch v4 https://github.com/HydeYYHH/litube.git
-cd litube
+git clone https://github.com/nev-minhnh/MinTube.git
+cd MinTube
 ```
 
 Gradle downloads MediaServiceCore v1.0.0 from JitPack using the version pinned in `gradle/libs.versions.toml`.
@@ -77,9 +61,9 @@ Set `ANDROID_HOME` to your Android SDK directory, or set `sdk.dir` in an untrack
 
 On Windows, replace `./gradlew` with `.\gradlew.bat` in these commands.
 
-The debug APK is saved to `app/build/outputs/apk/debug/app-debug.apk`. Debug builds use the application ID `com.hhst.litube.debug`; release builds use `com.hhst.litube`.
+The debug APK is saved to `app/build/outputs/apk/debug/app-debug.apk`. Debug builds use the application ID `com.nevminhnh.mintube.debug`; release builds use `com.nevminhnh.mintube`. The Kotlin package and namespace remain `com.hhst.youtubelite`, as in Litube.
 
-To build the release APK, run `./gradlew :app:assembleRelease`. The unsigned APK is saved to `app/build/outputs/apk/release/app-release-unsigned.apk`; sign it with your release key before distribution.
+To build the release APK, run `./gradlew :app:assembleRelease`. The unsigned APK is saved to `app/build/outputs/apk/release/app-release-unsigned.apk`; sign it with your own release key before distribution. Signing material must never be committed.
 
 <details>
 <summary><strong>Tests and verification</strong></summary>
@@ -103,7 +87,7 @@ Instrumented tests use local fixtures by default. To run live-service read check
 <details>
 <summary><strong>Tech stack</strong></summary>
 
-Litube is built with **Kotlin**, Jetpack Compose / Material 3, **AndroidX Media3**, **coroutines / StateFlow**, **Koin**, **Room**, **WorkManager**, and **OkHttp**.
+MinTube is built with **Kotlin**, Jetpack Compose / Material 3, **AndroidX Media3**, **coroutines / StateFlow**, **Koin**, **Room**, **WorkManager**, and **OkHttp**, all inherited from Litube.
 
 Content and stream extraction are provided by the [MediaServiceCore fork maintained for Litube](https://github.com/HydeYYHH/MediaServiceCore).
 
@@ -111,30 +95,22 @@ Content and stream extraction are provided by the [MediaServiceCore fork maintai
 
 ## Contributing
 
-Bug reports, translations, and focused pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the project structure, coding conventions, and validation steps.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the project structure, coding conventions, and validation steps, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the invariants a UI change must not break.
 
-When [reporting a bug](https://github.com/HydeYYHH/litube/issues), include your app version, device model, Android version, steps to reproduce the issue, and what you expected to happen. Describe what happened instead and attach a diagnostic archive if available.
+When reporting a bug, include your app version, device model, Android version, steps to reproduce the issue, and what you expected to happen. Describe what happened instead and attach a diagnostic archive if available (About > Export diagnostic logs).
 
 ## Acknowledgements
 
-Built on a [fork of MediaServiceCore](https://github.com/HydeYYHH/MediaServiceCore), the YouTube engine used by [SmartTube](https://github.com/yuliskov/SmartTube), and inspired by [NewTube](https://github.com/aleixrodriala/newtube). Our thanks to the maintainers and contributors of both projects for the work, code, and ideas that make Litube possible.
+MinTube exists because of [Litube](https://github.com/HydeYYHH/litube) by HydeYYHH and its contributors: all of the app's functionality comes from that project.
 
-Parts of the Cast implementation are adapted from [NewTube](https://github.com/aleixrodriala/newtube), with the original license and attribution retained. Litube also builds on AndroidX Media3 and the wider open-source Android ecosystem, with support for SponsorBlock and DeArrow.
+Litube, and therefore MinTube, is built on a [fork of MediaServiceCore](https://github.com/HydeYYHH/MediaServiceCore), the YouTube engine used by [SmartTube](https://github.com/yuliskov/SmartTube), and inspired by [NewTube](https://github.com/aleixrodriala/newtube). Our thanks to the maintainers and contributors of these projects for the work, code, and ideas that make this app possible.
 
-## Star History
+Parts of the Cast implementation are adapted from [NewTube](https://github.com/aleixrodriala/newtube), with the original license and attribution retained. The app also builds on AndroidX Media3 and the wider open-source Android ecosystem, with support for SponsorBlock and DeArrow.
 
-<p align="center">
-  <a href="https://www.star-history.com/?repos=HydeYYHH%2Flitube&type=date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=HydeYYHH/litube&type=Date&theme=dark">
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=HydeYYHH/litube&type=Date">
-      <img src="https://api.star-history.com/svg?repos=HydeYYHH/litube&type=Date" alt="Litube star history" width="800">
-    </picture>
-  </a>
-</p>
+Fonts and icons: Be Vietnam Pro (SIL Open Font License 1.1), Roboto and Material Symbols (Apache License 2.0). Their licence texts ship in `app/src/main/assets/`.
 
 ---
 
 <p align="center">
-  <strong>Litube</strong> · Licensed under the <a href="LICENSE">GNU GPL v3.0</a>
+  <strong>MinTube</strong> · a fork of Litube 4.0.0 · Licensed under the <a href="LICENSE">GNU GPL v3.0</a>
 </p>
