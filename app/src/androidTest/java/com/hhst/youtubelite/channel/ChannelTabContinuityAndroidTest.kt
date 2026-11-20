@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -30,7 +31,7 @@ class ChannelTabContinuityAndroidTest {
         compose.mainClock.autoAdvance = false
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { ChannelScreen(state, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { ChannelScreen(state, {}, {}) }
             }
         }
         compose.mainClock.advanceTimeBy(32)

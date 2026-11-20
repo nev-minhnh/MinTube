@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -21,6 +22,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hhst.youtubelite.channel.data.FixtureChannelRepository
 import com.hhst.youtubelite.channel.domain.*
+import com.hhst.youtubelite.channel.presentation.ChannelMetrics
 import com.hhst.youtubelite.channel.presentation.ChannelScreen
 import java.io.File
 import kotlin.math.abs
@@ -49,7 +51,7 @@ class ChannelScreenshotAndroidTest {
     private fun setContent(width: androidx.compose.runtime.MutableIntState, height: androidx.compose.runtime.MutableIntState, state: androidx.compose.runtime.MutableState<ChannelUiState>) {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
                     ChannelScreen(state.value, {}, {})
                 }
             }
@@ -98,7 +100,9 @@ class ChannelScreenshotAndroidTest {
         var state = mutableStateOf(stateOf("videos", tab = ChannelTab.Videos))
         setContent(width, height, state)
         val output = File(compose.activity.getExternalFilesDir(null), "channel-acceptance").apply { mkdirs() }
-        for ((below, edge) in listOf(527 to 528, 599 to 600, 699 to 700, 1147 to 1148)) {
+        // Mint window classes: compact below 600dp, medium to 839dp, expanded from 840dp. The old
+        // 528/700/1148 probes stay as in-class checks.
+        for ((below, edge) in listOf(527 to 528, 599 to 600, 699 to 700, 839 to 840, 1147 to 1148)) {
             for (w in listOf(below, edge)) {
                 compose.runOnIdle { width.intValue = w; height.intValue = 900 }
                 compose.waitForIdle()
@@ -107,22 +111,23 @@ class ChannelScreenshotAndroidTest {
                 // so every check stays relative to the page origin.
                 val pageLeft = boundsOf("channel-page").left
                 val avatar = boundsOf("channel-avatar")
-                assertEquals("avatar size at $w", if (w < 600) 72f else if (w < 700) 120f else 160f, avatar.width, 1f)
+                assertEquals("avatar size at $w", if (w < 600) 72f else if (w < 840) 96f else 120f, avatar.width, 1f)
                 val subscribe = boundsOf("channel-subscribe")
-                if (w < 700) assertEquals("subscribe width at $w", w - 32f, subscribe.width, 1f)
-                else assertTrue("compact subscribe at $w: ${subscribe.width}", subscribe.width < 200f)
+                // The Mint subscribe pill keeps its content width in every window class.
+                assertTrue("compact subscribe at $w: ${subscribe.width}", subscribe.width in 48f..200f)
             }
         }
         // The second video's thumb sits at the next cell's start, so its left edge
         // moves exactly with the flipped column count.
-        for (w in listOf(1147, 1148)) {
+        for (w in listOf(839, 840, 1147, 1148)) {
             compose.runOnIdle { width.intValue = w }
             compose.waitForIdle()
             capture("videos-$w", output, true, emptySet())
             val pageLeft = boundsOf("channel-page").left
             val dream = boundsOf("channel-thumb-dream")
+            val columns = ChannelMetrics.videoColumns(w.toFloat())
             assertEquals("grid column position at $w",
-                ChannelLayout.PageInset + ChannelLayout.cardWidth(w.toFloat()) + ChannelLayout.PageInset,
+                (ChannelMetrics.inset(w.toFloat()) + ChannelMetrics.cellWidth(w.toFloat(), columns) + ChannelMetrics.GridGap).value,
                 dream.left - pageLeft, 1f)
         }
     }
@@ -132,7 +137,7 @@ class ChannelScreenshotAndroidTest {
         var state = mutableStateOf(stateOf("videos", tab = ChannelTab.Videos))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { ChannelScreen(state.value, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { ChannelScreen(state.value, {}, {}) }
             }
         }
         awaitKeyAnchors()
@@ -156,9 +161,10 @@ class ChannelScreenshotAndroidTest {
         val avatar = boundsOf("channel-avatar")
         val description = boundsOf("channel-description")
         val subscribe = boundsOf("channel-subscribe")
-        assertEquals(192f, description.left, 0.5f)
+        // 24dp page inset + 120dp expanded avatar + 16dp gap.
+        assertEquals(160f, description.left, 0.5f)
         assertTrue("Description must stay beside the avatar", description.top < avatar.bottom)
-        assertEquals(429.17f, subscribe.top, 1.5f)
+        assertEquals(453f, subscribe.top, 1.5f)
         val footer = boundsOf("channel-navigation")
         assertEquals(800f, footer.bottom, 0.5f)
         assertEquals(57f, footer.height, 0.5f)
@@ -167,7 +173,7 @@ class ChannelScreenshotAndroidTest {
     @Test fun shortErrorWindowKeepsRetryReachable() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(320.dp, 240.dp)) {
+                TestWindowBox(Modifier.requiredSize(320.dp, 240.dp)) {
                     ChannelScreen(ChannelUiState(content = ChannelContent.Failed), {}, {})
                 }
             }
@@ -182,7 +188,7 @@ class ChannelScreenshotAndroidTest {
         val profile = FixtureChannelRepository.profile().copy(description = "A very long channel description. ".repeat(30), banner = null)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(320.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(320.dp, 844.dp)) {
                     ChannelScreen(ChannelUiState(content = ChannelContent.Ready(ChannelPage(profile, emptyList()))), {}, {})
                 }
             }

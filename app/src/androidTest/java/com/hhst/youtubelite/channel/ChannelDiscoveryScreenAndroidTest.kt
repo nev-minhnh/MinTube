@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -39,19 +40,22 @@ class ChannelDiscoveryScreenAndroidTest {
         var width by mutableIntStateOf(390)
         val actions = mutableListOf<SearchAction>()
         compose.setContent { CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-            Box(Modifier.requiredSize(width.dp, 844.dp)) { SearchResultsScreen(search(), actions::add, {}) }
+            TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) { SearchResultsScreen(search(), actions::add, {}) }
         } }
         for (w in listOf(390, 1280)) {
             compose.runOnIdle { width = w }
-            val inset = if (w == 1280) 220 else 0
+            // At 1280 the results column is centred: its content starts 228dp in.
+            val inset = if (w == 1280) 228 else 0
             val avatar = compose.onNodeWithTag("search-channel-avatar-blender", true).fetchSemanticsNode().boundsInRoot
-            assertEquals(inset + 58.5f, avatar.left, 1f)
-            assertEquals(83.5f, avatar.top, 1.5f)
-            assertEquals(67f, avatar.width, .1f)
+            // Mint channel row: 56dp avatar at the page inset, name 12dp after it.
+            assertEquals(inset + 16f, avatar.left, 1f)
+            assertEquals(120f, avatar.top, 1.5f)
+            assertEquals(56f, avatar.width, .1f)
             val title = compose.onNodeWithTag("search-channel-name-blender", true).fetchSemanticsNode().boundsInRoot
-            assertEquals(inset + 180f, title.left, .1f)
-            assertEquals(72f, title.top, .1f)
-            compose.onNodeWithTag("search-channel-subscribe-blender").performClick()
+            assertEquals(inset + 84f, title.left, .1f)
+            assertEquals(128f, title.top, .1f)
+            // The whole channel row is a button now; its subscribe pill stays a separate target.
+            compose.onNodeWithTag("search-channel-subscribe-blender", useUnmergedTree = true).performClick()
             assertEquals(SearchAction.Subscribe("blender"), actions.last())
         }
     }
@@ -60,7 +64,7 @@ class ChannelDiscoveryScreenAndroidTest {
         var width by mutableIntStateOf(390)
         var height by mutableIntStateOf(844)
         compose.setContent { CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-            Box(Modifier.requiredSize(width.dp, height.dp)) { ChannelScreen(channel(about = true), {}, {}) }
+            TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { ChannelScreen(channel(about = true), {}, {}) }
         } }
         for ((w, h, x, y, panelWidth) in listOf(
             listOf(390f, 844f, 0f, 267.375f, 390f), listOf(600f, 800f, 0f, 385.5f, 600f),
@@ -74,9 +78,10 @@ class ChannelDiscoveryScreenAndroidTest {
         val row = compose.onNodeWithTag("channel-about-detail-0", true).fetchSemanticsNode().boundsInRoot
         val icon = compose.onNodeWithTag("channel-about-detail-icon-0", true).fetchSemanticsNode().boundsInRoot
         val value = compose.onNodeWithTag("channel-about-detail-value-0", true).fetchSemanticsNode().boundsInRoot
-        assertEquals(row.top, icon.top, .1f)
-        assertEquals(row.top + 2f, value.top, .1f)
-        assertEquals(24f, icon.width, .1f)
+        // Mint detail rows: a 48dp row with the 20dp icon and the one-line value centred on it.
+        assertEquals(row.top + 14f, icon.top, .1f)
+        assertEquals(row.top + 14f, value.top, .1f)
+        assertEquals(20f, icon.width, .1f)
     }
 
     @Test fun statesAndWindowSizesMatchGoldens() {
@@ -85,7 +90,7 @@ class ChannelDiscoveryScreenAndroidTest {
         var font by mutableFloatStateOf(1f)
         var scene by mutableStateOf("channels")
         compose.setContent { CompositionLocalProvider(LocalDensity provides Density(1f, font)) {
-            key(scene) { Box(Modifier.requiredSize(width.dp, height.dp)) {
+            key(scene) { TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                 if (scene == "channels") SearchResultsScreen(search(), {}, {})
                 else ChannelScreen(channel(about = scene == "about", query = if (scene == "empty") "no-matching-local-title" else ""), {}, {})
             } }
@@ -112,8 +117,8 @@ class ChannelDiscoveryScreenAndroidTest {
                     compose.onNodeWithContentDescription("Submit channel search").assertIsDisplayed()
                 }
                 if (name == "channels") {
-                    compose.onNodeWithTag("search-channels-list").performScrollToNode(hasTestTag("search-channel-subscribe-blender"))
-                    compose.onNodeWithTag("search-channel-subscribe-blender").assertIsDisplayed()
+                    compose.onNodeWithTag("search-channels-list", useUnmergedTree = true).performScrollToNode(hasTestTag("search-channel-subscribe-blender"))
+                    compose.onNodeWithTag("search-channel-subscribe-blender", useUnmergedTree = true).assertIsDisplayed()
                 }
                 if (name == "channel-search") {
                     compose.onNodeWithTag("channel-search-list").performScrollToNode(hasTestTag("channel-search-video-bunny"))
