@@ -32,8 +32,16 @@ internal fun unwrapJsonp(body: String): String {
     return if (open <= 0) body else trimmed.substring(open + 1, trimmed.length - 1)
 }
 
+/**
+ * The endpoint also defaults to ISO-8859-1 ("tây du kí" arrived as "t�y du k�");
+ * `oe=utf-8` makes it answer UTF-8, which the shared HTTP client decodes.
+ */
+internal fun withUtf8Output(url: String): String =
+    if (Regex("[?&]oe=").containsMatchIn(url)) url else url + (if ('?' in url) "&" else "?") + "oe=utf-8"
+
 internal class JsonpUnwrappingClient(private val inner: HttpClient) : HttpClient {
-    override fun execute(request: HttpRequest): HttpReply = inner.execute(request).let { it.copy(body = unwrapJsonp(it.body)) }
+    override fun execute(request: HttpRequest): HttpReply =
+        inner.execute(request.copy(url = withUtf8Output(request.url))).let { it.copy(body = unwrapJsonp(it.body)) }
 }
 
 /** One rendered search-panel row set: locally-stored history matches first, then server suggestions. */

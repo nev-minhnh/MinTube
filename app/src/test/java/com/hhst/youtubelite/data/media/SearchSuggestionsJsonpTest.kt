@@ -35,6 +35,18 @@ class SearchSuggestionsJsonpTest {
             loadSearchSuggestions("how to", RequestContext(), JsonpUnwrappingClient(replying(json))).value)
     }
 
+    @Test fun requestAsksForUtf8OutputOnce() {
+        val urls = mutableListOf<String>()
+        val client = JsonpUnwrappingClient(object : HttpClient {
+            override fun execute(request: HttpRequest): HttpReply { urls += request.url; return HttpReply(200, jsonp, emptyMap()) }
+        })
+        loadSearchSuggestions("tây du", RequestContext(), client)
+        assertTrue(urls.single(), urls.single().startsWith("https://suggestqueries.google.com/complete/search?"))
+        assertTrue(urls.single(), urls.single().endsWith("&oe=utf-8"))
+        assertEquals("https://x/s?a=1&oe=latin1", withUtf8Output("https://x/s?a=1&oe=latin1"))
+        assertEquals("https://x/s?oe=utf-8", withUtf8Output("https://x/s"))
+    }
+
     @Test fun nonJsonpTextIsLeftAlone() {
         assertEquals("<html>error</html>", unwrapJsonp("<html>error</html>"))
         assertEquals("(oops)", unwrapJsonp("(oops)"))
