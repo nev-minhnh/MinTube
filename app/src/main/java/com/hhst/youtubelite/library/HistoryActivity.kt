@@ -225,7 +225,10 @@ class HistoryActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 com.hhst.youtubelite.ui.components.AppAlertDialog(
                     onDismissRequest = { historyViewModel.onAction(LibraryAction.CloseOverlay) },
                     title = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_clear_watch_history), com.hhst.youtubelite.ui.design.MinType.Title) },
-                    text = { com.hhst.youtubelite.ui.design.AppText(stringResource(R.string.ui_your_watch_history_will_be_cleared_on_this_account_this_can_t_be_undon)) },
+                    text = { com.hhst.youtubelite.ui.design.AppText(stringResource(
+                        // Anonymous history lives on the device lane; only the account lane clears "on this account".
+                        if (deviceLane) R.string.qa1_clear_history_device_body
+                        else R.string.ui_your_watch_history_will_be_cleared_on_this_account_this_can_t_be_undon)) },
                     confirmButton = {
                         com.hhst.youtubelite.ui.components.AppTextButton(
                             onClick = { historyViewModel.onAction(LibraryAction.ConfirmClearHistory) },
