@@ -58,20 +58,20 @@ class WatchContentScrollAndroidTest {
             compose.runOnIdle { width = layout.first; height = layout.second; state = ready("old-$index") }
             main().performScrollToIndex(1)
             assertTrue(value(main()) > 0f)
-            if (width >= 931) {
+            if (width >= 840 && width > height) {
                 sidebar().performScrollToIndex(4)
                 assertTrue(value(sidebar()) > 0f)
             }
             // A cached response can replace Loading within the same frame.
             compose.runOnIdle { state = ready("new-$index") }
             assertEquals("Main position at $layout", 0f, value(main()), 0f)
-            if (width >= 931) assertEquals("Related position at $layout", 0f, value(sidebar()), 0f)
+            if (width >= 840 && width > height) assertEquals("Related position at $layout", 0f, value(sidebar()), 0f)
             // A slower first read must also begin at the top before it completes.
             compose.runOnIdle { state = WatchUiState(videoId = "slow-$index", content = WatchContent.Loading) }
             assertEquals(0f, value(main()), 0f)
             compose.runOnIdle { state = ready("slow-$index") }
             assertEquals(0f, value(main()), 0f)
-            if (width >= 931) assertEquals(0f, value(sidebar()), 0f)
+            if (width >= 840 && width > height) assertEquals(0f, value(sidebar()), 0f)
         }
     }
 
@@ -92,7 +92,7 @@ class WatchContentScrollAndroidTest {
             main().performScrollToIndex(1)
             val mainBefore = value(main())
             assertTrue(mainBefore > 0f)
-            val relatedBefore = if (width >= 931) {
+            val relatedBefore = if (width >= 840 && width > height) {
                 sidebar().performScrollToIndex(4)
                 value(sidebar())
             } else null

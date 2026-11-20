@@ -525,7 +525,8 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
                     .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout))) {
                     val hideWatchControls = state.searchOpen || state.overlay is WatchOverlay.ItemMenu ||
                         state.overlay is WatchOverlay.Save || state.overlay is WatchOverlay.Feedback ||
-                        (state.commentsOpen && !fullscreen && !WatchLayout.sidebar(maxWidth.value, maxHeight.value))
+                        (state.commentsOpen && !fullscreen && !WatchLayout.sidebar(maxWidth.value, maxHeight.value,
+                            com.hhst.youtubelite.watch.presentation.watchSmallestWidth()))
                     WatchScreen(
                         state = state,
                         onAction = watchViewModel::onAction,

@@ -507,9 +507,12 @@ class WatchViewModelTest {
     }
 
     @Test fun shortWindowsLeaveTheBodyReachable() {
-        assertFalse(WatchLayout.pinnedPlayer(320f, 240f))
-        assertFalse(WatchLayout.pinnedPlayer(390f, 240f))
-        assertFalse(WatchLayout.pinnedPlayer(1280f, 320f))
+        // The player stays pinned even in short windows; it shrinks so the body stays reachable.
+        for ((width, height) in listOf(320f to 240f, 390f to 240f, 1280f to 320f)) {
+            assertTrue(WatchLayout.pinnedPlayer(width, height))
+            assertTrue("$width × $height", height - WatchLayout.playerHeight(width, height) >= minOf(96f, height / 2f) - 0.01f)
+        }
+        assertEquals(144f, WatchLayout.playerHeight(320f, 240f), 0.01f)
         assertEquals(WatchRelatedVariant.List, WatchLayout.relatedVariant(528f, 300f))
     }
 
@@ -519,23 +522,28 @@ class WatchViewModelTest {
         assertEquals(390f * 9f / 16f, WatchLayout.playerHeight(390f, 775f), 0.01f)
         assertTrue(WatchLayout.pinnedPlayer(390f, 775f))
         assertTrue(WatchLayout.pinnedPlayer(840f, 725f))
-        // Wide-short: the player scrolls with the content.
-        assertFalse(WatchLayout.pinnedPlayer(844f, 342f))
-        assertTrue(WatchLayout.wideShort(844f, 342f))
+        // Wide-short: list rows, and the player stays pinned like everywhere else.
+        assertTrue(WatchLayout.pinnedPlayer(800f, 342f))
+        assertTrue(WatchLayout.wideShort(800f, 342f))
         assertFalse(WatchLayout.wideShort(415f, 342f))
         assertFalse(WatchLayout.wideShort(931f, 600f))
-        // Sidebar needs width ≥931 AND landscape.
+        // Sidebar: landscape AND (width ≥ 840 OR a tablet).
         assertTrue(WatchLayout.sidebar(931f, 744f))
         assertTrue(WatchLayout.sidebar(1600f, 915f))
+        assertTrue(WatchLayout.sidebar(844f, 342f))
         assertFalse(WatchLayout.sidebar(1000f, 1200f))
-        assertFalse(WatchLayout.sidebar(930f, 900f))
-        assertEquals(256f, WatchLayout.sidebarWidth(931f), 0.01f)
-        assertEquals(256f, WatchLayout.sidebarWidth(1100f), 0.01f)
-        assertEquals(500f, WatchLayout.sidebarWidth(1280f), 0.01f)
-        assertEquals(675f, WatchLayout.columnWidth(931f, 744f), 0.01f)
-        assertEquals(780f, WatchLayout.columnWidth(1280f, 725f), 0.01f)
-        assertEquals(1100f, WatchLayout.columnWidth(1600f, 915f), 0.01f)
-        assertEquals(675f * 9f / 16f, WatchLayout.playerHeight(931f, 744f), 0.01f)
+        assertFalse(WatchLayout.sidebar(830f, 700f))
+        assertTrue(WatchLayout.sidebar(830f, 700f, smallestWidth = 600f))
+        assertFalse(WatchLayout.sidebar(700f, 830f, smallestWidth = 600f))
+        // Sidebar width: a third of the window, clamped to 320..480.
+        assertEquals(320f, WatchLayout.sidebarWidth(931f), 0.01f)
+        assertEquals(1100f / 3f, WatchLayout.sidebarWidth(1100f), 0.01f)
+        assertEquals(1280f / 3f, WatchLayout.sidebarWidth(1280f), 0.01f)
+        assertEquals(480f, WatchLayout.sidebarWidth(1600f), 0.01f)
+        assertEquals(611f, WatchLayout.columnWidth(931f, 744f), 0.01f)
+        assertEquals(1280f * 2f / 3f, WatchLayout.columnWidth(1280f, 725f), 0.01f)
+        assertEquals(1120f, WatchLayout.columnWidth(1600f, 915f), 0.01f)
+        assertEquals(611f * 9f / 16f, WatchLayout.playerHeight(931f, 744f), 0.01f)
     }
 
     @Test fun gridColumnsFollowTheSampledFormula() {
@@ -559,8 +567,10 @@ class WatchViewModelTest {
             Triple(411f, 714f, WatchRelatedVariant.Phone),
             Triple(550f, 828f, WatchRelatedVariant.Grid),
             Triple(840f, 914f, WatchRelatedVariant.Grid),
-            Triple(844f, 342f, WatchRelatedVariant.List),
-            Triple(840f, 725f, WatchRelatedVariant.Stacked),
+            Triple(800f, 342f, WatchRelatedVariant.List),
+            Triple(800f, 725f, WatchRelatedVariant.Stacked),
+            Triple(844f, 342f, WatchRelatedVariant.SidebarCompact),
+            Triple(840f, 725f, WatchRelatedVariant.SidebarCompact),
             Triple(931f, 744f, WatchRelatedVariant.SidebarCompact),
             Triple(1100f, 725f, WatchRelatedVariant.SidebarCompact),
             Triple(1280f, 725f, WatchRelatedVariant.SidebarWide),
@@ -570,6 +580,8 @@ class WatchViewModelTest {
         for ((width, height, expected) in expectations) {
             assertEquals("$width × $height", expected, WatchLayout.relatedVariant(width, height))
         }
+        // A landscape tablet below 840dp still gets the two-column layout.
+        assertEquals(WatchRelatedVariant.SidebarCompact, WatchLayout.relatedVariant(800f, 552f, smallestWidth = 600f))
     }
 
     @Test fun phoneCoverKeepsTheSampledPlusThirteen() {

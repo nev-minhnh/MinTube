@@ -199,13 +199,14 @@ class WatchScreenshotAndroidTest {
     }
 
     @Test fun listRelatedRowsUseTheWideShortCover() {
-        compose.setContent { Viewport(844, 342) { RenderScreen(contentOf("content")) } }
+        // 844 × 342 is now two-column (landscape ≥ 840dp); 800 × 342 is still wide-short.
+        compose.setContent { Viewport(800, 342) { RenderScreen(contentOf("content")) } }
         val player = bounds("watch-player-slot")
         assertEquals(0f, player.left, 0.5f)
         assertEquals(0f, player.top, 0.5f)
-        assertEquals(844f, player.width, 0.5f)
-        // Wide-short player scrolls with content, so the window clips its tall box.
-        assertEquals(342f, player.bottom, 0.5f)
+        assertEquals(800f, player.width, 0.5f)
+        // Wide-short player stays pinned and shrinks to leave the 96dp body reserve.
+        assertEquals(342f - 96f, player.bottom, 0.5f)
         scrollToCard("watch-thumb-harbour")
         scrollToCard("watch-thumb-studio")
         scrollToCard("watch-thumb-harbour")
@@ -219,11 +220,12 @@ class WatchScreenshotAndroidTest {
     }
 
     @Test fun stackedRelatedUsesTheInsetCover() {
-        compose.setContent { Viewport(840, 725) { RenderScreen(contentOf("content")) } }
+        // 840 × 725 is now two-column (landscape ≥ 840dp); 800 × 725 is still single-column stacked.
+        compose.setContent { Viewport(800, 725) { RenderScreen(contentOf("content")) } }
         val player = bounds("watch-player-slot")
         assertEquals(0f, player.top, 0.5f)
-        assertEquals(840f, player.width, 0.5f)
-        assertEquals(840f * 9f / 16f, player.height, 0.6f)
+        assertEquals(800f, player.width, 0.5f)
+        assertEquals(800f * 9f / 16f, player.height, 0.6f)
         scrollToCard("watch-thumb-harbour")
         val thumb = bounds("watch-thumb-harbour")
         assertEquals(12f, thumb.left, 0.5f)
@@ -239,45 +241,51 @@ class WatchScreenshotAndroidTest {
         var width by mutableIntStateOf(931)
         var height by mutableIntStateOf(744)
         compose.setContent { Viewport(width, height) { RenderScreen(contentOf("content")) } }
+        // Sidebar = a third of the window clamped to 320..480; rows put the thumbnail left.
         val pane = bounds("watch-related")
-        assertEquals(675f, pane.left, 0.5f)
-        assertEquals(256f, pane.width, 0.5f)
+        assertEquals(611f, pane.left, 0.5f)
+        assertEquals(320f, pane.width, 0.5f)
         val player = bounds("watch-player-slot")
         assertEquals(0f, player.left, 0.5f)
         assertEquals(0f, player.top, 0.5f)
-        assertEquals(675f, player.width, 0.5f)
-        assertEquals(675f * 9f / 16f, player.height, 0.6f)
+        assertEquals(611f, player.width, 0.5f)
+        assertEquals(611f * 9f / 16f, player.height, 0.6f)
         assertEquals(12f, bounds("watch-action-like").left, 0.6f)
+        // The chip row sits above the related list, inside the right column.
+        assertTrue(bounds("watch-related-chip-row").bottom <= pane.top + 0.5f)
+        assertEquals(611f, bounds("watch-related-chip-row").left, 0.5f)
         val cell = bounds("watch-related-harbour")
-        assertEquals(683f, cell.left, 0.5f)
-        assertEquals(240f, cell.width, 0.5f)
-        assertEquals(4f, cell.top, 1f)
+        assertEquals(623f, cell.left, 0.5f)
+        assertEquals(308f, cell.width, 0.5f)
+        assertTrue(cell.top >= pane.top)
         val thumb = bounds("watch-thumb-harbour")
-        assertEquals(683f, thumb.left, 0.5f)
-        assertEquals(240f, thumb.width, 0.5f)
-        assertEquals(135f, thumb.height, 0.6f)
+        assertEquals(623f, thumb.left, 0.5f)
+        assertEquals(320f * 0.42f, thumb.width, 0.5f)
+        assertEquals(320f * 0.42f * 9f / 16f, thumb.height, 0.6f)
 
         compose.runOnIdle { width = 1280; height = 725 }
         val wideShift = viewportShift()
         val widePane = bounds("watch-related")
-        assertEquals(780f + wideShift, widePane.left, 0.5f)
-        assertEquals(500f, widePane.width, 0.5f)
-        assertEquals(780f, bounds("watch-player-slot").width, 0.5f)
+        val wideColumn = 1280f * 2f / 3f
+        assertEquals(wideColumn + wideShift, widePane.left, 0.5f)
+        assertEquals(1280f / 3f, widePane.width, 0.5f)
+        assertEquals(wideColumn, bounds("watch-player-slot").width, 0.5f)
         assertEquals(12f + wideShift, bounds("watch-action-like").left, 0.6f)
         val wideCell = bounds("watch-related-harbour")
-        assertEquals(788f + wideShift, wideCell.left, 0.5f)
-        assertEquals(246f, wideCell.width, 0.5f)
-        assertEquals(0f, wideCell.top, 1f)
+        assertEquals(wideColumn + 12f + wideShift, wideCell.left, 0.5f)
+        assertEquals(1280f / 3f - 12f, wideCell.width, 0.5f)
+        assertTrue(wideCell.top >= widePane.top)
         val wideThumb = bounds("watch-thumb-harbour")
-        assertEquals(238f, wideThumb.width, 0.5f)
-        assertEquals(133.875f, wideThumb.height, 0.6f)
-        assertEquals(1034f + wideShift, bounds("watch-related-studio").left, 0.5f)
+        assertEquals(176f, wideThumb.width, 0.5f)
+        assertEquals(99f, wideThumb.height, 0.6f)
+        // One row per item: the next item sits below, not beside.
+        assertEquals(wideColumn + 12f + wideShift, bounds("watch-related-studio").left, 0.5f)
 
         compose.runOnIdle { width = 1600; height = 915 }
         val tallShift = viewportShift()
-        assertEquals(1100f + tallShift, bounds("watch-related").left, 0.5f)
-        assertEquals(500f, bounds("watch-related").width, 0.5f)
-        assertEquals(1100f, bounds("watch-player-slot").width, 0.5f)
+        assertEquals(1120f + tallShift, bounds("watch-related").left, 0.5f)
+        assertEquals(480f, bounds("watch-related").width, 0.5f)
+        assertEquals(1120f, bounds("watch-player-slot").width, 0.5f)
         assertEquals(12f + tallShift, bounds("watch-action-like").left, 0.6f)
     }
 
@@ -424,12 +432,15 @@ class WatchScreenshotAndroidTest {
     }
 
 
-    @Test fun shortWindowCanScrollThePlayerAwayAndReachRetry() {
+    @Test fun shortWindowKeepsThePlayerPinnedAndReachesRetry() {
         compose.setContent { Viewport(320, 240, 2f) { RenderScreen(contentOf("error")) } }
         compose.onNodeWithText("Retry").performScrollTo().assertIsDisplayed()
-        assertTrue("Player must scroll away in a short window", bounds("watch-player-slot").bottom <= 48f)
-        assertTrue("Retry must stay below the page toolbar",
-            compose.onNodeWithText("Retry").fetchSemanticsNode().boundsInRoot.top >= 48f)
+        // The player never scrolls away; a short window shrinks it to leave the 96dp body reserve.
+        val player = bounds("watch-player-slot")
+        assertEquals("Player stays pinned in a short window", 0f, player.top, 0.5f)
+        assertTrue("Player leaves room for the page", player.bottom <= 240f - 96f + 0.5f)
+        assertTrue("Retry must stay below the pinned player",
+            compose.onNodeWithText("Retry").fetchSemanticsNode().boundsInRoot.top >= player.bottom - 0.5f)
     }
 
     @Test fun portraitScrollSurvivesTheSidebarLayoutAndReturn() {

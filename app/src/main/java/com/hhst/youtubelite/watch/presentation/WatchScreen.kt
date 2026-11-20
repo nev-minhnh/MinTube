@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -81,10 +80,17 @@ fun WatchScreen(
     onCopyLink: ((String) -> Unit)? = null,
 ) {
     val showPlayer = !fullscreen || keepPlayerSlotInFullscreen
+    // One saved scroll state per column and layout, keyed by video: a new video starts at the
+    // top, and each column keeps its own place across recomposition, rotation and returning
+    // from another screen. The two columns never share a scroll or nested-scroll connection.
     val mainScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
     val sidebarMainScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
-    val compactRelatedScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
-    val wideRelatedScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
+    val relatedScroll = rememberSaveable(state.videoId, saver = LazyListState.Saver) { LazyListState() }
+    // Chip selection is presentation state; a new video starts on "All".
+    var fromChannel by rememberSaveable(state.videoId) { mutableStateOf(false) }
+    val page = (state.content as? WatchContent.Ready)?.page
+    val filter = page?.let { RelatedFilter.of(it, fromChannel) }
+    val smallestWidth = watchSmallestWidth()
     AppTheme {
         Box(modifier.fillMaxSize().then(if (drawBackground) Modifier.background(DesignTokens.Background) else Modifier).testTag("watch-screen")) {
             BoxWithConstraints(
@@ -95,66 +101,51 @@ fun WatchScreen(
             ) {
                 val width = maxWidth.value
                 val height = maxHeight.value
-                val sidebarMode = WatchLayout.sidebar(width, height)
-                val columnWidth = WatchLayout.columnWidth(width, height)
-                val playerHeight = WatchLayout.playerHeight(width, height)
-                val pinned = WatchLayout.pinnedPlayer(width, height)
+                val sidebarMode = WatchLayout.sidebar(width, height, smallestWidth)
+                val columnWidth = WatchLayout.columnWidth(width, height, smallestWidth)
+                val playerHeight = WatchLayout.playerHeight(width, height, smallestWidth)
+                // The player is pinned at the top of its column in every layout; the page scrolls
+                // below it, never with it.
+                val pinnedSlot: @Composable (Modifier) -> Unit = { slotModifier ->
+                    if (showPlayer) playerSlot(slotModifier.testTag("watch-player-slot")) else Spacer(slotModifier)
+                }
 
                 if (sidebarMode) {
                     Row(Modifier.fillMaxSize()) {
-                        Box(Modifier.weight(1f).fillMaxHeight()) {
+                        Column(Modifier.weight(1f).fillMaxHeight()) {
+                            pinnedSlot(Modifier.padding(top = WatchLayout.TopBarHeight.dp).fillMaxWidth().height(playerHeight.dp))
                             WatchMainBody(
                                 state = state,
                                 scroll = sidebarMainScroll,
                                 viewportWidth = width,
                                 viewportHeight = height,
-                                playerHeight = playerHeight,
-                                pinned = pinned,
-                                includeRelated = false,
-                                showPlayer = showPlayer,
-                                playerSlot = playerSlot,
+                                smallestWidth = smallestWidth,
+                                filter = null,
+                                onFilter = {},
                                 onAction = onAction,
                                 onCopyLink = onCopyLink,
+                                modifier = Modifier.weight(1f),
                             )
-                            if (pinned && showPlayer) {
-                                // The player is fixed over the main column only.
-                                Box(
-                                    Modifier.align(Alignment.TopStart)
-                                        .padding(top = WatchLayout.TopBarHeight.dp)
-                                        .fillMaxWidth()
-                                        .height(playerHeight.dp),
-                                ) {
-                                    playerSlot(Modifier.fillMaxSize().testTag("watch-player-slot"))
-                                }
-                            }
                         }
                         Box(if (sidebarCovered) Modifier.clearAndSetSemantics {} else Modifier) {
-                            WatchSidebarPane(state, width, if (WatchLayout.sidebarWidth(width) >= WatchLayout.SidebarWideWidth) wideRelatedScroll else compactRelatedScroll, onAction)
+                            WatchSidebarPane(state, width, relatedScroll, filter, { fromChannel = it }, onAction)
                         }
                     }
                 } else {
-                    WatchMainBody(
-                        state = state,
-                        scroll = mainScroll,
-                        viewportWidth = width,
-                        viewportHeight = height,
-                        playerHeight = playerHeight,
-                        pinned = pinned,
-                        includeRelated = true,
-                        showPlayer = showPlayer,
-                        playerSlot = playerSlot,
-                        onAction = onAction,
-                        onCopyLink = onCopyLink,
-                    )
-                    if (pinned && showPlayer) {
-                        Box(
-                            Modifier.align(Alignment.TopStart)
-                                .padding(top = WatchLayout.TopBarHeight.dp)
-                                .width(columnWidth.dp)
-                                .height(playerHeight.dp),
-                        ) {
-                            playerSlot(Modifier.fillMaxSize().testTag("watch-player-slot"))
-                        }
+                    Column(Modifier.fillMaxSize()) {
+                        pinnedSlot(Modifier.padding(top = WatchLayout.TopBarHeight.dp).width(columnWidth.dp).height(playerHeight.dp))
+                        WatchMainBody(
+                            state = state,
+                            scroll = mainScroll,
+                            viewportWidth = width,
+                            viewportHeight = height,
+                            smallestWidth = smallestWidth,
+                            filter = filter,
+                            onFilter = { fromChannel = it },
+                            onAction = onAction,
+                            onCopyLink = onCopyLink,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
                 }
             }
@@ -233,33 +224,38 @@ private fun WatchVideoMenuAction.icon(): AppIcon = when (this) {
     WatchVideoMenuAction.NotInterested -> AppIcon.Block
     WatchVideoMenuAction.DontRecommend -> AppIcon.Close
 }
+/**
+ * The scrolling page below the pinned player. In the single-column layout it also carries the
+ * related feed, whose chip row sticks directly under the player while info and feed scroll.
+ */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun WatchMainBody(
     state: WatchUiState,
     scroll: LazyListState,
     viewportWidth: Float,
     viewportHeight: Float,
-    playerHeight: Float,
-    pinned: Boolean,
-    includeRelated: Boolean,
-    showPlayer: Boolean,
-    playerSlot: @Composable (Modifier) -> Unit,
+    smallestWidth: Float,
+    filter: RelatedFilter?,
+    onFilter: (Boolean) -> Unit,
     onAction: (WatchAction) -> Unit,
     onCopyLink: ((String) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    if (includeRelated) RelatedPaging(state, scroll, onAction)
+    val includeRelated = !WatchLayout.sidebar(viewportWidth, viewportHeight, smallestWidth)
+    val filtered = includeRelated && filter?.fromChannel == true
+    // "From <channel>" keeps the loaded items and pauses paging; "All" pages on as before.
+    if (includeRelated && !filtered) RelatedPaging(state, scroll, onAction)
     // The slot geometry stays on WatchLayout (the overlay player and the panels read it);
     // only the feed below it follows the Mint window classes.
-    val listRows = WatchLayout.relatedVariant(viewportWidth, viewportHeight) == WatchRelatedVariant.List
+    val listRows = WatchLayout.relatedVariant(viewportWidth, viewportHeight, smallestWidth) == WatchRelatedVariant.List
     val window = WindowClass.of(viewportWidth.toInt())
     val columns = if (listRows) 1 else window.feedColumns
     val inset = MinSpace.pageInset(window)
-    val related = (state.content as? WatchContent.Ready)?.page?.related.orEmpty()
+    val related = if (includeRelated) filter?.visible.orEmpty() else emptyList()
     val relatedRows = remember(related, columns) { related.chunked(columns) }
-    Box(modifier.fillMaxSize().clipToBounds()) {
+    Box(modifier.fillMaxWidth().clipToBounds()) {
     LazyColumn(Modifier.fillMaxSize().testTag("watch-scroll"), state = scroll) {
-        item("player") { Spacer(Modifier.height(playerHeight.dp)) }
         when (val content = state.content) {
             WatchContent.Loading -> item("loading") {
                 val known = state.provisional
@@ -276,25 +272,26 @@ private fun WatchMainBody(
                 item("metadata") { WatchMetadata(content.page.video, state, inset, onAction, onCopyLink) }
                 item("comments") { WatchComments(content.page.video, inset, onAction) }
                 if (includeRelated) {
+                    if (filter != null && content.page.related.isNotEmpty()) stickyHeader("related-chips", contentType = "chips") {
+                        RelatedChipRow(filter, inset, onFilter)
+                    }
                     item("related-start") { RelatedHeader(inset) }
+                    if (filtered) item("related-filter-hint") { RelatedFilterHint(inset) }
                     if (related.isEmpty() && content.page.nextKey == null) item("related-empty") { RelatedEmpty() }
                     items(relatedRows, key = { row -> "related:${row.first().id}" }, contentType = { "related-row" }) { row ->
                         RelatedFeedRow(row, columns, listRows, inset, onAction)
                     }
-                    item("pagination") { RelatedFooter(state, onAction) }
+                    item("pagination") { if (filtered) Spacer(Modifier.height(MinSpace.lg)) else RelatedFooter(state, onAction) }
                 }
             }
         }
     }
-    if (!pinned && showPlayer) {
-        val density = LocalDensity.current
-        playerSlot(Modifier.fillMaxWidth().height(playerHeight.dp).offset {
-            androidx.compose.ui.unit.IntOffset(0, if (scroll.firstVisibleItemIndex == 0)
-                -scroll.firstVisibleItemScrollOffset else -with(density) { playerHeight.dp.roundToPx() })
-        }.testTag("watch-player-slot"))
-    }
     }
 }
+
+/** `smallestScreenWidthDp` for the tablet rule of [WatchLayout]; every watch-page layer reads this same value. */
+@Composable
+fun watchSmallestWidth(): Float = androidx.compose.ui.platform.LocalConfiguration.current.smallestScreenWidthDp.toFloat()
 
 @Composable
 internal fun RelatedPaging(state: WatchUiState, scroll: LazyListState, onAction: (WatchAction) -> Unit) {

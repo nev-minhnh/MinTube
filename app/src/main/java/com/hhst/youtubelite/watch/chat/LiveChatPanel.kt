@@ -79,8 +79,9 @@ fun LiveChatPanel(
     BoxWithConstraints(modifier.fillMaxSize()) {
         val width = maxWidth.value
         val height = maxHeight.value
-        PanelTransition(fromBottom = !WatchLayout.sidebar(width, height), onDismiss = onClose) { panelMotion, close ->
-        if (WatchLayout.sidebar(width, height)) {
+        val sidebar = WatchLayout.sidebar(width, height, com.hhst.youtubelite.watch.presentation.watchSmallestWidth())
+        PanelTransition(fromBottom = !sidebar, onDismiss = onClose) { panelMotion, close ->
+        if (sidebar) {
             Row(Modifier.fillMaxSize().testTag("live-chat-rail")) {
                 Spacer(Modifier.weight(1f).fillMaxHeight())
                 LiveChatSurface(state, onAction, close, compact = false, listState = listState,
@@ -90,7 +91,7 @@ fun LiveChatPanel(
         } else {
             val top = CommentsLayout.sheetTop(
                 topBar = WatchLayout.TopBarHeight,
-                playerHeight = WatchLayout.playerHeight(width, height),
+                playerHeight = WatchLayout.playerHeight(width, height, com.hhst.youtubelite.watch.presentation.watchSmallestWidth()),
                 windowHeight = height,
             ).roundToInt().toFloat()
             Box(Modifier.fillMaxSize()) {

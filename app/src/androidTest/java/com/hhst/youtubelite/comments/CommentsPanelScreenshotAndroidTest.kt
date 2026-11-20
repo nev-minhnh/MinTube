@@ -166,7 +166,7 @@ class CommentsPanelScreenshotAndroidTest {
         compose.runOnIdle { width = 1280; height = 800; overlay = CommentsOverlay.ReplyMenu("c1", "c1r1") }
         panel = compose.onNodeWithTag("comments-panel").fetchSemanticsNode().boundsInRoot
         sheet = compose.onNodeWithTag("comments-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(500f, panel.width, 0.5f)
+        assertEquals(1280f / 3f, panel.width, 0.5f)
         assertEquals(panel.width, sheet.width, 0.5f)
         assertEquals(panel.right, sheet.right, 0.5f)
         assertEquals(panel.bottom - 24f, sheet.bottom, 0.5f)

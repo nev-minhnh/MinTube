@@ -223,32 +223,45 @@ object WatchLayout {
 
     const val GridBreakpoint = 550f
     const val WideShortMinWidth = 416f
-    const val SidebarBreakpoint = 931f
-    const val SidebarWideBreakpoint = 1280f
-    const val SidebarCompactWidth = 256f
-    const val SidebarWideWidth = 500f
+    /** Two columns in any landscape window from this width (`WindowClass.Expanded`). */
+    const val SidebarBreakpoint = 840f
+    /** ...and in every landscape tablet window (`smallestScreenWidthDp >= 600`), whatever its width. */
+    const val TabletSmallestWidth = 600f
+    /** The related column takes about a third of the window, clamped to this range. */
+    const val SidebarMinWidth = 320f
+    const val SidebarMaxWidth = 480f
+    /** From this pane width the related rows use the large thumbnail ([WatchRelatedVariant.SidebarWide]). */
+    const val SidebarWideWidth = 400f
+    /** A pinned player always leaves at least this much (or half the window) for the page below it. */
+    const val BodyReserve = 96f
 
     const val ListCoverWidth = 200f
     const val ListCoverHeight = 112f
 
-    /** Wide-short landscape: the one zone where the player scrolls with the content. */
+    /** Wide-short landscape: a short single-column window whose related feed uses list rows. */
     fun wideShort(width: Float, height: Float): Boolean =
         width >= WideShortMinWidth && width * 9f >= height * 13f && width < SidebarBreakpoint
 
-    fun pinnedPlayer(width: Float, height: Float): Boolean =
-        !wideShort(width, height) && height >= TopBarHeight + playerHeight(width, height) + 96f
+    /**
+     * The player is pinned in every non-fullscreen layout: scrolling the page never moves it.
+     * Short windows keep the body reachable by shrinking the player instead ([playerHeight]).
+     */
+    @Suppress("UNUSED_PARAMETER")
+    fun pinnedPlayer(width: Float, height: Float): Boolean = true
 
-    /** Sidebar: `@media (min-width:931) and (orientation:landscape)`. */
-    fun sidebar(width: Float, height: Float): Boolean = width >= SidebarBreakpoint && width > height
+    /** Two columns: a landscape window that is a tablet, or at least [SidebarBreakpoint] wide. */
+    fun sidebar(width: Float, height: Float, smallestWidth: Float = 0f): Boolean =
+        width > height && (width >= SidebarBreakpoint || smallestWidth >= TabletSmallestWidth)
 
-    fun sidebarWidth(width: Float): Float =
-        if (width >= SidebarWideBreakpoint) SidebarWideWidth else SidebarCompactWidth
+    fun sidebarWidth(width: Float): Float = (width / 3f).coerceIn(SidebarMinWidth, SidebarMaxWidth)
 
     /** Main column = viewport minus the sidebar; the player is fixed over this width only. */
-    fun columnWidth(width: Float, height: Float): Float =
-        if (sidebar(width, height)) width - sidebarWidth(width) else width
+    fun columnWidth(width: Float, height: Float, smallestWidth: Float = 0f): Float =
+        if (sidebar(width, height, smallestWidth)) width - sidebarWidth(width) else width
 
-    fun playerHeight(width: Float, height: Float): Float = columnWidth(width, height) * 9f / 16f
+    /** The column's 16:9, capped so the pinned player leaves [BodyReserve] (or half a tiny window) below it. */
+    fun playerHeight(width: Float, height: Float, smallestWidth: Float = 0f): Float =
+        minOf(columnWidth(width, height, smallestWidth) * 9f / 16f, maxOf(height - BodyReserve, height / 2f))
 
     /** `cols = floor((width − 16) / 250)` → 2 for 550–750, 3 for ≥780. */
     fun gridColumns(width: Float): Int = floor((width - 16f) / 250f).toInt().coerceAtLeast(1)
@@ -256,8 +269,8 @@ object WatchLayout {
     /** Cells are flush: cell = width/cols − 8, so the right inset is 8 × (cols − 1). */
     fun gridCell(width: Float): Float = width / gridColumns(width) - 8f
 
-    fun relatedVariant(width: Float, height: Float): WatchRelatedVariant = when {
-        sidebar(width, height) ->
+    fun relatedVariant(width: Float, height: Float, smallestWidth: Float = 0f): WatchRelatedVariant = when {
+        sidebar(width, height, smallestWidth) ->
             if (sidebarWidth(width) >= SidebarWideWidth) WatchRelatedVariant.SidebarWide
             else WatchRelatedVariant.SidebarCompact
         wideShort(width, height) -> WatchRelatedVariant.List

@@ -104,46 +104,60 @@ internal fun RelatedSkeleton(columns: Int, listRows: Boolean, inset: Dp) {
     }
 }
 
-/** The related pane of the two-pane layout. Its width stays on WatchLayout: the comments rail docks over it. */
+/**
+ * The right column of the two-column layout: the chip row on top, then the related rows (thumbnail
+ * left, text right) in their own scroll container. Its width stays on WatchLayout: the comments
+ * rail docks over it.
+ */
 @Composable
-internal fun WatchSidebarPane(state: WatchUiState, viewportWidth: Float, scroll: LazyListState, onAction: (WatchAction) -> Unit) {
-    RelatedPaging(state, scroll, onAction)
+internal fun WatchSidebarPane(
+    state: WatchUiState,
+    viewportWidth: Float,
+    scroll: LazyListState,
+    filter: RelatedFilter?,
+    onFilter: (Boolean) -> Unit,
+    onAction: (WatchAction) -> Unit,
+) {
+    val filtered = filter?.fromChannel == true
+    if (!filtered) RelatedPaging(state, scroll, onAction)
     val paneWidth = WatchLayout.sidebarWidth(viewportWidth)
-    val wide = paneWidth >= WatchLayout.SidebarWideWidth
-    Box(
-        Modifier.width(paneWidth.dp).fillMaxHeight()
-            .padding(top = WatchLayout.TopBarHeight.dp)
-            .testTag("watch-related"),
-    ) {
-        when (val content = state.content) {
-            WatchContent.Loading -> Column(
-                Modifier.fillMaxWidth().padding(horizontal = MinSpace.md).padding(top = MinSpace.md).clearAndSetSemantics {},
-                verticalArrangement = Arrangement.spacedBy(MinSpace.lg),
-            ) {
-                repeat(if (wide) 5 else 3) {
-                    if (wide) VideoRowSkeleton(thumbnailWidth = RowThumbnailWidth) else VideoCardSkeleton()
-                }
-            }
-            WatchContent.Failed -> Unit
-            is WatchContent.Ready -> {
-                val related = content.page.related
-                LazyColumn(
-                    Modifier.fillMaxSize(),
-                    state = scroll,
-                    contentPadding = PaddingValues(top = MinSpace.xs, bottom = MinSpace.lg),
+    val thumbnailWidth = sidebarThumbnailWidth(paneWidth)
+    Column(Modifier.width(paneWidth.dp).fillMaxHeight().padding(top = WatchLayout.TopBarHeight.dp)) {
+        if (filter != null && (state.content as? WatchContent.Ready)?.page?.related?.isNotEmpty() == true)
+            RelatedChipRow(filter, MinSpace.md, onFilter, Modifier.padding(top = MinSpace.xs))
+        Box(Modifier.weight(1f).fillMaxWidth().testTag("watch-related")) {
+            when (val content = state.content) {
+                WatchContent.Loading -> Column(
+                    Modifier.fillMaxWidth().padding(horizontal = MinSpace.md).padding(top = MinSpace.md).clearAndSetSemantics {},
+                    verticalArrangement = Arrangement.spacedBy(MinSpace.lg),
                 ) {
-                    item("header") { RelatedHeader(MinSpace.md) }
-                    if (related.isEmpty() && content.page.nextKey == null) item("related-empty") { RelatedEmpty() }
-                    items(related, key = { it.id }, contentType = { "related" }) { item ->
-                        if (wide) RelatedRow(item, onAction, Modifier.padding(start = MinSpace.md, bottom = MinSpace.md))
-                        else RelatedCard(item, onAction, Modifier.padding(horizontal = MinSpace.md).padding(bottom = MinSpace.lg), showAvatar = false)
+                    repeat(5) { VideoRowSkeleton(thumbnailWidth = thumbnailWidth) }
+                }
+                WatchContent.Failed -> Unit
+                is WatchContent.Ready -> {
+                    val related = filter?.visible ?: content.page.related
+                    LazyColumn(
+                        Modifier.fillMaxSize(),
+                        state = scroll,
+                        contentPadding = PaddingValues(top = MinSpace.xs, bottom = MinSpace.lg),
+                    ) {
+                        item("header") { RelatedHeader(MinSpace.md) }
+                        if (filtered) item("related-filter-hint") { RelatedFilterHint(MinSpace.md) }
+                        if (related.isEmpty() && content.page.nextKey == null) item("related-empty") { RelatedEmpty() }
+                        items(related, key = { it.id }, contentType = { "related" }) { item ->
+                            RelatedRow(item, onAction, Modifier.padding(start = MinSpace.md, bottom = MinSpace.md), thumbnailWidth)
+                        }
+                        item("pagination") { if (filtered) Spacer(Modifier.size(MinSpace.lg)) else RelatedFooter(state, onAction) }
                     }
-                    item("pagination") { RelatedFooter(state, onAction) }
                 }
             }
         }
     }
 }
+
+/** Row thumbnails take ~42% of the pane: large panes ([WatchLayout.SidebarWideWidth]+) get the full row cover. */
+private fun sidebarThumbnailWidth(paneWidth: Float): Dp =
+    (paneWidth * 0.42f).coerceIn(128f, RowThumbnailWidth.value + 8f).dp
 
 @Composable
 private fun RelatedCard(item: WatchRelated, onAction: (WatchAction) -> Unit, modifier: Modifier = Modifier, showAvatar: Boolean = true) {
@@ -161,9 +175,10 @@ private fun RelatedCard(item: WatchRelated, onAction: (WatchAction) -> Unit, mod
 }
 
 @Composable
-private fun RelatedRow(item: WatchRelated, onAction: (WatchAction) -> Unit, modifier: Modifier = Modifier) {
+private fun RelatedRow(item: WatchRelated, onAction: (WatchAction) -> Unit, modifier: Modifier = Modifier,
+    thumbnailWidth: Dp = RowThumbnailWidth) {
     Row(modifier.fillMaxWidth().testTag("watch-related-${item.id}"), verticalAlignment = Alignment.Top) {
-        RelatedThumb(item, Modifier.width(RowThumbnailWidth).aspectRatio(16f / 9f), MinRadius.Field, onAction)
+        RelatedThumb(item, Modifier.width(thumbnailWidth).aspectRatio(16f / 9f), MinRadius.Field, onAction)
         Spacer(Modifier.width(MinSpace.md))
         RelatedText(item, Modifier.weight(1f).padding(top = MinSpace.xxs), large = false, onAction = onAction)
         RelatedKebab(item, onAction)

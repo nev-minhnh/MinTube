@@ -215,14 +215,15 @@ class CommentsPanelAndroidTest {
         viewportHeight = 800
         render()
         val panel = bounds("comments-panel")
-        assertEquals(500f, panel.width, 0.5f)
+        // The docked rail covers the related column: a third of 1280dp.
+        assertEquals(1280f / 3f, panel.width, 0.5f)
         assertEquals(800f, panel.height, 0.5f)
         compose.onNodeWithTag("comments-title").assertDoesNotExist()
         assertEquals(14f, textLayout("comments-count").layoutInput.style.fontSize.value, 0.01f)
         assertEquals(20f, textLayout("comments-count").layoutInput.style.lineHeight.value, 0.01f)
         assertEquals(12f, bounds("comments-count").left - panel.left, 0.5f)
         assertEquals(65f, bounds("comments-header").height, 0.5f)
-        assertEquals(492f, bounds("comments-close").right - panel.left, 0.5f)
+        assertEquals(panel.width - 8f, bounds("comments-close").right - panel.left, 0.5f)
         assertEquals(68f, bounds("comments-input").left - panel.left, 0.5f)
         assertEquals(488f, bounds("comments-input").right - panel.left, 0.5f)
         assertEquals(480f, bounds("comment-c1-more").right - panel.left, 0.5f)

@@ -108,7 +108,8 @@ fun CommentsPanel(
     BoxWithConstraints(modifier.fillMaxSize()) {
         val width = maxWidth.value
         val height = maxHeight.value
-        if (WatchLayout.sidebar(width, height)) {
+        val smallestWidth = com.hhst.youtubelite.watch.presentation.watchSmallestWidth()
+        if (WatchLayout.sidebar(width, height, smallestWidth)) {
             com.hhst.youtubelite.ui.design.PanelTransition(fromBottom = false, onDismiss = onClose,
                 backEnabled = state.overlay == CommentsOverlay.None) { panelMotion, close ->
             Row(Modifier.fillMaxSize().testTag("comments-rail")) {
@@ -131,7 +132,7 @@ fun CommentsPanel(
             // Page rounds the fractional 16:9 player; the sheet must start on the same pixel.
             val top = sheetTopOverride ?: CommentsLayout.sheetTop(
                 topBar = WatchLayout.TopBarHeight,
-                playerHeight = WatchLayout.playerHeight(width, height),
+                playerHeight = WatchLayout.playerHeight(width, height, smallestWidth),
                 windowHeight = height,
             ).roundToInt().toFloat()
             val density = LocalDensity.current.density

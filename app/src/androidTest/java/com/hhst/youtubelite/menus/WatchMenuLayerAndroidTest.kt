@@ -22,7 +22,7 @@ class WatchMenuLayerAndroidTest {
         ActivityScenario.launch<WatchActivity>(WatchActivity.commentsIntent(
             ApplicationProvider.getApplicationContext(), "bunny", CommentsScenario.Content,
         )).use { host ->
-            host.onActivity { assertTrue("Use a landscape host at least 931dp wide", it.resources.configuration.screenWidthDp >= 931) }
+            host.onActivity { assertTrue("Use a landscape host at least 840dp wide", it.resources.configuration.screenWidthDp >= 840) }
             compose.waitUntil(10000) { compose.onAllNodesWithTag("comments-list").fetchSemanticsNodes().isNotEmpty() }
             compose.onNodeWithTag("watch-title", useUnmergedTree = true).assertIsDisplayed()
             compose.onNodeWithContentDescription("More actions for City light trails — a night walk through the old harbour").assertDoesNotExist()
