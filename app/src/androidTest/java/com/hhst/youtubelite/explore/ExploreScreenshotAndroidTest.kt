@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.explore
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -42,7 +43,7 @@ class ExploreScreenshotAndroidTest {
         var ui by mutableStateOf(state(category))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, scale)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { ExploreScreen(ui, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { ExploreScreen(ui, {}, {}) }
             }
         }
         for ((w, h) in listOf(320 to 844, 390 to 844, 411 to 844, 600 to 844, 840 to 800, 1280 to 800, 1600 to 800)) {
@@ -53,16 +54,18 @@ class ExploreScreenshotAndroidTest {
         val first = compose.onNodeWithTag("explore-item-music-bunny").fetchSemanticsNode().boundsInRoot
         val second = compose.onNodeWithTag("explore-item-music-dream").fetchSemanticsNode().boundsInRoot
         val third = compose.onNodeWithTag("explore-item-music-sintel").fetchSemanticsNode().boundsInRoot
-        val cell = (1280f - 32f - 32f) / 3f
-        assertEquals(16f, first.left, 0.5f)
+        // Mint grid: 24dp page inset on wide windows, 16dp gaps.
+        val cell = (1280f - 48f - 32f) / 3f
+        assertEquals(24f, first.left, 0.5f)
         assertEquals(cell, first.width, 1f)
         assertEquals(first.left + first.width + 16f, second.left, 1f)
         assertEquals(second.left + second.width + 16f, third.left, 1f)
         assertEquals(first.top, second.top, 0.5f)
         compose.runOnIdle { width = 390; height = 844; ui = state(ExploreCategory.Music) }
         val phone = compose.onNodeWithTag("explore-item-music-bunny").fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, phone.left, 0.5f)
-        assertEquals(390f, phone.width, 0.5f)
+        // Phone cards sit inside the 16dp page inset instead of running edge to edge.
+        assertEquals(16f, phone.left, 0.5f)
+        assertEquals(358f, phone.width, 0.5f)
         for (c in listOf(ExploreCategory.Gaming, ExploreCategory.News, ExploreCategory.Sports)) {
             compose.runOnIdle { width = 390; height = 844; ui = state(c) }
             capture("explore-${c.name.lowercase()}-390", output, record, goldens)
