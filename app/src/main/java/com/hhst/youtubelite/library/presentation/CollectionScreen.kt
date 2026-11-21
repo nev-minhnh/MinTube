@@ -41,6 +41,7 @@ import com.hhst.youtubelite.ui.design.VerificationCard
 import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.ui.design.rememberWindowClass
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** The Playlists list. */
 @Composable
@@ -91,8 +92,9 @@ private fun CollectionList(content: CollectionContent.Ready, append: AppendState
         if (nearEnd && content.nextKey != null && append == AppendState.Idle) onAction(LibraryAction.LoadCollectionNext)
     }
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(Modifier.widthIn(max = if (columns == 2) 1280.dp else LibraryContentMaxWidth).fillMaxSize().testTag("playlists-list"),
-            state = listState, contentPadding = PaddingValues(start = inset, end = inset, top = MinSpace.sm, bottom = MinSpace.xxl)) {
+        val dock = miniDockListPadding(MinSpace.xxl)
+        LazyColumn(Modifier.widthIn(max = if (columns == 2) 1280.dp else LibraryContentMaxWidth).fillMaxSize().then(dock.modifier).testTag("playlists-list"),
+            state = listState, contentPadding = PaddingValues(start = inset, end = inset, top = MinSpace.sm, bottom = dock.bottom)) {
             items(content.playlists.chunked(columns), key = { it.first().id }) { line ->
                 Row(Modifier.fillMaxWidth().padding(bottom = MinSpace.lg), horizontalArrangement = Arrangement.spacedBy(MinSpace.xxl)) {
                     line.forEach { playlist ->

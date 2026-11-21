@@ -30,6 +30,7 @@ import com.hhst.youtubelite.playlist.domain.PlaylistSummary
 import com.hhst.youtubelite.search.domain.SearchResultsLayout
 import com.hhst.youtubelite.ui.design.*
 import androidx.compose.ui.res.stringResource
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 @Composable
 internal fun PlaylistArtwork(asset: String, modifier: Modifier = Modifier) {
@@ -66,8 +67,9 @@ fun PlaylistSearchList(
 ) {
     val viewport = rememberUpdatedState(width to height)
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(Modifier.widthIn(max = 840.dp).fillMaxSize().testTag("playlist-search-list"), state = listState,
-            contentPadding = PaddingValues(top = SearchResultsLayout.listTopInset(width).dp, bottom = 24.dp)) {
+        val dock = miniDockListPadding(24.dp)
+        LazyColumn(Modifier.widthIn(max = 840.dp).fillMaxSize().then(dock.modifier).testTag("playlist-search-list"), state = listState,
+            contentPadding = PaddingValues(top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
             items(playlists, key = { it.id }) { playlist ->
                 val (w, h) = viewport.value
                 val row = SearchResultsLayout.listLockup(w, h)

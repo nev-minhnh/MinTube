@@ -76,6 +76,7 @@ import com.hhst.youtubelite.ui.design.VerificationCard
 import com.hhst.youtubelite.ui.design.appDescription
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Page inset of the playlist screen; the cover and the rows share it at every width. */
 internal val PlaylistInset = MinSpace.lg
@@ -130,8 +131,9 @@ fun PlaylistScreen(state: PlaylistUiState, onAction: (PlaylistAction) -> Unit, o
                                     onAction(PlaylistAction.LoadNext)
                                 }
                             }
-                            LazyColumn(Modifier.fillMaxSize().testTag("playlist-list"), state = listState,
-                                contentPadding = PaddingValues(bottom = MinSpace.lg)) {
+                            val dock = miniDockListPadding(MinSpace.lg)
+                            LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("playlist-list"), state = listState,
+                                contentPadding = PaddingValues(bottom = dock.bottom)) {
                                 item(key = "header") {
                                     val w = viewport.value
                                     // A device-stored list that is still empty has no artwork to show.

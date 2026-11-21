@@ -1,7 +1,18 @@
 package com.hhst.youtubelite.ui.design
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 
 /**
  * Device class by `smallestScreenWidthDp`: phones (< 600dp) run portrait-only outside video
@@ -58,4 +69,54 @@ object MiniDock {
     /** The bottom inset a full-window host passes so its mini matches the browse host's dock. */
     fun windowBottomInsetDp(form: NavigationForm, safeBottomDp: Int): Int =
         safeBottomDp + maxOf(bottomInsetDp(form), bottomFloorDp(form))
+
+    /**
+     * Top edge, in window px, of the space the docked mini occupies: its height plus its bottom
+     * margin (which already includes the bar clearance) above the dock area's bottom edge.
+     */
+    fun miniTopInWindowPx(dockBottomPx: Float, miniBottomMarginDp: Int, miniHeightDp: Int, density: Float): Float =
+        dockBottomPx - (miniBottomMarginDp + miniHeightDp) * density
+
+    /**
+     * Extra bottom content padding, in px, that lets a list's last rows scroll clear of the mini:
+     * the part of the list the mini covers. A list ending at the tab bar gets the mini's height
+     * plus its margin; one ending at the screen bottom also gets the bar clearance. 0 without a mini.
+     */
+    fun listClearancePx(listBottomPx: Float?, miniTopPx: Float?): Float =
+        if (listBottomPx == null || miniTopPx == null) 0f else (listBottomPx - miniTopPx).coerceAtLeast(0f)
+}
+
+/**
+ * The docked in-app mini-player as seen by the screen under it. Its host (`ContentActivity`, the
+ * one place the mini is drawn) publishes [topInWindowPx]; null while no mini is docked.
+ */
+@Stable
+class MiniDockArea {
+    var topInWindowPx: Float? by mutableStateOf(null)
+}
+
+/** An Activity that docks the in-app mini over its content; `setAppContent` provides its area. */
+interface MiniDockHost {
+    val miniDockArea: MiniDockArea
+}
+
+/** The mini dock of the current window; null where no mini is ever docked (Settings, Downloads...). */
+val LocalMiniDockArea = staticCompositionLocalOf<MiniDockArea?> { null }
+
+/** Bottom content padding for a scrolling list, and the [modifier] that measures that list. */
+class MiniDockListPadding(val bottom: Dp, val modifier: Modifier)
+
+/**
+ * [base] bottom content padding plus the part of the list the docked mini covers, so every row can
+ * scroll above the mini and stay fully tappable. Put [MiniDockListPadding.modifier] on the list.
+ */
+@Composable
+fun miniDockListPadding(base: Dp): MiniDockListPadding {
+    val area = LocalMiniDockArea.current
+    val listBottom = remember { mutableStateOf<Float?>(null) }
+    val modifier = remember(area) {
+        if (area == null) Modifier else Modifier.onGloballyPositioned { listBottom.value = it.boundsInWindow().bottom }
+    }
+    val extraPx = MiniDock.listClearancePx(listBottom.value, area?.topInWindowPx)
+    return MiniDockListPadding(base + with(LocalDensity.current) { extraPx.toDp() }, modifier)
 }

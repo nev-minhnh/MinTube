@@ -55,6 +55,7 @@ import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.ui.design.rememberWindowClass
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /**
  * The You tab: account header, entry tiles, recent-history and playlists shelves, then Settings
@@ -127,8 +128,9 @@ private fun LibraryList(listState: LazyListState, content: LibraryContent.Ready,
     val page = content.page
     val inset = MinSpace.pageInset(window)
     val cardWidth = if (window == WindowClass.Compact) 160.dp else 208.dp
-    LazyColumn(Modifier.fillMaxSize().testTag("you-library"), state = listState,
-        contentPadding = PaddingValues(top = MinSpace.sm, bottom = MinSpace.xxl)) {
+    val dock = miniDockListPadding(MinSpace.xxl)
+    LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("you-library"), state = listState,
+        contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom)) {
         item(key = "account") { AccountHeader(page.account, inset) { onAction(LibraryAction.OpenAccountMenu) } }
         item(key = "rows") {
             // Liked has no device lane, so its tile exists only for a signed-in account.

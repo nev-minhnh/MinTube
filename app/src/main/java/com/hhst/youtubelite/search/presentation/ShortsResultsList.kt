@@ -22,17 +22,19 @@ import com.hhst.youtubelite.search.domain.SearchResult
 import com.hhst.youtubelite.search.domain.SearchResultsLayout
 import com.hhst.youtubelite.ui.components.ShortCard
 import com.hhst.youtubelite.ui.design.MinSpace
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Shorts filter results on the shared 9:16 card; views and length sit under the title, on the artwork scrim. */
 @Composable
 fun ShortsResultsList(shorts: List<SearchResult>, state: LazyGridState, onAction: (SearchAction) -> Unit, footer: (@Composable () -> Unit)? = null,
     columns: Int = 2, inset: Dp = MinSpace.lg) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val dock = miniDockListPadding(MinSpace.xxl)
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             state = state,
-            modifier = Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().testTag("search-shorts-list"),
-            contentPadding = PaddingValues(top = MinSpace.sm, start = inset, end = inset, bottom = MinSpace.xxl),
+            modifier = Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().then(dock.modifier).testTag("search-shorts-list"),
+            contentPadding = PaddingValues(top = MinSpace.sm, start = inset, end = inset, bottom = dock.bottom),
             horizontalArrangement = Arrangement.spacedBy(MinSpace.md),
             verticalArrangement = Arrangement.spacedBy(MinSpace.md),
         ) {

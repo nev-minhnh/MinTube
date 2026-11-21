@@ -115,6 +115,7 @@ import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
 import kotlin.math.roundToInt
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /**
  * Subscriptions: title bar, channel strip, filter chips and the feed on the Mint card family.
@@ -376,10 +377,11 @@ private fun SubscriptionsFeed(content: SubscriptionsContent.Feed, window: Window
                 modifier = Modifier.padding(horizontal = MinSpace.pageInset(window)).padding(top = MinSpace.sm, bottom = MinSpace.sm)
                     .testTag("subscriptions-verification-banner"))
         }
+        val dock = miniDockListPadding(MinSpace.xxl)
         LazyVerticalGrid(
             columns = GridCells.Fixed(window.feedColumns), state = gridState,
-            modifier = Modifier.fillMaxSize().testTag("subscriptions-feed"),
-            contentPadding = PaddingValues(start = inset, end = inset, bottom = MinSpace.xxl),
+            modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("subscriptions-feed"),
+            contentPadding = PaddingValues(start = inset, end = inset, bottom = dock.bottom),
             horizontalArrangement = Arrangement.spacedBy(MinSpace.lg),
         ) {
             items(visibleItems, key = { it.id }, contentType = { "video" }) { item ->
@@ -483,6 +485,7 @@ private fun ChannelsOverlay(channels: SubscriptionsChannels, listState: LazyList
             // A reading-width column keeps names and the new-content dot together on wide windows.
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 val page = Modifier.widthIn(max = 720.dp).fillMaxSize()
+                val dock = miniDockListPadding(MinSpace.xxl)
                 when (channels) {
                     SubscriptionsChannels.Loading -> Column(
                         page.testTag("channels-skeleton").clearAndSetSemantics {}
@@ -496,8 +499,8 @@ private fun ChannelsOverlay(channels: SubscriptionsChannels, listState: LazyList
                             onAction = { onAction(SubscriptionsAction.RetryChannels) }, tag = "channels-error",
                         )
                     }
-                    is SubscriptionsChannels.Ready -> LazyColumn(page.testTag("channels-list"), state = listState,
-                        contentPadding = PaddingValues(top = MinSpace.sm, bottom = MinSpace.xxl)) {
+                    is SubscriptionsChannels.Ready -> LazyColumn(page.then(dock.modifier).testTag("channels-list"), state = listState,
+                        contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom)) {
                         if (channels.channels.isEmpty()) {
                             item {
                                 StateMessage(stringResource(R.string.ui_no_channels_yet), icon = AppIcon.Subscriptions, tag = "channels-empty")

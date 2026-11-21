@@ -60,6 +60,7 @@ import com.hhst.youtubelite.ui.design.MinRadius
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
 import com.hhst.youtubelite.ui.design.labelResource
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Height of the post top bar at the default font scale; the comments sheet opens below it. */
 private const val PostTopBarHeight = 56f
@@ -169,9 +170,10 @@ private fun PostDetailContentColumn(
 ) {
     val post = state.post ?: return
     val inset = PostMetrics.inset(pageWidth)
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
-        Modifier.fillMaxSize().testTag("post-detail-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        Modifier.fillMaxSize().then(dock.modifier).testTag("post-detail-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item("author") {
             PostColumn {

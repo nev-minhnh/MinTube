@@ -54,6 +54,7 @@ import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
 import com.hhst.youtubelite.ui.design.labelResource
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /*
  * Home, Videos and Playlists tabs, plus the pieces every tab shares: the card grid inside the
@@ -251,10 +252,11 @@ internal fun ChannelHomeTab(
     val viewport by rememberUpdatedState(width)
     val columns = ChannelMetrics.videoColumns(width)
     val inset = ChannelMetrics.inset(width)
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().testTag("channel-home-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("channel-home-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         // The tab row scrolls with the header and pins once the header is gone.
@@ -294,10 +296,11 @@ internal fun ChannelVideosTab(
     val canPage = page.videosNextKey != null
     val columns = ChannelMetrics.videoColumns(width)
     ObserveChannelPagination(state, canPage, append) { onAction(ChannelAction.LoadVideosNext) }
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().testTag("channel-videos-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("channel-videos-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Videos, onAction) }
@@ -340,7 +343,8 @@ internal fun ChannelPlaylistsTab(
         if (sort == ChannelPlaylistSort.LastVideo) rows.sortedBy { it.updatedDays ?: Int.MAX_VALUE } else rows
     }
     ObserveChannelPagination(state, canPage, append) { onAction(ChannelAction.LoadPlaylistsNext) }
-    LazyColumn(Modifier.fillMaxSize().testTag("channel-playlists-list"), state = state, contentPadding = PaddingValues(bottom = MinSpace.xxl)) {
+    val dock = miniDockListPadding(MinSpace.xxl)
+    LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("channel-playlists-list"), state = state, contentPadding = PaddingValues(bottom = dock.bottom)) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Playlists, onAction) }
         if (canSortByUpdate) item {

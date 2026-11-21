@@ -22,7 +22,9 @@ import com.hhst.youtubelite.watch.presentation.WatchPlayer
 import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
 
-abstract class ContentActivity : NativeActivity() {
+abstract class ContentActivity : NativeActivity(), com.hhst.youtubelite.ui.design.MiniDockHost {
+    /** Where the docked mini sits, for the lists of this screen (see `miniDockListPadding`). */
+    override val miniDockArea = com.hhst.youtubelite.ui.design.MiniDockArea()
     private var miniWindowReady = false
     private var miniEntryBounds by mutableStateOf<androidx.compose.ui.geometry.Rect?>(null)
     private var miniEntryVersion by mutableIntStateOf(0)
@@ -249,12 +251,21 @@ abstract class ContentActivity : NativeActivity() {
                             val dock = com.hhst.youtubelite.ui.design.rememberNavigationForm()
                             // In this screen's own PiP the one window fills the PiP frame over a black backdrop.
                             val ownPip = contentPip
+                            val density = androidx.compose.ui.platform.LocalDensity.current.density
+                            DisposableEffect(Unit) { onDispose { miniDockArea.topInWindowPx = null } }
                             BoxWithConstraints((if (ownPip) Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Black)
                                 else Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
                                 .padding(start = com.hhst.youtubelite.ui.design.MiniDock.startInsetDp(dock).dp))
                                 .onGloballyPositioned { coordinates ->
                                     val bounds = coordinates.boundsInWindow()
                                     miniDockBounds = android.graphics.RectF(bounds.left, bounds.top, bounds.right, bounds.bottom)
+                                    // Same spec MiniPlayerWindow docks with (the box fills its constraints).
+                                    val spec = com.hhst.youtubelite.player.surface.MiniPlayerLayout.computeSpec(
+                                        (bounds.width / density).toInt(), com.hhst.youtubelite.ui.design.MiniDock.bottomInsetDp(dock),
+                                        com.hhst.youtubelite.player.surface.MiniPlayerLayout.NO_WIDTH_OVERRIDE_DP,
+                                        com.hhst.youtubelite.ui.design.MiniDock.bottomFloorDp(dock))
+                                    miniDockArea.topInWindowPx = if (ownPip) null else com.hhst.youtubelite.ui.design.MiniDock
+                                        .miniTopInWindowPx(bounds.bottom, spec.bottomMarginDp, spec.heightDp, density)
                                 }
                                 // The mini (also mid-entry from the watch page, or folded to the start
                                 // edge) is clipped, drawing and touch, at the dock's start edge, so it

@@ -106,8 +106,11 @@ fun androidx.activity.ComponentActivity.setAppContent(navigationRail: Boolean = 
             // keyboard) lands here, invisibly, instead of drawing the first clickable's (the Home
             // wordmark's) focus highlight. Tab and D-pad then move on to the first control as before.
             Box(Modifier.fillMaxSize().background(DesignTokens.Background).focusTarget()) {
-                // Wide landscape windows move the screen's tab bar to a start-edge rail.
-                com.hhst.youtubelite.ui.components.NavigationFrame(navigationRail, content)
+                // Lists read the docked mini's area to keep their last rows scrollable above it.
+                CompositionLocalProvider(LocalMiniDockArea provides (this@setAppContent as? MiniDockHost)?.miniDockArea) {
+                    // Wide landscape windows move the screen's tab bar to a start-edge rail.
+                    com.hhst.youtubelite.ui.components.NavigationFrame(navigationRail, content)
+                }
             }
         }
     }
