@@ -114,6 +114,22 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
             android:theme="@style/Theme.App.Tv" />
+        <activity
+            android:name=".tv.shorts.TvShortsActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.App.Tv.Player" />
+        <activity
+            android:name=".tv.library.TvLibraryPageActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
+        <!-- Stand-in for TV channel, playlist and sign-in screens until they merge (tv/routes/TvRoutes.kt). -->
+        <activity
+            android:name=".tv.routes.TvPlaceholderActivity"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
         <!-- Route external playback links straight to the TV watch screen. -->
         <activity
             android:name=".tv.TvLinkActivity"

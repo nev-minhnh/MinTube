@@ -6,11 +6,13 @@ import android.os.Bundle
 import androidx.compose.runtime.Composable
 import com.hhst.youtubelite.tv.home.TvHomeController
 import com.hhst.youtubelite.tv.search.TvSearchController
+import com.hhst.youtubelite.tv.library.TvLibraryController
 import com.hhst.youtubelite.tv.shell.TvComingSoon
 import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.TvShellState
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
+import com.hhst.youtubelite.tv.subscriptions.TvSubscriptionsController
 
 /**
  * LEANBACK_LAUNCHER entry of MinTube TV: the shell (rail + content) hosting the top-level
@@ -20,6 +22,9 @@ import com.hhst.youtubelite.tv.shell.rememberTvShellState
 class TvMainActivity : TvActivity() {
     private lateinit var home: TvHomeController
     private lateinit var search: TvSearchController
+    // Created on first visit: their ViewModels start reading when built.
+    private var subscriptions: TvSubscriptionsController? = null
+    private var library: TvLibraryController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +41,9 @@ class TvMainActivity : TvActivity() {
         when (destination) {
             TvDestination.Home -> home.Content()
             TvDestination.Search -> search.Content()
-            TvDestination.Subscriptions,
-            TvDestination.Library, TvDestination.Settings ->
+            TvDestination.Subscriptions -> (subscriptions ?: TvSubscriptionsController(this).also { subscriptions = it }).Content()
+            TvDestination.Library -> (library ?: TvLibraryController(this).also { library = it }).Content()
+            TvDestination.Settings ->
                 TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
         }
     }
@@ -46,6 +52,8 @@ class TvMainActivity : TvActivity() {
         super.onResume()
         if (::home.isInitialized) home.onResume()
         if (::search.isInitialized) search.onResume()
+        subscriptions?.onResume()
+        library?.onResume()
     }
 
     companion object {
