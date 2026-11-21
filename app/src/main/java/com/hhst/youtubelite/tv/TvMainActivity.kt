@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
+import com.hhst.youtubelite.tv.home.TvHomeController
 import com.hhst.youtubelite.tv.shell.TvComingSoon
 import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
@@ -16,8 +17,11 @@ import com.hhst.youtubelite.tv.shell.rememberTvShellState
  * pages (watch, channel, playlist) are their own [TvActivity].
  */
 class TvMainActivity : TvActivity() {
+    private lateinit var home: TvHomeController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        home = TvHomeController(this)
         setTvContent {
             val shell = rememberTvShellState()
             TvShell(shell, onExit = ::finish) { destination -> Destination(destination, shell) }
@@ -27,10 +31,16 @@ class TvMainActivity : TvActivity() {
     @Composable
     private fun Destination(destination: TvDestination, shell: TvShellState) {
         when (destination) {
-            TvDestination.Home, TvDestination.Search, TvDestination.Subscriptions,
+            TvDestination.Home -> home.Content()
+            TvDestination.Search, TvDestination.Subscriptions,
             TvDestination.Library, TvDestination.Settings ->
                 TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::home.isInitialized) home.onResume()
     }
 
     companion object {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LeakCanary's launcher entry is also a LEANBACK_LAUNCHER entry (it borrows the TV banner).
+         Hide it so a debug TV build shows MinTube TV once. Leaks still notify. -->
+    <bool name="leak_canary_add_launcher_icon">false</bool>
+</resources>
