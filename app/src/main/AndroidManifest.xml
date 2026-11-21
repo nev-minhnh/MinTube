@@ -20,6 +20,10 @@
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
+        <!-- TV Search shows its voice button only when a recognizer activity resolves. -->
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+        </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -100,6 +104,16 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:theme="@style/Theme.App.Tv.Player" />
+        <activity
+            android:name=".tv.channel.TvChannelActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
+        <activity
+            android:name=".tv.playlist.TvPlaylistActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
         <!-- Route external playback links straight to the TV watch screen. -->
         <activity
             android:name=".tv.TvLinkActivity"
