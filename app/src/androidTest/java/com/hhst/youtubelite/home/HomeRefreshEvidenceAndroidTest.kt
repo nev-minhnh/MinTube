@@ -2,6 +2,10 @@ package com.hhst.youtubelite.home
 
 import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
+import android.view.Choreographer
+import android.view.PixelCopy
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -30,6 +34,10 @@ import com.hhst.youtubelite.ui.theme.AppAppearance
 import com.hhst.youtubelite.ui.theme.AppTheme
 import com.hhst.youtubelite.ui.theme.ThemeMode
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
@@ -69,10 +77,14 @@ class HomeRefreshEvidenceAndroidTest {
         }
         compose.onNodeWithTag("home-refresh-indicator").assertExists()
         save("home-refresh-user-$suffix", output)
+        // A pull during a refresh is rejected, so the feed's edge stretch takes it, and a
+        // finger holding that stretch redraws every frame: the window never idles until
+        // release. Capture this one state from the window without waiting for idle.
+        val screen = compose.onNodeWithTag("home-screen").fetchSemanticsNode().boundsInWindow
         compose.onNodeWithTag("home-feed").performTouchInput {
             down(Offset(center.x, 200f)); moveBy(Offset(0f, 300f))
         }
-        save("home-pull-held-$suffix", output)
+        saveHeld("home-pull-held-$suffix", output, screen)
         compose.onNodeWithTag("home-feed").performTouchInput { up() }
         compose.runOnIdle { state = HomeUiState(content = HomeContent.Empty(refreshing = true, userRefresh = true)) }
         compose.onNodeWithTag("home-refresh-indicator").assertExists()
@@ -95,6 +107,27 @@ class HomeRefreshEvidenceAndroidTest {
         compose.waitForIdle()
         val bitmap = compose.onNodeWithTag("about-busy").captureToImage().asAndroidBitmap()
         File(output(), "about-busy-$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    private fun saveHeld(name: String, output: File, bounds: androidx.compose.ui.geometry.Rect) {
+        val window = compose.activity.window
+        val drawn = CountDownLatch(1)
+        // Two frames: the first draws the injected move, the second presents it.
+        compose.runOnUiThread {
+            Choreographer.getInstance().postFrameCallback {
+                Choreographer.getInstance().postFrameCallback { drawn.countDown() }
+            }
+        }
+        assertTrue(drawn.await(5, TimeUnit.SECONDS))
+        val bitmap = Bitmap.createBitmap(bounds.width.toInt(), bounds.height.toInt(), Bitmap.Config.ARGB_8888)
+        val copied = CountDownLatch(1)
+        var result = -1
+        PixelCopy.request(window, android.graphics.Rect(bounds.left.toInt(), bounds.top.toInt(),
+            bounds.right.toInt(), bounds.bottom.toInt()), bitmap, { result = it; copied.countDown() },
+            Handler(Looper.getMainLooper()))
+        assertTrue(copied.await(5, TimeUnit.SECONDS))
+        assertEquals(PixelCopy.SUCCESS, result)
+        File(output, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
     private fun save(name: String, output: File) {
