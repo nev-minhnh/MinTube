@@ -111,8 +111,12 @@ class PinnedVideoRecoveryAndroidTest {
         val state = MemoryJsonCache()
         if (rememberedMissing) state.put("player:quality", "1080p60", 60_000)
         val prefs = GlobalContext.get().get<ExtensionManager>()
+        // Remembered progress is off: whether a tick persisted a position past the 5s safe
+        // zone depends on host speed, so every resume position checked here must come from
+        // the engine's own recovery state.
         val previous = listOf(PreferenceKeys.SKIP_SPONSORS, PreferenceKeys.SKIP_SELF_PROMO,
-            PreferenceKeys.SKIP_POI_HIGHLIGHT, PreferenceKeys.REMEMBER_QUALITY).associateWith(prefs::isEnabled)
+            PreferenceKeys.SKIP_POI_HIGHLIGHT, PreferenceKeys.REMEMBER_QUALITY,
+            PreferenceKeys.REMEMBER_LAST_POSITION).associateWith(prefs::isEnabled)
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         val http = OkHttpClient()
         lateinit var surface: SurfaceView

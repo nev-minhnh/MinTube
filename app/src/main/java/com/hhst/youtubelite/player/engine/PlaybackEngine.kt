@@ -304,9 +304,9 @@ class PlaybackEngine(
     private val discontinuityEpoch = AtomicLong()
     /** Generation of the media currently attached to [player]. */
     @Volatile private var attachedGeneration = 0L
-    /** Explicit start of the newest fresh load request, held until that load
-        attaches: a first-load failure must retry at "t=" (0 included), not at
-        remembered progress. */
+    /** Explicit start of the newest load request, held until that load renders a
+        frame: a first-load failure must retry at "t=" (0 included), and a failed
+        recovery reload at the position it resumed from, not at remembered progress. */
     @Volatile private var pendingExplicitStartMs: Long? = null
     private val refreshCastMutex = Mutex()
 
@@ -1932,6 +1932,9 @@ class PlaybackEngine(
             if (videoId != null && attempt?.tryLightRefresh() == true) {
                 playerLog("recovery_light_refresh", mapOf("reason" to reason.name, "attempt" to attempt.lightRefreshes))
                 val position = player.currentPosition
+                // The reload attaches a new source; until it renders, a user retry
+                // must resume here rather than at remembered progress.
+                pendingExplicitStartMs = position
                 nextPlaybackGeneration()
                 playJob?.cancel()
                 rebuildJob?.cancel()
@@ -1989,6 +1992,7 @@ class PlaybackEngine(
         ) {
             muxedFallbackActive = false
             val position = player.currentPosition
+            pendingExplicitStartMs = position
             nextPlaybackGeneration()
             playJob?.cancel()
             rebuildJob?.cancel()
