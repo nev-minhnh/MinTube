@@ -14,11 +14,18 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
+/**
+ * [read] uses the session's content language. Directory shelves carry no stable id, only
+ * a localized title, so they are found by their English or Vietnamese title; for any other
+ * language, or when YouTube renames a shelf, that source falls back to [englishRead]
+ * (`hl=en`) and keeps English for its continuations.
+ */
 internal class HomeDiscovery(
+    private val englishRead: (suspend (HomeSection, String?, Long) -> BrowsePage)? = null,
     private val read: suspend (HomeSection, String?, Long) -> BrowsePage,
 ) {
     @Serializable
-    private data class Pending(val kind: HomeCatalog, val key: String? = null)
+    private data class Pending(val kind: HomeCatalog, val key: String? = null, val english: Boolean = false)
     @Serializable
     private data class Cursor(val generation: Long, val catalog: HomeCatalog, val sources: List<Pending>)
     private data class Source(val pending: Pending, val group: MediaGroup?, val failure: Exception? = null)
@@ -28,7 +35,7 @@ internal class HomeDiscovery(
         else decode(continuation, generation, catalog).sources
         val results = pending.map { source -> async {
             try {
-                Source(source, loadSource(source, generation))
+                loadSource(source, generation)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -67,7 +74,20 @@ internal class HomeDiscovery(
         }, catalog = catalog, partialFailure = failed)
     }
 
-    private suspend fun loadSource(source: Pending, generation: Long): MediaGroup {
+    private suspend fun loadSource(source: Pending, generation: Long): Source {
+        val english = englishRead
+        if (source.english && english != null) return Source(source, loadShelf(source, generation, english))
+        try {
+            return Source(source, loadShelf(source, generation, read))
+        } catch (missing: MediaException) {
+            if (english == null || source.key != null || missing.failure.code != CATALOG_SHELF_MISSING) throw missing
+        }
+        val fallback = source.copy(english = true)
+        return Source(fallback, loadShelf(fallback, generation, english))
+    }
+
+    private suspend fun loadShelf(source: Pending, generation: Long,
+                                  read: suspend (HomeSection, String?, Long) -> BrowsePage): MediaGroup {
         val section = when (source.kind) {
             HomeCatalog.Popular -> error("Popular has multiple sources")
             HomeCatalog.MusicCharts -> HomeSection.MUSIC
@@ -80,20 +100,23 @@ internal class HomeDiscovery(
             val group = page.groups.singleOrNull()
             return group ?: MediaGroup(null, page.items, page.nextKey)
         }
-        // Directory requests use a fixed language; filter labels are localized by the UI.
-        val title = when (source.kind) {
-            HomeCatalog.Popular -> error("Popular has multiple sources")
-            HomeCatalog.MusicCharts -> "Top charts"
-            HomeCatalog.Gaming -> "Trending videos"
-            HomeCatalog.Sports -> "Trending"
-            HomeCatalog.News -> "Top news"
-        }
-        page.groups.firstOrNull { it.title == title }?.let { return it }
+        // Filter labels are localized by the UI; only the shelf lookup reads server titles.
+        val titles = shelfTitles(source.kind)
+        page.groups.firstOrNull { it.title in titles }?.let { return it }
         if (source.kind == HomeCatalog.MusicCharts && page.nextKey != null) {
             val next = read(section, page.nextKey, generation)
-            next.groups.firstOrNull { it.title == title }?.let { return it }
+            next.groups.firstOrNull { it.title in titles }?.let { return it }
         }
-        throw MediaException(RequestError(RequestFailure.PARSE, "catalog_shelf_missing"))
+        throw MediaException(RequestError(RequestFailure.PARSE, CATALOG_SHELF_MISSING))
+    }
+
+    /** English (`hl=en`) and Vietnamese (`hl=vi`) titles of each directory shelf. */
+    private fun shelfTitles(kind: HomeCatalog): Set<String> = when (kind) {
+        HomeCatalog.Popular -> error("Popular has multiple sources")
+        HomeCatalog.MusicCharts -> setOf("Top charts", "Bảng xếp hạng hàng đầu")
+        HomeCatalog.Gaming -> setOf("Trending videos", "Video thịnh hành")
+        HomeCatalog.Sports -> setOf("Trending", "Thịnh hành")
+        HomeCatalog.News -> setOf("Top news", "Tin tức hàng đầu")
     }
 
     private fun sources(catalog: HomeCatalog): List<HomeCatalog> = when (catalog) {
@@ -116,6 +139,7 @@ internal class HomeDiscovery(
 
     companion object {
         private const val PREFIX = "discovery:"
+        private const val CATALOG_SHELF_MISSING = "catalog_shelf_missing"
         fun owns(continuation: String?) = continuation?.startsWith(PREFIX) == true
     }
 }

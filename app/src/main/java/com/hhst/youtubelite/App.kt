@@ -53,6 +53,8 @@ class App : Application(), Configuration.Provider {
             androidContext(this@App)
             modules(appModule)
         }
+        // Before any activity reads: every request carries the user's content hl/gl.
+        com.hhst.youtubelite.core.ContentLocaleSync.install(this, get())
         // Home card warm-up still prepares the web fallback while browsing. A direct VOD
         // cold-open must not start an unused JS runtime alongside its first media requests.
         registerActivityLifecycleCallbacks(com.hhst.youtubelite.player.PlaybackLifecycle())

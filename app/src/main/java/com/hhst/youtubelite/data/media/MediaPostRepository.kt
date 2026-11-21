@@ -75,7 +75,7 @@ class MediaPostRepository(private val client: MediaClient,
         val publicContext = context.anonymous()
         val resolved = resolveChannel(channelId, publicContext, http)
         val first = loadChannel(resolved, publicContext, http = http).requireValue()
-        val tab = first.page.tabs.firstOrNull { it.title.equals("Posts", true) || it.title.equals("Community", true) }
+        val tab = first.page.tabs.firstOrNull(ChannelTabKind.Posts::matches)
             ?: return@readIdempotent ChannelPostsPage(emptyList())
         val page = loadChannelPosts(tab.browseId ?: resolved, publicContext, params = tab.params, http = http).requireValue()
         ChannelPostsPage(page.posts.map { it.summary() }, page.nextKey)

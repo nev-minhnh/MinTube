@@ -19,20 +19,21 @@ class MediaWatchRepository(private val client: MediaClient,
     override suspend fun watchFresh(videoId: String): AppWatchPage = readWatch(videoId, fresh = true)
 
     private suspend fun readWatch(videoId: String, fresh: Boolean): AppWatchPage {
-        val (page, initialDetails) = client.readTogether(
+        val (read, initialDetails) = client.readTogether(
             { context, http ->
                 val core: CoreWatchPage = if (shared != null)
                     shared.read(videoId, context, http, fresh) { id, ctx, httpClient ->
                         loadWatch(id, ctx, http = httpClient)
                     }.requireValue()
                 else loadWatch(videoId, context, http = http).requireValue()
-                Triple(core, context.generation, context.signedIn)
+                Triple(core, context.generation, context.signedIn) to (MediaSession.contentLocale()?.originalText == true)
             },
             { context, http -> loadPlayerDetails(videoId, context, http).value },
         )
         // TV music metadata omits publication dates, and its player response may be
         // partial. Supplement display fields from public WEB metadata, retaining the
         // signed-in tracking identity used by playback/reporting.
+        val (page, originalText) = read
         val details = if (page.third && (page.first.published.isNullOrBlank() && initialDetails?.published.isNullOrBlank() ||
             page.first.author.isNullOrBlank() && initialDetails?.author.isNullOrBlank())) {
             val supplement = try { client.read { context, http ->
@@ -47,7 +48,7 @@ class MediaWatchRepository(private val client: MediaClient,
                 published = initialDetails.published ?: supplement?.published)
                 ?: supplement?.copy(tracking = null)
         } else initialDetails
-        val result = page.first.toAppWatchPage(videoId, details, page.second, page.third)
+        val result = page.first.toAppWatchPage(videoId, details, page.second, page.third, originalText)
         // Signed-in TV /next omits liveChatRenderer even when the stream has an
         // active chat. Discover its continuation via public WEB /next, then keep
         // polling/posting through the current account's existing chat transport.
@@ -97,16 +98,22 @@ class MediaWatchRepository(private val client: MediaClient,
     }
 }
 
-internal fun CoreWatchPage.toAppWatchPage(id: String, details: PlayerDetails?, generation: Long? = null, feedbackAllowed: Boolean = false): AppWatchPage {
+/**
+ * [originalText] prefers the player's `videoDetails` title and description, which YouTube
+ * always returns as the creator wrote them; `/next` text follows `hl` and may be translated.
+ */
+internal fun CoreWatchPage.toAppWatchPage(id: String, details: PlayerDetails?, generation: Long? = null, feedbackAllowed: Boolean = false,
+                                          originalText: Boolean = false): AppWatchPage {
     fun String?.present() = this?.takeIf { it.isNotBlank() }
-    val title = title.present() ?: details?.title.present()
+    val title = (if (originalText) details?.title.present() else null) ?: title.present() ?: details?.title.present()
         ?: throw MediaException(RequestError(RequestFailure.PARSE, "missing_video_details"))
     return AppWatchPage(WatchVideo(id, title,
         author.present() ?: details?.author.orEmpty(), "", channelId.present() ?: details?.channelId.orEmpty(),
         details?.thumbnail.orEmpty(), "", viewCount.present() ?: details?.viewCount?.let {
             java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(it) + " views"
         }.orEmpty(), published.present() ?: details?.published?.substringBefore('T').orEmpty(), commentCount.orEmpty(), WatchComment("", "", ""),
-        description.present() ?: details?.description.orEmpty(), details?.live == true,
+        (if (originalText) details?.description.present() else null) ?: description.present() ?: details?.description.orEmpty(),
+        details?.live == true,
         rating = when (rating) { "LIKE" -> VideoRating.Like; "DISLIKE" -> VideoRating.Dislike; else -> VideoRating.None },
         subscribed = subscribed == true, avatar = authorThumbnail.orEmpty(), commentsStatus = WatchCommentsStatus.Loading,
         tracking = details?.tracking, chatKey = chatKey, sessionGeneration = generation),
@@ -166,7 +173,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
         val page = loadChannel(resolved, context, http = http).requireValue()
         // Optional tabs stay out of the first paint: the playlists tab and an unselected
         // videos tab load on demand, so their latency or failure never blocks the header.
-        val videosTab = page.page.tabs.firstOrNull { it.title.equals("Videos", true) }
+        val videosTab = page.page.tabs.firstOrNull(ChannelTabKind.Videos::matches)
         val videosInline = videosTab == null || videosTab.selected
         AppChannelPage(ChannelProfile(resolved, page.title.orEmpty(), page.handle.orEmpty(), page.thumbnail.orEmpty(), page.banner,
             page.subscriberCount.orEmpty(), page.description.orEmpty(), videoCount = page.videoCount.orEmpty(),
@@ -186,7 +193,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
             },
             videosNextKey = if (videosInline) page.page.nextKey else null,
             videosDeferred = !videosInline,
-            playlistsDeferred = page.page.tabs.any { it.title.equals("Playlists", true) },
+            playlistsDeferred = page.page.tabs.any(ChannelTabKind.Playlists::matches),
             readReference = Landing(this, context, page))
     }
 
@@ -195,7 +202,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
     override suspend fun playlists(channelId: String, opened: AppChannelPage): com.hhst.youtubelite.library.domain.PlaylistCollectionPage = playlistPage(channelId, opened)
 
     private suspend fun playlistPage(channelId: String, opened: AppChannelPage?): com.hhst.youtubelite.library.domain.PlaylistCollectionPage = client.readIdempotent { context, http ->
-        val page = loadTab(channelId, "Playlists", opened, context, http)!!
+        val page = loadTab(channelId, ChannelTabKind.Playlists, opened, context, http)!!
         com.hhst.youtubelite.library.domain.PlaylistCollectionPage(
             page.page.items.filter { it.kind == "playlist" }.map(MediaItem::playlistSummary), page.page.nextKey)
     }
@@ -228,7 +235,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
     private suspend fun videoPage(channelId: String, continuation: String?, opened: AppChannelPage?): ChannelVideosPage = client.read { context, http ->
         val page = if (continuation != null) loadChannel(resolveChannel(channelId, context, http), context,
             continuation = continuation, http = http).requireValue()
-        else loadTab(channelId, "Videos", opened, context, http)!!
+        else loadTab(channelId, ChannelTabKind.Videos, opened, context, http)!!
         ChannelVideosPage(page.page.items.filter { it.kind == "video" }.map { it.channelVideo() }, page.page.nextKey)
     }
 
@@ -238,7 +245,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
     override suspend fun shorts(channelId: String, opened: AppChannelPage): ChannelShortsPage = shortsPage(channelId, opened)
 
     private suspend fun shortsPage(channelId: String, opened: AppChannelPage?): ChannelShortsPage {
-        val (items, nextKey) = tabPage(channelId, "Shorts", opened)
+        val (items, nextKey) = tabPage(channelId, ChannelTabKind.Shorts, opened)
         return ChannelShortsPage(items.filter { it.kind in setOf("video", "short") }.mapIndexed { index, it ->
             ChannelShort(it.id, it.title.orEmpty(), it.viewCount.orEmpty(), it.thumbnail.orEmpty(), index, viewMagnitude(it.viewCount))
         }, nextKey)
@@ -256,7 +263,7 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
     override suspend fun live(channelId: String, opened: AppChannelPage): ChannelLivePage = livePage(channelId, opened)
 
     private suspend fun livePage(channelId: String, opened: AppChannelPage?): ChannelLivePage {
-        val (items, nextKey) = tabPage(channelId, "Live", opened)
+        val (items, nextKey) = tabPage(channelId, ChannelTabKind.Live, opened)
         val videos = items.filter { it.kind == "video" }.mapIndexed { index, it ->
             ChannelLiveVideo(it.id, it.title.orEmpty(), it.viewCount.orEmpty(), it.published.orEmpty(), it.duration.orEmpty(), it.thumbnail.orEmpty(), it.live, index, viewMagnitude(it.viewCount))
         }
@@ -275,13 +282,13 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
     override suspend fun postsNext(channelId: String, cursor: String): ChannelPostsPage = posts.channelPostsNext(channelId, cursor)
 
     /** One tab page with its continuation, so Shorts/Live keep the cursors the adapter dropped. */
-    private suspend fun tabPage(channelId: String, label: String, opened: AppChannelPage?): Pair<List<MediaItem>, String?> =
+    private suspend fun tabPage(channelId: String, kind: ChannelTabKind, opened: AppChannelPage?): Pair<List<MediaItem>, String?> =
         client.read { context, http ->
-            loadTab(channelId, label, opened, context, http)?.page?.let { it.items to it.nextKey }
+            loadTab(channelId, kind, opened, context, http)?.page?.let { it.items to it.nextKey }
                 ?: (emptyList<MediaItem>() to null)
         }
 
-    private fun loadTab(channelId: String, label: String, opened: AppChannelPage?, context: RequestContext,
+    private fun loadTab(channelId: String, kind: ChannelTabKind, opened: AppChannelPage?, context: RequestContext,
                         http: HttpClient): com.liskovsoft.youtubeapi.videoinfo.V2.ChannelPage? {
         // Endpoints belong to the opened page, not a long-lived channel cache. A changed
         // account, token, visitor or locale must discover that session's own endpoints.
@@ -290,9 +297,9 @@ class MediaChannelRepository(private val client: MediaClient, private val posts:
         }
         val resolved = landing?.page?.id ?: resolveChannel(channelId, context, http)
         val first = landing?.page ?: loadChannel(resolved, context, http = http).requireValue()
-        val tab = first.page.tabs.firstOrNull { it.title.equals(label, true) }
-        if (tab == null) return first.takeIf { label == "Videos" || label == "Playlists" }
-        if (tab.selected || label == "Playlists" && tab.params == null) return first
+        val tab = first.page.tabs.firstOrNull(kind::matches)
+        if (tab == null) return first.takeIf { kind == ChannelTabKind.Videos || kind == ChannelTabKind.Playlists }
+        if (tab.selected || kind == ChannelTabKind.Playlists && tab.params == null) return first
         return loadChannel(tab.browseId ?: resolved, context, tab.params, http = http).requireValue()
     }
 }

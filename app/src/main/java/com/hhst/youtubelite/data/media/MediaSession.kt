@@ -85,6 +85,8 @@ object MediaSession {
     /** Extra generation offset from anonymous-mode flips; the derived generation never collides. */
     private var identityEpoch = 0L
     private var privateMode: () -> Boolean = { false }
+    /** Null keeps the library defaults (tests and pre-start code paths). */
+    private var contentLocale: ContentLocale? = null
     private val _changes = kotlinx.coroutines.flow.MutableStateFlow(MediaSessionIdentity(0L, false))
     val changes: kotlinx.coroutines.flow.StateFlow<MediaSessionIdentity> = _changes
 
@@ -104,6 +106,7 @@ object MediaSession {
             this.store = store
             persistedAccess = null
             this.privateMode = privateMode
+            contentLocale = null
             visitor = store.read(KEY_VISITOR)?.takeIf { it.isNotBlank() }
             visitorCookie = store.read(KEY_VISITOR_COOKIE)?.takeIf { it.isNotBlank() }
             visitorPairVerified = visitor?.let { id -> visitorCookie?.let { cookie ->
@@ -148,8 +151,28 @@ object MediaSession {
             it.signedIn -> it
             else -> it.copy(visitor = visitor, visitorCookie = visitorCookie)
         }
-        base.copy(generation = base.generation + identityEpoch)
+        val locale = contentLocale
+        if (locale == null) base.copy(generation = base.generation + identityEpoch)
+        else base.copy(language = locale.language, region = locale.region, generation = base.generation + identityEpoch)
     } }
+
+    fun contentLocale(): ContentLocale? = synchronized(lock) { contentLocale }
+
+    /**
+     * Sets the `hl`/`gl` every request carries. A change after the first value bumps the
+     * generation like [setAnonymousMode]: in-flight reads of the previous locale abort with
+     * "session_changed", pagination cursors stop matching and screens reload, so rows in two
+     * languages or regions never mix. Returns true when the locale changed.
+     */
+    fun setContentLocale(locale: ContentLocale): Boolean = synchronized(lock) {
+        val previous = contentLocale
+        if (previous == locale) return false
+        contentLocale = locale
+        if (previous == null) return false
+        identityEpoch += 1
+        changed()
+        true
+    }
     fun privateBrowsing(): Boolean = privateMode()
 
     fun anonymousMode(): Boolean = synchronized(lock) { anonymousMode }
