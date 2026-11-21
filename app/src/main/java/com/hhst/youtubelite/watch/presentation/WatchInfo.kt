@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
+import com.hhst.youtubelite.ui.components.MinAvatar
 import com.hhst.youtubelite.ui.components.SkeletonBox
 import com.hhst.youtubelite.ui.components.SkeletonLine
 import com.hhst.youtubelite.ui.components.StateKind
@@ -251,7 +252,8 @@ private fun WatchChannelRow(video: WatchVideo, pending: Boolean, pendingAction: 
                 .clickable(enabled = video.channelId.isNotBlank(), role = Role.Button, onClick = openChannel),
             contentAlignment = Alignment.Center,
         ) {
-            Artwork(video.avatar.orEmpty(), Modifier.size(40.dp).clip(CircleShape))
+            // Like the card family: the channel's initial while the avatar is missing or loading.
+            MinAvatar(video.avatar, video.channel, size = 40.dp)
         }
         Spacer(Modifier.width(MinSpace.sm))
         Column(
@@ -387,7 +389,7 @@ internal fun WatchProvisionalHeader(known: WatchProvisional, inset: Dp) {
         Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = inset - MinSpace.xs, end = inset),
             verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(MinSpace.Touch).testTag("watch-action-avatar"), contentAlignment = Alignment.Center) {
-                Artwork(known.avatar.orEmpty(), Modifier.size(40.dp).clip(CircleShape))
+                MinAvatar(known.avatar, known.channel, size = 40.dp)
             }
             Spacer(Modifier.width(MinSpace.sm))
             AppText(known.channel, MinType.Subtitle, Modifier.weight(1f).testTag("watch-channel-name"), maxLines = 2)

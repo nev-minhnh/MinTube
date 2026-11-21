@@ -51,7 +51,12 @@ class ChannelTypographyAndroidTest {
         }
         compose.setContent {
             val locale = Locale.forLanguageTag(sample.first)
-            val configuration = Configuration(compose.activity.resources.configuration).apply { setLocale(locale) }
+            // The scene is a 390x844 phone window: the channel header reads its orientation from the configuration.
+            val configuration = Configuration(compose.activity.resources.configuration).apply {
+                setLocale(locale)
+                screenWidthDp = 390; screenHeightDp = 844; smallestScreenWidthDp = 390
+                orientation = Configuration.ORIENTATION_PORTRAIT
+            }
             val context = compose.activity.createConfigurationContext(configuration)
             CompositionLocalProvider(LocalConfiguration provides configuration, LocalContext provides context,
                 LocalDensity provides Density(1f, scale),

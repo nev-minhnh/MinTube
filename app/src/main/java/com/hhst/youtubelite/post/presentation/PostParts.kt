@@ -147,7 +147,9 @@ internal fun PostRatingRow(
             stringResource(if (disliked) R.string.ui_remove_dislike else R.string.a11y_dislike_post),
             modifier = Modifier.testTag(dislikeTag).semantics { selected = disliked },
             enabled = enabled, pending = dislikePending,
-            background = if (disliked) DesignTokens.Surface else Color.Transparent,
+            // A selected dislike uses the same accent as the video's rating pills and the Home post card.
+            background = if (disliked) DesignTokens.AccentContainer else Color.Transparent,
+            color = if (disliked) DesignTokens.AccentText else DesignTokens.Ink,
             onClick = onDislike,
         )
         Spacer(Modifier.weight(1f))

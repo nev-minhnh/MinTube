@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
@@ -59,7 +60,7 @@ class ChannelCommunityScreenshotAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 key(width.intValue, detailMode.value) {
-                    Box(Modifier.requiredSize(width.intValue.dp, 844.dp)) {
+                    TestWindowBox(Modifier.requiredSize(width.intValue.dp, 844.dp)) {
                         if (detailMode.value) PostDetailScreen(PostDetailUiState(detail.identity, PostDetailContent.Ready(detail)), {}, {})
                         else ChannelScreen(state(ChannelTab.Posts, width.intValue), {}, {})
                     }
@@ -68,19 +69,22 @@ class ChannelCommunityScreenshotAndroidTest {
         }
         for (w in listOf(390, 1280)) {
             compose.runOnIdle { width.intValue = w; detailMode.value = true }
+            // Posts read in a centred 720dp column with the 16dp (phone) or 24dp page inset; the name
+            // starts after the 48dp avatar slot and a 4dp gap.
+            val start = if (w == 390) 16f else (w - 720f) / 2f + 24f
             val name = boundsOf("post-detail-author-name")
-            assertEquals(60f, name.left, .5f)
-            assertEquals(61f, name.top, .5f)
-            assertEquals(116f, boundsOf("post-detail-body").top, .5f)
+            assertEquals(start + 52f, name.left, .5f)
+            assertEquals(69f, name.top, .5f)
+            assertEquals(129f, boundsOf("post-detail-body").top, .5f)
             compose.onNodeWithTag("post-detail-navigation").assertIsDisplayed()
             compose.runOnIdle { detailMode.value = false }
             val first = FixturePostRepository.samplePosts("studio").first().identity.postId
             val card = boundsOf("channel-post-$first")
             val author = compose.onNodeWithTag("channel-post-author-$first", true).fetchSemanticsNode().boundsInRoot
             val avatar = compose.onNodeWithTag("channel-post-avatar-$first", true).fetchSemanticsNode().boundsInRoot
-            assertEquals(60f, author.left, .5f)
+            assertEquals(start + 52f, author.left, .5f)
             assertEquals(card.top + 12f, author.top, .5f)
-            assertEquals(12f, avatar.left, .5f)
+            assertEquals(start, avatar.left, .5f)
             assertEquals(card.top + 12f, avatar.top, .5f)
             assertEquals(40f, avatar.width, .5f)
         }
@@ -93,7 +97,7 @@ class ChannelCommunityScreenshotAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 key(width.intValue, state.value.selectedTab) {
-                    Box(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
+                    TestWindowBox(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
                         ChannelScreen(state.value, {}, {})
                     }
                 }
@@ -145,7 +149,7 @@ class ChannelCommunityScreenshotAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
                 key(width.intValue) {
-                    Box(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
+                    TestWindowBox(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
                         PostDetailScreen(state.value, {}, {})
                     }
                 }
@@ -183,7 +187,7 @@ class ChannelCommunityScreenshotAndroidTest {
         val state = mutableStateOf(state(ChannelTab.Shorts, 390))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
                     ChannelScreen(state.value, {}, {})
                 }
             }
@@ -246,7 +250,7 @@ class ChannelCommunityScreenshotAndroidTest {
         val state = mutableStateOf(base.copy(shorts = ChannelSection.Loading))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.intValue.dp, height.intValue.dp)) {
                     ChannelScreen(state.value, { lastAction = it }, {})
                 }
             }

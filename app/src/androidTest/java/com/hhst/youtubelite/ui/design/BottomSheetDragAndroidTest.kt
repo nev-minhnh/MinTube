@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.ui.design
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -28,7 +29,7 @@ class BottomSheetDragAndroidTest {
         var closes = 0
         compose.setContent { AppTheme {
             CompositionLocalProvider(LocalDensity provides Density(1f), LocalMotionScale provides 1f) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     if (open) ChannelAboutPanel(FixtureChannelRepository.profile(), 390f, 844f, {
                         if (it == ChannelAction.CloseOverlay) { closes++; open = false }
                     })
@@ -58,7 +59,7 @@ class BottomSheetDragAndroidTest {
         var closes = 0
         compose.setContent { AppTheme {
             CompositionLocalProvider(LocalDensity provides Density(1f), LocalMotionScale provides 0f) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     if (open) LiveChatPanel(LiveChatUiState(), {}, { closes++; open = false })
                 }
             }
@@ -75,7 +76,7 @@ class BottomSheetDragAndroidTest {
         var closes = 0
         compose.setContent { AppTheme {
             CompositionLocalProvider(LocalDensity provides Density(1f), LocalMotionScale provides 0f) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     if (open) ChannelAboutPanel(FixtureChannelRepository.profile(), 390f, 844f, {
                         if (it == ChannelAction.CloseOverlay) { closes++; open = false }
                     })

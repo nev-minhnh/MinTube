@@ -545,6 +545,8 @@ fun BatchConfirmSheet(
                 .navigationBarsPadding()
                 .padding(horizontal = DownloadTokens.PageInset),
         ) {
+            // Name what is being downloaded, as the single-video sheet does with its title.
+            if (snapshot.name.isNotBlank()) SheetIdentity(snapshot.name, author = "")
             Text(
                 stringResource(R.string.download_batch_meta, snapshot.items.size, snapshot.source.name),
                 style = MinType.Caption,

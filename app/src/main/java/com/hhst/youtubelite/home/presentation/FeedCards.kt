@@ -79,6 +79,8 @@ internal fun FeedCard(item: FeedItem, window: WindowClass, live: Boolean = false
             },
             modifier = Modifier.testTag("feed-item-${item.id}"),
             durationLabel = item.duration, live = item.live, progress = item.progress,
+            // The thumbnail is its own button and speaks "title, duration" (or LIVE), as the channel cards do.
+            thumbnailDescription = stringResource(R.string.a11y_title_duration, item.title, item.duration),
             avatar = item.avatar.orEmpty(),
             avatarDescription = stringResource(R.string.a11y_go_to_channel, item.author),
             onAvatarClick = { onAction(HomeAction.Navigate(HomeNavigationRequest.Channel(item.channelId))) },

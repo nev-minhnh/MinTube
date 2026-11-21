@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.subscriptions
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +32,7 @@ class SubscriptionsScrollRestorationAndroidTest {
         restoration.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
                 AppTheme {
-                    Box(Modifier.requiredSize(390.dp, 844.dp)) { SubscriptionsScreen(state, {}) }
+                    TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { SubscriptionsScreen(state, {}) }
                 }
             }
         }

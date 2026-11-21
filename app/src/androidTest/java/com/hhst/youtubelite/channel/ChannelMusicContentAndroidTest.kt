@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -31,7 +32,7 @@ class ChannelMusicContentAndroidTest {
             playlists = listOf(album), homeShelves = listOf(ChannelHomeShelf("Albums & Singles", playlists = listOf(album))))
         val actions = mutableListOf<ChannelAction>()
         compose.setContent { CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-            Box(Modifier.requiredSize(390.dp, 844.dp)) {
+            TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                 ChannelScreen(ChannelUiState(content = ChannelContent.Ready(page)), actions::add, {})
             }
         } }

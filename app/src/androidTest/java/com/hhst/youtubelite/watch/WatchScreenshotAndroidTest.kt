@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.watch
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -57,7 +58,7 @@ class WatchScreenshotAndroidTest {
     private fun Viewport(width: Int, height: Int, fontScale: Float = 1f, content: @Composable () -> Unit) {
         CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { content() }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { content() }
             }
         }
     }
@@ -83,7 +84,8 @@ class WatchScreenshotAndroidTest {
 
         val meta = bounds("watch-metadata")
         assertEquals(411f * 9f / 16f, meta.top, 0.6f)
-        assertEquals(166f, meta.height, 0.6f)
+        // The Mint metadata block also holds the action row and the description card.
+        assertEquals(296f, meta.height, 0.6f)
 
         val title = bounds("watch-title")
         assertEquals(16f, title.left, 0.5f)
@@ -92,22 +94,22 @@ class WatchScreenshotAndroidTest {
         compose.onNodeWithTag("watch-title", useUnmergedTree = true)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(titleStyle) }
         assertEquals(18.sp, titleStyle.single().layoutInput.style.fontSize)
-        assertEquals(FontWeight.Black, titleStyle.single().layoutInput.style.fontWeight)
-        assertEquals(1, titleStyle.single().lineCount)
+        assertEquals(FontWeight.SemiBold, titleStyle.single().layoutInput.style.fontWeight)
+        assertEquals(2, titleStyle.single().lineCount)
         compose.onNodeWithTag("watch-title", useUnmergedTree = true)
             .assertTextEquals("Big Buck Bunny | A short film by the Blender Foundation")
-        assertEquals(18f, bounds("watch-meta").height, 0.5f)
+        assertEquals(16f, bounds("watch-meta").height, 0.5f)
 
         val actions = bounds("watch-actions")
         assertEquals(48f, actions.height, 0.5f)
-        assertEquals(meta.top + 118f, actions.top, 0.6f)
+        assertEquals(meta.top + 84f, actions.top, 0.6f)
         val avatar = bounds("watch-action-avatar")
-        assertEquals(8f, avatar.left, 0.5f)
+        assertEquals(12f, avatar.left, 0.5f)
         assertEquals(48f, avatar.width, 0.5f)
         assertEquals(48f, avatar.height, 0.5f)
         compose.onNodeWithTag("watch-channel-name", useUnmergedTree = true).assertTextEquals("Blender")
         val subscribe = bounds("watch-action-subscribe")
-        assertEquals(403f, subscribe.right, 0.5f)
+        assertEquals(395f, subscribe.right, 0.5f)
         assertTrue(subscribe.height >= 48f)
         val like = bounds("watch-action-like")
         val icon = bounds("watch-action-like-icon")
@@ -119,17 +121,18 @@ class WatchScreenshotAndroidTest {
         for (tag in listOf("download", "queue", "open-with", "share", "save", "report")) {
             compose.onNodeWithTag("watch-action-$tag", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
             assertEquals("Equal touch heights for $tag", 48f, bounds("watch-action-$tag").height, 0.5f)
-            assertEquals("Equal icon size for $tag", 24f, bounds("watch-action-$tag-icon").height, 0.5f)
+            assertEquals("Equal icon size for $tag", 20f, bounds("watch-action-$tag-icon").height, 0.5f)
         }
 
         val comments = bounds("watch-comments")
-        assertEquals(actions.bottom, comments.top, 0.5f)
-        assertEquals(113f, comments.height, 0.5f)
+        // The description card now sits between the actions and comments, inside the metadata block.
+        assertEquals(meta.bottom, comments.top, 0.5f)
+        assertEquals(100f, comments.height, 0.5f)
         val card = bounds("watch-comments-card")
         assertEquals(16f, card.left, 0.5f)
         assertEquals(379f, card.width, 0.5f)
         assertEquals(92f, card.height, 0.5f)
-        assertEquals(comments.top + 8f, card.top, 0.5f)
+        assertEquals(comments.top + 4f, card.top, 0.5f)
     }
 
     @Test fun actionsRemainReachableAcrossColumnWidths() {
@@ -147,55 +150,65 @@ class WatchScreenshotAndroidTest {
 
     @Test fun phoneRelatedLockupMatchesMeasuredAnchors() {
         compose.setContent { Viewport(390, 844) { RenderScreen(contentOf("content")) } }
-        val cell = bounds("watch-related-harbour")
-        assertEquals(0f, cell.left, 0.5f)
-        assertEquals(390f, cell.width, 0.5f)
+        // The related header and chip row sit between the comments card and the first related card.
         val comments = bounds("watch-comments")
+        assertEquals(comments.bottom + 108f, bounds("watch-thumb-harbour").top, 0.6f)
+        // The related feed is a lazy list: bring the card fully into view before measuring it.
+        scrollToCard("watch-related-harbour")
+        val cell = bounds("watch-related-harbour")
+        assertEquals(16f, cell.left, 0.5f)
+        assertEquals(358f, cell.width, 0.5f)
         val thumb = bounds("watch-thumb-harbour")
-        assertEquals(0f, thumb.left, 0.5f)
-        assertEquals(390f, thumb.width, 0.5f)
-        assertEquals(232.375f, thumb.height, 0.6f)
-        assertEquals(comments.bottom + 12f, thumb.top, 0.6f)
+        assertEquals(16f, thumb.left, 0.5f)
+        assertEquals(358f, thumb.width, 0.5f)
+        assertEquals(201.375f, thumb.height, 0.6f)
+        // Mint card row: 48dp avatar slot 8dp below the cover, title after a 4dp gap.
         val avatar = bounds("watch-avatar-harbour")
-        assertEquals(12f, avatar.left, 0.5f)
-        assertEquals(40f, avatar.width, 0.5f)
-        assertEquals(40f, avatar.height, 0.5f)
-        assertEquals(thumb.bottom + 4f, avatar.top, 0.6f)
+        assertEquals(16f, avatar.left, 0.5f)
+        assertEquals(48f, avatar.width, 0.5f)
+        assertEquals(48f, avatar.height, 0.5f)
+        assertEquals(thumb.bottom + 8f, avatar.top, 0.6f)
         val title = bounds("watch-related-title-harbour")
-        assertEquals(64f, title.left, 0.5f)
-        assertEquals(278f, title.width, 0.5f)
+        assertEquals(68f, title.left, 0.5f)
+        assertEquals(258f, title.width, 0.5f)
         assertEquals(thumb.bottom + 12f, title.top, 0.6f)
         val titleStyle = mutableListOf<TextLayoutResult>()
         compose.onNodeWithTag("watch-related-title-harbour", useUnmergedTree = true)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(titleStyle) }
-        assertEquals(14.sp, titleStyle.single().layoutInput.style.fontSize)
-        assertEquals(17.5.sp, titleStyle.single().layoutInput.style.lineHeight)
-        assertEquals(FontWeight.Normal, titleStyle.single().layoutInput.style.fontWeight)
+        // MinType.Subtitle; the badge's tagged node includes its 8dp corner inset.
+        assertEquals(16.sp, titleStyle.single().layoutInput.style.fontSize)
+        assertEquals(22.sp, titleStyle.single().layoutInput.style.lineHeight)
+        assertEquals(FontWeight.Medium, titleStyle.single().layoutInput.style.fontWeight)
         val badge = bounds("watch-badge-harbour")
-        assertEquals(thumb.right - 8f, badge.right, 0.6f)
-        assertEquals(thumb.bottom - 8f, badge.bottom, 0.6f)
+        assertEquals(thumb.right, badge.right, 0.6f)
+        assertEquals(thumb.bottom, badge.bottom, 0.6f)
         val kebab = compose.onNodeWithContentDescription(
             "More actions for City light trails — a night walk through the old harbour",
         ).fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, kebab.right, 0.5f)
+        assertEquals(374f, kebab.right, 0.5f)
         assertEquals(48f, kebab.width, 0.5f)
     }
 
-    @Test fun gridRelatedRowsStayFlushAtSixHundred() {
-        compose.setContent { Viewport(600, 960) { RenderScreen(contentOf("content")) } }
+    @Test fun gridRelatedRowsKeepTheirGapAtSixHundred() {
+        // 600dp wide; tall enough that two Mint card rows fit below the pinned player.
+        compose.setContent { Viewport(600, 1200) { RenderScreen(contentOf("content")) } }
+        // Bring the second row fully into view; the first row then sits placed just above it.
+        scrollToCard("watch-related-meadow")
+        // Two Mint cards per row inside the 24dp medium inset, 16dp apart; covers are the full cell.
         val cell = bounds("watch-related-harbour")
-        assertEquals(8f, cell.left, 0.5f)
-        assertEquals(292f, cell.width, 0.5f)
+        assertEquals(24f, cell.left, 0.5f)
+        assertEquals(268f, cell.width, 0.5f)
         val thumb = bounds("watch-thumb-harbour")
-        assertEquals(16f, thumb.left, 0.5f)
-        assertEquals(276f, thumb.width, 0.5f)
-        assertEquals(155.25f, thumb.height, 0.6f)
+        assertEquals(24f, thumb.left, 0.5f)
+        assertEquals(268f, thumb.width, 0.5f)
+        assertEquals(150.75f, thumb.height, 0.6f)
         val second = bounds("watch-related-studio")
-        assertEquals(300f, second.left, 0.5f)
-        assertEquals(292f, second.width, 0.5f)
+        assertEquals(308f, second.left, 0.5f)
+        assertEquals(268f, second.width, 0.5f)
         val third = bounds("watch-related-meadow")
         val firstRowBottom = maxOf(cell.bottom, second.bottom)
-        assertEquals(firstRowBottom, third.top, 0.6f)
+        // Mint grid rows sit 16dp apart.
+        assertEquals("third card $third below $cell / $second", firstRowBottom + 16f, third.top, 0.6f)
     }
 
     @Test fun listRelatedRowsUseTheWideShortCover() {
@@ -207,34 +220,42 @@ class WatchScreenshotAndroidTest {
         assertEquals(800f, player.width, 0.5f)
         // Wide-short player stays pinned and shrinks to leave the 96dp body reserve.
         assertEquals(342f - 96f, player.bottom, 0.5f)
+        fun scrollValue() = compose.onNodeWithTag("watch-scroll").fetchSemanticsNode().config[
+            androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
         scrollToCard("watch-thumb-harbour")
         scrollToCard("watch-thumb-studio")
+        val studioOffset = scrollValue()
         scrollToCard("watch-thumb-harbour")
+        val harbourOffset = scrollValue()
+        // Wide-short list rows: 168dp cover inside the 24dp inset, title 12dp after it.
         val thumb = bounds("watch-thumb-harbour")
-        assertEquals(12f, thumb.left, 0.5f)
-        assertEquals(200f, thumb.width, 0.5f)
-        assertEquals(112f, thumb.height, 0.5f)
-        assertEquals(224f, bounds("watch-related-title-harbour").left, 0.5f)
-        val second = bounds("watch-thumb-studio")
-        assertEquals(thumb.bottom + 12f, second.top, 0.6f)
+        assertEquals(24f, thumb.left, 0.5f)
+        assertEquals(168f, thumb.width, 0.5f)
+        assertEquals(94.5f, thumb.height, 0.6f)
+        assertEquals(204f, bounds("watch-related-title-harbour").left, 0.5f)
+        // The 96dp body shows one row at a time; the next row starts 12dp below this one.
+        assertEquals(168f * 9f / 16f + 12f, studioOffset - harbourOffset, 0.6f)
     }
 
     @Test fun stackedRelatedUsesTheInsetCover() {
-        // 840 × 725 is now two-column (landscape ≥ 840dp); 800 × 725 is still single-column stacked.
-        compose.setContent { Viewport(800, 725) { RenderScreen(contentOf("content")) } }
+        // Every landscape tablet window (smallest width >= 600dp) is two-column now; a 620 x 590
+        // landscape window is still single-column stacked and leaves room for a whole card.
+        compose.setContent { Viewport(620, 590) { RenderScreen(contentOf("content")) } }
         val player = bounds("watch-player-slot")
         assertEquals(0f, player.top, 0.5f)
-        assertEquals(800f, player.width, 0.5f)
-        assertEquals(800f * 9f / 16f, player.height, 0.6f)
+        assertEquals(620f, player.width, 0.5f)
+        assertEquals(620f * 9f / 16f, player.height, 0.6f)
         scrollToCard("watch-thumb-harbour")
+        // Stacked Mint cards: two per row inside the 24dp inset, 16dp apart.
+        val cover = (620f - 48f - 16f) / 2f
         val thumb = bounds("watch-thumb-harbour")
-        assertEquals(12f, thumb.left, 0.5f)
-        assertEquals(816f, thumb.width, 0.5f)
-        assertEquals(459f, thumb.height, 0.6f)
+        assertEquals(24f, thumb.left, 0.5f)
+        assertEquals(cover, thumb.width, 0.5f)
+        assertEquals(cover * 9f / 16f, thumb.height, 0.6f)
         compose.onNodeWithTag("watch-related-title-harbour", useUnmergedTree = true).performScrollTo()
         // Title and avatar share the details row, so revealing the title reveals both.
-        assertEquals(64f, bounds("watch-related-title-harbour").left, 0.5f)
-        assertEquals(12f, bounds("watch-avatar-harbour").left, 0.5f)
+        assertEquals(76f, bounds("watch-related-title-harbour").left, 0.5f)
+        assertEquals(24f, bounds("watch-avatar-harbour").left, 0.5f)
     }
 
     @Test fun sidebarPanesMatchBothBreakpointWidths() {
@@ -250,7 +271,7 @@ class WatchScreenshotAndroidTest {
         assertEquals(0f, player.top, 0.5f)
         assertEquals(611f, player.width, 0.5f)
         assertEquals(611f * 9f / 16f, player.height, 0.6f)
-        assertEquals(12f, bounds("watch-action-like").left, 0.6f)
+        assertEquals(24f, bounds("watch-action-like").left, 0.6f)
         // The chip row sits above the related list, inside the right column.
         assertTrue(bounds("watch-related-chip-row").bottom <= pane.top + 0.5f)
         assertEquals(611f, bounds("watch-related-chip-row").left, 0.5f)
@@ -270,7 +291,7 @@ class WatchScreenshotAndroidTest {
         assertEquals(wideColumn + wideShift, widePane.left, 0.5f)
         assertEquals(1280f / 3f, widePane.width, 0.5f)
         assertEquals(wideColumn, bounds("watch-player-slot").width, 0.5f)
-        assertEquals(12f + wideShift, bounds("watch-action-like").left, 0.6f)
+        assertEquals(24f + wideShift, bounds("watch-action-like").left, 0.6f)
         val wideCell = bounds("watch-related-harbour")
         assertEquals(wideColumn + 12f + wideShift, wideCell.left, 0.5f)
         assertEquals(1280f / 3f - 12f, wideCell.width, 0.5f)
@@ -286,7 +307,7 @@ class WatchScreenshotAndroidTest {
         assertEquals(1120f + tallShift, bounds("watch-related").left, 0.5f)
         assertEquals(480f, bounds("watch-related").width, 0.5f)
         assertEquals(1120f, bounds("watch-player-slot").width, 0.5f)
-        assertEquals(12f + tallShift, bounds("watch-action-like").left, 0.6f)
+        assertEquals(24f + tallShift, bounds("watch-action-like").left, 0.6f)
     }
 
     @Test fun stateMatrixSwitchesSurfaces() {
@@ -319,9 +340,11 @@ class WatchScreenshotAndroidTest {
         assertTrue("Title must stay inside the phone column", title.right <= 320.5f)
         assertTrue("Like pill must stay measurable", bounds("watch-action-like").width > 0f)
         compose.onNodeWithContentDescription("Show more").assertExists()
-        compose.onNodeWithTag("watch-related-harbour").assertExists()
         val output = File(compose.activity.getExternalFilesDir(null), "watch-acceptance").apply { mkdirs() }
         capture("content-320-font2", output, true, emptySet())
+        // The related feed is lazy: it must still be reachable below the enlarged page.
+        scrollToCard("watch-related-harbour")
+        compose.onNodeWithTag("watch-related-harbour").assertExists()
     }
 
     @Test fun splitWindowsKeepTheChromeInsideTheWindow() {
@@ -365,8 +388,9 @@ class WatchScreenshotAndroidTest {
         }
         val output = File(compose.activity.getExternalFilesDir(null), "watch-acceptance").apply { mkdirs() }
         val sheet = compose.onNodeWithTag("watch-video-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, sheet.width, 0.5f)
-        assertEquals(0f, sheet.left, 0.5f)
+        // Mint sheets float 8dp in from the phone edges.
+        assertEquals(374f, sheet.width, 0.5f)
+        assertEquals(8f, sheet.left, 0.5f)
         assertEquals(844f - 24f, sheet.bottom, 0.5f)
         assertEquals(48f, compose.onNodeWithTag("watch-menu-Share").fetchSemanticsNode().boundsInRoot.height, 0.5f)
         capture("video-menu-390", output, true, emptySet())
@@ -447,7 +471,7 @@ class WatchScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         var height by mutableIntStateOf(844)
         compose.setContent { Viewport(width, height) { RenderScreen(contentOf("content")) } }
-        compose.onNodeWithTag("watch-thumb-studio", useUnmergedTree = true).performScrollTo()
+        scrollToCard("watch-thumb-studio")
         fun scrollValue() = compose.onNodeWithTag("watch-scroll").fetchSemanticsNode().config[
             androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
         val before = scrollValue()

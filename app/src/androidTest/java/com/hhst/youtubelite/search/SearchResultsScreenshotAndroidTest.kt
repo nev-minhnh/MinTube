@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.search
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -50,64 +51,68 @@ class SearchResultsScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
         }
         val thumb = compose.onNodeWithTag("search-thumb-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, thumb.left, 0.5f)
-        assertEquals(48f, thumb.top, 0.5f)
-        assertEquals(390f, thumb.width, 0.5f)
-        assertEquals(218.875f, thumb.height, 0.5f)
+        // Mint stacked card: 16:9 cover inside the 16dp inset, 48dp avatar slot 8dp below it.
+        assertEquals(16f, thumb.left, 0.5f)
+        assertEquals(112f, thumb.top, 0.5f)
+        assertEquals(358f, thumb.width, 0.5f)
+        assertEquals(201.375f, thumb.height, 0.5f)
         val avatar = compose.onNodeWithTag("search-channel-harbour").fetchSemanticsNode().boundsInRoot
-        assertEquals(12f, avatar.left, 0.5f)
-        assertEquals(thumb.bottom + 4f + 8f, avatar.top, 0.5f)
-        assertEquals(40f, avatar.width, 0.5f)
-        assertEquals(40f, avatar.height, 0.5f)
+        assertEquals(16f, avatar.left, 0.5f)
+        assertEquals(thumb.bottom + 8f, avatar.top, 0.5f)
+        assertEquals(48f, avatar.width, 0.5f)
+        assertEquals(48f, avatar.height, 0.5f)
         val title = compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(64f, title.left, 0.5f)
-        assertEquals(278f, title.width, 0.5f)
+        assertEquals(68f, title.left, 0.5f)
+        assertEquals(258f, title.width, 0.5f)
         val menu = compose.onNodeWithContentDescription("More actions for ${FixtureSearchRepository.sampleResults()[0].title}")
             .fetchSemanticsNode().boundsInRoot
-        assertEquals(342f, menu.left, 0.5f)
-        assertEquals(390f, menu.right, 0.5f)
+        assertEquals(326f, menu.left, 0.5f)
+        assertEquals(374f, menu.right, 0.5f)
         assertEquals(48f, menu.width, 0.5f)
+        // The badge's tagged node is its 8dp corner inset around the 18dp label.
         val badge = compose.onNodeWithTag("search-badge-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(thumb.right - 8f, badge.right, 0.5f)
-        assertEquals(thumb.bottom - 8f, badge.bottom, 0.5f)
-        assertEquals(20f, badge.height, 0.5f)
+        assertEquals(thumb.right, badge.right, 0.5f)
+        assertEquals(thumb.bottom, badge.bottom, 0.5f)
+        assertEquals(34f, badge.height, 0.5f)
         // Sampled row pitch: cover + 4px + a 51px details row, then 24px between rows. Compose
         // rounds the sampled sub-pixel boxes up (cover 218.875→219, every 17.5px title line box
         // to 18px), so the two-line row sits 1.125px above the browser value.
         val twoLine = compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot
-        assertEquals(282.875f, twoLine.height, 1.5f)
+        assertEquals(275f, twoLine.height, 1.5f)
         val titleStyle = mutableListOf<TextLayoutResult>()
         compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(titleStyle) }
-        assertEquals(14.sp, titleStyle.single().layoutInput.style.fontSize)
-        assertEquals(17.5.sp, titleStyle.single().layoutInput.style.lineHeight)
-        assertEquals(FontWeight.Normal, titleStyle.single().layoutInput.style.fontWeight)
+        // MinType.Subtitle.
+        assertEquals(16.sp, titleStyle.single().layoutInput.style.fontSize)
+        assertEquals(22.sp, titleStyle.single().layoutInput.style.lineHeight)
+        assertEquals(FontWeight.Medium, titleStyle.single().layoutInput.style.fontWeight)
         assertEquals(2, titleStyle.single().lineCount)
         compose.onNodeWithTag("search-results-list").performScrollToIndex(3)
-        assertEquals(273.875f, compose.onNodeWithTag("search-result-workshop").fetchSemanticsNode().boundsInRoot.height, 1f)
+        assertEquals(291f, compose.onNodeWithTag("search-result-workshop").fetchSemanticsNode().boundsInRoot.height, 1f)
         compose.onNodeWithTag("search-results-list").performScrollToIndex(2)
-        assertEquals(287.375f, compose.onNodeWithTag("search-result-meadow").fetchSemanticsNode().boundsInRoot.height, 1f)
+        assertEquals(297f, compose.onNodeWithTag("search-result-meadow").fetchSemanticsNode().boundsInRoot.height, 1f)
         compose.onNodeWithTag("search-results-list").performScrollToIndex(0)
         compose.runOnIdle { width = 600 }
         val tabletThumb = compose.onNodeWithTag("search-thumb-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(12f, tabletThumb.left, 0.5f)
-        assertEquals(576f, tabletThumb.width, 0.5f)
-        assertEquals(324f, tabletThumb.height, 0.5f)
+        // From 600dp (medium windows) results are list rows with a 200dp cover inside the 24dp inset.
+        assertEquals(24f, tabletThumb.left, 0.5f)
+        assertEquals(200f, tabletThumb.width, 0.5f)
+        assertEquals(113f, tabletThumb.height, 0.5f)
         val tabletTitle = compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(64f, tabletTitle.left, 0.5f)
-        assertEquals(484f, tabletTitle.width, 0.5f)
+        assertEquals(236f, tabletTitle.left, 0.5f)
+        assertEquals(292f, tabletTitle.width, 0.5f)
     }
 
     @Test fun listLockupMatchesMeasuredAnchors() {
         var width by mutableIntStateOf(1280)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 800.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 800.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
@@ -115,23 +120,24 @@ class SearchResultsScreenshotAndroidTest {
         val item = compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot
         assertEquals(220f, item.left, 0.5f)
         assertEquals(840f, item.width, 0.5f)
-        assertEquals(112f, item.height, 0.5f)
+        // Expanded list rows use the 240dp cover.
+        assertEquals(135f, item.height, 0.5f)
         val thumb = compose.onNodeWithTag("search-thumb-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(232f, thumb.left, 0.5f)
-        assertEquals(200f, thumb.width, 0.5f)
-        assertEquals(112f, thumb.height, 0.5f)
+        assertEquals(244f, thumb.left, 0.5f)
+        assertEquals(240f, thumb.width, 0.5f)
+        assertEquals(135f, thumb.height, 0.5f)
         val title = compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(444f, title.left, 0.5f)
-        assertEquals(552f, title.width, 0.5f)
+        assertEquals(496f, title.left, 0.5f)
+        assertEquals(492f, title.width, 0.5f)
         val menu = compose.onNodeWithContentDescription("More actions for ${FixtureSearchRepository.sampleResults()[0].title}")
             .fetchSemanticsNode().boundsInRoot
-        assertEquals(996f, menu.left, 0.5f)
-        assertEquals(40f, menu.width, 0.5f)
+        assertEquals(988f, menu.left, 0.5f)
+        assertEquals(48f, menu.width, 0.5f)
         val badge = compose.onNodeWithTag("search-badge-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(thumb.right - 5f, badge.right, 0.5f)
-        assertEquals(thumb.bottom - 5f, badge.bottom, 0.5f)
+        assertEquals(thumb.right, badge.right, 0.5f)
+        assertEquals(thumb.bottom, badge.bottom, 0.5f)
         val second = compose.onNodeWithTag("search-thumb-studio").fetchSemanticsNode().boundsInRoot
-        assertEquals(thumb.bottom + 12f, second.top, 1f)
+        assertEquals(thumb.bottom + 16f, second.top, 1f)
         compose.runOnIdle { width = 1600 }
         assertEquals(380f, compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot.left, 0.5f)
         compose.runOnIdle { width = 840 }
@@ -143,7 +149,7 @@ class SearchResultsScreenshotAndroidTest {
         val actions = mutableListOf<SearchAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) { SearchResultsScreen(state, { actions += it }, {}) }
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) { SearchResultsScreen(state, { actions += it }, {}) }
             }
         }
         compose.onNodeWithTag("search-empty").assertIsDisplayed()
@@ -162,28 +168,30 @@ class SearchResultsScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     SearchResultsScreen(SearchUiState(query = "open movie", content = results()), {}, {})
                 }
             }
         }
         val bar = compose.onNodeWithTag("search-topbar").fetchSemanticsNode().boundsInRoot
-        assertEquals(48f, bar.height, 0.5f)
-        val field = compose.onNodeWithTag("search-field").fetchSemanticsNode().boundsInRoot
-        assertEquals(53f, field.left, 0.5f)
+        // Mint 56dp toolbar; the field is part of the bar's tappable surface.
+        assertEquals(56f, bar.height, 0.5f)
+        val field = compose.onNodeWithTag("search-field", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        // 40dp pill field; the filter, voice and overflow buttons follow it as 48dp targets.
+        assertEquals(52f, field.left, 0.5f)
         assertEquals(8f, field.top, 0.5f)
-        assertEquals(32f, field.height, 0.5f)
-        assertEquals(298f, field.right, 0.5f)
+        assertEquals(40f, field.height, 0.5f)
+        assertEquals(242f, field.right, 0.5f)
         val query = compose.onNodeWithTag("search-query-label", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
-        assertEquals(65f, query.left, 0.5f)
+        assertEquals(94f, query.left, 0.5f)
         val filters = compose.onNodeWithContentDescription("Search filters").fetchSemanticsNode().boundsInRoot
-        assertEquals(field.right - 48f, filters.left, 0.5f)
+        assertEquals(field.right, filters.left, 0.5f)
         assertEquals(48f, filters.height, 0.5f)
         val voice = compose.onNodeWithContentDescription("Search with your voice").fetchSemanticsNode().boundsInRoot
-        assertEquals(40f, voice.width, 0.5f)
-        assertEquals(40f, voice.height, 0.5f)
+        assertEquals(48f, voice.width, 0.5f)
+        assertEquals(48f, voice.height, 0.5f)
         val more = compose.onNodeWithContentDescription("More options").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, more.right, 0.5f)
+        assertEquals(386f, more.right, 0.5f)
         assertEquals(48f, more.width, 0.5f)
         val nav = compose.onNodeWithTag("search-navigation").fetchSemanticsNode().boundsInRoot
         assertEquals(844f, nav.bottom, 0.5f)
@@ -203,7 +211,7 @@ class SearchResultsScreenshotAndroidTest {
         var height by mutableIntStateOf(400)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
@@ -214,7 +222,8 @@ class SearchResultsScreenshotAndroidTest {
             val thumb = compose.onNodeWithTag("search-thumb-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
             val title = compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
             val nav = compose.onNodeWithTag("search-navigation").fetchSemanticsNode().boundsInRoot
-            val expectedThumb = if (SearchResultsLayout.listLockup(w.toFloat(), h.toFloat())) 200f else SearchResultsLayout.stackedThumbnailWidth(w.toFloat(), h.toFloat())
+            // Stacked covers fill the column inside the 16dp inset.
+            val expectedThumb = if (SearchResultsLayout.listLockup(w.toFloat(), h.toFloat())) 200f else w - 32f
             assertEquals("$w × $h thumb", expectedThumb, thumb.width, 0.5f)
             assertTrue("$w × $h title inside window", title.right <= w.toFloat() + 0.5f)
             assertTrue("$w × $h nav inside window", nav.bottom <= h.toFloat() + 0.5f)
@@ -230,7 +239,7 @@ class SearchResultsScreenshotAndroidTest {
         var state by mutableStateOf(SearchUiState(query = QUERY, content = results()))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
             }
         }
         val output = File(compose.activity.getExternalFilesDir(null), "search-acceptance").apply { mkdirs() }
@@ -261,7 +270,7 @@ class SearchResultsScreenshotAndroidTest {
         var state by mutableStateOf(SearchUiState(query = QUERY, content = results()))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
             }
         }
         val output = File(compose.activity.getExternalFilesDir(null), "search-acceptance").apply { mkdirs() }
@@ -278,7 +287,7 @@ class SearchResultsScreenshotAndroidTest {
     @Test fun enlargedTextKeepsResultRowsReadable() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 844.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
@@ -298,7 +307,7 @@ class SearchResultsScreenshotAndroidTest {
         var width by mutableIntStateOf(390)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                     SearchResultsScreen(SearchUiState(content = SearchContent.Loading), {}, {})
                 }
             }
@@ -312,12 +321,13 @@ class SearchResultsScreenshotAndroidTest {
             assertEquals(16f, title.height, 0.5f)
             assertEquals(120f, byline.width, 0.5f)
             assertEquals(title.bottom + 8f, byline.top, 0.5f)
-            if (w < 931) {
+            // Mint results stack below 600dp and become list rows from 600dp.
+            if (w < 600) {
                 assertEquals(thumb.bottom + 12f, title.top, 0.5f)
-                assertEquals(12f, title.left, 0.5f)
+                assertEquals(16f, title.left, 0.5f)
             } else {
                 assertEquals(thumb.right + 12f, title.left, 0.5f)
-                assertEquals(thumb.top, title.top, 0.5f)
+                assertEquals(thumb.top + 4f, title.top, 0.5f)
             }
         }
     }
@@ -327,7 +337,7 @@ class SearchResultsScreenshotAndroidTest {
         val actions = mutableListOf<SearchAction>()
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(320.dp, 240.dp)) {
+                TestWindowBox(Modifier.requiredSize(320.dp, 240.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = content), { actions += it }, {})
                 }
             }
@@ -348,7 +358,7 @@ class SearchResultsScreenshotAndroidTest {
         var height by mutableIntStateOf(844)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
@@ -360,10 +370,11 @@ class SearchResultsScreenshotAndroidTest {
             val title = compose.onNodeWithTag("search-title-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
             val menu = compose.onNodeWithContentDescription("More actions for " + FixtureSearchRepository.sampleResults()[0].title)
                 .fetchSemanticsNode().boundsInRoot
-            val stacked = w == 900 || w == 930
-            assertEquals(if (stacked) 445.5f else 112f, thumb.height, 0.6f)
-            assertEquals(if (w >= 931) 40f else 48f, menu.width, 0.5f)
-            assertEquals(if (stacked) 716f else if (w == 700) 404f else if (w == 840) 544f else 552f, title.width, 0.5f)
+            // Every landscape window here is at least 600dp wide, so all use list rows: the 200dp
+            // cover below 840dp, the 240dp cover from 840dp; menus keep their 48dp target.
+            assertEquals(if (w == 700) 113f else 135f, thumb.height, 0.6f)
+            assertEquals(48f, menu.width, 0.5f)
+            assertEquals(if (w == 700) 392f else 492f, title.width, 0.5f)
             capture("results-landscape-$w-$h", output, true, emptySet())
         }
     }
@@ -373,16 +384,17 @@ class SearchResultsScreenshotAndroidTest {
         var width by mutableIntStateOf(320)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, 855.dp)) {
+                TestWindowBox(Modifier.requiredSize(width.dp, 855.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
                 }
             }
         }
         for ((w, inset, thumbHeight, titleX, titleWidth) in listOf(
-            listOf(320f, 12f, 179.5f, 76f, 184f),
-            listOf(528f, 0f, 296.5f, 64f, 416f),
-            listOf(549f, 0f, 308.3125f, 64f, 437f),
-            listOf(550f, 12f, 295.875f, 64f, 434f),
+            // Mint: one 16dp inset for every compact width; covers stay 16:9.
+            listOf(320f, 16f, 162f, 68f, 188f),
+            listOf(528f, 16f, 279f, 68f, 396f),
+            listOf(549f, 16f, 290.8125f, 68f, 417f),
+            listOf(550f, 16f, 291.375f, 68f, 418f),
         )) {
             compose.runOnIdle { width = w.toInt() }
             val thumb = compose.onNodeWithTag("search-thumb-harbour", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
@@ -408,7 +420,7 @@ class SearchResultsScreenshotAndroidTest {
         )
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, height.dp)) { SearchResultsScreen(state, {}, {}) }
             }
         }
         val output = File(compose.activity.getExternalFilesDir(null), "search-acceptance").apply { mkdirs() }
@@ -440,8 +452,9 @@ class SearchResultsScreenshotAndroidTest {
             state = state.copy(filtersOpen = false, overlay = SearchOverlay.ItemMenu("harbour"))
         }
         val sheet = compose.onNodeWithTag("search-video-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, sheet.width, 0.5f)
-        assertEquals(0f, sheet.left, 0.5f)
+        // Mint sheets float 8dp in from the phone edges.
+        assertEquals(374f, sheet.width, 0.5f)
+        assertEquals(8f, sheet.left, 0.5f)
         assertEquals(844f - 24f, sheet.bottom, 0.5f)
         val shareRow = compose.onNodeWithTag("search-menu-Share").fetchSemanticsNode().boundsInRoot
         assertEquals(48f, shareRow.height, 0.5f)
@@ -458,7 +471,7 @@ class SearchResultsScreenshotAndroidTest {
     @Test fun largeTextFiltersCanScrollToEveryControlInNarrowWindows() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 2f)) {
-                Box(Modifier.requiredSize(240.dp, 320.dp)) {
+                TestWindowBox(Modifier.requiredSize(240.dp, 320.dp)) {
                     SearchResultsScreen(SearchUiState(query = QUERY, content = results(), filtersOpen = true), {}, {})
                 }
             }

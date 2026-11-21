@@ -126,6 +126,7 @@ internal fun ChannelPlaylistItem(playlist: PlaylistSummary, onAction: (ChannelAc
         countLabel = playlist.videoCountText ?: playlist.videoCount?.toString(),
         onMenu = { onAction(ChannelAction.OpenPlaylistMenu(playlist.id)) },
         menuDescription = stringResource(R.string.a11y_more_actions_for, playlist.title),
+        titleTag = "playlist-title-${playlist.id}",
     )
 }
 

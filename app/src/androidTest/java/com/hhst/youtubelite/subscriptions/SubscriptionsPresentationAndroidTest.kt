@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.subscriptions
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
@@ -43,7 +44,7 @@ class SubscriptionsPresentationAndroidTest {
         val channels = mutableStateOf(original)
         compose.setContent {
             AppTheme {
-                Box(Modifier.requiredSize(390.dp, 800.dp)) {
+                TestWindowBox(Modifier.requiredSize(390.dp, 800.dp)) {
                     SubscriptionsScreen(SubscriptionsUiState(signedIn = true,
                         channels = SubscriptionsChannels.Ready(channels.value),
                         content = SubscriptionsContent.Feed(SubscriptionsPage(emptyList(), emptyList()))), {})
@@ -79,7 +80,7 @@ class SubscriptionsPresentationAndroidTest {
                 LocalLayoutDirection provides direction, LocalDensity provides Density(density, fontScale.value)) {
                 AppTheme {
                     key(language.value, fontScale.value, directory.value) {
-                        Box(Modifier.requiredSize(390.dp, 800.dp)) {
+                        TestWindowBox(Modifier.requiredSize(390.dp, 800.dp)) {
                             SubscriptionsScreen(SubscriptionsUiState(signedIn = true,
                                 channels = SubscriptionsChannels.Ready(channels),
                                 content = SubscriptionsContent.Feed(SubscriptionsPage(

@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.watch.chat
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -49,7 +50,7 @@ class LiveChatPanelScreenshotAndroidTest {
         })
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(390.dp, 844.dp)) {
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing).requiredSize(390.dp, 844.dp)) {
                     LiveChatPanel(LiveChatUiState(LiveChatContent.Ready(rows), signedIn = true, canSend = false),
                         onAction = {}, onClose = {})
                 }
@@ -73,7 +74,7 @@ class LiveChatPanelScreenshotAndroidTest {
         var signedIn by androidx.compose.runtime.mutableStateOf(true)
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).testTag("live-chat-scene")) {
                     LiveChatPanel(LiveChatUiState(LiveChatContent.Ready(messages), signedIn = signedIn),
                         onAction = {}, onClose = {})

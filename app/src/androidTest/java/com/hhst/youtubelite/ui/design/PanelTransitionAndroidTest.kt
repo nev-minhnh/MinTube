@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.ui.design
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -42,7 +43,7 @@ class PanelTransitionAndroidTest {
         try {
             compose.setContent {
                 AppTheme { CompositionLocalProvider(LocalDensity provides Density(1f), LocalMotionScale provides 1f) {
-                    Box(Modifier.requiredSize(390.dp, 844.dp).background(Color.White).testTag("channel-about-host")) {
+                    TestWindowBox(Modifier.requiredSize(390.dp, 844.dp).background(Color.White).testTag("channel-about-host")) {
                         if (open) ChannelAboutPanel(FixtureChannelRepository.profile(), 390f, 844f, { action ->
                             if (action == ChannelAction.CloseOverlay) { closes++; open = false }
                         })

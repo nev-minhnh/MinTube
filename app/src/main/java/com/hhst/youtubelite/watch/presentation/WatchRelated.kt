@@ -33,6 +33,7 @@ import com.hhst.youtubelite.R
 import com.hhst.youtubelite.dearrow.VideoArtwork
 import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
 import com.hhst.youtubelite.ui.components.DurationBadge
+import com.hhst.youtubelite.ui.components.MinAvatar
 import com.hhst.youtubelite.ui.components.SectionHeader
 import com.hhst.youtubelite.ui.components.StateMessage
 import com.hhst.youtubelite.ui.components.ThumbnailProgress
@@ -41,7 +42,6 @@ import com.hhst.youtubelite.ui.components.VideoRowSkeleton
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.AppText
-import com.hhst.youtubelite.ui.design.Artwork
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinRadius
 import com.hhst.youtubelite.ui.design.MinSpace
@@ -230,7 +230,7 @@ private fun RelatedAvatar(item: WatchRelated, onAction: (WatchAction) -> Unit) {
             .appDescription(R.string.a11y_go_to_channel, item.channel),
         contentAlignment = Alignment.Center,
     ) {
-        Artwork(item.avatar.orEmpty(), Modifier.size(36.dp).clip(CircleShape))
+        MinAvatar(item.avatar, item.channel, size = 36.dp)
     }
 }
 

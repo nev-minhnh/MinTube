@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
@@ -63,7 +64,7 @@ class HomeRefreshEvidenceAndroidTest {
         var state by mutableStateOf(HomeUiState(content = feed.copy(refreshing = true, userRefresh = true), signedInPreview = true))
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
-                Box(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(state, {}) }
+                TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) { HomeScreen(state, {}) }
             }
         }
         compose.onNodeWithTag("home-refresh-indicator").assertExists()
@@ -85,7 +86,7 @@ class HomeRefreshEvidenceAndroidTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
                 AppTheme {
-                    Box(Modifier.requiredSize(width.dp, 844.dp).testTag("about-busy")) {
+                    TestWindowBox(Modifier.requiredSize(width.dp, 844.dp).testTag("about-busy")) {
                         com.hhst.youtubelite.ui.about.AboutScreen("Litube", "4.0.0", {}, true, "", {}, {}, {}, {}, {})
                     }
                 }

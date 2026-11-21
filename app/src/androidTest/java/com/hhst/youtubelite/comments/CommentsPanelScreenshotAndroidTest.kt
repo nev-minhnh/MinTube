@@ -157,8 +157,9 @@ class CommentsPanelScreenshotAndroidTest {
         val output = File(compose.activity.getExternalFilesDir(null), "comments-acceptance").apply { mkdirs() }
         var panel = compose.onNodeWithTag("comments-panel").fetchSemanticsNode().boundsInRoot
         var sheet = compose.onNodeWithTag("comments-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(390f, sheet.width, 0.5f)
-        assertEquals(panel.left, sheet.left, 0.5f)
+        // Mint sheets float 8dp inside the panel when it is no wider than the sheet maximum.
+        assertEquals(374f, sheet.width, 0.5f)
+        assertEquals(panel.left + 8f, sheet.left, 0.5f)
         assertEquals(panel.bottom - 24f, sheet.bottom, 0.5f)
         assertEquals(48f, compose.onNodeWithTag("comment-menu-reply").fetchSemanticsNode().boundsInRoot.height, 0.5f)
         capture("comments-menu-390", output, record, goldens)
@@ -167,8 +168,8 @@ class CommentsPanelScreenshotAndroidTest {
         panel = compose.onNodeWithTag("comments-panel").fetchSemanticsNode().boundsInRoot
         sheet = compose.onNodeWithTag("comments-menu").fetchSemanticsNode().boundsInRoot
         assertEquals(1280f / 3f, panel.width, 0.5f)
-        assertEquals(panel.width, sheet.width, 0.5f)
-        assertEquals(panel.right, sheet.right, 0.5f)
+        assertEquals(panel.width - 16f, sheet.width, 0.5f)
+        assertEquals(panel.right - 8f, sheet.right, 0.5f)
         assertEquals(panel.bottom - 24f, sheet.bottom, 0.5f)
         capture("comments-menu-1280", output, record, goldens)
     }

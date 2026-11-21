@@ -49,7 +49,7 @@ import com.hhst.youtubelite.comments.domain.CommentsLayout
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.AppText
-import com.hhst.youtubelite.ui.design.Artwork
+import com.hhst.youtubelite.ui.components.MinAvatar
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.PanelTransition
 import com.hhst.youtubelite.ui.design.rememberBottomSheetDrag
@@ -177,7 +177,8 @@ private fun LiveChatSurface(
                         items(content.messages, key = { it.id }) { message ->
                             Row(Modifier.fillMaxWidth().padding(horizontal = MinSpace.lg, vertical = 6.dp)
                                 .testTag("live-chat-message")) {
-                                Artwork(message.photo, Modifier.size(28.dp).clip(CircleShape))
+                                // The author initial stands in while the photo is missing, as on the cards.
+                                MinAvatar(message.photo, message.author, size = 28.dp)
                                 Spacer(Modifier.width(MinSpace.md))
                                 Column(Modifier.weight(1f)) {
                                     AppText(message.author, MinType.Caption.copy(fontWeight = FontWeight.Medium),

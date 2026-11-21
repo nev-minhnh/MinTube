@@ -2,6 +2,7 @@ package com.hhst.youtubelite.post
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,9 +18,11 @@ import com.hhst.youtubelite.post.data.FixturePostRepository
 import com.hhst.youtubelite.post.domain.*
 import com.hhst.youtubelite.post.presentation.*
 import com.hhst.youtubelite.ui.design.AppTheme
+import com.hhst.youtubelite.ui.design.MintColors
 import com.hhst.youtubelite.watch.domain.VideoRating
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
+import kotlin.math.abs
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Rule
@@ -32,14 +35,19 @@ class PostInteractionContinuityAndroidTest {
     private val original = FixturePostRepository.sampleDetail(identity)!!
     @After fun cleanup() { compose.runOnIdle { model?.viewModelScope?.cancel() } }
 
-    private fun assertRedOutline(tag: String) {
+    /** A selected rating draws its glyph in the accent ink the video's selected rating pill uses. */
+    private fun assertAccentOutline(tag: String) {
         val pixels = compose.onNodeWithTag(tag).captureToImage().toPixelMap()
-        var redPixels = 0
+        val accents = listOf(MintColors.LightAccentText, MintColors.DarkAccentText).map { Color(it) }
+        var accentPixels = 0
         for (y in 0 until pixels.height) for (x in 0 until pixels.width) {
             val pixel = pixels[x, y]
-            if (pixel.red > 0.7f && pixel.green < 0.35f && pixel.blue < 0.35f) redPixels++
+            if (accents.any { accent ->
+                    abs(pixel.red - accent.red) < 0.08f && abs(pixel.green - accent.green) < 0.08f &&
+                        abs(pixel.blue - accent.blue) < 0.08f
+                }) accentPixels++
         }
-        assertTrue("Selected action should use the video's red outline", redPixels > 10)
+        assertTrue("Selected action should use the video's accent outline", accentPixels > 10)
     }
 
     private fun repository(gate: CompletableDeferred<PostDetail>, detail: PostDetail = original) =
@@ -72,7 +80,7 @@ class PostInteractionContinuityAndroidTest {
         assertEquals(before, compose.onNodeWithTag("post-detail-feedback").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { write.complete(original.copy(rating = VideoRating.Like)) }
         compose.onNodeWithTag("post-detail-like").assertIsSelected()
-        assertRedOutline("post-detail-like")
+        assertAccentOutline("post-detail-like")
         compose.runOnIdle { vm.refreshAuthorization(true) }
         compose.onNodeWithTag("post-detail-refreshing").assertIsDisplayed()
         compose.onNodeWithTag("post-detail-loading").assertDoesNotExist()
@@ -100,7 +108,7 @@ class PostInteractionContinuityAndroidTest {
         assertEquals(before, compose.onNodeWithTag("post-like-post").fetchSemanticsNode().boundsInRoot)
         compose.runOnIdle { gate.complete(original.copy(rating = VideoRating.Like)) }
         compose.onNodeWithTag("post-like-post").assertIsSelected()
-        assertRedOutline("post-like-post")
+        assertAccentOutline("post-like-post")
         compose.runOnIdle { assertEquals(0, navigations) }
     }
 
@@ -144,7 +152,7 @@ class PostInteractionContinuityAndroidTest {
         compose.runOnIdle { assertEquals(images to 2, opened); assertEquals(0, navigations) }
     }
 
-    @Test fun channelCardOpensTheSelectedImageAndUsesRedDislike() {
+    @Test fun channelCardOpensTheSelectedImageAndUsesAccentDislike() {
         val summary = FixturePostRepository.samplePosts("studio").first()
         var opened: Pair<List<String>, Int>? = null
         var navigations = 0
@@ -155,7 +163,7 @@ class PostInteractionContinuityAndroidTest {
                     { _, _ -> }, { urls, index -> opened = urls to index }))
         } }
         compose.onNodeWithTag("channel-post-dislike-post").performScrollTo()
-        assertRedOutline("channel-post-dislike-post")
+        assertAccentOutline("channel-post-dislike-post")
         compose.onNodeWithTag("post-image-0").performScrollTo()
         compose.onNodeWithTag("post-images").performTouchInput { swipeLeft() }
         compose.onNodeWithTag("post-image-1").performClick()

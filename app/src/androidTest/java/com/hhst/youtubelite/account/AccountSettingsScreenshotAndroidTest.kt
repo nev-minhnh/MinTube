@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.account
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
@@ -21,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hhst.youtubelite.account.presentation.AccountMenuHeader
-import com.hhst.youtubelite.account.presentation.accountMenuItems
+import androidx.compose.ui.res.stringResource
+import com.hhst.youtubelite.account.presentation.accountMenuActions
+import com.hhst.youtubelite.ui.design.MenuSheetItem
+import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.extension.PreferenceKeys
 import com.hhst.youtubelite.library.data.FixtureLibraryRepository
 import com.hhst.youtubelite.library.domain.LibraryContent
@@ -50,11 +54,15 @@ class AccountSettingsScreenshotAndroidTest {
             FixtureLibraryRepository.collections())
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, scale)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).testTag("account-scene")) {
                     YouScreen(LibraryUiState(signedIn = true, content = LibraryContent.Ready(page)), {})
                     MenuBottomSheet(
-                        items = accountMenuItems, onDismiss = {}, onSelect = {}, tag = "account-menu",
+                        // Same localized rows as YouActivity's account menu.
+                        items = accountMenuActions.map { action ->
+                            MenuSheetItem(null, stringResource(action.labelResource), tag = "account-action-${action.tag}")
+                        },
+                        onDismiss = {}, onSelect = {}, tag = "account-menu",
                         paneTitle = "Account menu",
                         header = { AccountMenuHeader(page.account) {} },
                     )
@@ -67,11 +75,13 @@ class AccountSettingsScreenshotAndroidTest {
         }
         compose.runOnIdle { width = 390; height = 844 }
         val phone = compose.onNodeWithTag("account-menu").fetchSemanticsNode().boundsInRoot
-        assertEquals(0f, phone.left, 0.5f)
-        assertEquals(390f, phone.width, 0.5f)
+        // Mint sheets float 8dp in from the window edges on phones.
+        assertEquals(8f, phone.left, 0.5f)
+        assertEquals(374f, phone.width, 0.5f)
         assertEquals(820f, phone.bottom, 0.5f)
-        // Mint header: 48dp avatar inside 8dp vertical padding.
-        assertEquals(13f + 64f + 4 * 48f, phone.height, 0.5f)
+        // Mint header: 48dp avatar inside 8dp vertical padding; sheet chrome is the 20dp handle strip
+        // plus 8dp under the actions.
+        assertEquals(28f + 64f + 4 * 48f, phone.height, 0.5f)
         compose.runOnIdle { width = 1280; height = 800 }
         val wide = compose.onNodeWithTag("account-menu").fetchSemanticsNode().boundsInRoot
         assertEquals(440f, wide.left, 0.5f)
@@ -96,7 +106,7 @@ class AccountSettingsScreenshotAndroidTest {
         )
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, scale)) {
-                Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
+                TestWindowBox(Modifier.consumeWindowInsets(WindowInsets.safeDrawing)
                     .requiredSize(width.dp, height.dp).testTag("settings-scene")) {
                     SettingsScreen(page, preferences, notificationsEnabled = true,
                         onNavigate = { page = it }, onToggle = { _, _ -> }, onAbout = {},

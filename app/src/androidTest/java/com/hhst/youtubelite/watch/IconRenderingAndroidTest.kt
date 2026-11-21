@@ -61,11 +61,12 @@ class IconRenderingAndroidTest {
         }
         val small = compose.onNodeWithTag("playlist-badge").captureToImage().toPixelMap()
         val large = compose.onNodeWithTag("playlist-large").captureToImage().toPixelMap()
-        listOf(3, 6, 9).forEach { y ->
-            assertTrue("12-unit line at $y must remain visible", small[5, y].red < 0.8f)
+        // Material Symbols playlist_play: three bars centred at y = 280, 440 and 600 of 960 units.
+        listOf(3, 5, 7).forEach { y ->
+            assertTrue("12-unit line at $y must remain visible", small[3, y].red < 0.8f)
         }
-        listOf(6, 12, 18).forEach { y ->
-            assertTrue("Scaled line at $y must remain visible", large[10, y].red < 0.5f)
+        listOf(7, 11, 15).forEach { y ->
+            assertTrue("Scaled line at $y must remain visible", large[6, y].red < 0.5f)
         }
     }
 
@@ -83,8 +84,9 @@ class IconRenderingAndroidTest {
         assertTrue("Bottom frame", external[12, 20].red < 0.2f)
         assertTrue("Arrow head", external[20, 5].red < 0.2f)
         val chevron = compose.onNodeWithTag("chevron").captureToImage().toPixelMap()
-        assertTrue("Left arm", chevron[7, 11].red < 0.6f)
-        assertTrue("Right arm", chevron[16, 11].red < 0.6f)
+        // Material Symbols expand_more: both arms cross y = 9.5 at x = 7.5 and 16.5.
+        assertTrue("Left arm", chevron[7, 9].red < 0.6f)
+        assertTrue("Right arm", chevron[16, 9].red < 0.6f)
     }
 
     @Test fun negativeViewBoxOriginsRemainInsideTheIcon() {

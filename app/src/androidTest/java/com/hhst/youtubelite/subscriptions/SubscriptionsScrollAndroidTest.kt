@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.subscriptions
 
+import com.hhst.youtubelite.ui.TestWindowBox
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
@@ -39,7 +40,7 @@ class SubscriptionsScrollAndroidTest(private val width: Int, private val fontSca
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, fontScale)) {
                 AppTheme {
-                    Box(Modifier.requiredSize(width.dp, 844.dp)) {
+                    TestWindowBox(Modifier.requiredSize(width.dp, 844.dp)) {
                         SubscriptionsScreen(state.value, { if (it == SubscriptionsAction.Retry) refreshes++ })
                     }
                 }
