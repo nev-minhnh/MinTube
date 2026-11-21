@@ -97,6 +97,7 @@ MinTube TV then appears in the TV's app row. Check the file against the `.sha256
 | | Down | Up next (related videos) |
 | | OK on the autoplay card / Back | Play the next video now / cancel autoplay |
 | | Play/Pause, FF/RW, Next/Previous | Media keys work as expected |
+| | Back | Hide the controls (the video keeps playing, or stays paused); with nothing on screen, leave |
 | Shorts | Up / Down | Previous / next Short |
 | | OK | Pause or play |
 | | Left / Right | Seek 5 s |

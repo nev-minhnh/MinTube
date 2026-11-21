@@ -152,6 +152,55 @@ class TvPlayerAndroidTest {
         assertEquals(listOf("exit"), calls)
     }
 
+    @Test fun backWithThePausedBarHidesItAndKeepsTheVideo() {
+        host()
+        // OK pauses and shows the bar; Back hides it without touching playback or leaving.
+        compose.press(Key.DirectionCenter)
+        compose.awaitFocus(TAG_SEEK_BAR)
+        compose.back()
+        compose.onNodeWithTag(TAG_SEEK_BAR).assertDoesNotExist()
+        compose.awaitFocus(TAG_PLAYER)
+        assertEquals(listOf("playPause"), calls)
+        // Nothing over the video now: Back leaves.
+        compose.back()
+        assertEquals(listOf("playPause", "exit"), calls)
+    }
+
+    @Test fun backAfterASeekHidesTheBarFirst() {
+        host()
+        compose.press(Key.DirectionRight)
+        compose.awaitFocus(TAG_SEEK_BAR)
+        compose.back()
+        compose.onNodeWithTag(TAG_SEEK_BAR).assertDoesNotExist()
+        assertTrue("exit" !in calls)
+        compose.back()
+        assertEquals("exit", calls.last())
+    }
+
+    @Test fun backAsAKeyEventHidesTheBarToo() {
+        host()
+        // Older Android TV delivers Back as a key to the focused node instead of the dispatcher.
+        compose.press(Key.DirectionLeft)
+        compose.awaitFocus(TAG_SEEK_BAR)
+        compose.press(Key.Back)
+        compose.onNodeWithTag(TAG_SEEK_BAR).assertDoesNotExist()
+        compose.awaitFocus(TAG_PLAYER)
+        assertTrue("exit" !in calls)
+        compose.press(Key.Back)
+        assertEquals("exit", calls.last())
+    }
+
+    @Test fun backFromTheUpNextRowHidesItAndKeepsPlaying() {
+        player.value = player.value.copy(isPlaying = true, userWantsPlay = true)
+        host()
+        compose.press(Key.DirectionDown)
+        compose.awaitFocus("$TAG_UP_NEXT_CARD-0")
+        compose.back()
+        compose.onNodeWithTag("$TAG_UP_NEXT_CARD-0").assertDoesNotExist()
+        compose.awaitFocus(TAG_PLAYER)
+        assertTrue(calls.none { it == "exit" || it == "playPause" || it == "pause" })
+    }
+
     @Test fun mediaKeysControlPlayback() {
         host()
         compose.press(Key.MediaPlayPause)

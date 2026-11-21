@@ -5,6 +5,7 @@ import com.hhst.youtubelite.tv.design.tvAnchor
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -137,8 +138,12 @@ fun TvPlayerScreen(
     }
     val error = player.error != null
 
+    // The overlay's own visibility, including its fade-out after the mode went back to Hidden.
+    val overlay = remember { MutableTransitionState(false) }
+
     fun show(next: TvOverlayMode) {
         mode = next
+        overlay.targetState = next != TvOverlayMode.Hidden
         options = null
     }
 
@@ -180,11 +185,18 @@ fun TvPlayerScreen(
     }
 
     // Right after the controls open, focus may still sit on the root for a frame: treat it as the bar.
+    // Anything still drawn over the video (a fading bar, a seek preview) counts as visible for Back.
     fun context() = TvPlayerKeyContext(mode, seekBarFocused || rootFocused && mode == TvOverlayMode.Controls,
-        options != null, countdown != null)
+        options != null, countdown != null,
+        barVisible = overlay.currentState || overlay.targetState || seekOffset != 0L || seekTarget.value != null)
 
-    // Back is delivered through the dispatcher (predictive back), not as a key event.
-    BackHandler { handle(keyMapper.map(TvKeyInput(AndroidKeyEvent.KEYCODE_BACK, down = true), context())) }
+    fun back() = handle(TvPlayerKeyMapper.mapDown(TvKeyInput(AndroidKeyEvent.KEYCODE_BACK, down = true), context()))
+
+    // Back normally arrives through the dispatcher (predictive back on API 33+), not as a key event.
+    BackHandler { back() }
+    // Where Back does arrive as a key (older Android TV), it is handled here on release, never
+    // left to Compose (which would move focus out of the bar) or to the activity's default.
+    var backDown by remember { mutableStateOf(false) }
 
     // A held seek key whose release was lost (focus moved, window changed) still lands.
     LaunchedEffect(seekOffset) {
@@ -253,7 +265,17 @@ fun TvPlayerScreen(
             .background(Color.Black)
             .onPreviewKeyEvent { event ->
                 val native = event.nativeKeyEvent
-                if (native.keyCode == AndroidKeyEvent.KEYCODE_BACK) return@onPreviewKeyEvent false
+                if (native.keyCode == AndroidKeyEvent.KEYCODE_BACK || native.keyCode == AndroidKeyEvent.KEYCODE_ESCAPE) {
+                    when {
+                        native.action == AndroidKeyEvent.ACTION_DOWN -> backDown = true
+                        backDown && !native.isCanceled -> {
+                            backDown = false
+                            back()
+                        }
+                        else -> backDown = false
+                    }
+                    return@onPreviewKeyEvent true
+                }
                 interactions++
                 handle(keyMapper.map(TvKeyInput.of(native), context()))
             }
@@ -266,7 +288,7 @@ fun TvPlayerScreen(
         if (player.loading && !error) {
             TvSpinner(Modifier.align(Alignment.Center))
         }
-        AnimatedVisibility(mode != TvOverlayMode.Hidden, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(overlay, enter = fadeIn(), exit = fadeOut()) {
             Box(Modifier.fillMaxSize()) {
                 Box(Modifier.fillMaxWidth().height(180.dp).background(
                     Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.85f), Color.Transparent))))

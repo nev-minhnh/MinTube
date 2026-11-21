@@ -15,7 +15,15 @@ data class TvPlayerKeyContext(
     val optionsOpen: Boolean = false,
     /** The autoplay countdown card is showing. */
     val countdown: Boolean = false,
-)
+    /**
+     * Overlay chrome is still on screen although [mode] is [TvOverlayMode.Hidden]: the controls
+     * are fading out, or a seek preview is in flight.
+     */
+    val barVisible: Boolean = false,
+) {
+    /** Anything of the overlay (title, time, seek bar, rows) is on screen over the video. */
+    val overlayVisible: Boolean get() = mode != TvOverlayMode.Hidden || barVisible
+}
 
 /** A remote key as the mapper sees it (decoupled from android.view.KeyEvent for unit tests). */
 data class TvKeyInput(val keyCode: Int, val down: Boolean, val repeatCount: Int = 0) {
@@ -52,7 +60,9 @@ sealed interface TvPlayerAction {
  *   showing over the video it plays the next video now.
  * - Left/Right: seek ∓/±10 s; holding accelerates ([seekStepMs]). Elsewhere they move focus.
  * - Up: settings row (quality, speed, captions, audio, chapters). Down: the "Up next" row.
- * - Back: close an option list, then the overlay, then the autoplay card, then leave.
+ * - Back: close an option list, then hide whatever overlay is on screen (controls shown by OK,
+ *   pause or a seek, the settings row, "Up next", a fading bar) without touching playback, then
+ *   cancel the autoplay card; only with nothing over the video does it leave.
  * - Media keys: play/pause, play, pause, stop (pause), fast-forward/rewind (seek), next, previous.
  *
  * The only state kept here pairs key-up with a handled key-down, so the up half of a key the
@@ -108,7 +118,7 @@ class TvPlayerKeyMapper {
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS -> TvPlayerAction.Previous
                 KeyEvent.KEYCODE_BACK -> when {
                     context.optionsOpen -> TvPlayerAction.CloseOptions
-                    !onVideo -> TvPlayerAction.Hide
+                    context.overlayVisible -> TvPlayerAction.Hide
                     context.countdown -> TvPlayerAction.CancelAutoplay
                     else -> TvPlayerAction.Exit
                 }

@@ -76,6 +76,37 @@ class TvPlayerKeyMapperTest {
         assertEquals(TvPlayerAction.Exit, map(KeyEvent.KEYCODE_BACK, hidden))
     }
 
+    @Test fun backHidesEveryVisibleOverlayAndLeavesOnlyFromThePlainVideo() {
+        // Controls with focus anywhere: on the bar (OK, pause, a seek), on the root right after
+        // they opened, on a row, with the countdown card under them.
+        val visible = listOf(
+            onSeekBar,
+            TvPlayerKeyContext(TvOverlayMode.Controls, seekBarFocused = false),
+            onSeekBar.copy(countdown = true),
+            inSettings,
+            TvPlayerKeyContext(TvOverlayMode.UpNext),
+            // The bar still fading out, or a seek preview in flight, while the mode is already Hidden.
+            hidden.copy(barVisible = true),
+            hidden.copy(barVisible = true, countdown = true),
+        )
+        for (context in visible) {
+            assertEquals("$context", true, context.overlayVisible)
+            assertEquals("$context", TvPlayerAction.Hide, map(KeyEvent.KEYCODE_BACK, context))
+        }
+        assertEquals(false, hidden.overlayVisible)
+        assertEquals(TvPlayerAction.Exit, map(KeyEvent.KEYCODE_BACK, hidden))
+    }
+
+    @Test fun backNeverTouchesPlayback() {
+        val contexts = listOf(hidden, hidden.copy(barVisible = true), onSeekBar, inSettings, inSettings.copy(optionsOpen = true),
+            TvPlayerKeyContext(TvOverlayMode.UpNext), hidden.copy(countdown = true))
+        for (context in contexts) {
+            val action = map(KeyEvent.KEYCODE_BACK, context)
+            assertEquals("$context", false, action is TvPlayerAction.TogglePlayPause || action == TvPlayerAction.Play ||
+                action == TvPlayerAction.Pause)
+        }
+    }
+
     @Test fun okOnTheAutoplayCardPlaysTheNextVideo() {
         assertEquals(TvPlayerAction.PlayUpNext, map(KeyEvent.KEYCODE_DPAD_CENTER, hidden.copy(countdown = true)))
         assertEquals(TvPlayerAction.TogglePlayPause(showControls = true),
