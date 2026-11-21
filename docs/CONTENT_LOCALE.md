@@ -62,6 +62,10 @@ gl does not affect account data.
 - With OFF and `hl=vi`, lists show creator or YouTube translations into Vietnamese where they exist
   (for example MrBeast). Vietnamese and Korean videos keep their originals. Only the watch page is
   guaranteed original. Per-row originals would need one `/player` or oEmbed call per item; the extensions do this, and MinTube does not.
+- **MSC limit, seen on device:** lists parsed from TV-client tiles (Home, discovery, Explore,
+  channel tabs) classify each metadata line with MSC's keyword regex in `ContentReadKt`. That regex covers
+  en/zh/ja/ko/es/pt/fr/de/ru but not Vietnamese, so with `hl=vi` these rows show no "lượt xem · ngày trước".
+  WEB-parsed rows (search, watch) do show them. Fix this in MediaServiceCore: add `lượt xem|đang xem` and `trước|hôm qua|hôm nay|công chiếu|phát trực tiếp`.
 - `viewMagnitude` (sort by popularity on channel Shorts and Live) parses English suffixes.
   Vietnamese "1,5 Tr" sorts approximately.
 - App-formatted fallbacks such as "N views" when the server omits a count stay English (existing behaviour).
