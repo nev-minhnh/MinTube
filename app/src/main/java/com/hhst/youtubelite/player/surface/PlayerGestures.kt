@@ -69,13 +69,15 @@ fun Modifier.playerGestures(
     /** Shorts (vertical feed): vertical drag switches video, not brightness/volume. */
     verticalFeed: Boolean = false,
     fullscreenEntry: Boolean = false,
+    /** Brightness/volume side zones; [GestureMath.edgeSlidersActive] (fullscreen only). */
+    edgeSliders: Boolean = true,
 ): Modifier = composed {
     val tapGuard = remember { TapGuard() }
     val coordinates = remember { GestureCoordinates() }
     val density = LocalDensity.current.density
     this
         .onGloballyPositioned { coordinates.layout = it }
-        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry) {
+        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry, edgeSliders) {
             if (!enabled) return@pointerInput
             detectTapGestures(
                 onTap = {
@@ -95,9 +97,9 @@ fun Modifier.playerGestures(
                 },
             )
         }
-        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry) {
+        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry, edgeSliders) {
             if (!enabled) return@pointerInput
-            awaitEachGesture { trackDrag(callbacks, zoneEnabled, tapGuard, zoomEnabled, verticalFeed, fullscreenEntry, density, coordinates::toWindow) }
+            awaitEachGesture { trackDrag(callbacks, zoneEnabled, tapGuard, zoomEnabled, verticalFeed, fullscreenEntry, edgeSliders, density, coordinates::toWindow) }
         }
 }
 
@@ -115,6 +117,7 @@ private suspend fun AwaitPointerEventScope.trackDrag(
     zoomEnabled: Boolean,
     verticalFeed: Boolean,
     fullscreenEntry: Boolean,
+    edgeSliders: Boolean,
     density: Float,
     toWindow: (Offset) -> Offset,
 ) {
@@ -223,7 +226,7 @@ private suspend fun AwaitPointerEventScope.trackDrag(
                 val dx = upInWindow.x - startInWindow.x
                 val dy = upInWindow.y - startInWindow.y
                 if (max(abs(dx), abs(dy)) > viewConfiguration.touchSlop && abs(dy) > abs(dx) &&
-                    GestureMath.resolveDragMode(dx, dy, start.x, width, verticalFeed, fullscreenEntry) ==
+                    GestureMath.resolveDragMode(dx, dy, start.x, width, verticalFeed, fullscreenEntry, edgeSliders) ==
                     GestureMath.DragMode.NONE) {
                     dragResolved = true
                     totalDx = dx
@@ -257,7 +260,7 @@ private suspend fun AwaitPointerEventScope.trackDrag(
                 if (change.isConsumed) return // a child owns this drag
                 dragResolved = true
                 rawMode = GestureMath.resolveDragMode(totalDx, totalDy, start.x, width, verticalFeed,
-                    fullscreenEntry && zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE))
+                    fullscreenEntry && zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE), edgeSliders)
                 dragMode = when (rawMode) {
                     GestureMath.DragMode.SEEK ->
                         if (zoneEnabled(GestureMath.GestureZone.SEEK)) rawMode else GestureMath.DragMode.NONE

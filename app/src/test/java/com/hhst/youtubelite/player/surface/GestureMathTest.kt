@@ -72,20 +72,44 @@ class GestureMathTest {
     }
 
     @Test fun embeddedUpwardEntryHasAWiderZoneWithoutTakingOverFullscreenEdgeSliders() {
-        for (x in listOf(250f, 750f)) {
-            assertEquals(GestureMath.DragMode.NONE,
-                GestureMath.resolveDragMode(10f, -50f, x, 1000f, fullscreenEntry = true))
+        // Embedded (owner rule 2026-11-21): no edge sliders at all, so every vertical drag,
+        // up or down, centre or edge, is the window swipe; horizontal stays seek.
+        for (x in listOf(100f, 250f, 500f, 750f, 900f)) {
+            for (dy in listOf(-50f, 50f)) {
+                assertEquals(GestureMath.DragMode.NONE,
+                    GestureMath.resolveDragMode(10f, dy, x, 1000f, fullscreenEntry = true, edgeSliders = false))
+            }
         }
-        assertEquals(GestureMath.DragMode.BRIGHTNESS,
-            GestureMath.resolveDragMode(10f, -50f, 100f, 1000f, fullscreenEntry = true))
-        assertEquals(GestureMath.DragMode.VOLUME,
-            GestureMath.resolveDragMode(10f, -50f, 900f, 1000f, fullscreenEntry = true))
+        assertEquals(GestureMath.DragMode.SEEK,
+            GestureMath.resolveDragMode(100f, -50f, 500f, 1000f, fullscreenEntry = true, edgeSliders = false))
+        // Fullscreen keeps its edge sliders in both directions.
         assertEquals(GestureMath.DragMode.BRIGHTNESS,
             GestureMath.resolveDragMode(10f, -50f, 250f, 1000f))
+        assertEquals(GestureMath.DragMode.BRIGHTNESS,
+            GestureMath.resolveDragMode(10f, 50f, 100f, 1000f, edgeSliders = true))
         assertEquals(GestureMath.DragMode.VOLUME,
-            GestureMath.resolveDragMode(10f, 50f, 750f, 1000f, fullscreenEntry = true))
-        assertEquals(GestureMath.DragMode.SEEK,
-            GestureMath.resolveDragMode(100f, -50f, 500f, 1000f, fullscreenEntry = true))
+            GestureMath.resolveDragMode(10f, -50f, 900f, 1000f, edgeSliders = true))
+    }
+
+    @Test
+    fun edgeSliders_fullscreenOnly_neverEmbeddedOrMini() {
+        assertTrue(GestureMath.edgeSlidersActive(fullscreen = true, mini = false))
+        assertFalse("Embedded watch player", GestureMath.edgeSlidersActive(fullscreen = false, mini = false))
+        assertFalse("In-app mini player", GestureMath.edgeSlidersActive(fullscreen = false, mini = true))
+        assertFalse(GestureMath.edgeSlidersActive(fullscreen = true, mini = true))
+    }
+
+    @Test
+    fun embeddedEdgeSwipeDownMinimizesInsteadOfBrightnessOrVolume() {
+        for (x in listOf(100f, 900f)) {
+            val mode = GestureMath.resolveDragMode(5f, 60f, x, 1000f, fullscreenEntry = true,
+                edgeSliders = GestureMath.edgeSlidersActive(fullscreen = false, mini = false))
+            assertEquals(GestureMath.DragMode.NONE, mode)
+            assertTrue(commitsMini(dxDp = 2f, dyDp = 30f, velocityDpS = 1_500f))
+        }
+        val miniMode = GestureMath.resolveDragMode(5f, 60f, 100f, 1000f,
+            edgeSliders = GestureMath.edgeSlidersActive(fullscreen = false, mini = true))
+        assertEquals("The mini routes nothing to brightness", GestureMath.DragMode.NONE, miniMode)
     }
 
     @Test

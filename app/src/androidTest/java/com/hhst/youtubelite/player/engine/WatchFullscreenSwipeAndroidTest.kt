@@ -561,9 +561,11 @@ class WatchFullscreenSwipeAndroidTest {
 
     /** Fling with explicit event times, so the release speed does not depend on emulator pacing. */
     private fun flick(fixture: OfflineWatchFixture, x: Float, fromY: Float, path: List<Float>, stepMs: Long) {
+        // Times count from the DOWN event itself: the player measures fling speed from it,
+        // however long a loaded device takes to dispatch it.
         val downTime = SystemClock.uptimeMillis()
         fixture.instrumentation.sendPointerSync(MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, fromY, 0))
-        val base = SystemClock.uptimeMillis()
+        val base = downTime
         path.forEachIndexed { index, y ->
             fixture.instrumentation.sendPointerSync(MotionEvent.obtain(
                 downTime, base + stepMs * (index + 1), MotionEvent.ACTION_MOVE, x, y, 0))

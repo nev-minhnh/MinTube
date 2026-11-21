@@ -6,7 +6,8 @@ import kotlin.math.roundToInt
 
 /**
  * Pure gesture math for the player surface (no Android deps).
- * Zone model: left 35% brightness, right 35% volume, center fullscreen swipe;
+ * Zone model: in fullscreen, left 35% brightness, right 35% volume, center fullscreen swipe;
+ * on the embedded player every vertical drag is the window swipe (down = mini, up = fullscreen);
  * horizontal drag seek scrub (±120 s full-width); double-tap thirds −10/play-pause/+10.
  */
 object GestureMath {
@@ -94,6 +95,12 @@ object GestureMath {
         return -dy / height * VOLUME_FACTOR
     }
 
+    /**
+     * Brightness and volume edge sliders exist only in fullscreen: never on the embedded
+     * watch player (its vertical drags minimize or enter fullscreen) and never on the mini.
+     */
+    fun edgeSlidersActive(fullscreen: Boolean, mini: Boolean): Boolean = fullscreen && !mini
+
     /** Chooses drag mode once touch slop is exceeded. */
     fun resolveDragMode(
         dx: Float,
@@ -102,11 +109,14 @@ object GestureMath {
         width: Float,
         verticalFeed: Boolean = false,
         fullscreenEntry: Boolean = false,
+        /** See [edgeSlidersActive]; false routes every vertical drag to the window swipe. */
+        edgeSliders: Boolean = true,
     ): DragMode {
         if (abs(dx) > abs(dy)) return DragMode.SEEK
         // Shorts (and similar vertical feeds): every vertical drag switches
         // the page video; brightness/volume must not eat the swipe.
         if (verticalFeed) return DragMode.NONE
+        if (!edgeSliders) return DragMode.NONE
         if (fullscreenEntry && dy < 0f && startX >= width * .2f && startX <= width * .8f) return DragMode.NONE
         return when {
             startX < width * BRIGHTNESS_ZONE_END -> DragMode.BRIGHTNESS
