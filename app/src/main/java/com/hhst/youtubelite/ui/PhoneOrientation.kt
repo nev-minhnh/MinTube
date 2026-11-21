@@ -15,7 +15,15 @@ object PhoneOrientation {
      * Device class from the largest window the display offers, not the current window: a tablet in
      * split screen stays a tablet, a foldable follows its fold state.
      */
-    fun isPhone(activity: Activity): Boolean = DeviceClass.isPhone(deviceSmallestWidthDp(activity))
+    fun isPhone(activity: Activity): Boolean = !isTelevision(activity) && DeviceClass.isPhone(deviceSmallestWidthDp(activity))
+
+    /**
+     * A 1080p TV reports a 540 dp smallest width, but a TV cannot rotate: a portrait lock there
+     * letterboxes the window into a 9:16 strip. TVs keep their landscape screen.
+     */
+    private fun isTelevision(activity: Activity): Boolean =
+        activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK ==
+            android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
 
     private fun deviceSmallestWidthDp(activity: Activity): Int {
         val density = activity.resources.displayMetrics.density.takeIf { it > 0f } ?: return 0
