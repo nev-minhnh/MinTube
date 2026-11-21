@@ -32,6 +32,8 @@ issues to Litube.
     its details on the left, related videos on the right, and each column scrolls on its own.
   - The playing video stays pinned at the top while you scroll. A "now playing" strip with the title and channel
     appears under it once the title scrolls away, followed by a filter row for the related videos.
+- **Gestures.** Flick down on the video to minimize it, on phones and tablets. Brightness and volume swipes
+  work only in fullscreen, so they never fight with minimizing.
 - **Mini-player and picture-in-picture.**
   - Inside the app, the mini-player always sits at the bottom-right corner, above the navigation bar, and
     cannot be dragged around.
