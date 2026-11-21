@@ -162,7 +162,9 @@ private fun TvHomeRows(
     }
     // Focus must never be lost: when this screen is resumed but neither it nor a rail the user chose
     // holds focus while it had focus before, put focus back on the remembered card.
-    LaunchedEffect(focusRows, resumed.isAtLeast(Lifecycle.State.RESUMED)) {
+    // Also when Compose moves focus to the rail by itself: a row's Retry leaves while the row reloads.
+    val railFocused = shell?.railFocused == true
+    LaunchedEffect(focusRows, resumed.isAtLeast(Lifecycle.State.RESUMED), railFocused) {
         if (!resumed.isAtLeast(Lifecycle.State.RESUMED) || memory.lastRowKey == null) return@LaunchedEffect
         withFrameNanos { }
         delay(RESTORE_SETTLE_MS)

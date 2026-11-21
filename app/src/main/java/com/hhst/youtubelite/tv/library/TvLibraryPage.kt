@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.Text
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.tv.design.TvButton
@@ -131,10 +132,11 @@ fun TvItemActionDialog(
     onDismiss: () -> Unit,
     confirmIcon: AppIcon = AppIcon.Delete,
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+    // Not the platform dialog width: it clipped the second button ("Can" for Cancel) at 1080p.
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         val confirm = remember { FocusRequester() }
         Column(
-            Modifier.widthIn(max = 560.dp).background(TvColors.Panel, RoundedCornerShape(TvSizes.Corner))
+            Modifier.widthIn(max = 840.dp).background(TvColors.Panel, RoundedCornerShape(TvSizes.Corner))
                 .padding(TvSpacing.xl).testTag(TAG_ITEM_DIALOG),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.lg),
         ) {

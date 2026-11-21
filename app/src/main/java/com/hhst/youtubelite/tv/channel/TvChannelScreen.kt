@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.channel
 
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -156,7 +158,10 @@ private fun ChannelPage(
                 ChannelHeader(status.header, onSubscribe)
             }
             item(key = "tabs", span = { GridItemSpan(maxLineSpan) }, contentType = "tabs") {
-                Row(Modifier.fillMaxWidth().testTag(TAG_CHANNEL_TABS), horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm)) {
+                // A full-width group: Up from any card of the first row lands on the selected tab, not on
+                // Subscribe above the right-hand cards. Selecting a tab never changes on mere entry.
+                Row(Modifier.fillMaxWidth().focusRestorer(tabRequesters.of(selected.name)).focusGroup().testTag(TAG_CHANNEL_TABS),
+                    horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm)) {
                     status.tabs.forEach { tab ->
                         TvChip(
                             stringResource(tab.labelResource), tab == selected, { onSelectTab(tab) },

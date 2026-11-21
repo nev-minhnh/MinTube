@@ -185,10 +185,19 @@ class TvLibraryPageActivity : TvActivity() {
             emptyMessage = stringResource(R.string.tv_library_history_empty),
             actions = if (!state.live || page.status == TvPageStatus.SignedOut) null else ({
                 val paused = devicePaused
-                if (paused != true) TvButton(stringResource(R.string.ui_pause_watch_history),
-                    { vm.onAction(LibraryAction.PauseHistory) }, Modifier.testTag(TAG_HISTORY_PAUSE), icon = AppIcon.Pause)
-                if (paused != false) TvButton(stringResource(R.string.ui_resume_watch_history),
-                    { vm.onAction(LibraryAction.ResumeHistory) }, Modifier.testTag(TAG_HISTORY_RESUME), icon = AppIcon.Play)
+                if (paused == null) {
+                    // State unknown (account history): offer both.
+                    TvButton(stringResource(R.string.ui_pause_watch_history),
+                        { vm.onAction(LibraryAction.PauseHistory) }, Modifier.testTag(TAG_HISTORY_PAUSE), icon = AppIcon.Pause)
+                    TvButton(stringResource(R.string.ui_resume_watch_history),
+                        { vm.onAction(LibraryAction.ResumeHistory) }, Modifier.testTag(TAG_HISTORY_RESUME), icon = AppIcon.Play)
+                } else {
+                    // One toggle button, so focus stays on it when Pause turns into Resume.
+                    TvButton(stringResource(if (paused) R.string.ui_resume_watch_history else R.string.ui_pause_watch_history),
+                        { vm.onAction(if (paused) LibraryAction.ResumeHistory else LibraryAction.PauseHistory) },
+                        Modifier.testTag(if (paused) TAG_HISTORY_RESUME else TAG_HISTORY_PAUSE),
+                        icon = if (paused) AppIcon.Play else AppIcon.Pause)
+                }
                 if (state.undo != null) TvButton(stringResource(R.string.undo),
                     { vm.onAction(LibraryAction.UndoHistoryRemove) }, Modifier.testTag(TAG_HISTORY_UNDO), icon = AppIcon.History)
             }),

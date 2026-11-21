@@ -194,7 +194,9 @@ fun TvFocusKeeper(
     val focusAction by rememberUpdatedState(focus)
     val fallbackAction by rememberUpdatedState(fallback)
     val focused by rememberUpdatedState(hasFocus)
-    LaunchedEffect(rows, resumed) {
+    // Also when Compose moves focus to the rail by itself (a shelf's Retry leaves while it reloads).
+    val railFocused = shell?.railFocused == true
+    LaunchedEffect(rows, resumed, railFocused) {
         if (!resumed || memory.lastRowKey == null && !initial) return@LaunchedEffect
         // Compose may hand focus to the rail when the focused card leaves; only a user's move there counts.
         repeat(RESTORE_ATTEMPTS) {

@@ -162,7 +162,7 @@
     <string name="info_itag">Itag</string>
     <string name="info_audio_bitrate">Tốc độ bit âm thanh</string>
     <string name="info_sample_rate">Tốc độ lấy mẫu</string>
-    <string name="info_channels">Kênh âm thanh</string>
+    <string name="info_channels">Kênh</string>
     <string name="copy">Sao chép</string>
     <string name="copied">Đã sao chép</string>
     <string name="copy_all">Sao chép tất cả</string>

@@ -109,8 +109,13 @@ fun TvShelves(
                 TvRowHeader(shelf.title, Modifier.padding(start = ShelfStart))
                 when (val state = shelf.state) {
                     TvShelfState.Loading -> TvSkeletonRow(Modifier.padding(start = ShelfStart), showHeader = false)
-                    is TvShelfState.Empty -> Text(state.message ?: stringResource(R.string.tv_row_empty), style = TvType.Body,
-                        color = TvColors.Secondary, modifier = Modifier.padding(start = ShelfStart))
+                    // Still focusable when empty: View all leads (History's page holds Pause/Resume), so a
+                    // Library with nothing in it never leaves focus stranded in the rail.
+                    is TvShelfState.Empty -> Row(Modifier.padding(start = ShelfStart), verticalAlignment = Alignment.CenterVertically) {
+                        TvButton(stringResource(R.string.ui_view_all), { onViewAll(shelf.key) }, Modifier.testTag(shelfViewAllTag(shelf.key)))
+                        Spacer(Modifier.width(TvSpacing.lg))
+                        Text(state.message ?: stringResource(R.string.tv_row_empty), style = TvType.Body, color = TvColors.Secondary)
+                    }
                     TvShelfState.Failed -> Row(Modifier.padding(start = ShelfStart), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.tv_row_failed), style = TvType.Body, color = TvColors.Secondary)
                         Spacer(Modifier.width(TvSpacing.lg))

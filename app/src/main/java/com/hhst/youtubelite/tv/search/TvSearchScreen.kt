@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.tv.search
 
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.withFrameNanos
 import com.hhst.youtubelite.tv.design.tvFocusRestorer
 import com.hhst.youtubelite.tv.design.tvAnchor
@@ -128,6 +129,7 @@ fun TvSearchScreen(
     var awaitingResults by remember { mutableStateOf(false) }
     var fieldFocused by remember { mutableStateOf(false) }
     var screenFocused by remember { mutableStateOf(false) }
+    var resultsFocused by remember { mutableStateOf(false) }
     val fieldRequester = remember { FocusRequester() }
     val resultRequester = remember { FocusRequester() }
     val retryRequester = remember { FocusRequester() }
@@ -162,14 +164,23 @@ fun TvSearchScreen(
         if (!awaitingResults || suggesting) return@LaunchedEffect
         val status = state.results.status
         if (status == TvSearchStatus.Loading || status == TvSearchStatus.Idle) return@LaunchedEffect
-        awaitingResults = false
+        // Clear the flag only after the move: it keys this effect, so clearing it first cancelled
+        // the request below before its first frame (focus stayed on the field on a real device).
         // The user may have moved on (filters, rail) while results loaded: only move focus from the field.
-        if (!fieldFocused) return@LaunchedEffect
-        when (status) {
-            TvSearchStatus.Ready -> if (state.results.items.isNotEmpty()) resultRequester.requestWhenReady()
-            TvSearchStatus.Failed, is TvSearchStatus.Empty -> retryRequester.requestWhenReady()
-            else -> Unit
+        val target = when (status) {
+            TvSearchStatus.Ready -> if (state.results.items.isNotEmpty()) resultRequester else null
+            TvSearchStatus.Failed, is TvSearchStatus.Empty -> retryRequester
+            else -> null
         }
+        if (target != null && fieldFocused) {
+            // The keyboard closing after an IME submit can hand focus back to the field: confirm it left.
+            for (attempt in 0 until FOLLOW_ATTEMPTS) {
+                target.requestWhenReady()
+                delay(FOLLOW_SETTLE_MS)
+                if (resultsFocused || !fieldFocused) break
+            }
+        }
+        awaitingResults = false
     }
     BackHandler(enabled = editing && state.query.isNotBlank()) {
         editing = false
@@ -218,8 +229,10 @@ fun TvSearchScreen(
                 awaitingResults = true
                 onRetry()
             }
-            ResultsPane(state, onSelectType, onSelectDate, onOpen, onOpenChannel, onLoadMore, onRetryMore, retry,
-                onVisibleVideos, focusMemory, resultRequester, retryRequester)
+            Box(Modifier.onFocusChanged { resultsFocused = it.hasFocus }) {
+                ResultsPane(state, onSelectType, onSelectDate, onOpen, onOpenChannel, onLoadMore, onRetryMore, retry,
+                    onVisibleVideos, focusMemory, resultRequester, retryRequester)
+            }
         }
     }
 }
@@ -546,3 +559,5 @@ fun typeTag(type: SearchResultType) = "tv-search-type-${type.name}"
 fun dateTag(date: SearchUploadDate) = "tv-search-date-${date.name}"
 
 private const val REFOCUS_ATTEMPTS = 4
+private const val FOLLOW_ATTEMPTS = 6
+private const val FOLLOW_SETTLE_MS = 200L

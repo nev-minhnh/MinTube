@@ -216,7 +216,8 @@ private fun TvRail(state: TvShellState) {
         Column(
             Modifier
                 .fillMaxHeight()
-                .padding(start = TvSpacing.xl, end = TvSpacing.lg, top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical)
+                .padding(start = TvSpacing.OverscanHorizontal - 12.dp, end = TvSpacing.lg, top = TvSpacing.OverscanVertical,
+                    bottom = TvSpacing.OverscanVertical)
                 .focusRestorer(state.railRequesters.getValue(state.selected))
                 .onFocusChanged { state.onRailFocus(it.hasFocus) }
                 .focusGroup()

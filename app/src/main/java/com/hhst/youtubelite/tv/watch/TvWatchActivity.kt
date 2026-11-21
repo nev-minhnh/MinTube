@@ -22,6 +22,7 @@ import com.hhst.youtubelite.App
 import com.hhst.youtubelite.core.AppNotice
 import com.hhst.youtubelite.data.media.MediaSession
 import com.hhst.youtubelite.data.media.ContentRepositories
+import com.hhst.youtubelite.data.media.PlaybackSample
 import com.hhst.youtubelite.data.media.PlaybackWatchReporting
 import com.hhst.youtubelite.data.media.toReportingVideo
 import com.hhst.youtubelite.extension.ExtensionManager
@@ -90,6 +91,7 @@ class TvWatchActivity : TvActivity() {
             watchViewModel.refreshSession()
         }
         (application as App).startMediaRuntime()
+        com.hhst.youtubelite.player.PlaybackSession.register(playerViewModel)
         playerViewModel.openVideo(videoId, if (savedInstanceState == null) intent.startSeconds() else null)
         bindWatchPage(videoId)
         lifecycleScope.launch {
@@ -221,6 +223,14 @@ class TvWatchActivity : TvActivity() {
             }
         }
         val reporting = org.koin.java.KoinJavaComponent.getKoin().get<PlaybackWatchReporting>()
+        // As the phone PlaybackActivity does: the reporting loop samples this playback, which records
+        // watch progress (signed in) and the on-device history (signed out).
+        val reportingPlayer = playerViewModel
+        reporting.attach {
+            val state = reportingPlayer.uiState.value
+            PlaybackSample(state.videoId, reportingPlayer.positionState.value, state.durationMs, state.isPlaying,
+                state.discontinuityEpoch)
+        }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 watchViewModel.uiState.map { (it.content as? WatchContent.Ready)?.page?.video }
