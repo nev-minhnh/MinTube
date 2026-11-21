@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -185,7 +186,7 @@ fun TvShell(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(start = TvSizes.RailCollapsed)
+                    .padding(start = TvSizes.RailFootprint)
                     .focusRequester(state.contentRequester)
                     .focusRestorer()
                     .onFocusChanged { state.contentFocused = it.hasFocus }
@@ -207,17 +208,20 @@ private fun TvRail(state: TvShellState) {
     Box(
         Modifier
             .fillMaxHeight()
-            .width(width)
+            .width(TvSizes.RailInset + width + if (expanded) TvSpacing.xxl else 0.dp)
             .background(
-                if (expanded) Brush.horizontalGradient(listOf(TvColors.Panel, TvColors.Panel.copy(alpha = 0.96f), Color.Transparent))
+                if (expanded) Brush.horizontalGradient(0.75f to TvColors.Panel, 0.9f to TvColors.Panel.copy(alpha = 0.96f),
+                    1f to Color.Transparent)
                 else Brush.horizontalGradient(listOf(TvColors.Background, TvColors.Background)),
-            ),
+            )
+            .testTag(TAG_RAIL_PANEL),
     ) {
         Column(
             Modifier
                 .fillMaxHeight()
-                .padding(start = TvSpacing.OverscanHorizontal - 12.dp, end = TvSpacing.lg, top = TvSpacing.OverscanVertical,
-                    bottom = TvSpacing.OverscanVertical)
+                .padding(start = TvSizes.RailInset, top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical)
+                .width(width)
+                .padding(horizontal = RailPillInset)
                 .focusRestorer(state.railRequesters.getValue(state.selected))
                 .onFocusChanged { state.onRailFocus(it.hasFocus) }
                 .focusGroup()
@@ -228,59 +232,64 @@ private fun TvRail(state: TvShellState) {
         ) {
             TvDestination.entries.forEach { destination ->
                 TvRailItem(
-                    destination = destination,
+                    label = stringResource(destination.label),
+                    icon = destination.icon,
                     selected = destination == state.selected,
                     expanded = expanded,
                     onClick = { state.select(destination) },
-                    modifier = Modifier.focusRequester(state.railRequesters.getValue(destination)),
+                    modifier = Modifier.focusRequester(state.railRequesters.getValue(destination)).testTag(railItemTag(destination)),
                 )
             }
         }
     }
 }
 
+/** One rail entry: a 48 dp focus pill around a 24 dp icon; the label shows while the rail is expanded. */
 @Composable
 private fun TvRailItem(
-    destination: TvDestination,
+    label: String,
+    icon: AppIcon,
     selected: Boolean,
     expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selectable: Boolean = true,
 ) {
-    val label = stringResource(destination.label)
     Surface(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .height(TvSizes.RailItemHeight)
             .semantics {
-                this.selected = selected
+                if (selectable) this.selected = selected
                 contentDescription = label
-            }
-            .testTag(railItemTag(destination)),
+            },
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(TvSizes.RailItemHeight / 2)),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
+            containerColor = if (selected && expanded) TvColors.Surface else Color.Transparent,
             contentColor = if (selected) TvColors.Accent else TvColors.Secondary,
             focusedContainerColor = TvColors.Accent,
             focusedContentColor = TvColors.OnAccent,
             pressedContainerColor = TvColors.Accent,
             pressedContentColor = TvColors.OnAccent,
         ),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
+        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.04f),
     ) {
         val color = LocalContentColor.current
-        Row(Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(24.dp)) {
-                AppIcon(destination.icon, Modifier.size(24.dp), color = color)
+        Row(
+            Modifier.fillMaxSize().padding(horizontal = (TvSizes.RailItemHeight - TvSizes.RailIcon) / 2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(TvSizes.RailIcon)) {
+                AppIcon(icon, Modifier.size(TvSizes.RailIcon), color = color)
                 if (selected && !expanded) {
-                    Box(Modifier.align(Alignment.BottomCenter).padding(top = 2.dp).size(4.dp)
+                    Box(Modifier.align(Alignment.BottomCenter).offset(y = 6.dp).size(width = 12.dp, height = 3.dp)
                         .clip(RoundedCornerShape(2.dp)).background(TvColors.Accent))
                 }
             }
             AnimatedVisibility(expanded, enter = fadeIn(), exit = fadeOut()) {
                 Row {
-                    Spacer(Modifier.width(TvSpacing.lg))
+                    Spacer(Modifier.width(TvSpacing.md))
                     Text(label, style = TvType.BodyStrong, color = color, maxLines = 1)
                 }
             }
@@ -288,10 +297,13 @@ private fun TvRailItem(
     }
 }
 
+/** Collapsed pills are 48 dp inside the 60 dp column. */
+private val RailPillInset = (TvSizes.RailCollapsed - TvSizes.RailItemHeight) / 2
 private const val USER_FOCUS_WINDOW_MS = 600L
 private const val CONTENT_FOCUS_ATTEMPTS = 100
 private const val CONTENT_FOCUS_RETRY_MS = 120L
 
 const val TAG_RAIL = "tv-rail"
+const val TAG_RAIL_PANEL = "tv-rail-panel"
 const val TAG_CONTENT = "tv-shell-content"
 fun railItemTag(destination: TvDestination) = "tv-rail-${destination.name}"

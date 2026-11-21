@@ -16,6 +16,7 @@ import com.hhst.youtubelite.tv.search.TAG_FIELD
 import com.hhst.youtubelite.tv.search.TAG_RETRY
 import com.hhst.youtubelite.tv.search.TAG_SKELETON
 import com.hhst.youtubelite.tv.search.TAG_START
+import com.hhst.youtubelite.tv.search.TAG_CLEAR
 import com.hhst.youtubelite.tv.search.TAG_VOICE
 import com.hhst.youtubelite.tv.search.TvSearchItem
 import com.hhst.youtubelite.tv.search.TvSearchResults
@@ -28,6 +29,9 @@ import com.hhst.youtubelite.tv.search.resultTag
 import com.hhst.youtubelite.tv.search.typeTag
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -93,6 +97,21 @@ class TvSearchAndroidTest {
         compose.awaitFocus(TAG_VOICE)
         compose.press(Key.DirectionCenter)
         assertEquals(1, voice)
+    }
+
+    @Test fun theSearchBarIsCompactWithIconButtonsAndClearEmptiesTheField() {
+        host(TvSearchUiState(voiceAvailable = true, draft = "cats"))
+        compose.awaitFocus(TAG_FIELD)
+        assertEquals(48f, compose.onNodeWithTag(TAG_FIELD).getUnclippedBoundsInRoot().height.value, 1f)
+        assertEquals(44f, compose.onNodeWithTag(TAG_VOICE).getUnclippedBoundsInRoot().width.value, 1f)
+        compose.press(Key.DirectionRight)
+        compose.awaitFocus(TAG_CLEAR)
+        compose.press(Key.DirectionCenter)
+        assertEquals("", state.draft)
+        compose.onNodeWithTag(TAG_CLEAR).assertDoesNotExist()
+        compose.awaitFocus(TAG_FIELD)
+        compose.press(Key.DirectionRight)
+        compose.awaitFocus(TAG_VOICE)
     }
 
     @Test fun noVoiceButtonWhenNothingResolves() {

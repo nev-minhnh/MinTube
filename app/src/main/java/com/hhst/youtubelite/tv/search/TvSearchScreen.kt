@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -72,9 +71,9 @@ import androidx.tv.material3.Text
 import com.hhst.youtubelite.R
 import com.hhst.youtubelite.search.domain.SearchResultType
 import com.hhst.youtubelite.search.domain.SearchUploadDate
-import com.hhst.youtubelite.tv.design.TvButton
 import com.hhst.youtubelite.tv.design.TvCard
 import com.hhst.youtubelite.tv.design.TvChip
+import com.hhst.youtubelite.tv.design.TvIconButton
 import com.hhst.youtubelite.tv.design.TvColors
 import com.hhst.youtubelite.tv.design.TvFocusMemory
 import com.hhst.youtubelite.tv.design.TvRowHeader
@@ -198,10 +197,12 @@ fun TvSearchScreen(
             .onFocusChanged { screenFocused = it.hasFocus }
             .focusRestorer(fieldRequester)
             .focusGroup()
-            .padding(start = TvSpacing.xl, top = TvSpacing.OverscanVertical, end = TvSpacing.OverscanHorizontal)
+            .padding(start = TvSpacing.ContentStart, top = TvSpacing.OverscanVertical, end = TvSpacing.OverscanHorizontal)
             .testTag(TAG_SEARCH),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TvSpacing.lg)) {
+        // Compact bar: a single-line 48 dp field, then round icon buttons (clear, voice).
+        Row(Modifier.widthIn(max = SearchBarMaxWidth), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
             TvSearchField(
                 value = state.draft,
                 onValueChange = { text ->
@@ -215,11 +216,18 @@ fun TvSearchScreen(
                 },
                 modifier = Modifier.weight(1f).focusRequester(fieldRequester).onFocusChanged { fieldFocused = it.isFocused },
             )
+            if (state.draft.isNotEmpty()) {
+                TvIconButton(AppIcon.Close, stringResource(R.string.a11y_clear_search), {
+                    editing = true
+                    onDraftChange("")
+                    runCatching { fieldRequester.requestFocus() }
+                }, Modifier.testTag(TAG_CLEAR))
+            }
             if (state.voiceAvailable) {
-                TvButton(stringResource(R.string.tv_search_voice), onVoice, Modifier.testTag(TAG_VOICE), icon = AppIcon.Voice)
+                TvIconButton(AppIcon.Voice, stringResource(R.string.tv_search_voice), onVoice, Modifier.testTag(TAG_VOICE))
             }
         }
-        Spacer(Modifier.height(TvSpacing.xl))
+        Spacer(Modifier.height(TvSpacing.lg))
         if (suggesting) {
             SuggestionPane(state, ::submit, onRemoveRecent, fieldRequester)
         } else {
@@ -291,14 +299,14 @@ private fun TvSearchField(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 52.dp)
+                    .height(TvSizes.FieldHeight)
                     .background(if (focused) TvColors.Surface else TvColors.Panel, CircleShape)
-                    .border(BorderStroke(if (focused) 3.dp else 1.dp, if (focused) TvColors.Accent else TvColors.Ghost), CircleShape)
-                    .padding(horizontal = TvSpacing.xl, vertical = TvSpacing.md),
+                    .border(BorderStroke(if (focused) 2.dp else 1.dp, if (focused) TvColors.Accent else TvColors.Ghost), CircleShape)
+                    .padding(horizontal = TvSpacing.lg),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(TvSpacing.md),
             ) {
-                com.hhst.youtubelite.ui.design.AppIcon(AppIcon.Search, Modifier.size(24.dp),
+                com.hhst.youtubelite.ui.design.AppIcon(AppIcon.Search, Modifier.size(20.dp),
                     color = if (focused) TvColors.Accent else TvColors.Secondary)
                 Box(Modifier.weight(1f)) {
                     if (value.isEmpty()) Text(hint, style = TvType.Body, color = TvColors.Secondary, maxLines = 1)
@@ -541,10 +549,12 @@ private fun ResultsGrid(
 }
 
 private const val RESULTS = "results"
+private val SearchBarMaxWidth = 760.dp
 
 const val TAG_SEARCH = "tv-search"
 const val TAG_FIELD = "tv-search-field"
 const val TAG_VOICE = "tv-search-voice"
+const val TAG_CLEAR = "tv-search-clear"
 const val TAG_START = "tv-search-start"
 const val TAG_SUGGESTIONS = "tv-search-suggestions"
 const val TAG_FILTERS = "tv-search-filters"

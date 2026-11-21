@@ -173,7 +173,7 @@ private fun ShelfRow(
     }
 }
 
-private val ShelfStart = TvSpacing.xl
+private val ShelfStart = TvSpacing.ContentStart
 
 const val TAG_SHELVES = "tv-shelves"
 fun shelfTag(key: String) = "tv-shelf-$key"

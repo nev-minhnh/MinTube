@@ -65,7 +65,7 @@ import com.hhst.youtubelite.ui.design.AppIcon
 import kotlinx.coroutines.delay
 
 /** Start inset of row content inside the shell's content area. */
-private val RowStart = TvSpacing.xl
+private val RowStart = TvSpacing.ContentStart
 
 /**
  * TV Home: one row per Home section. State-hoisted; [TvHomeController] wires the ViewModels.

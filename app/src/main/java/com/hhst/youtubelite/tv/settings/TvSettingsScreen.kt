@@ -122,7 +122,7 @@ fun TvSettingsScreen(
             modifier = Modifier.fillMaxSize().let { base ->
                 if (first != null) base.tvFocusRestorer(requesters.of(first)) else base
             }.testTag(TAG_SETTINGS_LIST),
-            contentPadding = PaddingValues(start = TvSpacing.xxl, end = TvSpacing.OverscanHorizontal,
+            contentPadding = PaddingValues(start = TvSpacing.ContentStart, end = TvSpacing.OverscanHorizontal,
                 top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical + 48.dp),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         ) {

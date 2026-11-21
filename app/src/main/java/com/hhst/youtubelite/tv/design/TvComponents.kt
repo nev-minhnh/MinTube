@@ -198,6 +198,36 @@ fun TvButton(
     }
 }
 
+/** Icon-only round button ([size] dp, 22 dp icon) for compact bars; [label] is its spoken name. */
+@Composable
+fun TvIconButton(
+    icon: AppIcon,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = TvSizes.IconButton,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.size(size).semantics { contentDescription = label },
+        shape = ClickableSurfaceDefaults.shape(CircleShape),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = TvColors.Surface,
+            contentColor = TvColors.Ink,
+            focusedContainerColor = TvColors.Accent,
+            focusedContentColor = TvColors.OnAccent,
+            pressedContainerColor = TvColors.Accent,
+            pressedContentColor = TvColors.OnAccent,
+        ),
+        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.08f),
+        glow = ClickableSurfaceDefaults.glow(focusedGlow = Glow(TvColors.Accent.copy(alpha = 0.45f), 8.dp)),
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            AppIcon(icon, Modifier.size(22.dp), color = androidx.tv.material3.LocalContentColor.current)
+        }
+    }
+}
+
 /** Filter or option chip. [selected] marks the current value; focus fills it with the accent. */
 @Composable
 fun TvChip(

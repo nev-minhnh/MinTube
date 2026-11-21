@@ -252,7 +252,7 @@ private fun ChannelStrip(
 }
 
 /** Matches Home's row inset inside the shell content. */
-private val Start = TvSpacing.xl
+private val Start = TvSpacing.ContentStart
 private const val ROW_CHANNELS = "channels"
 private const val ROW_FEED = "feed"
 private const val ITEM_CHANNELS = 1
