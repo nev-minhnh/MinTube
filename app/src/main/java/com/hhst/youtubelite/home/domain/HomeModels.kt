@@ -146,6 +146,11 @@ data class HomeUiState(
     val sessionGeneration: Long? = null,
     /** Set when the feed read came back as a `/sorry` traffic challenge; existing content stays visible. */
     val verification: com.hhst.youtubelite.core.VerificationRequired? = null,
+    /**
+     * Counts successful user-requested feed replacements (pull, retry, filter or identity change).
+     * The feed returns to the top only when this moves; returning to the screen keeps its position.
+     */
+    val completedUserRefreshes: Int = 0,
 ) {
     val suggestions: List<String> get() = if (query.isBlank()) emptyList() else listOf(
         query.trim(), "${query.trim()} documentary", "${query.trim()} music", "${query.trim()} live",

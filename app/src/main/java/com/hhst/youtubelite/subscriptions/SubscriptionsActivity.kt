@@ -244,10 +244,9 @@ class SubscriptionsActivity : com.hhst.youtubelite.ui.ContentActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Only an identity change reloads on return; the channel strip refreshes with a pull
+        // or when the channel list is opened.
         syncSession()
-        if (!com.hhst.youtubelite.data.media.ContentRepositories.fixtures(intent)) {
-            subscriptionsViewModel.onForeground()
-        }
     }
 
     private fun syncSession() {

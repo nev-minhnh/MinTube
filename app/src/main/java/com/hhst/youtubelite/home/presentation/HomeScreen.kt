@@ -138,13 +138,17 @@ fun HomeScreen(state: HomeUiState, onAction: (HomeAction) -> Unit, modifier: Mod
             var chromeHidden by rememberSaveable { mutableStateOf(false) }
             var displayedFilter by rememberSaveable { mutableStateOf(state.selectedChip) }
             var displayedSession by rememberSaveable { mutableStateOf(state.sessionGeneration) }
-            LaunchedEffect(state.selectedChip, state.sessionGeneration) {
-                if (displayedFilter != state.selectedChip || displayedSession != null && displayedSession != state.sessionGeneration) {
+            // Not saveable: a recreated screen adopts the current count instead of jumping to the top.
+            var displayedRefreshes by remember { mutableIntStateOf(state.completedUserRefreshes) }
+            LaunchedEffect(state.selectedChip, state.sessionGeneration, state.completedUserRefreshes) {
+                if (displayedFilter != state.selectedChip || displayedSession != null && displayedSession != state.sessionGeneration ||
+                    displayedRefreshes != state.completedUserRefreshes) {
                     grid.scrollToItem(0)
                     chromeHidden = false
                 }
                 displayedFilter = state.selectedChip
                 displayedSession = state.sessionGeneration
+                displayedRefreshes = state.completedUserRefreshes
             }
             val feed = state.content as? HomeContent.Feed
             val chromeOffset by animateFloatAsState(if (chromeHidden && feed != null) 1f else 0f,
