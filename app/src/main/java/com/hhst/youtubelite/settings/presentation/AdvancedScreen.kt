@@ -100,12 +100,11 @@ private fun HapticsRow(haptics: HapticsSettings) {
     }
 }
 
+// Brightness and volume swipes work only in fullscreen (owner decision), so the windowed list omits them.
 private val WINDOWED_GESTURE_ROWS = listOf(
     PreferenceKeys.GESTURE_TAP_WINDOWED to R.string.gesture_single_tap,
     PreferenceKeys.GESTURE_DOUBLE_TAP_WINDOWED to R.string.gesture_double_tap,
     PreferenceKeys.GESTURE_LONG_PRESS_WINDOWED to R.string.gesture_long_press_speed,
-    PreferenceKeys.GESTURE_BRIGHTNESS_WINDOWED to R.string.brightness,
-    PreferenceKeys.GESTURE_VOLUME_WINDOWED to R.string.volume,
     PreferenceKeys.GESTURE_SEEK_WINDOWED to R.string.gesture_seek,
     PreferenceKeys.GESTURE_FULLSCREEN_WINDOWED to R.string.gesture_fullscreen_swipe,
 )
