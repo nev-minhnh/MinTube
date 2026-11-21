@@ -39,7 +39,10 @@ class BottomSheetDragAndroidTest {
         val header = compose.onNodeWithTag("channel-about-drag-header")
         val panel = compose.onNodeWithTag("channel-about-panel")
         val top = panel.fetchSemanticsNode().boundsInRoot.top
-        header.performTouchInput { down(Offset(180f, 24f)); moveBy(Offset(0f, 36f), 300) }
+        // The drag starts only past the platform touch slop (device pixels, unaffected by the
+        // Density(1f) override) and GestureResistance keeps a 12dp dead zone after it. Travel
+        // 40px beyond the slop: a visible offset (~13px), still short of any dismissal commit.
+        header.performTouchInput { down(Offset(180f, 24f)); moveBy(Offset(0f, viewConfiguration.touchSlop + 40f), 300) }
         assertTrue(panel.fetchSemanticsNode().boundsInRoot.top > top + 8f)
         header.performTouchInput { up() }
         compose.waitForIdle()

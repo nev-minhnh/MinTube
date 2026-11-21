@@ -33,7 +33,9 @@ class HlsStartupAndroidTest {
         val parameters = TrackSelectionParameters.Builder().setMaxVideoSize(1280, 720).build()
         val pick = PlaybackStartup.selectFormat(formats, 20_000_000, parameters, ::support)!!
         assertEquals(MimeTypes.VIDEO_VP9, pick.sampleMimeType)
-        assertEquals(480, pick.height)
+        // 20 Mb/s affords every rung, so the 1280x720 cap decides: the top VP9 rung, not
+        // the AVC group's larger 1080p. Capabilities come from ::support, not the device.
+        assertEquals(720, pick.height)
         val variants = formats.map { HlsMultivariantPlaylist.Variant(Uri.parse("https://example.com/${it.id}.m3u8"),
             it, null, null, null, null, null, null) }
         val master = HlsMultivariantPlaylist("https://example.com/master.m3u8", emptyList(), variants,

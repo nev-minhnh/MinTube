@@ -2,6 +2,14 @@ package com.hhst.youtubelite.home
 
 import com.hhst.youtubelite.ui.TestWindowBox
 import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.Choreographer
+import android.view.PixelCopy
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
@@ -30,6 +38,10 @@ import com.hhst.youtubelite.ui.theme.AppAppearance
 import com.hhst.youtubelite.ui.theme.AppTheme
 import com.hhst.youtubelite.ui.theme.ThemeMode
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
@@ -69,11 +81,19 @@ class HomeRefreshEvidenceAndroidTest {
         }
         compose.onNodeWithTag("home-refresh-indicator").assertExists()
         save("home-refresh-user-$suffix", output)
+        // A pull during a refresh is rejected, so the feed's edge stretch takes it, and a
+        // finger holding that stretch redraws every frame: the window never idles until
+        // release. Capture and release this one state without waiting for idle; node
+        // lookups, compose.activity and performTouchInput all wait for idle first.
+        val screen = compose.onNodeWithTag("home-screen").fetchSemanticsNode().boundsInWindow
+        val feedBounds = compose.onNodeWithTag("home-feed").fetchSemanticsNode().boundsInRoot
+        val window = compose.activity.window
+        val root = (compose.activity.findViewById<ViewGroup>(android.R.id.content).getChildAt(0) as ViewGroup).getChildAt(0)
         compose.onNodeWithTag("home-feed").performTouchInput {
             down(Offset(center.x, 200f)); moveBy(Offset(0f, 300f))
         }
-        save("home-pull-held-$suffix", output)
-        compose.onNodeWithTag("home-feed").performTouchInput { up() }
+        saveHeld("home-pull-held-$suffix", output, screen, window)
+        releaseHeld(root, Offset(feedBounds.center.x, feedBounds.top + 500f))
         compose.runOnIdle { state = HomeUiState(content = HomeContent.Empty(refreshing = true, userRefresh = true)) }
         compose.onNodeWithTag("home-refresh-indicator").assertExists()
         save("home-empty-refresh-user-$suffix", output)
@@ -95,6 +115,40 @@ class HomeRefreshEvidenceAndroidTest {
         compose.waitForIdle()
         val bitmap = compose.onNodeWithTag("about-busy").captureToImage().asAndroidBitmap()
         File(output(), "about-busy-$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    private fun saveHeld(name: String, output: File, bounds: androidx.compose.ui.geometry.Rect, window: android.view.Window) {
+        val main = Handler(Looper.getMainLooper())
+        val drawn = CountDownLatch(1)
+        // Two frames: the first draws the injected move, the second presents it. Posted
+        // directly: runOnUiThread/runOnMainSync would wait for the idle that never comes.
+        main.post {
+            Choreographer.getInstance().postFrameCallback {
+                Choreographer.getInstance().postFrameCallback { drawn.countDown() }
+            }
+        }
+        assertTrue(drawn.await(5, TimeUnit.SECONDS))
+        val bitmap = Bitmap.createBitmap(bounds.width.toInt(), bounds.height.toInt(), Bitmap.Config.ARGB_8888)
+        val copied = CountDownLatch(1)
+        var result = -1
+        PixelCopy.request(window, android.graphics.Rect(bounds.left.toInt(), bounds.top.toInt(),
+            bounds.right.toInt(), bounds.bottom.toInt()), bitmap, { result = it; copied.countDown() }, main)
+        assertTrue(copied.await(5, TimeUnit.SECONDS))
+        assertEquals(PixelCopy.SUCCESS, result)
+        File(output, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    /** Lifts pointer 0 on the compose root view, where the test's down was dispatched. */
+    private fun releaseHeld(root: View, at: Offset) {
+        val lifted = CountDownLatch(1)
+        Handler(Looper.getMainLooper()).post {
+            val now = SystemClock.uptimeMillis()
+            val up = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, at.x, at.y, 0)
+            root.dispatchTouchEvent(up)
+            up.recycle()
+            lifted.countDown()
+        }
+        assertTrue(lifted.await(5, TimeUnit.SECONDS))
     }
 
     private fun save(name: String, output: File) {
