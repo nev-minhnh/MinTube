@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:08" hostname="MINHNH-LAPTOP" time="0.346">
+  <properties/>
+  <testcase name="incompletePublish_isReconciledWithoutDuplicate" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.031"/>
+  <testcase name="publishWriteVerifyComplete_thenOpenableUri" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.028"/>
+  <testcase name="completedRenameIsRecoveredAfterBackendRestartWithoutAnotherCopy" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.018"/>
+  <testcase name="renameFailureKeepsPendingInsteadOfCopyingOverTheDestination" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.009"/>
+  <testcase name="unsupportedAuthoritiesRootsAndTraversalCannotAccessLocalFiles" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.005"/>
+  <testcase name="completionCollisionPreservesExistingFinalAndPendingSource" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.007"/>
+  <testcase name="anAlreadyPublishedTargetDoesNotRequireSpaceForAnotherCopy" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.028"/>
+  <testcase name="encodedFileProviderUriAndLegacyRawUriResolveTheSameFileAfterRestart" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.015"/>
+  <testcase name="sameNamePublishesKeepBothFilesWhileFirstCompletionIsDelayed" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.062"/>
+  <testcase name="aVerifiedPendingTargetCanBeCompletedWhenStorageIsFull" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.022"/>
+  <testcase name="incompleteRecoveryDoesNotDeleteAnUnrelatedCompletedFile" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.023"/>
+  <testcase name="collisionRetryRegistersAnotherNameAndPreservesTheExistingFile" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.043"/>
+  <testcase name="recordAndFiles_deletesPublishedFile" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.02"/>
+  <testcase name="interruptBeforeComplete_retryUsesSameName" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.023"/>
+  <testcase name="enospc_isReported" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.005"/>
+  <testcase name="deleteFailure_isRetryableWithReason" classname="com.hhst.youtubelite.downloader.io.DownloadPublisherImplTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.ui.design.WindowClassTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:20" hostname="MINHNH-LAPTOP" time="0.001">
+  <properties/>
+  <testcase name="feedGridGrowsWithTheWindow" classname="com.hhst.youtubelite.ui.design.WindowClassTest" time="0.001"/>
+  <testcase name="breakpointsAre600And840" classname="com.hhst.youtubelite.ui.design.WindowClassTest" time="0.0"/>
+  <testcase name="tabletPortraitFitsThreeFeedColumns" classname="com.hhst.youtubelite.ui.design.WindowClassTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

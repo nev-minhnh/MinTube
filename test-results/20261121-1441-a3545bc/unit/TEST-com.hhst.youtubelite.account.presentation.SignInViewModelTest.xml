@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.account.presentation.SignInViewModelTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:46:42" hostname="MINHNH-LAPTOP" time="0.167">
+  <properties/>
+  <testcase name="aDeclinedSignInIsReported" classname="com.hhst.youtubelite.account.presentation.SignInViewModelTest" time="0.127"/>
+  <testcase name="theReadyStateExposesTheUserCodeWhilePolling" classname="com.hhst.youtubelite.account.presentation.SignInViewModelTest" time="0.013"/>
+  <testcase name="aTransportFailureMentionsTheConnection" classname="com.hhst.youtubelite.account.presentation.SignInViewModelTest" time="0.005"/>
+  <testcase name="codePollAndCommitReachSuccess" classname="com.hhst.youtubelite.account.presentation.SignInViewModelTest" time="0.011"/>
+  <testcase name="anExpiredCodeExplainsItselfAndRetries" classname="com.hhst.youtubelite.account.presentation.SignInViewModelTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

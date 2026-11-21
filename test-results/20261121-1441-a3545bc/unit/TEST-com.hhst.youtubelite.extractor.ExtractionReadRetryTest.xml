@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:13" hostname="MINHNH-LAPTOP" time="0.023">
+  <properties/>
+  <testcase name="nestedPhasesShareOneRetryAllowance" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.006"/>
+  <testcase name="transientReadFailureRecoversBeforePublishingTheResult" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <testcase name="anExpiredBudgetCannotStartAnotherAttempt" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.0"/>
+  <testcase name="insufficientRemainingBudgetKeepsTheOriginalFailure" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <testcase name="sessionChangeAbortsWithoutReplayingTheCapturedRequest" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.0"/>
+  <testcase name="httpDenialsAreReturnedToTheExistingClientRecovery" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <testcase name="recoveryKeepsTheCapturedSessionAndCapsItsNetworkDeadline" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <testcase name="mutationsAndTokenMintingAreNeverReplayed" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.0"/>
+  <testcase name="aPersistentFailureGetsOnlyOneExtraNetworkAttempt" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <testcase name="wrappedTlsEofCanRecover" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.0"/>
+  <testcase name="aRealSocketDisconnectRecoversOnTheNextHttpCall" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.011"/>
+  <testcase name="policyErrorsCancellationAndCertificateFailuresAreNotRetried" classname="com.hhst.youtubelite.extractor.ExtractionReadRetryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

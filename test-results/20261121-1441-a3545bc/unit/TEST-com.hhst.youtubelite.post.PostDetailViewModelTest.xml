@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.post.PostDetailViewModelTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:17" hostname="MINHNH-LAPTOP" time="0.053">
+  <properties/>
+  <testcase name="missingPostAuthorizationRequestsSignInWithoutChangingTheRating" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.012"/>
+  <testcase name="loadsTheRequestedPostIdentity" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.002"/>
+  <testcase name="ratingRequestsCaptureTheDisplayedPreviousAndDesiredState" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.003"/>
+  <testcase name="aPostLinkResolvesItsAuthorBeforeNavigationAndKeepsThatIdentityOnRetry" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.006"/>
+  <testcase name="navigationSessionSurvivesContentLoadingAndSignOut" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.004"/>
+  <testcase name="authorizationRefreshKeepsContentAndWaitsBeforeWriting" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.004"/>
+  <testcase name="failedRefreshKeepsContentAndBlocksWritesUntilAnExplicitRetrySucceeds" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.004"/>
+  <testcase name="missingPostShowsFailureAndKeepsIdentity" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.003"/>
+  <testcase name="failedPostRetriesWithoutChangingIdentity" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.002"/>
+  <testcase name="bottomNavigationEmitsTheRequestedDestination" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.002"/>
+  <testcase name="productionRatingWaitsForConfirmationAndRejectsDuplicateTaps" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.003"/>
+  <testcase name="feedbackCommentsAndMenuActionsCarryThePostIdentity" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.005"/>
+  <testcase name="localImageSelectionIsSavedWithThePost" classname="com.hhst.youtubelite.post.PostDetailViewModelTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

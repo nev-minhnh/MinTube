@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:12" hostname="MINHNH-LAPTOP" time="0.009">
+  <properties/>
+  <testcase name="live_distinctReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="userHigherQuality_canExceed1080" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="explicitCaptionKindDoesNotFallBackAndAudioHintKeepsTrackIdentity" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <testcase name="sameQuality_prefersAvc" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <testcase name="batchQualityCap_appliedPerItem" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="gatedHevc_unavailableWithReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="attachmentsOnly_skipsMediaAndKeepsSidecars" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="unsupportedOriginalDoesNotSelectADub" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <testcase name="premiereUnstarted_distinctReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="defaultAudio_usesExplicitDefaultWhenNoOriginal" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="defaultAudio_prefersOriginal" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="audioOnly_usesAacM4a" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="defaultQuality_highestNotExceeding1080" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.002"/>
+  <testcase name="audioBitrateKeepsLanguageAndRejectsAnUnavailableQuality" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="gatedOpusAudio_unavailableWithReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="thumbnailKeepsExtension" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <testcase name="noFileStreams_distinctReason" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="specifiedAudioLanguage_doesNotSilentFallback" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="retry_keepsExplicitQualityAndAudio" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <testcase name="specifiedSubtitleLanguage_doesNotSilentFallback" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="defaultAudio_ambiguousRequiresChoice" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="subtitleKeepsRealExtension" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.0"/>
+  <testcase name="itagHint_usedWhenPresent_failsWhenMissing" classname="com.hhst.youtubelite.downloader.resolve.DownloadSelectorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

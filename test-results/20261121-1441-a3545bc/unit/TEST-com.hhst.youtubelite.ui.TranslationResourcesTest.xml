@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.ui.TranslationResourcesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:18" hostname="MINHNH-LAPTOP" time="2.154">
+  <properties/>
+  <testcase name="everyExistingLocaleContainsTheCompleteMessageCatalog" classname="com.hhst.youtubelite.ui.TranslationResourcesTest" time="0.862"/>
+  <testcase name="translatedFormatArgumentsMatchAndRenderInTheirLocale" classname="com.hhst.youtubelite.ui.TranslationResourcesTest" time="1.292"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

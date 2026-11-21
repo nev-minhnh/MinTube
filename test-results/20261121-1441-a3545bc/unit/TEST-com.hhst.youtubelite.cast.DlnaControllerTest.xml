@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.cast.DlnaControllerTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:46:43" hostname="MINHNH-LAPTOP" time="0.271">
+  <properties/>
+  <testcase name="a local network change ends the session with a report" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.081"/>
+  <testcase name="endSession clears selection and state without callbacks" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.007"/>
+  <testcase name="startup stopped status waits for an actual playback sample" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.01"/>
+  <testcase name="readiness timeout reports its stage and never issues seek or pause" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.019"/>
+  <testcase name="normal startup confirms readiness and tolerates missing position metadata" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.018"/>
+  <testcase name="quality reload fences old player commands before waiting for the transport" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.013"/>
+  <testcase name="stop during a pending load cannot reopen the session" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.015"/>
+  <testcase name="quality reload restores paused playback after loading and seeking" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.008"/>
+  <testcase name="own stop does not echo the session end" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.007"/>
+  <testcase name="same-session recast reuses the live player instead of building a new one" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.008"/>
+  <testcase name="renderer-initiated stop echoes the session end once" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.007"/>
+  <testcase name="startup buffering without playback eventually fails" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.015"/>
+  <testcase name="renderer rejection keeps the session closed" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.01"/>
+  <testcase name="slow load readiness seek and pause have independent deadlines" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.006"/>
+  <testcase name="startCasting without a selected device is refused" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.007"/>
+  <testcase name="renderer error echoes a session failure" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.01"/>
+  <testcase name="a stopped sample at the media tail does not disconnect repeat playback" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.006"/>
+  <testcase name="startCasting pushes the muxed url to the prefixed device route" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.004"/>
+  <testcase name="cast failure retains the device stage and response code until dismissed" classname="com.hhst.youtubelite.cast.DlnaControllerTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

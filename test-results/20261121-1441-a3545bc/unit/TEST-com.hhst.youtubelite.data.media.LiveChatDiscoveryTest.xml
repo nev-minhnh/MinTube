@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:07" hostname="MINHNH-LAPTOP" time="0.03">
+  <properties/>
+  <testcase name="signedInLiveChatIsDiscoveredWithoutReplacingAccountMetadata" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.007"/>
+  <testcase name="archivedStreamsDoNotStartLiveChatDiscovery" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.004"/>
+  <testcase name="aConfirmedChatDisabledStreamDoesNotFabricateAChat" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.005"/>
+  <testcase name="guestsUseTheirExistingWebChatWithoutAnotherRead" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.003"/>
+  <testcase name="failedDiscoveryKeepsPlaybackAndCanBeRetriedFresh" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.007"/>
+  <testcase name="existingChatContinuationsDoNotCostAnotherRead" classname="com.hhst.youtubelite.data.media.LiveChatDiscoveryTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

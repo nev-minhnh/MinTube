@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.HomeFeedMappingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:06" hostname="MINHNH-LAPTOP" time="0.002">
+  <properties/>
+  <testcase name="shelvesStayInServerOrderWithInlineRails" classname="com.hhst.youtubelite.data.media.HomeFeedMappingTest" time="0.002"/>
+  <testcase name="railsWithoutShortsDoNotAppear" classname="com.hhst.youtubelite.data.media.HomeFeedMappingTest" time="0.0"/>
+  <testcase name="playlistRowsHaveNoRouteOnHomeAndStayOutInsteadOfFakingContainers" classname="com.hhst.youtubelite.data.media.HomeFeedMappingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

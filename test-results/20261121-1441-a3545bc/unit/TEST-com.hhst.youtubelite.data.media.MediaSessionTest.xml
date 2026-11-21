@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaSessionTest" tests="40" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:16" hostname="MINHNH-LAPTOP" time="0.046">
+  <properties/>
+  <testcase name="aMissingAccessTokenCannotReuseThePersistedFutureExpiry" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.007"/>
+  <testcase name="signOutWipesTheAccountStateButKeepsTheInstallCredentials" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="aRefreshCannotRestoreCredentialsAfterSignOut" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.003"/>
+  <testcase name="refreshedAccessAndExpiryArePersistedOnlyOnce" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.002"/>
+  <testcase name="aRefreshCannotPersistAcrossTheAnonymousSwitch" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.002"/>
+  <testcase name="freshContextKeepsTheCachedTokenWhileItIsValid" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="aRefreshCannotOverwriteANewerSignIn" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.002"/>
+  <testcase name="anonymousModePersistsAcrossARestartAndSwitchingBackSelectsTheAccount" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="completeSignInAnchorsTheFirstEnabledAccountWhenNoneIsSelected" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="persistedRefreshTokenRecoversAMissingAccessToken" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="freshContextWithoutASessionStaysAnonymous" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="selectAccountPersistsAndBumps" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="selectingASavedAccountExitsDeviceIdentityAndSurvivesRestart" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="aRecoveredAccessTokenCanBootstrapTheAccountList" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="unverifiedStoredPairIsRepairedOnceWithoutReplacingTheCookieIdentity" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="anonymousVisitorPersistsWithoutBecomingAnAccountAndSurvivesSignOut" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="repeatedFreshContextsDoNotReadOrWriteAnAlreadyPersistedAccessPair" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="aRefreshCannotPersistAcrossAnAccountSelection" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="freshContextRefreshesWithoutMovingTheGeneration" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="restoredSessionSurvivesAProcessRestart" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="reinitializingWithoutCredentialsPublishesTheActualAnonymousIdentity" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="aPartlyFailedAccessPairWriteIsRetriedBeforeItCanBeSkipped" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="restoredAccessPairIsVerifiedOnceEvenWhenContextsAreConcurrent" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.002"/>
+  <testcase name="signingInAlwaysEndsTheAnonymousSwitch" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="anonymousVisitorAndCookieRemainPairedAcrossIdentitySwitches" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="aNewStoreDoesNotInheritThePreviousStoresPersistenceConfirmation" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="malformedCachedAccountRowsDoNotPreventStartup" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="setAnonymousModeIsIdempotent" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="localOperationCannotCrossAnIdentityChange" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.003"/>
+  <testcase name="credentialsSurviveAProfileBootstrapWithoutAccounts" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="startsAnonymousWithoutPersistedState" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="accountFieldsSurviveTheEncodingRoundTrip" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="lateProfilesCannotRestoreASignedOutSession" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="aRefreshWithTheSameAccessTokenStillPersistsItsNewExpiry" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <testcase name="disabledAccountsStayDisabledAfterRestart" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="recoveringAMissingTokenPublishesSignedInWithoutMovingTheGeneration" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.006"/>
+  <testcase name="completeSignInPersistsAndBumpsTheGeneration" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="rotatingAnExistingTokenDoesNotPublishAnIdentityChange" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.004"/>
+  <testcase name="freshContextNeverAttachesATokenWhileAnonymousModeIsEngaged" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.001"/>
+  <testcase name="anonymousModeForcesTheWholeAppOntoTheDeviceIdentityWhileKeepingCredentials" classname="com.hhst.youtubelite.data.media.MediaSessionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

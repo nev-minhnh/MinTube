@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:43" hostname="MINHNH-LAPTOP" time="0.007">
+  <properties/>
+  <testcase name="samePlaylist_matchesListIdAcrossHosts" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.002"/>
+  <testcase name="duplicateIntent_consumedOnce" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.0"/>
+  <testcase name="videoUrl_opensSingleConfirm" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.003"/>
+  <testcase name="playlistOnlyUrl_isPlaylist" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.002"/>
+  <testcase name="watchUrlWithList_isStillSingleVideo" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.0"/>
+  <testcase name="coldStart_readsSendExtraAndViewData" classname="com.hhst.youtubelite.downloader.core.DownloadShareParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.cast.CastMessageCodecTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:46:42" hostname="MINHNH-LAPTOP" time="0.02">
+  <properties/>
+  <testcase name="unknownFieldsAreSkippedForEverySupportedWireType" classname="com.hhst.youtubelite.cast.CastMessageCodecTest" time="0.005"/>
+  <testcase name="unicodeAndBinaryPayloadsSurviveFraming" classname="com.hhst.youtubelite.cast.CastMessageCodecTest" time="0.001"/>
+  <testcase name="malformedFramesAndFieldsAreRejected" classname="com.hhst.youtubelite.cast.CastMessageCodecTest" time="0.008"/>
+  <testcase name="oversizedOutgoingMessagesDoNotWriteAPartialFrame" classname="com.hhst.youtubelite.cast.CastMessageCodecTest" time="0.004"/>
+  <testcase name="encodingMatchesTheWireFields" classname="com.hhst.youtubelite.cast.CastMessageCodecTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

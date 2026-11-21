@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.HomeDiscoveryTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:06" hostname="MINHNH-LAPTOP" time="0.044">
+  <properties/>
+  <testcase name="musicFindsChartsOnTheNextDirectoryPageAndUsesTheShelfCursor" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.006"/>
+  <testcase name="unequalSourceLengthsInterleaveAndDuplicatesAppearOnlyOnce" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.004"/>
+  <testcase name="allInterleavesOnlyPopularVideosAndPreservesSourceOrder" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.003"/>
+  <testcase name="partialFailureKeepsOtherSourcesAndRetriesOnlyTheMissingSource" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.004"/>
+  <testcase name="staleIdentityAndMalformedCursorsFailBeforeRequestsStart" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.005"/>
+  <testcase name="repeatedShelfCursorsStopAndNeverUseTheDirectoryCursor" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.004"/>
+  <testcase name="categoryFilterReadsOnlyItsOwnShelfAndRejectsAnotherFiltersCursor" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.004"/>
+  <testcase name="totalFailureAndCancellationAreNotConvertedIntoEmptySuccess" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.005"/>
+  <testcase name="allSourcesStartBeforeWaitingForAnyPeer" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.005"/>
+  <testcase name="unrelatedMusicPlaylistsAreNeverRelabeledAsCharts" classname="com.hhst.youtubelite.data.media.HomeDiscoveryTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

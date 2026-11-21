@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.core.WebViewMainGateTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:06" hostname="MINHNH-LAPTOP" time="0.009">
+  <properties/>
+  <testcase name="hoppedEval_fromIo_keepsPotokenOccupancyUntilWorkReturns" classname="com.hhst.youtubelite.core.WebViewMainGateTest" time="0.005"/>
+  <testcase name="hoppingGate_fromBackground_runsMintOnAllowedExecutor" classname="com.hhst.youtubelite.core.WebViewMainGateTest" time="0.002"/>
+  <testcase name="checkingGate_failsIfMintWorkRunsOffAllowedDispatcher" classname="com.hhst.youtubelite.core.WebViewMainGateTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

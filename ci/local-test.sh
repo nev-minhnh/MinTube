@@ -9,11 +9,14 @@
 set -uo pipefail
 
 AVD="mintube_ci"  # dedicated to this script; agents must not boot it
+PORT=5554         # explicit port so adb always targets this emulator, even if others run
 DEVICE=1
+BUILD=1
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --avd) AVD="$2"; shift 2 ;;
     --no-device) DEVICE=0; shift ;;
+    --device-only) BUILD=0; shift ;;  # reuse the APKs already in app/build/outputs (same commit)
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -33,9 +36,14 @@ run_stage() {  # name, gradle args...
   echo "$name: ${stage[$name]}"
 }
 
-run_stage unit-and-lint :app:testDebugUnitTest :app:lintDebug --continue
-run_stage builds :app:assembleDebug :app:assembleDebugAndroidTest :app:assembleRelease
-run_stage r8-builds -PandroidTestBuildType=minifiedDebug :app:assembleMinifiedDebug :app:assembleMinifiedDebugAndroidTest
+if [[ $BUILD == 1 ]]; then
+  run_stage unit-and-lint :app:testDebugUnitTest :app:lintDebug --continue
+  run_stage builds :app:assembleDebug :app:assembleDebugAndroidTest :app:assembleRelease
+  run_stage r8-builds -PandroidTestBuildType=minifiedDebug :app:assembleMinifiedDebug :app:assembleMinifiedDebugAndroidTest
+else
+  for s in unit-and-lint builds r8-builds; do stage[$s]="SKIPPED (--device-only)"; done
+  stage[builds]=PASS; stage[r8-builds]=PASS
+fi
 
 cp app/build/test-results/testDebugUnitTest/*.xml "$OUT/unit/" 2>/dev/null || true
 cp app/build/reports/lint-results-debug.txt app/build/reports/lint-results-debug.xml "$OUT/lint/" 2>/dev/null || true
@@ -58,7 +66,8 @@ lint_line=$(grep -oE "[0-9]+ errors?, [0-9]+ warnings?" "$OUT/lint/lint-results-
 device_line="skipped (--no-device)"
 if [[ $DEVICE == 1 && ${stage[builds]} == PASS && ${stage[r8-builds]} == PASS ]]; then
   echo "=== device suite on $AVD"
-  emulator -avd "$AVD" -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim > "$OUT/device/emulator.log" 2>&1 &
+  export ANDROID_SERIAL="emulator-$PORT"
+  emulator -avd "$AVD" -port "$PORT" -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim > "$OUT/device/emulator.log" 2>&1 &
   emu=$!
   adb wait-for-device
   until [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == 1 ]]; do sleep 2; done
@@ -77,7 +86,7 @@ fi
   echo "- Host: $(uname -s), $(java -version 2>&1 | head -n 1)"
   echo "- Unit tests: $unit_line"
   echo "- Lint (debug): $lint_line"
-  echo "- Stages: unit-and-lint ${stage[unit-and-lint]}, builds ${stage[builds]}, r8-builds ${stage[r8-builds]}"
+  echo "- Stages: unit-and-lint ${stage[unit-and-lint]}, builds ${stage[builds]}, r8-builds ${stage[r8-builds]}$( [[ $BUILD == 0 ]] && echo " (device-only run: build stages reused from the previous run of this commit)")"
   echo "- Offline device suite ($AVD): $device_line"
   echo "- Overall: $( [[ $status == 0 ]] && echo PASS || echo FAIL )"
 } > "$OUT/SUMMARY.md"

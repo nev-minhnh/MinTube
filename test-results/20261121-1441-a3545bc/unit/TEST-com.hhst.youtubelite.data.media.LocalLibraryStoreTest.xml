@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:07" hostname="MINHNH-LAPTOP" time="0.209">
+  <properties/>
+  <testcase name="legacyEntriesWithoutRemoveTokenStayRemovable" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.002"/>
+  <testcase name="restoreKeepsChangesTheUserMadeAfterTheRemoval" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <testcase name="localCollectionsSurviveAccountStoreChanges" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <testcase name="aFailedDeferredWriteKeepsTheDirtyRevisionForTheNextFlush" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.003"/>
+  <testcase name="historyAndCollectionsPersistIndependentlyAndRemovalDoesNotDeleteSavedVideos" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.001"/>
+  <testcase name="pauseAndClearArePersistentAndBounded" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.165"/>
+  <testcase name="aDelayedSerializationCannotWriteAnObsoleteRevision" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.003"/>
+  <testcase name="removeReturnsAnchorRecordAndRestorePutsTheEntryBackBetweenItsNeighbours" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <testcase name="corruptedDataDoesNotCrashTheLibrary" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.001"/>
+  <testcase name="corruptPayloadsKeepABoundedRecoveryCopy" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <testcase name="restoreIsANoOpWhenTheVideoIsPresentAgain" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <testcase name="burstsOfWritesCoalesceIntoASingleLatestStateFlush" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.002"/>
+  <testcase name="anInFlightHistoryWriteCannotOverwriteANewerCollectionEdit" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.011"/>
+  <testcase name="queuedHistoryCannotOverwriteAnExplicitCollectionEdit" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.001"/>
+  <testcase name="restoreFallsBackToTheRecordedIndexWhenBothNeighboursAreGone" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.001"/>
+  <testcase name="collectionLimitDoesNotCreateUnreadableStoredData" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.015"/>
+  <testcase name="explicitEditsPropagateWriteFailureWithoutChangingMemory" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.002"/>
+  <testcase name="removeOfUnknownVideoReturnsNullAndDoubleRestoreStaysIdempotent" classname="com.hhst.youtubelite.data.media.LocalLibraryStoreTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

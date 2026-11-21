@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.home.HomeViewModelTest" tests="41" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:15" hostname="MINHNH-LAPTOP" time="0.318">
+  <properties/>
+  <testcase name="guestNotInterestedStillOpensTheReasonSheetWithoutWriting" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.006"/>
+  <testcase name="signedOutHomeRowStillLooksUpItsChannelAndAvatarButExposesNoFeedback" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.014"/>
+  <testcase name="aLateMenuCannotOverwriteANewerMenuForTheSameVideo" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.012"/>
+  <testcase name="saveToPlaylistIsLocalUntilTheTargetIsChosen" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.008"/>
+  <testcase name="productionMenusOfferOnlyRowsWithARealRoute" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.0"/>
+  <testcase name="lateFilterReplyCannotReplaceNewerSelection" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.008"/>
+  <testcase name="aNewAccountInvalidatesVerificationAndItsLateResult" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.006"/>
+  <testcase name="asynchronousSnapshotPaintsWhileAutomaticLoadIsPending" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.05"/>
+  <testcase name="successfulEmptyReplyPreservesServerMessageWithoutFallback" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="ordinaryFailuresNeverReportVerification" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.005"/>
+  <testcase name="firstVisitDoesNotLoadRecommendations" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="menuEmitsExactItemAndActionWithoutWritingAnAccount" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="blankSearchDoesNotEmitNavigation" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.004"/>
+  <testcase name="confirmedFeedbackRemovesTheRow" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.01"/>
+  <testcase name="failedChoicesOfferRetryAndKeepTheSheetOpen" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.022"/>
+  <testcase name="watchLaterMenuRowWritesThroughTheRepositoryInLiveMode" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.006"/>
+  <testcase name="appendedShelvesKeepTheirIdentityAndSplitRailsMerge" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.004"/>
+  <testcase name="doubleAppendDoesNotStartDuplicateRequests" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="menuFollowsAspectRatioAndWidthBoundaries" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.004"/>
+  <testcase name="liveSaveSheetLoadsChoicesAndTogglesThroughTheServer" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.007"/>
+  <testcase name="signedInHomeLoadsFeedbackWithoutAnInlineMenuEndpoint" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.005"/>
+  <testcase name="identityChangesCloseTheMenuAndRejectLateCapabilities" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.005"/>
+  <testcase name="websiteColumnBoundariesDoNotDependOnOrientation" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.001"/>
+  <testcase name="refreshFailureIsNotPresentedAsPaginationFailure" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="aUserRefreshNeverRestartsAnInFlightRequest" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="requestFailureIsNotAnEmptyFeed" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.002"/>
+  <testcase name="menuKindsRejectActionsThatDoNotBelongToTheContent" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.006"/>
+  <testcase name="changedAccountSessionReloadsOnceEvenWhenBothSessionsAreSignedIn" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.004"/>
+  <testcase name="failedFeedbackKeepsTheRow" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.006"/>
+  <testcase name="shortsColumnsRespectTheNarrowShelfBoundary" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.001"/>
+  <testcase name="menuLoadsOnDemandAndFailureCanRetryWithoutReloadingTheFeed" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.004"/>
+  <testcase name="searchEmitsTypedRequestWithoutInventingResults" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="repeatedFeedbackClicksSendOneRequestAndStaleResultsNeverLand" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.005"/>
+  <testcase name="trafficChallengeKeepsTheFeedAndReportsVerification" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="homeRecoversMissingChannelBeforeRequestingItsAvatar" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.007"/>
+  <testcase name="newPlaylistDraftRestoresWithItsVideoIdentity" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.002"/>
+  <testcase name="queryAndOpenSearchSurviveSavedStateReconstruction" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.001"/>
+  <testcase name="failedAppendKeepsVisibleItemsAndCanRetrySameCursor" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="failedInitialRequestCanRecoverWithTheSameFilter" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <testcase name="coldStartPaintsTheCapturedSnapshotAndTheLiveLoadReplacesIt" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.067"/>
+  <testcase name="guestSaveClosesTheSheetAndRequestsSignIn" classname="com.hhst.youtubelite.home.HomeViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
