@@ -4,7 +4,8 @@ on:
   pull_request:
   push:
     branches: [master, v4]
-    tags: ['v*']
+    # v* = phone releases; tv-v* = MinTube TV releases (branch tv).
+    tags: ['v*', 'tv-v*']
   workflow_dispatch:
 
 permissions:
@@ -47,8 +48,9 @@ jobs:
 
   release:
     # Runs only for version tags, after the build job. Tests run locally (ci/local-test.sh) and their
-    # results are committed under test-results/.
-    if: startsWith(github.ref, 'refs/tags/v')
+    # results are committed under test-results/. Phone tags are v<versionName>; MinTube TV tags are
+    # tv-v<versionName> and publish MinTube-TV-v<version>.apk.
+    if: startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/tv-v')
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -79,6 +81,15 @@ jobs:
             echo "::error::Release signing secrets are missing: ${missing[*]}. Refusing to publish an unsigned or debug-signed APK."
             exit 1
           fi
+      - name: Resolve the release flavour from the tag
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          case "$tag" in
+            tv-v*) echo "EXPECTED_VERSION_TAG=${tag#tv-}"; echo "ASSET=MinTube-TV-${tag#tv-}"; echo "RELEASE_TITLE=MinTube TV ${tag#tv-}"; echo "PRODUCT=MinTube TV"; echo "LATEST=false" ;;
+            v*) echo "EXPECTED_VERSION_TAG=$tag"; echo "ASSET=MinTube-$tag"; echo "RELEASE_TITLE=MinTube $tag"; echo "PRODUCT=MinTube"; echo "LATEST=true" ;;
+            *) echo "::error::Unsupported release tag $tag (expected v<version> or tv-v<version>)."; exit 1 ;;
+          esac >> "$GITHUB_ENV"
       - name: Sign the release APK
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -95,7 +106,7 @@ jobs:
           fi
           tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
           version=$("$tools/aapt2" dump badging "$unsigned" | sed -n "s/.*versionName='\([^']*\)'.*/\1/p" | head -n 1)
-          if [[ "v$version" != "$tag" ]]; then
+          if [[ "v$version" != "$EXPECTED_VERSION_TAG" ]]; then
             echo "::error::Tag $tag does not match the APK versionName $version."
             exit 1
           fi
@@ -103,7 +114,7 @@ jobs:
           trap 'rm -f "$keystore"' EXIT
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$keystore"
           mkdir -p dist
-          apk="dist/MinTube-$tag.apk"
+          apk="dist/$ASSET.apk"
           "$tools/zipalign" -f -p 4 "$unsigned" "$RUNNER_TEMP/aligned.apk"
           "$tools/apksigner" sign --ks "$keystore" --ks-type PKCS12 --ks-key-alias "$KEY_ALIAS" \
             --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEY_PASSWORD --out "$apk" "$RUNNER_TEMP/aligned.apk"
@@ -115,8 +126,8 @@ jobs:
           fi
           grep -q 'CN=MinTube' dist/signature.txt
           rm dist/signature.txt
-          (cd dist && sha256sum "MinTube-$tag.apk" > "MinTube-$tag.apk.sha256")
-          cat "dist/MinTube-$tag.apk.sha256"
+          (cd dist && sha256sum "$ASSET.apk" > "$ASSET.apk.sha256")
+          cat "dist/$ASSET.apk.sha256"
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -126,8 +137,8 @@ jobs:
           notes="docs/release-notes/$tag.md"
           if [[ ! -f "$notes" ]]; then
             notes="$RUNNER_TEMP/notes.md"
-            printf 'MinTube %s\n\nMinTube is a fork of Litube 4.0.0 by HydeYYHH (GPL-3.0).\n' "$tag" > "$notes"
+            printf '%s %s\n\nMinTube is a fork of Litube 4.0.0 by HydeYYHH (GPL-3.0).\n' "$PRODUCT" "$tag" > "$notes"
           fi
-          printf '\n\nSHA-256: `%s`\n' "$(cut -d' ' -f1 "dist/MinTube-$tag.apk.sha256")" >> "$notes"
-          gh release create "$tag" "dist/MinTube-$tag.apk" "dist/MinTube-$tag.apk.sha256" \
-            --repo "$GITHUB_REPOSITORY" --title "MinTube $tag" --notes-file "$notes" --verify-tag
+          printf '\n\nSHA-256: `%s`\n' "$(cut -d' ' -f1 "dist/$ASSET.apk.sha256")" >> "$notes"
+          gh release create "$tag" "dist/$ASSET.apk" "dist/$ASSET.apk.sha256" \
+            --repo "$GITHUB_REPOSITORY" --title "$RELEASE_TITLE" --notes-file "$notes" --verify-tag --latest="$LATEST"
