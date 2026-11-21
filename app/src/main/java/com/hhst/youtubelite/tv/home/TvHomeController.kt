@@ -96,9 +96,6 @@ class TvHomeController(private val activity: ComponentActivity) {
                 sources.home, extras.createSavedStateHandle(), loadOnStart = true,
                 saveRepository = sources.saves, snapshots = sources.snapshots,
                 accountKey = ::snapshotKey,
-                reportSignal = {
-                    getKoin().get<com.hhst.youtubelite.data.media.PlaybackWatchReporting>().anonymousReportSignal.value
-                },
                 warm = ::warm,
             ) as T
         }
