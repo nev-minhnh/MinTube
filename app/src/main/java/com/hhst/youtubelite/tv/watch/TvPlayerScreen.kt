@@ -111,9 +111,11 @@ fun TvPlayerScreen(
     val retry = remember { FocusRequester() }
     val latestPlayer by rememberUpdatedState(player)
     val candidate = upNext.firstOrNull { it.id != player.videoId }
-    val countdown by remember(player.videoId, player.durationMs, player.isLive, player.ended, autoplayEnabled, candidate, cancelledFor) {
+    val countdown by remember(player.videoId, player.durationMs, player.isLive, player.ended, player.error, autoplayEnabled,
+        candidate, cancelledFor) {
         derivedStateOf {
-            TvAutoplay.secondsLeft(position.value, player.durationMs, player.isLive, autoplayEnabled,
+            // A failed playback will not advance: no countdown over the error.
+            TvAutoplay.secondsLeft(position.value, player.durationMs, player.isLive, autoplayEnabled && player.error == null,
                 candidate != null, cancelledFor == player.videoId, player.ended)
         }
     }

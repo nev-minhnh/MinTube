@@ -14,6 +14,7 @@ import com.hhst.youtubelite.tv.watch.TAG_AUTOPLAY
 import com.hhst.youtubelite.tv.watch.TAG_OPTION
 import com.hhst.youtubelite.tv.watch.TAG_OPTIONS
 import com.hhst.youtubelite.tv.watch.TAG_PLAYER
+import com.hhst.youtubelite.tv.watch.TAG_PLAYER_RETRY
 import com.hhst.youtubelite.tv.watch.TAG_SEEK_BAR
 import com.hhst.youtubelite.tv.watch.TAG_SETTING
 import com.hhst.youtubelite.tv.watch.TAG_SETTINGS
@@ -72,7 +73,7 @@ class TvPlayerAndroidTest {
                 )
             }
         }
-        compose.awaitFocus(TAG_PLAYER)
+        compose.awaitFocus(if (player.value.error == null) TAG_PLAYER else TAG_PLAYER_RETRY)
     }
 
     @Test fun okTogglesPlaybackAndShowsTheSeekBarWhichSeeksTenSeconds() {
@@ -162,6 +163,16 @@ class TvPlayerAndroidTest {
         compose.press(Key.MediaPrevious)
         assertEquals(listOf("playPause", "pause", "play", "preview:10000", "commit:10000",
             "preview:-10000", "commit:-10000", "next", "previous"), calls)
+    }
+
+    @Test fun aPlaybackErrorShowsAFocusedRetryAndNoCountdown() {
+        position.longValue = 594_200
+        player.value = player.value.copy(error = "Connection to YouTube timed out.")
+        host()
+        compose.awaitFocus(TAG_PLAYER_RETRY)
+        compose.onNodeWithTag(TAG_AUTOPLAY).assertDoesNotExist()
+        compose.press(Key.DirectionCenter)
+        assertEquals(listOf("retry"), calls)
     }
 
     @Test fun autoplayCardCountsDownAndOkPlaysNextWhileBackCancels() {

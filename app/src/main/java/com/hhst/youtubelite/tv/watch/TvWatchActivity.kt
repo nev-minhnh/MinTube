@@ -154,6 +154,15 @@ class TvWatchActivity : TvActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // The phone's failure dialog (report text, Copy all) is a touch surface; on TV the
+                // overlay shows the error with a focused Retry instead.
+                playerViewModel.uiState.map { it.failureDialogVisible }.distinctUntilChanged().collect { visible ->
+                    if (visible) playerViewModel.dismissPlaybackFailure()
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 playerViewModel.uiState.map { it.videoId }.distinctUntilChanged().collect { id ->
                     if (id != null && id != watchViewModel.uiState.value.videoId) watchViewModel.selectVideo(id)
                     if (id != cancelledVideo) restoreLoopMode()
