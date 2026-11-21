@@ -25,10 +25,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.playlist.domain.PlaylistSummary
 import com.hhst.youtubelite.search.domain.SearchResultsLayout
 import com.hhst.youtubelite.ui.design.*
 import androidx.compose.ui.res.stringResource
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 @Composable
 internal fun PlaylistArtwork(asset: String, modifier: Modifier = Modifier) {
@@ -65,8 +67,9 @@ fun PlaylistSearchList(
 ) {
     val viewport = rememberUpdatedState(width to height)
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(Modifier.widthIn(max = 840.dp).fillMaxSize().testTag("playlist-search-list"), state = listState,
-            contentPadding = PaddingValues(top = SearchResultsLayout.listTopInset(width).dp, bottom = 24.dp)) {
+        val dock = miniDockListPadding(24.dp)
+        LazyColumn(Modifier.widthIn(max = 840.dp).fillMaxSize().then(dock.modifier).testTag("playlist-search-list"), state = listState,
+            contentPadding = PaddingValues(top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
             items(playlists, key = { it.id }) { playlist ->
                 val (w, h) = viewport.value
                 val row = SearchResultsLayout.listLockup(w, h)
@@ -80,7 +83,7 @@ fun PlaylistSearchList(
                         Column(Modifier.weight(1f).padding(top = 5.dp)) {
                             PlaylistTitle(playlist, Modifier.fillMaxWidth().clickable(onClick = open))
                             Spacer(Modifier.height(3.dp))
-                            AppText(stringResource(R.string.ui_playlist_owner, playlist.owner), size = 12, line = 14, color = DesignTokens.Secondary,
+                            AppText(stringResource(R.string.ui_playlist_owner, localLabel(playlist.owner)), size = 12, line = 14, color = DesignTokens.Secondary,
                                 modifier = Modifier.clickable { onOwner(playlist.channelId) }, maxLines = 1)
                         }
                         AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, playlist.title), diameter = menuSize,
@@ -102,7 +105,7 @@ fun PlaylistSearchList(
                                 Column(Modifier.weight(1f).heightIn(min = 43.dp).clickable(onClick = open)) {
                                     PlaylistTitle(playlist, Modifier.fillMaxWidth())
                                     Spacer(Modifier.height(3.dp))
-                                    AppText(stringResource(R.string.ui_playlist_owner, playlist.owner), size = 12, line = 14, color = DesignTokens.Secondary, maxLines = 1)
+                                    AppText(stringResource(R.string.ui_playlist_owner, localLabel(playlist.owner)), size = 12, line = 14, color = DesignTokens.Secondary, maxLines = 1)
                                 }
                             }
                             Box(Modifier.matchParentSize().wrapContentSize(Alignment.TopEnd, unbounded = true).padding(end = menuInset)) {
@@ -135,7 +138,7 @@ fun ChannelPlaylistRow(playlist: PlaylistSummary, onOpen: () -> Unit, onMenu: ()
             Column(Modifier.weight(1f).padding(top = 8.dp).clickable(role = Role.Button, onClick = onOpen)) {
                 PlaylistTitle(playlist, Modifier.fillMaxWidth(), maxLines = if (menuSize == 48f) 3 else 2)
                 Spacer(Modifier.height(3.dp))
-                AppText(stringResource(R.string.ui_playlist_owner, playlist.owner), size = 12, line = 14, color = DesignTokens.Secondary, maxLines = 1)
+                AppText(stringResource(R.string.ui_playlist_owner, localLabel(playlist.owner)), size = 12, line = 14, color = DesignTokens.Secondary, maxLines = 1)
             }
             AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, playlist.title), diameter = menuSize.dp, onClick = onMenu)
         }

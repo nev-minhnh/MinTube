@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.account.domain.AccountMenuAction
 import com.hhst.youtubelite.library.domain.AccountProfile
 import com.hhst.youtubelite.library.domain.LibraryAction
@@ -54,6 +55,7 @@ import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.ui.design.rememberWindowClass
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /**
  * The You tab: account header, entry tiles, recent-history and playlists shelves, then Settings
@@ -126,8 +128,9 @@ private fun LibraryList(listState: LazyListState, content: LibraryContent.Ready,
     val page = content.page
     val inset = MinSpace.pageInset(window)
     val cardWidth = if (window == WindowClass.Compact) 160.dp else 208.dp
-    LazyColumn(Modifier.fillMaxSize().testTag("you-library"), state = listState,
-        contentPadding = PaddingValues(top = MinSpace.sm, bottom = MinSpace.xxl)) {
+    val dock = miniDockListPadding(MinSpace.xxl)
+    LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("you-library"), state = listState,
+        contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom)) {
         item(key = "account") { AccountHeader(page.account, inset) { onAction(LibraryAction.OpenAccountMenu) } }
         item(key = "rows") {
             // Liked has no device lane, so its tile exists only for a signed-in account.
@@ -207,8 +210,8 @@ private fun AccountHeader(account: AccountProfile, inset: androidx.compose.ui.un
         }
         Spacer(Modifier.width(MinSpace.lg))
         Column(Modifier.weight(1f)) {
-            AppText(account.name, MinType.Title, maxLines = 2)
-            if (account.handle.isNotBlank()) AppText(account.handle, MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
+            AppText(localLabel(account.name), MinType.Title, maxLines = 2)
+            if (account.handle.isNotBlank()) AppText(localLabel(account.handle), MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
         }
         AppIcon(AppIcon.ChevronRight, Modifier.padding(start = MinSpace.sm).size(20.dp), color = DesignTokens.Secondary)
     }

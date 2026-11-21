@@ -71,3 +71,19 @@ internal fun Context.noticeText(text: String, failure: Boolean = false): String 
     return if (resource != null) getString(resource)
     else if (failure) getString(R.string.ui_something_went_wrong_please_try_again) else text
 }
+
+/**
+ * Display labels the data layer writes for content kept on this device ("On this device" as the
+ * You header, history section and local playlist owner). The stored values stay English, so
+ * identity, persisted data and backups are unchanged; only the displayed text is localized.
+ */
+internal fun localLabelResource(text: String): Int? = when (text) {
+    "On this device" -> R.string.ui_on_this_device
+    "Local history and playlists" -> R.string.qa2_local_history_and_playlists
+    else -> null
+}
+
+/** [text] localized when it is one of the device labels in [localLabelResource], else unchanged. */
+@androidx.compose.runtime.Composable
+internal fun localLabel(text: String): String =
+    localLabelResource(text)?.let { androidx.compose.ui.res.stringResource(it) } ?: text

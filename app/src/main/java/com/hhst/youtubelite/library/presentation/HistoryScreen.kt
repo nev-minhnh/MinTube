@@ -34,6 +34,7 @@ import com.hhst.youtubelite.library.domain.HistoryUiState
 import com.hhst.youtubelite.library.domain.LibraryAction
 import com.hhst.youtubelite.library.domain.LibraryOverlay
 import com.hhst.youtubelite.ui.components.MinTopBar
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.CollapsingAppBar
@@ -44,6 +45,7 @@ import com.hhst.youtubelite.ui.design.VerificationCard
 import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.ui.design.rememberWindowClass
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Section names that only repeat the page title; the bar already reads "History". */
 private val RedundantHistorySections = setOf("历史记录", "历史", "觀看記錄", "观看记录")
@@ -110,13 +112,14 @@ private fun HistoryList(content: HistoryContent.Ready, append: AppendState, list
         if (nearEnd && content.page.nextKey != null && append == AppendState.Idle) onAction(LibraryAction.LoadHistoryNext)
     }
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        LazyColumn(Modifier.widthIn(max = if (columns == 2) 1280.dp else LibraryContentMaxWidth).fillMaxSize().testTag("history-list"),
-            state = listState, contentPadding = PaddingValues(start = inset, end = inset, top = MinSpace.sm, bottom = MinSpace.xxl)) {
+        val dock = miniDockListPadding(MinSpace.xxl)
+        LazyColumn(Modifier.widthIn(max = if (columns == 2) 1280.dp else LibraryContentMaxWidth).fillMaxSize().then(dock.modifier).testTag("history-list"),
+            state = listState, contentPadding = PaddingValues(start = inset, end = inset, top = MinSpace.sm, bottom = dock.bottom)) {
             grouped.forEach { (section, entries) ->
                 val name = section.trim()
                 // The top bar already reads "History"; the body adds only the section groups.
                 if (name.isNotEmpty() && !name.equals("History", ignoreCase = true) && name !in RedundantHistorySections) item(key = "section-$section") {
-                    LibrarySectionTitle(section, Modifier.padding(top = MinSpace.sm, bottom = MinSpace.md))
+                    LibrarySectionTitle(localLabel(section), Modifier.padding(top = MinSpace.sm, bottom = MinSpace.md))
                 }
                 items(entries.chunked(columns), key = { it.first().id }) { line ->
                     Row(Modifier.fillMaxWidth().padding(bottom = MinSpace.lg), horizontalArrangement = Arrangement.spacedBy(MinSpace.xxl)) {

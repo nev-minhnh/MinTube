@@ -70,6 +70,7 @@ import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.watch.domain.VideoRating
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /*
  * Shorts, Live and Posts tabs. Each is its own LazyColumn that starts with the channel header and
@@ -100,10 +101,11 @@ fun ChannelShortsTab(
         }
     }
     ObserveChannelPagination(state, canPage, append) { onAction(ChannelAction.LoadShortsNext) }
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().testTag("channel-shorts-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("channel-shorts-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Shorts, onAction) }
@@ -157,10 +159,11 @@ fun ChannelLiveTab(
     }
     val columns = ChannelMetrics.videoColumns(width)
     ObserveChannelPagination(state, canPage, append) { onAction(ChannelAction.LoadLiveNext) }
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().testTag("channel-live-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("channel-live-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Live, onAction) }
@@ -204,10 +207,11 @@ fun ChannelPostsTab(
 ) {
     val viewport by rememberUpdatedState(width)
     ObserveChannelPagination(state, canPage, append) { onAction(ChannelAction.LoadPostsNext) }
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
         state = state,
-        modifier = Modifier.fillMaxSize().testTag("channel-posts-list"),
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("channel-posts-list"),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         item { ChannelHeader(page, viewport, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Posts, onAction) }

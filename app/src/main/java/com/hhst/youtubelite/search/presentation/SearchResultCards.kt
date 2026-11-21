@@ -73,6 +73,7 @@ import com.hhst.youtubelite.ui.design.appDescription
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Geometry shared by the result list and its skeleton, derived from the available window. */
 internal data class SearchListSpec(val window: WindowClass, val rows: Boolean) {
@@ -120,10 +121,11 @@ internal fun SearchAllList(
     val shortsAfter = minOf(VideosBeforeShorts, results.size)
     val playlistsAfter = minOf(VideosBeforePlaylists, results.size)
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val dock = miniDockListPadding(MinSpace.xxl)
         LazyColumn(
-            Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().testTag("search-results-list"),
+            Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().then(dock.modifier).testTag("search-results-list"),
             state = listState,
-            contentPadding = PaddingValues(top = MinSpace.sm, bottom = MinSpace.xxl),
+            contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom),
             verticalArrangement = Arrangement.spacedBy(spec.spacing),
         ) {
             items(leading, key = { "all-channel-${it.id}" }, contentType = { "channel" }) { channel ->

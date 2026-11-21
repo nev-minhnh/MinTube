@@ -50,6 +50,7 @@ import com.hhst.youtubelite.ui.design.AppText
 import com.hhst.youtubelite.ui.design.DesignTokens
 import com.hhst.youtubelite.ui.design.MinSpace
 import com.hhst.youtubelite.ui.design.MinType
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /**
  * Search inside the channel: a search field under the tab row, matching playlists, then video
@@ -81,7 +82,8 @@ internal fun ChannelSearchTab(page: ChannelPage, width: Float, height: Float, li
     LaunchedEffect(submitted) {
         if (submitted != appliedQuery) { appliedQuery = submitted; listState.scrollToItem(1) }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("channel-search-list"), state = listState, contentPadding = PaddingValues(bottom = MinSpace.xxl)) {
+    val dock = miniDockListPadding(MinSpace.xxl)
+    LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("channel-search-list"), state = listState, contentPadding = PaddingValues(bottom = dock.bottom)) {
         item { ChannelHeader(page, width, onAction, subscribePending) }
         stickyHeader("channel-tabbar") { ChannelTabBar(ChannelTab.Search, onAction) }
         item {

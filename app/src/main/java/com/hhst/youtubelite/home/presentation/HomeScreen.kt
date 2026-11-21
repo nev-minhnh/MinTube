@@ -109,6 +109,7 @@ import com.hhst.youtubelite.ui.design.rememberAppInteractions
 import com.hhst.youtubelite.ui.design.rememberPullRefreshState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Top bar (56dp) plus chip strip (48dp) before the first measure pass reports the real height. */
 private val ChromeEstimate = 104.dp
@@ -213,6 +214,7 @@ fun HomeScreen(state: HomeUiState, onAction: (HomeAction) -> Unit, modifier: Mod
             Column(Modifier.fillMaxSize().then(if (state.overlay != HomeOverlay.None) Modifier.clearAndSetSemantics {} else Modifier)) {
                 Box(Modifier.weight(1f).fillMaxWidth().clipToBounds().nestedScroll(chromeConnection)
                     .pullRefreshGesture(pullMotion)) {
+                    val dock = miniDockListPadding(MinSpace.xxl)
                     when (val content = state.content) {
                         is HomeContent.Empty -> Box(Modifier.fillMaxSize().padding(top = chromeHeight).graphicsLayer { translationY = pullMotion.offset }) {
                             EmptyHome(content, firstVisit = !searchOpen && !catalogMode, catalog = catalogMode, onAction = onAction)
@@ -230,8 +232,8 @@ fun HomeScreen(state: HomeUiState, onAction: (HomeAction) -> Unit, modifier: Mod
                         is HomeContent.Feed -> LazyVerticalGrid(
                             columns = GridCells.Fixed(com.hhst.youtubelite.ui.design.rememberFeedColumns()), state = grid,
                             // Pull moves the feed rows only; the chrome stack keeps its place.
-                            modifier = Modifier.fillMaxSize().graphicsLayer { translationY = pullMotion.offset }.testTag("home-feed"),
-                            contentPadding = PaddingValues(start = inset, end = inset, top = chromeHeight + MinSpace.sm, bottom = MinSpace.xxl),
+                            modifier = Modifier.fillMaxSize().then(dock.modifier).graphicsLayer { translationY = pullMotion.offset }.testTag("home-feed"),
+                            contentPadding = PaddingValues(start = inset, end = inset, top = chromeHeight + MinSpace.sm, bottom = dock.bottom),
                             horizontalArrangement = Arrangement.spacedBy(MinSpace.lg),
                         ) {
                             homeCards(visibleItems, window, state.live, onAction, postInteractions)

@@ -73,6 +73,7 @@ import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
+import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 @Composable
 fun ExploreScreen(state: ExploreUiState, onAction: (ExploreAction) -> Unit, onBack: () -> Unit, modifier: Modifier = Modifier) {
@@ -192,10 +193,11 @@ private fun CategoryChips(selected: ExploreCategory, inset: Dp, onAction: (Explo
 @Composable
 private fun SectionedContainer(content: ExploreContent.Ready, inset: Dp, cardWidth: Dp,
     columnState: LazyListState, shelfState: (Int) -> LazyListState, onAction: (ExploreAction) -> Unit) {
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyColumn(
-        Modifier.fillMaxSize().testTag("explore-sections"),
+        Modifier.fillMaxSize().then(dock.modifier).testTag("explore-sections"),
         state = columnState,
-        contentPadding = PaddingValues(bottom = MinSpace.xxl),
+        contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
         content.page.sections.forEachIndexed { index, section ->
             if (section.videos.isEmpty() && section.playlists.isEmpty()) {
@@ -282,11 +284,12 @@ private fun CategoryContainer(category: ExploreCategory, content: ExploreContent
     val inset = MinSpace.pageInset(window)
     val page = content.page
     val empty = page.videos.isEmpty() && page.playlists.isEmpty() && page.nextKey == null && content.append == AppendState.Idle
+    val dock = miniDockListPadding(MinSpace.xxl)
     LazyVerticalGrid(
         columns = GridCells.Fixed(window.feedColumns),
-        modifier = Modifier.fillMaxSize().testTag("explore-list"),
+        modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("explore-list"),
         state = gridState,
-        contentPadding = PaddingValues(start = inset, end = inset, bottom = MinSpace.xxl),
+        contentPadding = PaddingValues(start = inset, end = inset, bottom = dock.bottom),
         horizontalArrangement = Arrangement.spacedBy(MinSpace.lg),
     ) {
         if (empty) item(key = "empty", span = { GridItemSpan(maxLineSpan) }, contentType = "empty") {
