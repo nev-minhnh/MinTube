@@ -769,4 +769,20 @@
     <string name="locale_translate_titles_summary">Tắt để xem tiêu đề gốc, lượt xem và ngày theo ngôn ngữ ứng dụng</string>
     <string name="locale_trending_vietnam">Thịnh hành tại Việt Nam</string>
     <string name="locale_trending_vietnam_summary">Tắt để dùng khu vực của thiết bị cho thịnh hành và tìm kiếm</string>
+    <string name="tv_loading_more">Đang tải thêm…</string>
+    <string name="tv_search_hint">Tìm kiếm trên YouTube</string>
+    <string name="tv_search_voice">Tìm bằng giọng nói</string>
+    <string name="tv_search_start_title">Tìm kiếm trên MinTube</string>
+    <string name="tv_search_start_message">Nhấn OK vào ô tìm kiếm để nhập, hoặc dùng tìm kiếm bằng giọng nói.</string>
+    <string name="tv_search_recent">Tìm kiếm gần đây</string>
+    <string name="tv_search_remove_hint">Giữ OK để xóa</string>
+    <string name="tv_search_remove">Xóa %1$s khỏi tìm kiếm gần đây</string>
+    <string name="tv_search_suggestions">Gợi ý</string>
+    <string name="tv_search_failed_title">Không tải được kết quả</string>
+    <string name="tv_search_empty_title">Không có kết quả</string>
+    <string name="tv_channel_failed_title">Không tải được kênh này</string>
+    <string name="tv_playlist_failed_title">Không tải được danh sách phát này</string>
+    <string name="tv_playlist_unavailable">Danh sách phát này không khả dụng</string>
+    <string name="tv_playlist_empty">Danh sách phát này không có video</string>
+    <string name="tv_playlist_loading_all">Đang tải toàn bộ danh sách phát… %1$d video</string>
 </resources>
