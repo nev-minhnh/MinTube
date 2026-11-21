@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:15" hostname="MINHNH-LAPTOP" time="0.06">
+  <properties/>
+  <testcase name="endlessEmptyPagesPauseAutomaticRequestsAndOneManualReadCanRecover" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.027"/>
+  <testcase name="anEmptyHomePageKeepsItsCursorAndTheFollowingPageCanRecover" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.003"/>
+  <testcase name="anEmptyContinuationWithoutAnotherCursorBecomesTheHonestEmptyState" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.003"/>
+  <testcase name="duplicateOnlyPagesAlsoPauseAutomaticReadsWhilePreservingRowsAndCursor" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.005"/>
+  <testcase name="subscriptionsContinuationRepairsPartialDuplicateCardsWithoutLosingTheirDurationAndAvatar" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.018"/>
+  <testcase name="homeContinuationRepairsPartialDuplicateCardsWithoutLosingTheirDurationAndAvatar" classname="com.hhst.youtubelite.home.FeedDisplayCompletenessTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

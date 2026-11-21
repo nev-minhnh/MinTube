@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.datasource.StreamSelectionTest" tests="26" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:17" hostname="MINHNH-LAPTOP" time="0.006">
+  <properties/>
+  <testcase name="fallbackPrefersTheNearestLowerHeightOverAHigherOne" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.002"/>
+  <testcase name="missingDimensionsDoNotDiscardTheOnlyVideoStream" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="parseHeight" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="isBetter_poTokenBeatsCodec" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="streamingClient_readsCParam" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectVideo_fallbackToLower" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectVideo_exactMatch" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.001"/>
+  <testcase name="playableFilteringKeepsTheChosenAudioIdentity" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectVideo_noMatch_returnsHighest" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="filterBest_dedupHeightFps_codecWins" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectVideo_exactMatchWithFps" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="missingFpsKeepsTheResolutionAndUsesAvailableFps" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="preferPlayable_allowAndroidVrDoesNotReintroduceUndecodable" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="preferPlayable_dropsAndroidVrWhenStableExists" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.001"/>
+  <testcase name="isWindowExempt_visionosDirectUrl" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="isWindowExempt_windowBoundClients" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="codecPriority" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectAudio_preferredKeyBeatsOriginal" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="parseFps" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="codecPriority_hev1" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="qualityLabels_fromPlayablePool_only" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.001"/>
+  <testcase name="isWindowExempt_poTokenUrl" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="selectVideo_allAboveTarget_nearestUp" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="hasPoToken_acceptsQueryOrAmp" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="fallbackUsesTheHighestFpsAtTheSmallestAvailableHeight" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <testcase name="filterBest_sortsByHeightThenFps" classname="com.hhst.youtubelite.player.datasource.StreamSelectionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:12" hostname="MINHNH-LAPTOP" time="0.053">
+  <properties/>
+  <testcase name="aResolutionAcceptedBeforeResumeCannotPublishItsCacheAfterResume" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.013"/>
+  <testcase name="staleBackupIsRejectedWhileTheCurrentGenerationCanStillUseItsBackup" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.008"/>
+  <testcase name="lateCatalogCannotOverwriteTheResumedSources" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.008"/>
+  <testcase name="lateForbiddenRecoveryCannotAdoptTheResumedGeneration" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.014"/>
+  <testcase name="staleAdmissionCannotResolveTheResumedGeneration" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.004"/>
+  <testcase name="lateCatalogCannotPublishAfterPauseWithoutResume" classname="com.hhst.youtubelite.downloader.resolve.DownloadResolverGenerationTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.surface.GestureMathTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:17" hostname="MINHNH-LAPTOP" time="0.004">
+  <properties/>
+  <testcase name="resolveDragMode_verticalFeedIgnoresSideZones" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.002"/>
+  <testcase name="miniSwipe_longSlowDragCommits" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="miniSwipe_mostlyHorizontalFlingDoesNotCommit" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="accumulateLevel_clampsWithoutOscillating" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="levelPercent_mapsSessionLevel" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="edgeSliders_fullscreenOnly_neverEmbeddedOrMini" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="miniSwipe_flickBelowTouchSlopOrUpwardDoesNotCommit" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="miniSwipe_slowShortDragDoesNotCommit" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="volumeDelta_usesVolumeFactor" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="miniSwipe_fastShortFlickCommits" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="brightnessDelta_upIncreases" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="seekOffset_fullWidthMapsTo120s" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="resolveDragMode_horizontalIsSeek" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="doubleTapZone_thirds" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="resolveDragMode_verticalZones" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="embeddedUpwardEntryHasAWiderZoneWithoutTakingOverFullscreenEdgeSliders" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.001"/>
+  <testcase name="embeddedEdgeSwipeDownMinimizesInsteadOfBrightnessOrVolume" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <testcase name="miniSwipe_fullscreenNeverMinimizes" classname="com.hhst.youtubelite.player.surface.GestureMathTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

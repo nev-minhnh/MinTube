@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:12" hostname="MINHNH-LAPTOP" time="2.112">
+  <properties/>
+  <testcase name="absentCommentViewerStateCannotConfirmARemovalOrReplayOldCapabilities" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.261"/>
+  <testcase name="theCommentFixtureExposesTheRealDetailContinuation" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.001"/>
+  <testcase name="anAlreadyCommittedPostRatingIsNotWrittenTwice" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.012"/>
+  <testcase name="removingAPostRatingUsesTheFreshDislikeRemovalCapability" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.259"/>
+  <testcase name="anAlreadyCommittedCommentRatingIsConfirmedByDetailWithoutASecondWrite" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.007"/>
+  <testcase name="missingCommentReadbackNeverReplaysAnOldOpaqueAction" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.275"/>
+  <testcase name="anUnacknowledgedCommentRatingReadsDetailAndUsesItsNewAction" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.262"/>
+  <testcase name="anUnacknowledgedPollVoteReacquiresTheCurrentSelectedCommand" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.26"/>
+  <testcase name="anUnacknowledgedPostRatingReadsNewCapabilitiesBeforeOneRetry" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.259"/>
+  <testcase name="removingACommentRatingUsesTheFreshDislikeRemovalCapability" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.258"/>
+  <testcase name="absentPollSelectionFlagsCannotConfirmARemovalOrReplayFeedback" classname="com.hhst.youtubelite.data.media.MediaInteractionRecoveryTest" time="0.258"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

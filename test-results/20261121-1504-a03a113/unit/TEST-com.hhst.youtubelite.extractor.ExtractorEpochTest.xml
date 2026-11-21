@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.ExtractorEpochTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:13" hostname="MINHNH-LAPTOP" time="0.035">
+  <properties/>
+  <testcase name="guardedPutAndBump_neverLeaveStaleCommitted" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.024"/>
+  <testcase name="epochGuard_dropsStaleStreamWriteForItsVideoOnly" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.001"/>
+  <testcase name="fullCacheHit_repeatedExtractDoesNotThrowRecursiveUpdate" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.004"/>
+  <testcase name="invalidateStream_forcesANewExtraction" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.003"/>
+  <testcase name="concurrentExtract_reusesInFlightUntilSettled" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.002"/>
+  <testcase name="invalidateStream_invalidatesTheParsedVideoIdOnly" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.001"/>
+  <testcase name="olderGuardStaysStaleWhenNewerSiblingSettlesFirst" classname="com.hhst.youtubelite.extractor.ExtractorEpochTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.ExtractorTest" tests="2" skipped="2" failures="0" errors="0" timestamp="2026-11-21T07:48:13" hostname="MINHNH-LAPTOP" time="0.004">
+  <properties/>
+  <testcase name="hasChapters_gJrjgg1KVL4" classname="com.hhst.youtubelite.extractor.ExtractorTest" time="0.004">
+    <skipped/>
+  </testcase>
+  <testcase name="noChapters_YQHsXMglC9A" classname="com.hhst.youtubelite.extractor.ExtractorTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

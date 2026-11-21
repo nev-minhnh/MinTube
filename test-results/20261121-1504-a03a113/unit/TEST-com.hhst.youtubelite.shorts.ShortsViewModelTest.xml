@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.shorts.ShortsViewModelTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:18" hostname="MINHNH-LAPTOP" time="0.062">
+  <properties/>
+  <testcase name="errorScenarioShowsFailureAndRetryRecovers" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.005"/>
+  <testcase name="loadsTheSharedShortsFixture" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.002"/>
+  <testcase name="saveToPlaylistNeedsASaveRepositoryAndRoutesThroughTheSharedSheet" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="accountSwitchClearsPendingRatingsWithoutPublishingOldResults" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="startItemIdOpensThePagerOnThatShort" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.002"/>
+  <testcase name="subscribeShowsPendingUntilTheServerConfirms" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.004"/>
+  <testcase name="appendFailureRequiresExplicitRetryAndRepeatedCursorsStop" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="playbackEndAdvancesOnlyTheCurrentItemAndWaitsForPanelsToClose" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.002"/>
+  <testcase name="commentsOverlayOpensAndClosesWithoutNavigation" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="serverSubscriptionStateSeedsTheMapThroughHydration" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="menuEmitsTheTypedActionAndCloses" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.004"/>
+  <testcase name="playbackEndWaitsForPaginationAndDoesNotOverrideASwipe" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="likeAndDislikeStayTypedRateRequestsWithoutStateChange" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.004"/>
+  <testcase name="currentItemAndCommentTargetSurviveRecreation" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="accountSwitchDiscardsLateRatingFailuresFromThePreviousSession" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.011"/>
+  <testcase name="pendingRatingsAreVisiblePerVideoAndDoNotBlockSubscriptions" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.003"/>
+  <testcase name="emptyPageHasAnExplicitStateAndChannelItemsKeepTheirIds" classname="com.hhst.youtubelite.shorts.ShortsViewModelTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

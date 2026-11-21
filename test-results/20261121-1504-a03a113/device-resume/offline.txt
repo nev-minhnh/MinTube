@@ -1,0 +1,8 @@
+INSTRUMENTATION_STATUS: class=com.hhst.youtubelite.player.engine.WatchStartSecondsAndroidTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+com.hhst.youtubelite.player.engine.WatchStartSecondsAndroidTest:
+INSTRUMENTATION_STATUS: test=aRecreatedActivityDoesNotReapplyTheExplicitStart
+INSTRUMENTATION_STATUS_CODE: 1

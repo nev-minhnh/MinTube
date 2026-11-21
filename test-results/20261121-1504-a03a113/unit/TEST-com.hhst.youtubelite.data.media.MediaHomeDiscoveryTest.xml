@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:12" hostname="MINHNH-LAPTOP" time="0.026">
+  <properties/>
+  <testcase name="signedInEmptyHomeStaysInItsOwnState" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.006"/>
+  <testcase name="musicChartsArePlaylistsAndNeverMergedIntoAllVideos" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.005"/>
+  <testcase name="failedHomeDoesNotSilentlyTurnIntoPublicContent" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.004"/>
+  <testcase name="authenticatedIdentityRejectsPublicContinuationsWithoutNetworkIo" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.002"/>
+  <testcase name="emptyAnonymousHomeLoadsOnlyTheSelectedPublicShelves" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.003"/>
+  <testcase name="realRecommendationsTakePriorityOverPublicDirectories" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.003"/>
+  <testcase name="categorySelectionReadsItsTrendingShelfWithoutProbingTheHome" classname="com.hhst.youtubelite.data.media.MediaHomeDiscoveryTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

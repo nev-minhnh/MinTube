@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.surface.MiniTouchTargetsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:17" hostname="MINHNH-LAPTOP" time="0.001">
+  <properties/>
+  <testcase name="tallMinisGet48dpTouchHeight" classname="com.hhst.youtubelite.player.surface.MiniTouchTargetsTest" time="0.001"/>
+  <testcase name="transportBoxesEndOnTheBottomEdgeAndRowsDoNotOverlap" classname="com.hhst.youtubelite.player.surface.MiniTouchTargetsTest" time="0.0"/>
+  <testcase name="defaultMiniGivesEveryControlA48dpSquare" classname="com.hhst.youtubelite.player.surface.MiniTouchTargetsTest" time="0.0"/>
+  <testcase name="everyControlIsAtLeast48dpWide" classname="com.hhst.youtubelite.player.surface.MiniTouchTargetsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.ContentLocaleTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:06" hostname="MINHNH-LAPTOP" time="0.046">
+  <properties/>
+  <testcase name="englishOffFollowsTheVietnameseAppLanguage" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.004"/>
+  <testcase name="vietnamOffUsesTheDeviceRegionThenUs" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.002"/>
+  <testcase name="appLanguageTagsMapToYoutubeInterfaceCodes" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.002"/>
+  <testcase name="englishOffWithoutAnAppLanguageFollowsTheSystemLocale" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.002"/>
+  <testcase name="defaultsRequestEnglishContentFromVietnam" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.001"/>
+  <testcase name="snapshotKeysDifferByLanguageAndRegion" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.031"/>
+  <testcase name="sessionCarriesTheLocaleAndAChangeStartsANewGeneration" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.002"/>
+  <testcase name="anUnmappedLanguageFallsBackToEnglish" classname="com.hhst.youtubelite.data.media.ContentLocaleTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.cast.DlnaDiscoveryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:46:43" hostname="MINHNH-LAPTOP" time="3.091">
+  <properties/>
+  <testcase name="allVerifiedDevicesReturnOnceEveryDescriptionFinishes" classname="com.hhst.youtubelite.cast.DlnaDiscoveryTest" time="0.071"/>
+  <testcase name="offlineCandidatesDoNotDelayVerifiedDevices" classname="com.hhst.youtubelite.cast.DlnaDiscoveryTest" time="3.018"/>
+  <testcase name="identicalNamesAreSeparatedByModelThenHost" classname="com.hhst.youtubelite.cast.DlnaDiscoveryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

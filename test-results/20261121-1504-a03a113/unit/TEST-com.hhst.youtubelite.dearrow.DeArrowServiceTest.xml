@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.dearrow.DeArrowServiceTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:47:31" hostname="MINHNH-LAPTOP" time="1.925">
+  <properties/>
+  <testcase name="disablingDecorationCancelsAStalledHttpCall" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.032"/>
+  <testcase name="concurrentBrandingsMergeOntoOneBucketFetch" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.326"/>
+  <testcase name="http204And404MeanNoSubmissionForTheBucket" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.016"/>
+  <testcase name="rateLimitedFetchBacksOffWithoutHammering" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.01"/>
+  <testcase name="importingDisabledTogglesUpdatesTheActiveService" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.001"/>
+  <testcase name="aBucketWithoutTheTargetVideoFallsBackToOriginal" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.009"/>
+  <testcase name="theFirstTitleCandidateDecidesAndLowerRankedOnesAreNeverPromoted" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.029"/>
+  <testcase name="formatterDirectivesAreStripped" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.009"/>
+  <testcase name="disabledTogglesIssueNoRequests" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.005"/>
+  <testcase name="resettingPreferencesUpdatesTheActiveService" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.001"/>
+  <testcase name="simultaneousCardsStartOnlyOneRequest" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.213"/>
+  <testcase name="oversizedBrandingResponseFallsBackWithoutParsingIt" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.017"/>
+  <testcase name="clearingDecorationCancelsRequestsAndAllowsFreshReads" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.018"/>
+  <testcase name="theMetadataCacheIsBounded" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.755"/>
+  <testcase name="preferenceListenersRefreshTheToggleFlows" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.001"/>
+  <testcase name="enablingOnlyTitlesStillFetchesTheSharedBucket" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.009"/>
+  <testcase name="theThumbnailServiceUrlCarriesTheVideoIdAndTime" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.003"/>
+  <testcase name="cancellingOneWaiterKeepsTheSharedRequestForOtherCards" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.411"/>
+  <testcase name="brandingIsStrictlyMatchedToTheRequestedVideoId" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.013"/>
+  <testcase name="thumbnailTimesMustBeValidAndInsideKnownDurations" classname="com.hhst.youtubelite.dearrow.DeArrowServiceTest" time="0.045"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 21, 2026 2:47:31 PM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[17183] connection from /127.0.0.1 didn't make a request
+Nov 21, 2026 2:47:32 PM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[17207] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

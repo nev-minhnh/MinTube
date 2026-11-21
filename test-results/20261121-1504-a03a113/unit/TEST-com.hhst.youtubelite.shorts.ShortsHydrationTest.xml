@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.shorts.ShortsHydrationTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:18" hostname="MINHNH-LAPTOP" time="0.129">
+  <properties/>
+  <testcase name="emptyHydrationRetriesAreBoundedAndSwipingCancelsTheBackoff" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.033"/>
+  <testcase name="fastSwipesRetainClaimedMetadataAndCancelReadsOutsideTheWindow" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.022"/>
+  <testcase name="accountChangeCancelsUpcomingMetadataAndDiscardsOldDetails" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.009"/>
+  <testcase name="theSelectedPreparationIsRetainedUntilItsFirstFrameBeforeWarmingTheNext" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.021"/>
+  <testcase name="revisitingAnEvictedDetailReloadsTrackingWithoutReloadingTheFeed" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.007"/>
+  <testcase name="stalledPlaybackStillGetsDetailsAndItsFirstFrameDoesNotRestartTheRead" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.002"/>
+  <testcase name="aDuplicateAppendCanFillMissingMetadataWithoutReplacingKnownValues" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.003"/>
+  <testcase name="nextTwoDetailsAreReadyBeforeSelectionAndAreNotFetchedAgain" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.014"/>
+  <testcase name="hydrationKeepsChannelArtworkSeparateFromTheVideoCover" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.0"/>
+  <testcase name="detailsWaitForARealFrameAndFastSwipesDoNotReadSkippedItems" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.003"/>
+  <testcase name="openingTheMenuDoesNotWaitForPlayback" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.002"/>
+  <testcase name="hydrationNeverBlocksTheFeed" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.001"/>
+  <testcase name="anEmptyHydrationResponseRetriesOnceWithoutBlockingTheSelectedShort" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.006"/>
+  <testcase name="onlyTheSelectedItemHydratesAndRevisitsReuseItsDetail" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.003"/>
+  <testcase name="returningBeforeCancellationCompletesStillHydratesTheSelectedItem" classname="com.hhst.youtubelite.shorts.ShortsHydrationTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

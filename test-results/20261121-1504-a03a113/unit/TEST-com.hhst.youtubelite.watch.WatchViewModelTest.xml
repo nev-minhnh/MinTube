@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.watch.WatchViewModelTest" tests="49" skipped="0" failures="0" errors="0" timestamp="2026-11-21T07:48:21" hostname="MINHNH-LAPTOP" time="0.223">
+  <properties/>
+  <testcase name="failedRatingKeepsTheServerStateAndRequestsSignIn" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.005"/>
+  <testcase name="relatedCardMenuKeepsSaveLocalAndEmitsTypedWatchLater" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.011"/>
+  <testcase name="closingTheMenuCancelsItsDeferredRead" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.006"/>
+  <testcase name="pinnedScenariosDoNotCallTheRepository" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.004"/>
+  <testcase name="aTypingEventAfterSubmitCannotReopenTheSearchOverlay" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.08"/>
+  <testcase name="failedRelatedPageKeepsLoadedContentAndCanBeRetried" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.005"/>
+  <testcase name="createdPlaylistAppearsCheckedInTheOpenSheet" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="ordinaryEntryLoadsTheLocalPageForTheRequestedVideo" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="playerAndColumnFollowTheBreakpointMatrix" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="metadataIncludesIdentityAndSeparateActions" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.0"/>
+  <testcase name="everyActionEmitsOnlyATypedRequest" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.012"/>
+  <testcase name="shortWindowsLeaveTheBodyReachable" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="accountChangesReloadSubscriptionStateAndCloseOldSaveChoices" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="trafficChallengeReportsVerificationAndRetriesOnceOnCompletion" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="relatedPagesAppendWithoutDuplicatesAndStopRepeatedCursors" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="pastBroadcastFixturesKeepTheirListMetadata" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="switchingVideosCancelsAnUnfinishedRating" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="cancelledAccountActionCannotClearTheNewAccountsPendingAction" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.004"/>
+  <testcase name="confirmingARatingKeepsTheLatestCommentPreview" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="watchLaterMenuRowWritesThroughTheRepository" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="thinWatchResponsesKeepKnownCardMetadataAndFreshViewerState" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="explicitPageActionReleasesTheStartupWait" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="relatedVariantSelectionMatchesTheZoneMatrix" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="descriptionExpansionPersistsThroughSavedState" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.0"/>
+  <testcase name="deferredPageLoadsOnlyTheCurrentVideoAfterPlaybackStarts" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="provisionalSummaryPaintsTheLoadingPageAndYieldsToRealContent" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="authFailureNeverReportsVerification" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="failedRequestKeepsLoadingOutAndRetryRecovers" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="liveVideoTimestampExplainsInsteadOfSeeking" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.004"/>
+  <testcase name="richerRelatedDuplicatesFillMissingFieldsWithoutDuplicatingCards" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="saveChooserAndNewPlaylistOnlyEmitTypedRequests" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.005"/>
+  <testcase name="searchDraftRestoresAndOnlySubmittingEmitsSearch" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.004"/>
+  <testcase name="aManualReloadClearsVerificationAndIgnoresItsLateResult" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.006"/>
+  <testcase name="ratingChangesOnlyAfterConfirmationAndBlocksDuplicateTaps" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="phoneCoverKeepsTheSampledPlusThirteen" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.0"/>
+  <testcase name="descriptionTimestampSeeksThroughTheHostBoundary" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="relatedVideoSaveUsesItsOwnServerChoices" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="switchingVideosWithoutACardClearsTheStaleProvisionalSummary" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="subscribeWithoutLoadedContentEmitsNothing" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="deferredFeedbackCapabilitiesAppearForTheOpenMenu" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="signedInRelatedCardsLoadFeedbackEvenWithoutAnInlineMenuEndpoint" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="aLiveStreamWithoutAChatKeyDoesNotOpenTheCommentsPanel" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="fixtureKeepsEnglishMetadataAndLocalArtwork" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="relatedCardMenuRestoresThroughSavedState" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.001"/>
+  <testcase name="reportAndRecommendationRowsOpenLocalReasonChoosers" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.005"/>
+  <testcase name="unconfirmedSaveToggleKeepsTheServerStateAndNotifies" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.003"/>
+  <testcase name="liveSaveSheetLoadsServerChoicesAndTogglesAfterConfirmation" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <testcase name="gridColumnsFollowTheSampledFormula" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.0"/>
+  <testcase name="guestSaveClosesTheSheetAndRequestsSignIn" classname="com.hhst.youtubelite.watch.WatchViewModelTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
