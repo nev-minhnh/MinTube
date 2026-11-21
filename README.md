@@ -52,6 +52,69 @@ issues to Litube.
 Kept on purpose, so existing data keeps working: downloads are still saved under `Downloads/Litube`, and settings
 backups keep the `litube-settings` format, so a Litube backup can be restored in MinTube.
 
+## MinTube TV
+
+MinTube TV is MinTube for Android TV and Google TV: a separate app with its own 10-foot interface, driven
+entirely by the TV remote. It shares MinTube's player, SponsorBlock, DeArrow, account and data code, and is
+released from the `tv` branch with `tv-v*` tags (for example `tv-v1.0.0`). Its application ID is
+`com.nevminhnh.mintube.tv` and it is signed with the same key as MinTube, so it installs next to the phone app.
+
+- **Screens:** Home rows by section plus a Shorts row, Search (keyboard, voice, suggestions, recent searches,
+  filters), full-screen Watch, channel and playlist pages, Subscriptions, Library (History, Watch later,
+  Playlists, Liked, Queue), full-screen Shorts and Settings.
+- **Sign-in:** a device-code page shows a large code, the address to open and a QR code; finish on your phone.
+- **Design:** dark only, cyan focus with a glow, overscan-safe margins, and focus that always comes back where
+  you left it.
+
+### Install
+
+MinTube TV is not on the Play Store. Download `MinTube-TV-tv-v<version>.apk` from the
+[releases](../../releases) page and sideload it in one of two ways:
+
+1. **Downloader app.** Install "Downloader" by AFTVnews from the TV's app store, allow it to install unknown apps
+   (Settings > Apps > Security & restrictions > Unknown sources, or when Android TV asks), enter the APK's
+   release URL and choose Install.
+2. **USB or adb.** Copy the APK to a USB drive and open it with a file manager on the TV, or with developer
+   options and network debugging on: `adb connect <tv-ip>` then `adb install MinTube-TV-tv-v<version>.apk`.
+
+MinTube TV then appears in the TV's app row. Check the file against the `.sha256` file published with it.
+
+### Remote controls
+
+| Where | Key | Action |
+|---|---|---|
+| Everywhere | D-pad | Move focus |
+| | OK | Open or activate |
+| | Back | Close the panel, then return to the menu, then leave |
+| Menu rail | Left (from content) | Open the menu: Home, Search, Subscriptions, Library, Settings |
+| Home, Search | Hold OK on a video | Open its channel (when the feed names the channel) |
+| Search | Mic button or remote's mic key | Voice search (when the TV has a recognizer) |
+| | Hold OK on a recent search | Remove it |
+| History | Hold OK on a video | Remove it from history |
+| Watch | OK | Play or pause and show the controls |
+| | Left / Right | Seek 10 s back or forward (hold to go faster) |
+| | Up | Quality, speed, captions, audio track, chapters, Info, Like, Subscribe, Watch later |
+| | Down | Up next (related videos) |
+| | OK on the autoplay card / Back | Play the next video now / cancel autoplay |
+| | Play/Pause, FF/RW, Next/Previous | Media keys work as expected |
+| Shorts | Up / Down | Previous / next Short |
+| | OK | Pause or play |
+| | Left / Right | Seek 5 s |
+| | Hold OK | Like |
+
+### Limitations
+
+- Sideload only; no Play Store listing and no in-app updates (watch this repository's releases).
+- Not on TV: downloads, picture-in-picture, the mini player, comments and live chat.
+- Voice search needs a speech recognizer on the TV.
+- Hold OK on a Home card opens the channel only when the feed provides it; some signed-out feeds do not, and
+  the card then just plays.
+- Signing in, switching accounts and signed-in pages (Subscriptions, Liked, playlists) were not verified on a
+  real account for this release.
+- Casting from the YouTube phone app to MinTube TV is not supported. Share a YouTube link to the TV instead, or
+  open the video in MinTube TV.
+- Dark theme only. TV-only text is translated into Vietnamese; in other app languages it shows in English.
+
 ## Screenshots
 
 Screenshots of every screen, light and dark, on phone and tablet, live in
