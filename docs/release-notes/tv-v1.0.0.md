@@ -19,7 +19,7 @@ It is a separate app (`com.nevminhnh.mintube.tv`), signed with the same key as M
 
 ## Install
 
-Download `MinTube-TV-tv-v1.0.0.apk` from this release and sideload it: copy it to the TV with a USB drive or the Downloader app, then allow installs from that source when Android TV asks. See the "MinTube TV" section of the README for step-by-step instructions and a remote cheat sheet.
+Download `MinTube-TV-v1.0.0.apk` from this release and sideload it: copy it to the TV with a USB drive or the Downloader app, then allow installs from that source when Android TV asks. See the "MinTube TV" section of the README for step-by-step instructions and a remote cheat sheet.
 
 ## Limitations
 

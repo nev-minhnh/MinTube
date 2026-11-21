@@ -68,14 +68,14 @@ released from the `tv` branch with `tv-v*` tags (for example `tv-v1.0.0`). Its a
 
 ### Install
 
-MinTube TV is not on the Play Store. Download `MinTube-TV-tv-v<version>.apk` from the
+MinTube TV is not on the Play Store. Download `MinTube-TV-v<version>.apk` from the
 [releases](../../releases) page and sideload it in one of two ways:
 
 1. **Downloader app.** Install "Downloader" by AFTVnews from the TV's app store, allow it to install unknown apps
    (Settings > Apps > Security & restrictions > Unknown sources, or when Android TV asks), enter the APK's
    release URL and choose Install.
 2. **USB or adb.** Copy the APK to a USB drive and open it with a file manager on the TV, or with developer
-   options and network debugging on: `adb connect <tv-ip>` then `adb install MinTube-TV-tv-v<version>.apk`.
+   options and network debugging on: `adb connect <tv-ip>` then `adb install MinTube-TV-v<version>.apk`.
 
 MinTube TV then appears in the TV's app row. Check the file against the `.sha256` file published with it.
 
