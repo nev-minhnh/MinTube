@@ -65,6 +65,7 @@ object TvHomeRows {
         // The phone card shows author · metadata (views and age already joined by the data layer).
         id = item.id, title = item.title, channel = item.author, metadata = item.metadata,
         artwork = item.artwork, duration = item.duration, live = item.live, progress = item.progress, short = short,
+        channelId = item.channelId,
     )
 
     fun videos(page: HomePage): List<TvVideo> = page.items.filterIsInstance<FeedItem.Video>()

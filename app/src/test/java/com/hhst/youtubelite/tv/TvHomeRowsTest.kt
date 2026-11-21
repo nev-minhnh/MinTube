@@ -13,8 +13,10 @@ import com.hhst.youtubelite.tv.home.TvHomeStatus
 import com.hhst.youtubelite.tv.home.TvRowKind
 import com.hhst.youtubelite.tv.home.TvRowState
 import com.hhst.youtubelite.tv.home.TvRowTitle
+import com.hhst.youtubelite.tv.design.TvVideo
 import com.hhst.youtubelite.tv.watch.TvAutoplay
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -53,6 +55,8 @@ class TvHomeRowsTest {
         val card = TvHomeRows.video(video("a"))
         assertEquals("Author · 1K views · 1 day ago", card.subtitle)
         assertEquals("1:00", card.duration)
+        // Hold OK on a Home card opens this channel.
+        assertEquals("UCa", card.channelId)
     }
 
     @Test fun signedOutCatalogIsTrendingWithTheRegionTitle() {
@@ -108,6 +112,21 @@ class TvHomeRowsTest {
         assertNull(left(55_000, cancelled = true))
         assertNull(left(55_000, ended = true))
         assertNull(left(55_000, duration = 0))
+    }
+
+    @Test fun playlistPlaybackAnnouncesThePlaylistsNextItemNotARelatedVideo() {
+        val related = listOf(TvVideo("cur", "Current"), TvVideo("rel", "Related"))
+        val next = TvVideo("pl2", "Playlist item 2")
+        assertEquals("rel", TvAutoplay.candidate(related, "cur", inPlaylist = false, playlistNext = null)?.id)
+        assertEquals("pl2", TvAutoplay.candidate(related, "cur", inPlaylist = true, playlistNext = next)?.id)
+        // Last playlist item: the engine stops, so no related video is announced.
+        assertNull(TvAutoplay.candidate(related, "cur", inPlaylist = true, playlistNext = null))
+        // A playlist advances even with the autoplay setting off; a user queue hides the card.
+        assertTrue(TvAutoplay.enabled(autoplaySetting = false, queueNext = true, queueEnabled = true, inPlaylist = true))
+        assertFalse(TvAutoplay.enabled(autoplaySetting = true, queueNext = true, queueEnabled = true, inPlaylist = false))
+        assertFalse(TvAutoplay.enabled(autoplaySetting = false, queueNext = true, queueEnabled = false, inPlaylist = false))
+        assertTrue(TvAutoplay.enabled(autoplaySetting = true, queueNext = true, queueEnabled = false, inPlaylist = false))
+        assertFalse(TvAutoplay.enabled(autoplaySetting = true, queueNext = false, queueEnabled = false, inPlaylist = true))
     }
 
     @Test fun linksOpenTheTvWatchScreenOrHome() {

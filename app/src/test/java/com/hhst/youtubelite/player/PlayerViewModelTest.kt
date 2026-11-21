@@ -185,6 +185,19 @@ class PlayerViewModelTest {
         assertEquals(VideoId.watchUrl("bbbbbbbbbbb"), engine.playCalls.last())
     }
 
+    @Test fun playlistOwnershipAndNextItemFollowThePlaylist() {
+        bindViewModel()
+        val items = listOf(watchId, "bbbbbbbbbbb", "ddddddddddd").map { QueueItem(it, title = it) }
+        viewModel.startPlaylist(items, startId = "bbbbbbbbbbb")
+        assertTrue(viewModel.playlistOwns("bbbbbbbbbbb"))
+        assertEquals("ddddddddddd", viewModel.playlistNextAfter("bbbbbbbbbbb")?.videoId)
+        assertNull(viewModel.playlistNextAfter("ddddddddddd"))
+        // Opening a video outside the playlist leaves it.
+        viewModel.openVideo("eeeeeeeeeee")
+        assertFalse(viewModel.playlistOwns("bbbbbbbbbbb"))
+        assertNull(viewModel.playlistNextAfter("bbbbbbbbbbb"))
+    }
+
     @Test fun autoplayPreferenceStopsServiceRequestsWithoutBreakingManualQueue() {
         var calls = 0
         bindViewModel { calls++; "bbbbbbbbbbb" }

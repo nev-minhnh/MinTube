@@ -102,6 +102,9 @@ fun TvPlayerScreen(
     actions: TvWatchActions = TvWatchActions.None,
     /** Clock for the SponsorBlock skip toast (tests pass a fake). */
     clockMs: () -> Long = { System.nanoTime() / 1_000_000 },
+    /** A playlist drives this video: the autoplay card announces [playlistNext], not a related video. */
+    inPlaylist: Boolean = false,
+    playlistNext: TvVideo? = null,
     video: @Composable () -> Unit = {},
 ) {
     var mode by remember { mutableStateOf(TvOverlayMode.Hidden) }
@@ -122,7 +125,7 @@ fun TvPlayerScreen(
     var promptOpen by remember { mutableStateOf(false) }
     var skipped by remember { mutableStateOf<String?>(null) }
     val skips = remember { TvSponsorSkipDetector() }
-    val candidate = upNext.firstOrNull { it.id != player.videoId }
+    val candidate = TvAutoplay.candidate(upNext, player.videoId, inPlaylist, playlistNext)
     val countdown by remember(player.videoId, player.durationMs, player.isLive, player.ended, player.error, autoplayEnabled,
         candidate, cancelledFor) {
         derivedStateOf {

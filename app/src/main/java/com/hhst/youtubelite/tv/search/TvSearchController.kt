@@ -33,7 +33,7 @@ import com.hhst.youtubelite.tv.watch.TvWatchActivity
 import com.hhst.youtubelite.ui.components.SearchRows
 import com.hhst.youtubelite.ui.components.rememberSearchRows
 import com.hhst.youtubelite.ui.observeAccountChanges
-import com.hhst.youtubelite.ui.renderNotice
+import com.hhst.youtubelite.tv.routes.renderTvNotice
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.getKoin
 
@@ -77,7 +77,7 @@ class TvSearchController(private val activity: ComponentActivity) {
         }
         activity.lifecycleScope.launch {
             activity.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.actionNotices.collect { activity.renderNotice(it) }
+                viewModel.actionNotices.collect { activity.renderTvNotice(it) }
             }
         }
     }

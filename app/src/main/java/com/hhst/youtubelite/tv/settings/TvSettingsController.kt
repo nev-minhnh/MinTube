@@ -16,7 +16,7 @@ import com.hhst.youtubelite.data.media.MediaSession
 import com.hhst.youtubelite.extension.ExtensionManager
 import com.hhst.youtubelite.player.PlayerViewModel
 import com.hhst.youtubelite.player.surface.SubtitleStyle
-import com.hhst.youtubelite.tv.account.TvSignInRoute
+import com.hhst.youtubelite.tv.routes.TvSignInRoute
 import com.hhst.youtubelite.tv.design.TvPanelOption
 import com.hhst.youtubelite.ui.observeAccountChanges
 import org.koin.java.KoinJavaComponent.getKoin

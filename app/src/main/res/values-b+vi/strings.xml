@@ -785,8 +785,6 @@
     <string name="tv_playlist_unavailable">Danh sách phát này không khả dụng</string>
     <string name="tv_playlist_empty">Danh sách phát này không có video</string>
     <string name="tv_playlist_loading_all">Đang tải toàn bộ danh sách phát… %1$d video</string>
-    <string name="tv_route_channel">Kênh</string>
-    <string name="tv_go_back">Quay lại</string>
     <string name="tv_loading">Đang tải…</string>
     <string name="tv_subscriptions_signed_out_title">Đăng nhập để xem kênh đăng ký</string>
     <string name="tv_subscriptions_signed_out_message">Video mới từ các kênh bạn đăng ký sẽ hiện ở đây.</string>

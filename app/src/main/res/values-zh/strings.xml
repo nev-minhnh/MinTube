@@ -787,8 +787,6 @@
     <string name="tv_playlist_unavailable">This playlist is unavailable</string>
     <string name="tv_playlist_empty">This playlist has no videos</string>
     <string name="tv_playlist_loading_all">Loading the whole playlist… %1$d videos</string>
-    <string name="tv_route_channel">Channel</string>
-    <string name="tv_go_back">Go back</string>
     <string name="tv_loading">Loading…</string>
     <string name="tv_subscriptions_signed_out_title">Sign in to see your subscriptions</string>
     <string name="tv_subscriptions_signed_out_message">New videos from the channels you subscribe to show up here.</string>

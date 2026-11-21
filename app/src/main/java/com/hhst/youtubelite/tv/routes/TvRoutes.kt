@@ -2,27 +2,23 @@ package com.hhst.youtubelite.tv.routes
 
 import android.content.Context
 import android.content.Intent
+import com.hhst.youtubelite.tv.account.TvSignInActivity
+import com.hhst.youtubelite.tv.channel.TvChannelActivity
+import com.hhst.youtubelite.tv.playlist.TvPlaylistActivity
 
-/*
- * Entry points into TV screens other agents own. Each factory opens [TvPlaceholderActivity] on this
- * branch; at merge time the coordinator replaces the body with the real Activity's intent
- * (TV-A: channel page and playlist detail; TV-C: sign-in). Callers never change.
- */
+/* Entry points into full-screen TV pages, so callers never depend on the Activity classes. */
 
-/** TV channel page (TV-A). */
+/** TV channel page. */
 object TvChannelRoute {
-    fun intent(context: Context, channelId: String): Intent =
-        TvPlaceholderActivity.intent(context, TvPlaceholderActivity.Kind.Channel, channelId)
+    fun intent(context: Context, channelId: String): Intent = TvChannelActivity.intent(context, channelId)
 }
 
-/** TV playlist detail (TV-A). Also used for "WL" and "LL" ids. */
+/** TV playlist detail. Also used for "WL" and "LL" ids. */
 object TvPlaylistRoute {
-    fun intent(context: Context, playlistId: String): Intent =
-        TvPlaceholderActivity.intent(context, TvPlaceholderActivity.Kind.Playlist, playlistId)
+    fun intent(context: Context, playlistId: String): Intent = TvPlaylistActivity.intent(context, playlistId)
 }
 
-/** TV sign-in, device code (TV-C). */
+/** TV device-code sign-in. Every signed-out TV action goes here, never to the phone SignInActivity. */
 object TvSignInRoute {
-    fun intent(context: Context): Intent =
-        TvPlaceholderActivity.intent(context, TvPlaceholderActivity.Kind.SignIn, null)
+    fun intent(context: Context): Intent = Intent(context, TvSignInActivity::class.java)
 }

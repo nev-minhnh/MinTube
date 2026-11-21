@@ -30,7 +30,8 @@ import com.hhst.youtubelite.player.GestureUi
 import com.hhst.youtubelite.player.PlayerViewModel
 import com.hhst.youtubelite.player.engine.LoopMode
 import com.hhst.youtubelite.tv.TvActivity
-import com.hhst.youtubelite.tv.account.TvSignInRoute
+import com.hhst.youtubelite.player.QueueItem
+import com.hhst.youtubelite.tv.routes.TvSignInRoute
 import com.hhst.youtubelite.tv.verify.TvVerification
 import com.hhst.youtubelite.ui.noticeText
 import com.hhst.youtubelite.tv.design.TvVideo
@@ -167,6 +168,9 @@ class TvWatchActivity : TvActivity() {
                 detail = listOfNotNull(ready?.video?.views?.takeIf(String::isNotBlank), ready?.video?.age?.takeIf(String::isNotBlank))
                     .joinToString(" · "),
             )
+            // Playlist playback (Play all / Shuffle): the card follows the playlist, not related videos.
+            val inPlaylist = playerViewModel.playlistOwns(player.videoId)
+            val playlistNext = if (inPlaylist) playerViewModel.playlistNextAfter(player.videoId)?.toTvVideo() else null
             TvPlayerScreen(
                 player = player,
                 position = playerViewModel.positionState,
@@ -174,8 +178,10 @@ class TvWatchActivity : TvActivity() {
                 seekTarget = seekTarget,
                 info = info,
                 upNext = upNext,
-                autoplayEnabled = prefs.isEnabled(PreferenceKeys.ENABLE_AUTOPLAY) && player.loopMode == LoopMode.QUEUE_NEXT &&
-                    !player.queueEnabled,
+                autoplayEnabled = TvAutoplay.enabled(prefs.isEnabled(PreferenceKeys.ENABLE_AUTOPLAY),
+                    queueNext = player.loopMode == LoopMode.QUEUE_NEXT, queueEnabled = player.queueEnabled, inPlaylist = inPlaylist),
+                inPlaylist = inPlaylist,
+                playlistNext = playlistNext,
                 callbacks = callbacks,
                 extras = TvWatchExtras(
                     details = ready?.video?.let { video ->
@@ -315,6 +321,10 @@ class TvWatchActivity : TvActivity() {
             if (hasExtra(EXTRA_START_SECONDS)) getLongExtra(EXTRA_START_SECONDS, 0).takeIf { it >= 0 } else null
     }
 }
+
+internal fun QueueItem.toTvVideo() = TvVideo(
+    id = videoId, title = title, channel = author.orEmpty(), artwork = thumbnailUrl.orEmpty(),
+)
 
 internal fun WatchRelated.toTvVideo() = TvVideo(
     id = id, title = title, channel = channel,

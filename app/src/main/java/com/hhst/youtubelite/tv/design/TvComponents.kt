@@ -60,6 +60,8 @@ data class TvVideo(
     val live: Boolean = false,
     val progress: Float? = null,
     val short: Boolean = false,
+    /** Uploader channel; blank when unknown. Long-press of OK opens it where a screen supports that. */
+    val channelId: String = "",
 ) {
     val subtitle: String get() = listOf(channel, metadata).filter(String::isNotBlank).joinToString(" · ")
 }

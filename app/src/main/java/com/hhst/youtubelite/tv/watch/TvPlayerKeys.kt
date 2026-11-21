@@ -1,6 +1,7 @@
 package com.hhst.youtubelite.tv.watch
 
 import android.view.KeyEvent
+import com.hhst.youtubelite.tv.design.TvVideo
 
 /** What the player overlay shows. Hidden = video only. */
 enum class TvOverlayMode { Hidden, Controls, Settings, UpNext }
@@ -146,4 +147,18 @@ object TvAutoplay {
         if (remaining <= 0 || remaining > WINDOW_MS) return null
         return ((remaining + 999) / 1000).toInt()
     }
+
+    /**
+     * Whether the engine will auto-advance at the end. A playlist always advances to its next item
+     * (the autoplay setting governs only related videos); a user queue hides the card.
+     */
+    fun enabled(autoplaySetting: Boolean, queueNext: Boolean, queueEnabled: Boolean, inPlaylist: Boolean): Boolean =
+        queueNext && (inPlaylist || autoplaySetting && !queueEnabled)
+
+    /**
+     * The video the card announces: during playlist playback the playlist's next item (none after
+     * its last item), never a related video; otherwise the first related video that is not this one.
+     */
+    fun candidate(upNext: List<TvVideo>, currentId: String?, inPlaylist: Boolean, playlistNext: TvVideo?): TvVideo? =
+        if (inPlaylist) playlistNext else upNext.firstOrNull { it.id != currentId }
 }

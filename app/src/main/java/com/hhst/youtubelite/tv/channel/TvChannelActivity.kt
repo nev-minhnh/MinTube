@@ -27,14 +27,14 @@ import com.hhst.youtubelite.tv.TvActivity
 import com.hhst.youtubelite.tv.playlist.TvPlaylistActivity
 import com.hhst.youtubelite.tv.watch.TvWatchActivity
 import com.hhst.youtubelite.ui.observeAccountChanges
-import com.hhst.youtubelite.ui.renderNotice
+import com.hhst.youtubelite.tv.routes.renderTvNotice
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 /**
  * Full-screen TV channel page over the unchanged phone [ChannelViewModel] (built as
  * ChannelActivity builds it). Subscribe runs the ViewModel's write and its notices, including
- * the sign-in notice, through [renderNotice]. Videos, Shorts and live rows open
+ * the sign-in notice, through [renderTvNotice] (TV sign-in, never the phone one). Videos, Shorts and live rows open
  * [TvWatchActivity]; playlists open [TvPlaylistActivity].
  */
 class TvChannelActivity : TvActivity() {
@@ -70,7 +70,7 @@ class TvChannelActivity : TvActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.actionNotices.collect { renderNotice(it) }
+                viewModel.actionNotices.collect { renderTvNotice(it) }
             }
         }
         lifecycleScope.launch {

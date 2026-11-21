@@ -875,6 +875,15 @@ class PlayerViewModel(
         (playlistItems.firstOrNull { it.videoId == startId } ?: playlistItems.firstOrNull())?.let { openVideo(it.videoId) }
     }
 
+    /** True while a playlist started with [startPlaylist] drives [videoId] (it advances to [playlistNextAfter]). */
+    fun playlistOwns(videoId: String?): Boolean = playlistActive && playlistItems.any { it.videoId == videoId }
+
+    /** The playlist item that follows [videoId], or null when no playlist owns it or it is the last one. */
+    fun playlistNextAfter(videoId: String?): QueueItem? {
+        if (!playlistOwns(videoId)) return null
+        return playlistItems.getOrNull(playlistItems.indexOfFirst { it.videoId == videoId } + 1)
+    }
+
     private fun playlistNeighbor(direction: Int): QueueItem? {
         val index = playlistItems.indexOfFirst { it.videoId == playbackQueueId() }
         return if (index < 0) null else playlistItems.getOrNull(index + direction)

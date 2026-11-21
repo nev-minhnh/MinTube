@@ -26,7 +26,7 @@ import com.hhst.youtubelite.tv.TvActivity
 import com.hhst.youtubelite.tv.channel.TvChannelActivity
 import com.hhst.youtubelite.tv.watch.TvWatchActivity
 import com.hhst.youtubelite.ui.observeAccountChanges
-import com.hhst.youtubelite.ui.renderNotice
+import com.hhst.youtubelite.tv.routes.renderTvNotice
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -60,7 +60,7 @@ class TvPlaylistActivity : TvActivity() {
         observeAccountChanges(::syncSession)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.actionNotices.collect { renderNotice(it) }
+                viewModel.actionNotices.collect { renderTvNotice(it) }
             }
         }
         lifecycleScope.launch {

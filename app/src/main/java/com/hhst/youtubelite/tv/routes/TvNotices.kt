@@ -2,6 +2,7 @@ package com.hhst.youtubelite.tv.routes
 
 import android.app.Activity
 import com.hhst.youtubelite.core.AppNotice
+import com.hhst.youtubelite.ui.noticeText
 import com.hhst.youtubelite.ui.showMessage
 
 /**
@@ -12,7 +13,7 @@ fun Activity.renderTvNotice(notice: AppNotice) {
     when (notice) {
         AppNotice.SignIn -> startActivity(TvSignInRoute.intent(this))
         is AppNotice.LocalizedMessage -> showMessage(getString(notice.resource, *notice.arguments.toTypedArray()))
-        is AppNotice.Message -> showMessage(notice.text)
-        is AppNotice.Failure -> showMessage(notice.text)
+        is AppNotice.Message -> showMessage(noticeText(notice.text))
+        is AppNotice.Failure -> showMessage(noticeText(notice.text, failure = true))
     }
 }

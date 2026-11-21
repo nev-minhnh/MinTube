@@ -1,7 +1,5 @@
 package com.hhst.youtubelite.tv.account
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.LaunchedEffect
@@ -22,11 +20,6 @@ import com.liskovsoft.youtubeapi.videoinfo.V2.Account
 import com.liskovsoft.youtubeapi.videoinfo.V2.SignInCode
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
-
-/** Entry point other TV screens use to start sign-in. Keep the name: TV-B references it. */
-object TvSignInRoute {
-    fun intent(context: Context): Intent = Intent(context, TvSignInActivity::class.java)
-}
 
 /**
  * Full-screen device-code sign-in for the remote. Same flow as the phone's SignInActivity: the

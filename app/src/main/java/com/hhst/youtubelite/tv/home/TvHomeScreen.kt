@@ -82,6 +82,7 @@ fun TvHomeScreen(
     onRowShown: (TvHomeRow) -> Unit = {},
     onFocusDwell: (TvVideo) -> Unit = {},
     focusMemory: TvFocusMemory = rememberTvFocusMemory(),
+    onOpenChannel: (TvVideo) -> Unit = {},
 ) {
     Box(modifier.fillMaxSize().testTag(TAG_HOME)) {
         when (val status = state.status) {
@@ -112,7 +113,7 @@ fun TvHomeScreen(
                     actionModifier = Modifier.testTag(TAG_RETRY),
                 )
             }
-            TvHomeStatus.Ready -> TvHomeRows(state.rows, onOpen, onLoadMore, onRetryRow, onRowShown, onFocusDwell, focusMemory)
+            TvHomeStatus.Ready -> TvHomeRows(state.rows, onOpen, onLoadMore, onRetryRow, onRowShown, onFocusDwell, focusMemory, onOpenChannel)
         }
     }
 }
@@ -146,6 +147,7 @@ private fun TvHomeRows(
     onRowShown: (TvHomeRow) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
     memory: TvFocusMemory,
+    onOpenChannel: (TvVideo) -> Unit,
 ) {
     val column = rememberLazyListState()
     val requesters = remember { TvFocusRequesters() }
@@ -181,7 +183,7 @@ private fun TvHomeRows(
         item(key = "brand", contentType = "brand") { Box(Modifier.padding(start = RowStart)) { TvHomeBrand() } }
         itemsIndexed(rows, key = { _, row -> row.key }, contentType = { _, row -> row.kind }) { index, row ->
             LaunchedEffect(row.key) { onRowShown(row) }
-            TvHomeRowItem(row, index, memory, requesters, scrolls.of(row.key), onOpen, onLoadMore, onRetryRow, onFocusDwell)
+            TvHomeRowItem(row, index, memory, requesters, scrolls.of(row.key), onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel)
         }
     }
 }
@@ -197,6 +199,7 @@ private fun TvHomeRowItem(
     onLoadMore: (String) -> Unit,
     onRetryRow: (String) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
+    onOpenChannel: (TvVideo) -> Unit,
 ) {
     val cardWidth = if (row.kind == TvRowKind.Shorts) TvSizes.ShortCardWidth else TvSizes.CardWidth
     val aspect = if (row.kind == TvRowKind.Shorts) 9f / 16f else 16f / 9f
@@ -213,7 +216,7 @@ private fun TvHomeRowItem(
                     icon = AppIcon.Refresh)
             }
             is TvRowState.Ready -> ReadyRow(row, state, rowIndex, cardWidth, aspect, memory, requesters, scroll,
-                onOpen, onLoadMore, onRetryRow, onFocusDwell)
+                onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel)
         }
     }
 }
@@ -232,6 +235,7 @@ private fun ReadyRow(
     onLoadMore: (String) -> Unit,
     onRetryRow: (String) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
+    onOpenChannel: (TvVideo) -> Unit,
 ) {
     val keys = remember(state.videos) { state.videos.map(TvVideo::id) }
     val anchor = memory.indexIn(row.key, keys)
@@ -263,6 +267,8 @@ private fun ReadyRow(
                 video = video,
                 onClick = { onOpen(video) },
                 width = cardWidth,
+                // Hold OK: open the uploader's channel, as in Search.
+                onLongClick = if (video.channelId.isNotBlank()) ({ onOpenChannel(video) }) else null,
                 modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier)
                     .testTag(cardTag(row.key, index)),
                 onFocused = {

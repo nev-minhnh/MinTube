@@ -28,6 +28,7 @@ import com.hhst.youtubelite.home.domain.HomeCatalog
 import com.hhst.youtubelite.home.domain.HomeContent
 import com.hhst.youtubelite.home.presentation.HomeViewModel
 import com.hhst.youtubelite.tv.design.TvVideo
+import com.hhst.youtubelite.tv.routes.TvChannelRoute
 import com.hhst.youtubelite.tv.verify.TvVerification
 import com.hhst.youtubelite.tv.verify.TvVerificationNotice
 import com.hhst.youtubelite.tv.watch.TvWatchActivity
@@ -197,6 +198,7 @@ class TvHomeController(private val activity: ComponentActivity) {
             onRetry = { main.onAction(HomeAction.Refresh) },
             onRowShown = { row -> row.chip?.let(::chip) },
             onFocusDwell = { video -> if (!video.short) warm(video.id) },
+            onOpenChannel = { video -> activity.startActivity(TvChannelRoute.intent(activity, video.channelId)) },
         )
     }
 }
