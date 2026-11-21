@@ -58,13 +58,18 @@ internal class DeferredMenuCache(private val now: () -> Long = System::currentTi
 class MediaHomeRepository(private val client: MediaClient,
     private val now: () -> Long = System::currentTimeMillis) : HomeRepository {
     private val menus = DeferredMenuCache(now)
-    private val discovery = HomeDiscovery { section, key, generation ->
+    private val discovery = HomeDiscovery(englishRead = { section, key, generation ->
+        discoveryRead(section, key, generation, ContentLocale.ENGLISH)
+    }) { section, key, generation -> discoveryRead(section, key, generation, null) }
+
+    /** Signed-out directory shelves: the session's hl/gl, or English when [language] pins it. */
+    private suspend fun discoveryRead(section: HomeSection, key: String?, generation: Long, language: String?) =
         client.readIdempotent { context, http ->
             if (context.generation != generation)
                 throw kotlinx.coroutines.CancellationException("Session changed")
-            loadHome(section, context.anonymous().copy(language = "en"), key, http).requireValue()
+            val anonymous = context.anonymous()
+            loadHome(section, if (language == null) anonymous else anonymous.copy(language = language), key, http).requireValue()
         }
-    }
     override val filters = listOf("All", "Music", "Gaming", "Live", "News", "Sports")
     override suspend fun loadHome(filter: String, continuation: String?): HomePage {
         val catalog = HomeCatalog.forFilter(filter)
@@ -200,8 +205,13 @@ class MediaSearchRepository(private val client: MediaClient,
         var anonymousFallback = page.anonymousFallback
         if (direct == null) {
             // Cold search / reset / unproven transition: each response carries cumulative params for the next option.
-            for (label in listOfNotNull(filters.uploaded.label(), filters.type.label())) {
+            val steps = listOfNotNull(
+                filters.uploaded.label()?.let { Triple(it, SearchFilterParams.UPLOAD_DATE, filters.uploaded.code()) },
+                filters.type.label()?.let { Triple(it, SearchFilterParams.TYPE, filters.type.code()) })
+            for ((label, field, code) in steps) {
+                // English labels first; any other hl is recognized by the option's params.
                 val filter = page.filters.firstOrNull { it.matches(label) }
+                    ?: page.filters.firstOrNull { !it.selected && SearchFilterParams.value(it.params, field) == code }
                     ?: throw MediaException(com.liskovsoft.youtubeapi.videoinfo.V2.RequestError(
                         com.liskovsoft.youtubeapi.videoinfo.V2.RequestFailure.UNSUPPORTED, "filter_unavailable"))
                 page = loadSearch(query, context, filter.params, http = http).requireValue()
@@ -263,6 +273,19 @@ class MediaSearchRepository(private val client: MediaClient,
         SearchUploadDate.ThisMonth -> "This month"
         SearchUploadDate.ThisYear -> "This year"
         SearchUploadDate.Anytime -> null
+    }
+    private fun SearchUploadDate.code(): Long? = when (this) {
+        SearchUploadDate.Today -> 2
+        SearchUploadDate.ThisWeek -> 3
+        SearchUploadDate.ThisMonth -> 4
+        SearchUploadDate.ThisYear -> 5
+        SearchUploadDate.Anytime -> null
+    }
+    private fun SearchResultType.code(): Long? = when (this) {
+        SearchResultType.Channels -> 2
+        SearchResultType.Playlists -> 3
+        SearchResultType.Shorts -> 9
+        SearchResultType.All -> null
     }
     private fun SearchResultType.label(): String? = when (this) {
         SearchResultType.Channels -> "Channel"

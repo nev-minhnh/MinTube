@@ -109,7 +109,11 @@ class HomeActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 require(modelClass == HomeViewModel::class.java)
                 return HomeViewModel(if (fixtures) FixtureHomeRepository(scenario) else sources.home, extras.createSavedStateHandle(), scenario, loadOnStart = !fixtures, if (fixtures) null else sources.saves, if (fixtures) null else sources.avatars,
                     if (fixtures) null else sources.snapshots,
-                    { com.hhst.youtubelite.data.media.MediaSession.snapshot().accountId ?: "visitor" },
+                    { com.hhst.youtubelite.data.media.MediaSession.snapshot().accountId.let { account ->
+                        // Snapshot rows carry server text in the request hl/gl: partition by both.
+                        val owner = account ?: "visitor"
+                        com.hhst.youtubelite.data.media.MediaSession.contentLocale()?.scope(owner) ?: owner
+                    } },
                     reportSignal = if (fixtures) null else {
                         { org.koin.java.KoinJavaComponent.getKoin()
                             .get<com.hhst.youtubelite.data.media.PlaybackWatchReporting>().anonymousReportSignal.value }

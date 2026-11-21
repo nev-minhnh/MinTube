@@ -5,6 +5,10 @@ object PreferenceKeys {
     const val HAPTIC_STRENGTH = "haptic_strength"
     const val THEME_MODE = "theme_mode"
     const val APP_LANGUAGE = "app_language"
+    /** Requests YouTube content with `hl=en`; off follows the app language. */
+    const val CONTENT_LANGUAGE_ENGLISH = "content_language_english"
+    /** Requests YouTube content with `gl=VN`; off follows the device region. */
+    const val TRENDING_REGION_VIETNAM = "trending_region_vietnam"
     const val ENABLE_DISPLAY_DISLIKES = "enable_display_dislikes"
     const val ENABLE_HIDE_SHORTS = "enable_hide_shorts"
     const val PRIVATE_BROWSING = "private_browsing"
@@ -78,6 +82,8 @@ object PreferenceKeys {
         ENABLE_SHOW_LIKES to true,
         ENABLE_HIDE_SHORTS to false,
         PRIVATE_BROWSING to false,
+        CONTENT_LANGUAGE_ENGLISH to true,
+        TRENDING_REGION_VIETNAM to true,
         SKIP_SPONSORS to true,
         SKIP_SELF_PROMO to true,
         SKIP_INTERACTION to true,

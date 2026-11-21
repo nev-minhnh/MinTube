@@ -351,7 +351,7 @@ class MediaShortsRepository(private val client: MediaClient, private val startId
         return if (cursor != null) loadChannel(channelId, context, continuation = cursor, http = http).requireValue().page
         else {
             val channel = loadChannel(channelId, context, http = http).requireValue()
-            val tab = channel.page.tabs.firstOrNull { it.title.equals("Shorts", true) }
+            val tab = channel.page.tabs.firstOrNull(ChannelTabKind.Shorts::matches)
             if (tab == null) channel.page.copy(items = emptyList()) else loadChannel(channelId, context, tab.params, http = http).requireValue().page
         }
     }

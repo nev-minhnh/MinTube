@@ -765,4 +765,8 @@
     <string name="qa1_history_paused_banner">Lịch sử xem đang tạm dừng. Các video bạn xem trên thiết bị này sẽ không được lưu.</string>
     <string name="qa1_clear_history_device_body">Lịch sử xem trên thiết bị này sẽ bị xóa. Bạn không thể hoàn tác thao tác này.</string>
     <string name="qa2_local_history_and_playlists">Lịch sử và danh sách phát trên máy</string>
+    <string name="locale_translate_titles">Dịch tiêu đề sang tiếng Anh</string>
+    <string name="locale_translate_titles_summary">Tắt để xem tiêu đề gốc, lượt xem và ngày theo ngôn ngữ ứng dụng</string>
+    <string name="locale_trending_vietnam">Thịnh hành tại Việt Nam</string>
+    <string name="locale_trending_vietnam_summary">Tắt để dùng khu vực của thiết bị cho thịnh hành và tìm kiếm</string>
 </resources>

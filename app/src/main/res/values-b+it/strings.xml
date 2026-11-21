@@ -765,4 +765,8 @@
     <string name="qa1_history_paused_banner">Watch history is paused. Videos you watch on this device are not saved.</string>
     <string name="qa1_clear_history_device_body">Your watch history will be cleared on this device. This can\'t be undone.</string>
     <string name="qa2_local_history_and_playlists">Local history and playlists</string>
+    <string name="locale_translate_titles">Translate titles to English</string>
+    <string name="locale_translate_titles_summary">Off shows original titles, with views and dates in the app language</string>
+    <string name="locale_trending_vietnam">Trending in Vietnam</string>
+    <string name="locale_trending_vietnam_summary">Off uses your device region for trending and search</string>
 </resources>

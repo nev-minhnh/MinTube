@@ -102,6 +102,10 @@ private fun GeneralSettings(
         value = AppLocale.OPTIONS.firstOrNull { it.first == AppLocale.tag(context) }?.second
             ?: java.util.Locale.forLanguageTag(AppLocale.tag(context)).displayName,
         tag = "settings-row-language", onClick = { languageDialog = true })
+    SettingsToggle(stringResource(R.string.locale_translate_titles), stringResource(R.string.locale_translate_titles_summary),
+        PreferenceKeys.CONTENT_LANGUAGE_ENGLISH, preferences, onToggle)
+    SettingsToggle(stringResource(R.string.locale_trending_vietnam), stringResource(R.string.locale_trending_vietnam_summary),
+        PreferenceKeys.TRENDING_REGION_VIETNAM, preferences, onToggle)
     SettingsGroup(stringResource(R.string.settings_group_feed))
     SettingsToggle(stringResource(R.string.settings_hide_shorts), stringResource(R.string.settings_hide_shorts_summary),
         PreferenceKeys.ENABLE_HIDE_SHORTS, preferences, onToggle)
