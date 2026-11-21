@@ -144,7 +144,10 @@ object MediaSession {
 
     /** Main-thread safe: the cached context, possibly holding a stale access token.
      *  The persisted anonymous mode forces the whole app (Home, Watch, library) onto
-     *  the device identity while the signed-in account stays selectable. */
+     *  the device identity while the signed-in account stays selectable.
+     *  It carries the content language but never the region override: player, watch/next,
+     *  Shorts and download resolution keep MSC's default `gl`. Region-scoped discovery
+     *  reads opt in through [withContentRegion]. */
     fun snapshot(): RequestContext = synchronized(lock) { session.snapshot().let {
         val base = when {
             anonymousMode -> it.anonymous().copy(visitor = visitor, visitorCookie = visitorCookie)
@@ -153,13 +156,22 @@ object MediaSession {
         }
         val locale = contentLocale
         if (locale == null) base.copy(generation = base.generation + identityEpoch)
-        else base.copy(language = locale.language, region = locale.region, generation = base.generation + identityEpoch)
+        else base.copy(language = locale.language, generation = base.generation + identityEpoch)
     } }
+
+    /**
+     * Adds the region override (`gl`) for Home/discovery, trending, Explore, search and
+     * suggestions only. A player request sent with a `gl` that disagrees with the network's
+     * country (for example `gl=VN` over a foreign VPN) returned media URLs that googlevideo
+     * rejected with 403 for geo-restricted videos, so playback requests must not use this.
+     */
+    fun withContentRegion(context: RequestContext): RequestContext =
+        contentLocale()?.let { context.copy(region = it.region) } ?: context
 
     fun contentLocale(): ContentLocale? = synchronized(lock) { contentLocale }
 
     /**
-     * Sets the `hl`/`gl` every request carries. A change after the first value bumps the
+     * Sets the content `hl` every request carries and the `gl` that [withContentRegion] adds. A change after the first value bumps the
      * generation like [setAnonymousMode]: in-flight reads of the previous locale abort with
      * "session_changed", pagination cursors stop matching and screens reload, so rows in two
      * languages or regions never mix. Returns true when the locale changed.
