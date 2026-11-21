@@ -3,23 +3,33 @@ package com.hhst.youtubelite.tv
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.hhst.youtubelite.R
-import androidx.tv.material3.Text
-import com.hhst.youtubelite.tv.design.TvType
+import androidx.compose.runtime.Composable
+import com.hhst.youtubelite.tv.shell.TvComingSoon
+import com.hhst.youtubelite.tv.shell.TvDestination
+import com.hhst.youtubelite.tv.shell.TvShell
+import com.hhst.youtubelite.tv.shell.TvShellState
+import com.hhst.youtubelite.tv.shell.rememberTvShellState
 
-/** LEANBACK_LAUNCHER entry of MinTube TV. */
+/**
+ * LEANBACK_LAUNCHER entry of MinTube TV: the shell (rail + content) hosting the top-level
+ * destinations. A destination plugs in by adding its composable to [Destination]; full-screen
+ * pages (watch, channel, playlist) are their own [TvActivity].
+ */
 class TvMainActivity : TvActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTvContent {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.tv_app_name), style = TvType.Display)
-            }
+            val shell = rememberTvShellState()
+            TvShell(shell, onExit = ::finish) { destination -> Destination(destination, shell) }
+        }
+    }
+
+    @Composable
+    private fun Destination(destination: TvDestination, shell: TvShellState) {
+        when (destination) {
+            TvDestination.Home, TvDestination.Search, TvDestination.Subscriptions,
+            TvDestination.Library, TvDestination.Settings ->
+                TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
         }
     }
 

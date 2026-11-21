@@ -62,8 +62,8 @@ object TvSpacing {
 object TvSizes {
     val CardWidth = 256.dp
     val ShortCardWidth = 140.dp
-    val RailCollapsed = 72.dp
-    val RailExpanded = 232.dp
+    val RailCollapsed = 96.dp
+    val RailExpanded = 264.dp
     val RailItemHeight = 48.dp
     val ButtonHeight = 44.dp
     val ChipHeight = 40.dp
