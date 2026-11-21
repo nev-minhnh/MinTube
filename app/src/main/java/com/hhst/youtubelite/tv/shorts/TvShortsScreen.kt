@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.tv.shorts
 
+import com.hhst.youtubelite.tv.grid.requestWhenReady
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -155,7 +156,8 @@ private fun Player(
     val rateable by rememberUpdatedState(canRate && info != null)
     // Video first; a playback failure puts focus on its Retry.
     LaunchedEffect(playback.failed) {
-        runCatching { if (playback.failed) retryRequester.requestFocus() else videoRequester.requestFocus() }
+        // Wait for the target to be laid out: a request in the first frame fails silently.
+        (if (playback.failed) retryRequester else videoRequester).requestWhenReady(attempts = 10)
     }
     // Back from the buttons returns to the video; from the video it leaves (the activity's Back).
     BackHandler(enabled = actionsFocused) { runCatching { videoRequester.requestFocus() } }

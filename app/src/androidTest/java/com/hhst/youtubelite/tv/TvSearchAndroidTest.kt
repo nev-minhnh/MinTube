@@ -74,7 +74,11 @@ class TvSearchAndroidTest {
                         onOpenChannel = {},
                         onLoadMore = {},
                         onRetryMore = {},
-                        onRetry = { retries++ },
+                        onRetry = {
+                            // As the ViewModel does: a retry reloads the results.
+                            retries++
+                            state = state.copy(results = TvSearchResults(TvSearchStatus.Loading))
+                        },
                     )
                 }
             }

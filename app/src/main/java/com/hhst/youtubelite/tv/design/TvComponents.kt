@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.design
 
+import androidx.compose.runtime.withFrameNanos
+import com.hhst.youtubelite.tv.shell.LocalTvShell
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -289,7 +291,15 @@ fun TvStateMessage(
         if (actionLabel != null && onAction != null) {
             Spacer(Modifier.height(TvSpacing.sm))
             TvButton(actionLabel, onAction, actionModifier.focusRequester(requester), primary = true)
-            if (requestFocus) LaunchedEffect(Unit) { runCatching { requester.requestFocus(FocusDirection.Enter) } }
+            // In the shell, a state that replaces the focused content (Sign in -> Retry) takes focus
+            // back, or Compose leaves it on the rail; never while the user chose the rail.
+            val shell = LocalTvShell.current
+            if (requestFocus || shell != null) LaunchedEffect(Unit) {
+                withFrameNanos { }
+                if (requestFocus || shell?.railFocusedByUser != true) {
+                    runCatching { requester.requestFocus(FocusDirection.Enter) }
+                }
+            }
         }
     }
 }

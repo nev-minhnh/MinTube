@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.watch
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -43,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -439,24 +440,24 @@ private fun SettingsRows(
         val list = rememberLazyListState(selected)
         LazyRow(
             state = list,
-            modifier = Modifier.fillMaxWidth().focusRestorer(optionList).testTag(TAG_OPTIONS),
+            modifier = Modifier.fillMaxWidth().tvFocusRestorer(optionList).testTag(TAG_OPTIONS),
             contentPadding = PaddingValues(horizontal = TvSpacing.OverscanHorizontal, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         ) {
             itemsIndexed(choices, key = { _, option -> option.key }) { index, option ->
                 TvChip(option.label, option.selected, { onPick(open, option) },
-                    (if (index == selected) Modifier.focusRequester(optionList) else Modifier).testTag("$TAG_OPTION-$index"))
+                    (if (index == selected) Modifier.tvAnchor(optionList) else Modifier).testTag("$TAG_OPTION-$index"))
             }
         }
     }
     LazyRow(
-        modifier = Modifier.fillMaxWidth().focusRestorer(settings).testTag(TAG_SETTINGS),
+        modifier = Modifier.fillMaxWidth().tvFocusRestorer(settings).testTag(TAG_SETTINGS),
         contentPadding = PaddingValues(horizontal = TvSpacing.OverscanHorizontal, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm),
     ) {
         itemsIndexed(kinds, key = { _, kind -> kind.name }) { index, kind ->
             TvChip(kind.label(), selected = kind == open, onClick = { onOpen(kind) },
-                modifier = (if (index == 0) Modifier.focusRequester(settings) else Modifier).testTag("$TAG_SETTING-${kind.name}"),
+                modifier = (if (index == 0) Modifier.tvAnchor(settings) else Modifier).testTag("$TAG_SETTING-${kind.name}"),
                 detail = settingValue(kind, player, position.value))
         }
         items(buttons, key = { "button:${it.name}" }) { button ->
@@ -542,13 +543,13 @@ private fun UpNextRow(videos: List<TvVideo>, requester: FocusRequester, onOpen: 
         LaunchedEffect(nearEnd, videos.size) { if (nearEnd) onNearEnd() }
         LazyRow(
             state = list,
-            modifier = Modifier.fillMaxWidth().focusRestorer(requester),
+            modifier = Modifier.fillMaxWidth().tvFocusRestorer(requester),
             contentPadding = PaddingValues(horizontal = TvSpacing.OverscanHorizontal, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
         ) {
             itemsIndexed(videos, key = { _, video -> video.id }) { index, video ->
                 TvCard(video, onClick = { onOpen(video) }, width = TvSizes.CardWidth * 0.85f,
-                    modifier = (if (index == 0) Modifier.focusRequester(requester) else Modifier).testTag("$TAG_UP_NEXT_CARD-$index"))
+                    modifier = (if (index == 0) Modifier.tvAnchor(requester) else Modifier).testTag("$TAG_UP_NEXT_CARD-$index"))
             }
         }
     }

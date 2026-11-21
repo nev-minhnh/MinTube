@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.settings
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -119,7 +120,7 @@ fun TvSettingsScreen(
         LazyColumn(
             state = list,
             modifier = Modifier.fillMaxSize().let { base ->
-                if (first != null) base.focusRestorer(requesters.of(first)) else base
+                if (first != null) base.tvFocusRestorer(requesters.of(first)) else base
             }.testTag(TAG_SETTINGS_LIST),
             contentPadding = PaddingValues(start = TvSpacing.xxl, end = TvSpacing.OverscanHorizontal,
                 top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical + 48.dp),
@@ -142,7 +143,7 @@ fun TvSettingsScreen(
                 item(key = row.key) {
                     val rowModifier = Modifier
                         .widthIn(max = 980.dp)
-                        .focusRequester(requesters.of(row.key))
+                        .tvAnchor(requesters.of(row.key))
                         .onFocusChanged { if (it.isFocused) focusedKey = row.key }
                         .testTag("$TAG_ROW-${row.key}")
                     SettingRow(row, rowModifier, callbacks, onOpen = { next -> open(next, row.key) })

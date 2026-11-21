@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.library
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -26,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -86,7 +87,7 @@ fun TvVideoGrid(
         LazyVerticalGrid(
             columns = GridCells.Fixed(metrics.columns),
             state = state,
-            modifier = Modifier.fillMaxSize().focusRestorer(requester).onFocusChanged { focused = it.hasFocus }.testTag(TAG_GRID),
+            modifier = Modifier.fillMaxSize().tvFocusRestorer(requester).onFocusChanged { focused = it.hasFocus }.testTag(TAG_GRID),
             contentPadding = PaddingValues(start = GridStart, end = TvSpacing.OverscanHorizontal,
                 top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical + 48.dp),
             horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
@@ -100,7 +101,7 @@ fun TvVideoGrid(
                         onClick = { onOpen(video) },
                         width = metrics.cardWidth,
                         onLongClick = onLongClick?.let { hold -> { hold(video) } },
-                        modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier).testTag(gridCardTag(index)),
+                        modifier = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier).testTag(gridCardTag(index)),
                         onFocused = { memory.record(GRID_KEY, 0, video.id, index) },
                     )
                 }

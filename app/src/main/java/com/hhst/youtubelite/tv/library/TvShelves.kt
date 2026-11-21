@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.library
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +26,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -141,7 +142,7 @@ private fun ShelfRow(
     val width = if (short) TvSizes.ShortCardWidth else TvSizes.CardWidth
     LazyRow(
         state = scroll,
-        modifier = Modifier.fillMaxWidth().focusRestorer(requester).testTag(shelfListTag(shelf.key)),
+        modifier = Modifier.fillMaxWidth().tvFocusRestorer(requester).testTag(shelfListTag(shelf.key)),
         contentPadding = PaddingValues(start = ShelfStart, end = TvSpacing.OverscanHorizontal, top = 10.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
     ) {
@@ -150,7 +151,7 @@ private fun ShelfRow(
                 video = video,
                 onClick = { onOpen(shelf.key, video) },
                 width = width,
-                modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier).testTag(shelfCardTag(shelf.key, index)),
+                modifier = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier).testTag(shelfCardTag(shelf.key, index)),
                 onFocused = { memory.record(shelf.key, rowIndex, video.id, index) },
             )
         }
@@ -160,7 +161,7 @@ private fun ShelfRow(
                 onClick = { onViewAll(shelf.key) },
                 width = width,
                 aspect = if (short) 9f / 16f else 16f / 9f,
-                modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier).testTag(shelfViewAllTag(shelf.key)),
+                modifier = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier).testTag(shelfViewAllTag(shelf.key)),
                 onFocused = { memory.record(shelf.key, rowIndex, VIEW_ALL_KEY, index) },
             )
         }

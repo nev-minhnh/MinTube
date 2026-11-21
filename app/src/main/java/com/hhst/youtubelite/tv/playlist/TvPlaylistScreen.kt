@@ -1,5 +1,9 @@
 package com.hhst.youtubelite.tv.playlist
 
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.focus.focusRestorer
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -34,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -160,7 +163,10 @@ private fun PlaylistPage(
             .padding(start = TvSpacing.OverscanHorizontal, top = TvSpacing.OverscanVertical),
         horizontalArrangement = Arrangement.spacedBy(TvSpacing.xxl),
     ) {
-        Column(Modifier.width(PanelWidth).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
+        // Left from the list returns to the last header control, else Play all (not whichever control
+        // happens to sit at the row's height).
+        Column(Modifier.width(PanelWidth).fillMaxHeight().focusRestorer(playAll).focusGroup(),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
             YoutubeThumb(status.header.artwork, Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(TvSizes.Corner)),
                 placeholderColor = TvColors.Surface)
             Text(status.header.title, style = TvType.Title, color = TvColors.Ink, maxLines = 3, overflow = TextOverflow.Ellipsis,
@@ -197,7 +203,7 @@ private fun PlaylistPage(
         } else {
             LazyColumn(
                 state = list,
-                modifier = Modifier.weight(1f).fillMaxHeight().focusRestorer(rowRequester).testTag(TAG_PLAYLIST_ROWS),
+                modifier = Modifier.weight(1f).fillMaxHeight().tvFocusRestorer(rowRequester).testTag(TAG_PLAYLIST_ROWS),
                 contentPadding = PaddingValues(end = TvSpacing.OverscanHorizontal, top = TvSpacing.xs,
                     bottom = TvSpacing.OverscanVertical + 48.dp),
                 verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
@@ -207,7 +213,7 @@ private fun PlaylistPage(
                         index = index,
                         row = row,
                         onClick = { onOpen(row) },
-                        modifier = (if (index == anchor) Modifier.focusRequester(rowRequester) else Modifier)
+                        modifier = (if (index == anchor) Modifier.tvAnchor(rowRequester) else Modifier)
                             .onFocusChanged { if (it.isFocused) memory.record(ROWS, 0, row.entryId, index) }
                             .testTag(playlistRowTag(index)),
                     )

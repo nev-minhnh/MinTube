@@ -61,7 +61,8 @@ object TvSignInText {
 fun TvSignInScreen(state: SignInUiState, onRetry: () -> Unit, onCancel: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier.fillMaxSize().background(TvColors.Background)
-            .padding(horizontal = TvSpacing.OverscanHorizontal * 2, vertical = TvSpacing.OverscanVertical * 2)
+            // One overscan margin vertically: at 1080p (540 dp) a double margin pushed the buttons off the page.
+            .padding(horizontal = TvSpacing.OverscanHorizontal * 2, vertical = TvSpacing.OverscanVertical)
             .testTag(TAG_SIGN_IN),
         contentAlignment = Alignment.Center,
     ) {
@@ -98,7 +99,7 @@ private fun CodeLayout(state: SignInUiState, onRetry: () -> Unit, onCancel: () -
     val url = ready?.verificationUrl ?: "https://${TvSignInText.DEFAULT_URL}"
     val primary = remember { FocusRequester() }
     Row(horizontalArrangement = Arrangement.spacedBy(64.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TvSpacing.lg)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
             Text(stringResource(R.string.ui_sign_in_with_your_google_account), style = TvType.Display, color = TvColors.Ink)
             Text(stringResource(R.string.ui_open_1_s_on_your_phone_or_computer, TvSignInText.displayUrl(url)),
                 style = TvType.Title, color = TvColors.Secondary, modifier = Modifier.testTag(TAG_SIGN_IN_URL))
@@ -119,7 +120,6 @@ private fun CodeLayout(state: SignInUiState, onRetry: () -> Unit, onCancel: () -
                     .clearAndSetSemantics { })
             }
             StatusLine(state)
-            Spacer(Modifier.height(TvSpacing.md))
             Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
                 TvButton(stringResource(R.string.tv_sign_in_new_code), onRetry,
                     Modifier.focusRequester(primary).testTag(TAG_SIGN_IN_RETRY), icon = AppIcon.Refresh)

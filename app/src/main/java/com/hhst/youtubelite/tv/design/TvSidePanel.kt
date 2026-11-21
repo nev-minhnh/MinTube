@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -95,7 +94,7 @@ fun TvOptionPanel(
         val first = remember { FocusRequester() }
         LazyColumn(
             state = list,
-            modifier = Modifier.fillMaxWidth().weight(1f).focusRestorer(first),
+            modifier = Modifier.fillMaxWidth().weight(1f).tvFocusRestorer(first),
             contentPadding = PaddingValues(vertical = TvSpacing.sm),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         ) {
@@ -103,7 +102,7 @@ fun TvOptionPanel(
                 TvListRow(
                     title = option.label,
                     onClick = { onSelect(index) },
-                    modifier = (if (index == initial) Modifier.focusRequester(first) else Modifier).testTag("$tag-$index"),
+                    modifier = (if (index == initial) Modifier.tvAnchor(first) else Modifier).testTag("$tag-$index"),
                     summary = option.detail,
                     selected = option.selected,
                 )

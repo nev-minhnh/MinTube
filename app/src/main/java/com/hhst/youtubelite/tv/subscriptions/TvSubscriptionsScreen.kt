@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.subscriptions
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,7 +33,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -213,10 +214,11 @@ private fun ChannelStrip(
 ) {
     when (strip) {
         TvChannelStrip.Loading -> TvAvatarSkeleton()
+        // Retry leads the row: as the top-left action it is where focus enters the page.
         TvChannelStrip.Failed -> Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.tv_subscriptions_channels_failed), style = TvType.Body, color = TvColors.Secondary)
-            Spacer(Modifier.width(TvSpacing.lg))
             TvButton(stringResource(R.string.retry), onRetry, Modifier.testTag(TAG_CHANNELS_RETRY), icon = AppIcon.Refresh)
+            Spacer(Modifier.width(TvSpacing.lg))
+            Text(stringResource(R.string.tv_subscriptions_channels_failed), style = TvType.Body, color = TvColors.Secondary)
         }
         is TvChannelStrip.Ready -> {
             if (strip.channels.isEmpty()) return
@@ -229,7 +231,7 @@ private fun ChannelStrip(
             LaunchedEffect(nearEnd, strip.canPage, strip.channels.size) { if (nearEnd && strip.canPage) onLoadMore() }
             LazyRow(
                 state = scroll,
-                modifier = Modifier.fillMaxWidth().focusRestorer(requester).testTag(TAG_CHANNELS),
+                modifier = Modifier.fillMaxWidth().tvFocusRestorer(requester).testTag(TAG_CHANNELS),
                 // Room for the focus scale; the grid already insets the start edge.
                 contentPadding = PaddingValues(top = 10.dp, bottom = 4.dp, end = TvSpacing.lg),
                 horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
@@ -240,7 +242,7 @@ private fun ChannelStrip(
                         avatar = channel.avatar,
                         hasNew = channel.hasNew,
                         onClick = { onOpenChannel(channel) },
-                        modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier).testTag(channelTag(index)),
+                        modifier = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier).testTag(channelTag(index)),
                         onFocused = { memory.record(ROW_CHANNELS, 0, channel.id, index) },
                     )
                 }

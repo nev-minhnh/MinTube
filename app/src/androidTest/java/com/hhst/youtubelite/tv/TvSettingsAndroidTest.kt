@@ -6,12 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToKey
 import androidx.compose.ui.test.requestFocus
 import androidx.test.platform.app.InstrumentationRegistry
 import com.hhst.youtubelite.account.domain.SignInUiState
 import com.hhst.youtubelite.extension.PreferenceKeys
+import com.hhst.youtubelite.tv.account.TAG_SIGN_IN_CANCEL
 import com.hhst.youtubelite.tv.account.TAG_SIGN_IN_CODE
 import com.hhst.youtubelite.tv.account.TAG_SIGN_IN_QR
 import com.hhst.youtubelite.tv.account.TAG_SIGN_IN_RETRY
@@ -152,6 +154,9 @@ class TvSettingsAndroidTest {
         compose.onNodeWithTag(TAG_SIGN_IN_CODE).assertExists()
         compose.onNodeWithTag(TAG_SIGN_IN_URL).assertExists()
         compose.onNodeWithTag(TAG_SIGN_IN_QR).assertExists()
+        // Both buttons must be on screen at 1080p, not laid out past the page.
+        compose.onNodeWithTag(TAG_SIGN_IN_RETRY).assertIsDisplayed()
+        compose.onNodeWithTag(TAG_SIGN_IN_CANCEL).assertIsDisplayed()
         compose.awaitFocus(TAG_SIGN_IN_RETRY)
         compose.press(Key.DirectionCenter)
         compose.press(Key.DirectionRight)

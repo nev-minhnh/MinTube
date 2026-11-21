@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.tv.home
 
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +34,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -258,7 +259,7 @@ private fun ReadyRow(
     LazyRow(
         state = scroll,
         // Entering the row (Up/Down, or Right from the rail) lands on the remembered card.
-        modifier = Modifier.fillMaxWidth().focusRestorer(requester).testTag(rowListTag(row.key)),
+        modifier = Modifier.fillMaxWidth().tvFocusRestorer(requester).testTag(rowListTag(row.key)),
         contentPadding = PaddingValues(start = RowStart, end = TvSpacing.OverscanHorizontal, top = 10.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
     ) {
@@ -269,7 +270,7 @@ private fun ReadyRow(
                 width = cardWidth,
                 // Hold OK: open the uploader's channel, as in Search.
                 onLongClick = if (video.channelId.isNotBlank()) ({ onOpenChannel(video) }) else null,
-                modifier = (if (index == anchor) Modifier.focusRequester(requester) else Modifier)
+                modifier = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier)
                     .testTag(cardTag(row.key, index)),
                 onFocused = {
                     memory.record(row.key, rowIndex, video.id, index)

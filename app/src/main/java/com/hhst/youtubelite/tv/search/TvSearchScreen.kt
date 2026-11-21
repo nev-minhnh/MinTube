@@ -1,5 +1,8 @@
 package com.hhst.youtubelite.tv.search
 
+import androidx.compose.runtime.withFrameNanos
+import com.hhst.youtubelite.tv.design.tvFocusRestorer
+import com.hhst.youtubelite.tv.design.tvAnchor
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -313,15 +316,26 @@ private fun SuggestionPane(
     }
     val rowRequesters = remember { mutableMapOf<Int, FocusRequester>() }
     var refocusIndex by remember { mutableIntStateOf(-1) }
+    var focusedRecent by remember { mutableIntStateOf(-1) }
     val list = rememberLazyListState()
     // A removed row takes focus with it: hand focus to the row now in its place, else the field.
+    // The window re-enters the screen after the focused button leaves (landing on the field), which
+    // can happen after this request: check that the row kept focus and ask again.
     LaunchedEffect(state.recent) {
         val index = refocusIndex
         if (index < 0) return@LaunchedEffect
         refocusIndex = -1
         val target = index.coerceAtMost(state.recent.lastIndex)
-        if (target >= 0) rowRequesters.getOrPut(target) { FocusRequester() }.requestWhenReady(attempts = 6)
-        else fieldRequester.requestWhenReady(attempts = 6)
+        if (target < 0) {
+            fieldRequester.requestWhenReady(attempts = 6)
+            return@LaunchedEffect
+        }
+        repeat(REFOCUS_ATTEMPTS) {
+            rowRequesters.getOrPut(target) { FocusRequester() }.requestWhenReady(attempts = 6)
+            withFrameNanos { }
+            withFrameNanos { }
+            if (focusedRecent == target) return@LaunchedEffect
+        }
     }
     LazyColumn(
         state = list,
@@ -342,6 +356,9 @@ private fun SuggestionPane(
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm)) {
                     TvListRow(entry, { onSubmit(entry) },
                         Modifier.weight(1f).focusRequester(rowRequesters.getOrPut(index) { FocusRequester() })
+                            .onFocusChanged { focus ->
+                                if (focus.isFocused) focusedRecent = index else if (focusedRecent == index) focusedRecent = -1
+                            }
                             .testTag(recentTag(index)),
                         icon = AppIcon.History, onLongClick = remove)
                     TvIconButton(AppIcon.Close, stringResource(R.string.tv_search_remove, entry), remove,
@@ -434,14 +451,14 @@ private fun FiltersRow(state: TvSearchUiState, onSelectType: (SearchResultType) 
     val selectedType = state.types.indexOf(state.filters.type).coerceAtLeast(0)
     val anchor = remember { FocusRequester() }
     LazyRow(
-        Modifier.fillMaxWidth().focusRestorer(anchor).testTag(TAG_FILTERS),
+        Modifier.fillMaxWidth().tvFocusRestorer(anchor).testTag(TAG_FILTERS),
         contentPadding = PaddingValues(vertical = TvSpacing.xs, horizontal = TvSpacing.xs),
         horizontalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         itemsIndexed(state.types, key = { _, type -> "type:${type.name}" }) { index, type ->
             TvChip(stringResource(type.labelResource), type == state.filters.type, { onSelectType(type) },
-                (if (index == selectedType) Modifier.focusRequester(anchor) else Modifier).testTag(typeTag(type)))
+                (if (index == selectedType) Modifier.tvAnchor(anchor) else Modifier).testTag(typeTag(type)))
         }
         item(key = "divider") { Box(Modifier.padding(horizontal = TvSpacing.sm).width(1.dp).height(24.dp).background(TvColors.Ghost)) }
         itemsIndexed(SearchUploadDate.entries, key = { _, date -> "date:${date.name}" }) { _, date ->
@@ -483,13 +500,13 @@ private fun ResultsGrid(
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             state = grid,
-            modifier = Modifier.fillMaxSize().focusRestorer(requester).testTag(TAG_GRID),
+            modifier = Modifier.fillMaxSize().tvFocusRestorer(requester).testTag(TAG_GRID),
             contentPadding = PaddingValues(start = TvSpacing.sm, end = TvSpacing.sm, top = 10.dp, bottom = TvSpacing.OverscanVertical + 48.dp),
             horizontalArrangement = Arrangement.spacedBy(TvSpacing.CardGap),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.RowGap),
         ) {
             itemsIndexed(items, key = { _, item -> item.key }, contentType = { _, item -> item::class.simpleName }) { index, item ->
-                val focus = (if (index == anchor) Modifier.focusRequester(requester) else Modifier).testTag(resultTag(index))
+                val focus = (if (index == anchor) Modifier.tvAnchor(requester) else Modifier).testTag(resultTag(index))
                 val record = { memory.record(RESULTS, 0, item.key, index) }
                 when (item) {
                     is TvSearchItem.Video -> TvCard(
@@ -527,3 +544,5 @@ fun suggestionTag(index: Int) = "tv-search-suggestion-$index"
 fun resultTag(index: Int) = "tv-search-result-$index"
 fun typeTag(type: SearchResultType) = "tv-search-type-${type.name}"
 fun dateTag(date: SearchUploadDate) = "tv-search-date-${date.name}"
+
+private const val REFOCUS_ATTEMPTS = 4

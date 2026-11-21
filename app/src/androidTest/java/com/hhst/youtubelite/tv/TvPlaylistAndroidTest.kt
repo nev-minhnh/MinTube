@@ -88,9 +88,9 @@ class TvPlaylistAndroidTest {
         compose.press(Key.DirectionCenter)
         assertEquals(listOf("e2"), opened)
         compose.press(Key.DirectionLeft)
-        compose.waitUntil(5_000) { compose.isFocused(TAG_PLAYLIST_SHUFFLE) || compose.isFocused(TAG_PLAYLIST_PLAY_ALL) }
+        compose.awaitAnyFocus(TAG_PLAYLIST_SHUFFLE, TAG_PLAYLIST_PLAY_ALL)
         compose.press(Key.DirectionRight)
-        compose.waitUntil(5_000) { compose.isFocused(TAG_PLAYLIST_SHUFFLE) || compose.isFocused(playlistRowTag(2)) }
+        compose.awaitAnyFocus(TAG_PLAYLIST_SHUFFLE, playlistRowTag(2))
         if (compose.isFocused(TAG_PLAYLIST_SHUFFLE)) compose.press(Key.DirectionRight)
         compose.awaitFocus(playlistRowTag(2))
     }
