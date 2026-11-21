@@ -86,8 +86,8 @@ jobs:
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
           case "$tag" in
-            tv-v*) echo "EXPECTED_VERSION_TAG=${tag#tv-}"; echo "ASSET=MinTube-TV-${tag#tv-}"; echo "RELEASE_TITLE=MinTube TV ${tag#tv-}"; echo "PRODUCT=MinTube TV" ;;
-            v*) echo "EXPECTED_VERSION_TAG=$tag"; echo "ASSET=MinTube-$tag"; echo "RELEASE_TITLE=MinTube $tag"; echo "PRODUCT=MinTube" ;;
+            tv-v*) echo "EXPECTED_VERSION_TAG=${tag#tv-}"; echo "ASSET=MinTube-TV-${tag#tv-}"; echo "RELEASE_TITLE=MinTube TV ${tag#tv-}"; echo "PRODUCT=MinTube TV"; echo "LATEST=false" ;;
+            v*) echo "EXPECTED_VERSION_TAG=$tag"; echo "ASSET=MinTube-$tag"; echo "RELEASE_TITLE=MinTube $tag"; echo "PRODUCT=MinTube"; echo "LATEST=true" ;;
             *) echo "::error::Unsupported release tag $tag (expected v<version> or tv-v<version>)."; exit 1 ;;
           esac >> "$GITHUB_ENV"
       - name: Sign the release APK
@@ -141,4 +141,4 @@ jobs:
           fi
           printf '\n\nSHA-256: `%s`\n' "$(cut -d' ' -f1 "dist/$ASSET.apk.sha256")" >> "$notes"
           gh release create "$tag" "dist/$ASSET.apk" "dist/$ASSET.apk.sha256" \
-            --repo "$GITHUB_REPOSITORY" --title "$RELEASE_TITLE" --notes-file "$notes" --verify-tag
+            --repo "$GITHUB_REPOSITORY" --title "$RELEASE_TITLE" --notes-file "$notes" --verify-tag --latest="$LATEST"
