@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:48" hostname="MINHNH-LAPTOP" time="0.033">
+  <properties/>
+  <testcase name="fingerprint_doesNotSkipDifferentQuality" classname="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" time="0.007"/>
+  <testcase name="cancelledTask_isNotReusedByFingerprint" classname="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" time="0.003"/>
+  <testcase name="allSkipped_isNoNewTasks" classname="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" time="0.01"/>
+  <testcase name="submissionId_replaysOriginalResult" classname="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" time="0.007"/>
+  <testcase name="fingerprint_skipsIdenticalRequest" classname="com.hhst.youtubelite.downloader.core.DownloadSubmissionTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

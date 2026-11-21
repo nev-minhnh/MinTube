@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaHistoryRecoveryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:10" hostname="MINHNH-LAPTOP" time="0.794">
+  <properties/>
+  <testcase name="missingManagementStateIsNotInferredFromAnEmptyHistory" classname="com.hhst.youtubelite.data.media.MediaHistoryRecoveryTest" time="0.267"/>
+  <testcase name="knownOldPauseStateAllowsOneBoundedIdempotentRetry" classname="com.hhst.youtubelite.data.media.MediaHistoryRecoveryTest" time="0.265"/>
+  <testcase name="aPausedStateCanSettleWithoutRepeatingTheManagementWrite" classname="com.hhst.youtubelite.data.media.MediaHistoryRecoveryTest" time="0.261"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

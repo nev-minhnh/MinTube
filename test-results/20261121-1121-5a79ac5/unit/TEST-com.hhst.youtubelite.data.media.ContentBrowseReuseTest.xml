@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:03" hostname="MINHNH-LAPTOP" time="0.393">
+  <properties/>
+  <testcase name="landingEndpointsRemoveTheRepeatedHomeAndHandleResolution" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.027"/>
+  <testcase name="aFailedFeedDoesNotPoisonTheIndependentDirectoryOrTheNextRefresh" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.059"/>
+  <testcase name="identitiesChannelParamsAndCursorsNeverJoinTheGlobalInitialRead" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.088"/>
+  <testcase name="aLandingFromAnotherIdentityOrRepositoryCannotSupplyEndpoints" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.076"/>
+  <testcase name="aWaitingDirectorySuspendsWithoutHoldingAWorkerAndSurvivesOwnerCancellation" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.037"/>
+  <testcase name="cookieDirectoryKeepsItsIndependentGuideRequest" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.022"/>
+  <testcase name="aDeferredFailureRetriesOnlyItsEndpointAndAnAbsentTabNeedsNoRequest" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.013"/>
+  <testcase name="subscriptionsPairInEitherOrderAndEveryNewPairIsFresh" classname="com.hhst.youtubelite.data.media.ContentBrowseReuseTest" time="0.069"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

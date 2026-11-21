@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.surface.PlayerUiTest" tests="24" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.077">
+  <properties/>
+  <testcase name="pipAspect_unknownFallsBackTo16by9" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.071"/>
+  <testcase name="offsetHint_signedSeconds" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="progressFraction_clampsAndZeroDuration" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="lockVisible_fullscreenOnlyNeverInMini" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="playerTopOffset_windowSpaceIsInsetPlusReportedPageTop" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="sheetMaxHeight_capsLandscapeAndPortrait" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="speedLabel_oneDecimalForWholeSpeeds" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="chapterIndexAt_positionBeforeFirstIsNegative" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="landscapeMini_compactPhoneFallsBackButRoomyTabletStaysEmbedded" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="surfaceHandoffDoesNotRestartLoadingAfterVideoHasRendered" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="seekBarInsetFollowsPageOrientationAndFullscreenEdges" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="endedPlaybackOffersReplayRegardlessOfRemainingNavigationOrPlayIntent" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="languageLabel_fallsBackWhenBlank" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="landscapeMini_boundaryAndPortraitRestoration" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="hudSidePad_subtractsChromeInset" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="fullscreenSideDp_atLeastSixteenAndGrowsWithCutout" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="gestureSideInset_scalesWithPlayerWidth" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="embeddedHeight_usesReportedOr16by9" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="nextBackStep_lockThenFullscreenThenBrowser" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="qualityButtonLabel_autoIncludesActiveTrack" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="pipAspect_clampsToAndroidPipRange" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="segmentRange_skipsEmptyAndClamps" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.001"/>
+  <testcase name="loadingIncludesResolutionBufferingAndWaitingForTheFirstVideoFrame" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <testcase name="highlightPoints_areDrawableOnlyWithinTheTimeline" classname="com.hhst.youtubelite.player.surface.PlayerUiTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:32" hostname="MINHNH-LAPTOP" time="0.017">
+  <properties/>
+  <testcase name="preferPlayable_filtersUndecodableAv1" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.001"/>
+  <testcase name="unknownCapabilitiesUseConservativeStandardResolution" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.0"/>
+  <testcase name="av1UsesDecoderDimensionsAndFrameRate" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.014"/>
+  <testcase name="preferPlayable_failsFastWhenNothingIsDecodable" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.0"/>
+  <testcase name="preferPlayable_decodableBeatsPotBearingUndecodable" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.001"/>
+  <testcase name="av1_droppedWithoutHardwareDecoder" classname="com.hhst.youtubelite.player.datasource.CodecCapabilitiesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

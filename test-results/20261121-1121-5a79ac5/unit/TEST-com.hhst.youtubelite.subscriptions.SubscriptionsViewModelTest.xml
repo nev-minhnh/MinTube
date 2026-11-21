@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" tests="37" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.149">
+  <properties/>
+  <testcase name="loadMoreAfterTheBoundFetchesOnePagePerTap" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.005"/>
+  <testcase name="feedPaginationNeverInvalidatesTheChannelGuide" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.008"/>
+  <testcase name="directoryRefreshKeepsContentAndReordersUpdatedChannels" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="unreadChannelsComeFirstWithoutReorderingEitherGroup" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.006"/>
+  <testcase name="mismatchedChallengeUrlKeepsTheBannerWithoutRetrying" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="accountSwitchResetsAndReloadsTheChannelGuide" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.007"/>
+  <testcase name="aSlowSelectedChannelCannotReplaceTheNextSelection" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.007"/>
+  <testcase name="postsChipKeepsTheEmptyStateInsteadOfInventingPosts" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="directoryRefreshFailureKeepsThePreviousDirectory" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="failedFeedKeepsTheLoadedChannelGuide" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.002"/>
+  <testcase name="signedOutFeedShowsThePromptWithoutLoading" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.001"/>
+  <testcase name="selectedChannelPaginationAndBackKeepTheirOwnFeedScopes" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.002"/>
+  <testcase name="staleFilterCompletionCannotOverwriteTheNewFilter" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="selectingTheSubscriptionsTabItselfDoesNotNavigate" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.006"/>
+  <testcase name="aMenuCapturedByAnotherSessionIsNeverReadOrWritten" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="selectingTheCurrentChipKeepsTheActiveReadAndLoadedFeed" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.002"/>
+  <testcase name="chipSelectionReloadsWithTheMatchingFilter" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="emptyFilteredPagesAutoContinueWithinTheBoundThenStop" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.002"/>
+  <testcase name="selectingAnAvatarLoadsItsFeedAndClearsOnlyItsBadgeWithoutNavigating" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.005"/>
+  <testcase name="filterSearchAndOverlayRestoreTogether" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="liveMenuReadsTheCardsOwnEndpointAndWritesBackItsCapabilities" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.005"/>
+  <testcase name="menuMirrorsTheHomeVideoActionsAndEmitsIdentity" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.008"/>
+  <testcase name="trafficChallengeShowsTheBannerAndCompletionRetriesOnce" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="scenarioInitialContentCoversLoadingErrorAndAppendStates" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.001"/>
+  <testcase name="directoryAppendsPagesMergesUnreadFlagsAndStopsAtTheHonestEnd" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="liveFeedbackRemovesTheCardAndOnlyItsOwnChannelCards" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="consumedBadgesSurviveStaleRefreshButFutureUpdatesCanBadgeAgain" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="failedPaginationCanRetryAndDuplicateIdsAreMerged" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="openingTheChannelDirectoryReusesTheIndependentGuide" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="failedMenuReadOffersRetryAndRecoveryClearsIt" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.002"/>
+  <testcase name="selectionAndConsumedBadgesRestoreButNeverLeakAcrossAccounts" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="paginationAppendsAndFailureKeepsTheLoadedFeed" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="failedChannelGuideDoesNotEraseTheFeedAndCanRetry" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="emptyFilteredPagesResumeTheFeedWhenResultsArrive" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.004"/>
+  <testcase name="liveMenuWritesThroughTheSaveSheetAndDropsFeedbackRows" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.006"/>
+  <testcase name="failedDirectoryPageKeepsLoadedChannelsAndCanRetry" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <testcase name="plainFailureLeavesNoVerificationToSolve" classname="com.hhst.youtubelite.subscriptions.SubscriptionsViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

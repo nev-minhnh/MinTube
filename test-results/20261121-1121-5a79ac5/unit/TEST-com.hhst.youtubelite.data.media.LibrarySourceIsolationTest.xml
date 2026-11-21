@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:04" hostname="MINHNH-LAPTOP" time="0.251">
+  <properties/>
+  <testcase name="accountPlaylistChoicesCannotMutateTheDevice" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.016"/>
+  <testcase name="removingSavedVideosAfterClearingHistoryNeverNeedsTheNetwork" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.048"/>
+  <testcase name="signedInReadsAndWritesHitTheServerAndLeaveTheDeviceAlone" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.097"/>
+  <testcase name="watchLaterIsADistinctListPerIdentity" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.015"/>
+  <testcase name="identityTransitionsKeepDeviceDataAndNeverWriteTheServer" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.014"/>
+  <testcase name="devicePlaylistIdsCannotBeSentToTheAccount" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.006"/>
+  <testcase name="queuedAccountWritesAreCancelledAfterTheIdentitySwitches" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.007"/>
+  <testcase name="theWholeAppAnonymousSwitchKeepsEveryLibraryCallLocalWhileCredentialsStay" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.019"/>
+  <testcase name="anonymousReadsAndWritesStayOnTheDevice" classname="com.hhst.youtubelite.data.media.LibrarySourceIsolationTest" time="0.026"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

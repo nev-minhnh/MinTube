@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.share.VideoShareTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.002">
+  <properties/>
+  <testcase name="fixtureIdsMapToTheirPublicWatchUrls" classname="com.hhst.youtubelite.share.VideoShareTest" time="0.002"/>
+  <testcase name="newFixtureAliasesResolveOnlyKnownMedia" classname="com.hhst.youtubelite.share.VideoShareTest" time="0.0"/>
+  <testcase name="localOrMalformedIdsNeverFabricateALink" classname="com.hhst.youtubelite.share.VideoShareTest" time="0.0"/>
+  <testcase name="canonicalIdsAreAcceptedVerbatim" classname="com.hhst.youtubelite.share.VideoShareTest" time="0.0"/>
+  <testcase name="fixtureShareTargetsFollowTheirArtwork" classname="com.hhst.youtubelite.share.VideoShareTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

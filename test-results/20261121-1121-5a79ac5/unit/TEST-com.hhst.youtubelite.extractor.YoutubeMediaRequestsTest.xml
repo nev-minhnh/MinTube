@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:29" hostname="MINHNH-LAPTOP" time="2.19">
+  <properties/>
+  <testcase name="accountIndexAcceptsThePageStringRepresentation" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.011"/>
+  <testcase name="child403KeepsThePlanActuallyUsedInsteadOfAPrefetchedClient" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.039"/>
+  <testcase name="serializedStreamCannotContainSessionCredentialsOrTokenHandles" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.002"/>
+  <testcase name="changingSessionCancelsAnAlreadyOpenBody" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="2.009"/>
+  <testcase name="get403RetriesPostOnceAndRetainsProfileUa" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.016"/>
+  <testcase name="unrangedPlanKeepsTheWholeBodyWhenAHeaderRangeIsIgnored" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.019"/>
+  <testcase name="expiredUrlIsRejectedBeforeAnHttpRequest" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="configurationParserHandlesBracesInsideStringsAndMergesSets" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="existingManifestBackupPreservesItsOwnSessionAndProfile" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.0"/>
+  <testcase name="oversizedPageChallengeIsNotCaptured" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.013"/>
+  <testcase name="anAnnouncedReadinessHoldDoesNotIssueAnExtraPostAfter403" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.009"/>
+  <testcase name="queryCroppedViewDoesNotChangeWholeObjectIdentity" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="staleOrUnplannedRequestsCannotInventAClientBinding" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.01"/>
+  <testcase name="noCompatibilityRetryForRateLimitOrManifest" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.008"/>
+  <testcase name="partialResponsesProvePositionAndObjectLength" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="pageFlagsUseOnlyTheCurrentPlayerAndAccountLogo" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="rejectedPostResponsesNeverBecomeALearnedCompatibilityMethod" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.023"/>
+  <testcase name="rangeIsBoundedAndIdentityChangeRejectsRequest" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <testcase name="htmlBodiesAndIgnoredRangesAreRejectedBeforeConsumption" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.02"/>
+  <testcase name="loosePageChallengeKeepsItsOwnEventAndDoesNotEvaluateJavascript" classname="com.hhst.youtubelite.extractor.YoutubeMediaRequestsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

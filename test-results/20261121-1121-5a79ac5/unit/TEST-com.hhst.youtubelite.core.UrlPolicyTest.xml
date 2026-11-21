@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.core.UrlPolicyTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:03" hostname="MINHNH-LAPTOP" time="0.003">
+  <properties/>
+  <testcase name="canLoadLocalSchemes" classname="com.hhst.youtubelite.core.UrlPolicyTest" time="0.001"/>
+  <testcase name="keepsTrafficChallengesInsideTheAppWithoutPageScripts" classname="com.hhst.youtubelite.core.UrlPolicyTest" time="0.001"/>
+  <testcase name="allowsYoutubeAndAccounts" classname="com.hhst.youtubelite.core.UrlPolicyTest" time="0.0"/>
+  <testcase name="rejectsOtherHosts" classname="com.hhst.youtubelite.core.UrlPolicyTest" time="0.001"/>
+  <testcase name="verificationOnlyCompletesOnAContentHost" classname="com.hhst.youtubelite.core.UrlPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

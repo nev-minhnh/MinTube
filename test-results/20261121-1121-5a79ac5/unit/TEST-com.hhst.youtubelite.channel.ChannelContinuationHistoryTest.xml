@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:15:49" hostname="MINHNH-LAPTOP" time="0.174">
+  <properties/>
+  <testcase name="accountRefreshStartsAnIndependentCycleForEverySection" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.106"/>
+  <testcase name="eachSectionStopsAtACursorCycleAndKeepsTheFinalPagesRows" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.011"/>
+  <testcase name="aDeferredVideosRefreshRejectsAnObsoleteAppendBeforeItCanConsumeTheNewCycle" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.013"/>
+  <testcase name="selfRepeatingCursorsStillContributeTheirReturnedRows" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.007"/>
+  <testcase name="failedWholePageRefreshPreservesTheRetainedSectionsHistory" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.009"/>
+  <testcase name="failedAppendDoesNotConsumeItsCursor" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.011"/>
+  <testcase name="failedRefreshRetainsHistoryAndSuccessfulRefreshStartsANewCycle" classname="com.hhst.youtubelite.channel.ChannelContinuationHistoryTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

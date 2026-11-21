@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.account.SignInServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:15:35" hostname="MINHNH-LAPTOP" time="0.105">
+  <properties/>
+  <testcase name="profilesFillTheCommittedSession" classname="com.hhst.youtubelite.account.SignInServiceTest" time="0.031"/>
+  <testcase name="profileFailureCannotDiscardAnAuthorizedCredential" classname="com.hhst.youtubelite.account.SignInServiceTest" time="0.062"/>
+  <testcase name="signingOutDuringDiscoveryCannotRestoreTheAccount" classname="com.hhst.youtubelite.account.SignInServiceTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

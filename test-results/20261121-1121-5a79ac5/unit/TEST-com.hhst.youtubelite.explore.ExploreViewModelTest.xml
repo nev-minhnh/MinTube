@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.explore.ExploreViewModelTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:28" hostname="MINHNH-LAPTOP" time="0.131">
+  <properties/>
+  <testcase name="emptyIntermediatePagesKeepTheirContinuations" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.01"/>
+  <testcase name="aRepeatedShelfMergesNewItemsInsteadOfDroppingThem" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="switchingAwayCancelsAnInFlightAppend" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.005"/>
+  <testcase name="aCompletedAvatarUpdatesARetainedCategory" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.027"/>
+  <testcase name="aFailedTailKeepsThePageAndRetriesOnlyTheAppend" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="failureScenarioStaysFailedUntilRetry" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.006"/>
+  <testcase name="theTailAppendsOnePagePerSignalAndEnds" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.005"/>
+  <testcase name="aLateShelfCannotOverwriteAnotherCategoryWithTheSameCursor" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="longerCursorCyclesEndTheFeed" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.005"/>
+  <testcase name="shelfAppendsStayScopedToTheirShelf" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.003"/>
+  <testcase name="aFlatContinuationRemainsVisibleAfterSectionedContent" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.005"/>
+  <testcase name="aShelfFailureStaysOnTheShelfAndRetries" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="anIdentityChangeDropsRetainedPages" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="videoAndChannelOpeningsStayTyped" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.01"/>
+  <testcase name="emptyIntermediateShelfPagesKeepTheirContinuations" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.004"/>
+  <testcase name="musicIsTheDefaultContainerAndCategoriesLoadTheirOwnPages" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.002"/>
+  <testcase name="switchingCategoriesKeepsLoadedPagesAndReselectNeverReloads" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.009"/>
+  <testcase name="aRepeatedCursorEndsTheCategory" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.01"/>
+  <testcase name="returningToCachedCategoryCancelsThePreviousLoad" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.006"/>
+  <testcase name="longerShelfCursorCyclesEndWithoutRepeatingRequests" classname="com.hhst.youtubelite.explore.ExploreViewModelTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

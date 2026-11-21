@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.datasource.PlaybackStartupTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:32" hostname="MINHNH-LAPTOP" time="0.078">
+  <properties/>
+  <testcase name="fastNetworksKeepThePlayersUncappedInitialQuality" classname="com.hhst.youtubelite.player.datasource.PlaybackStartupTest" time="0.004"/>
+  <testcase name="startFormatFollowsTheEstimate" classname="com.hhst.youtubelite.player.datasource.PlaybackStartupTest" time="0.001"/>
+  <testcase name="selectionPicksTheVariantThePlaylistOrderPredicted" classname="com.hhst.youtubelite.player.datasource.PlaybackStartupTest" time="0.067"/>
+  <testcase name="startVariantMovesFirstAndKeepsTheRestInOrder" classname="com.hhst.youtubelite.player.datasource.PlaybackStartupTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

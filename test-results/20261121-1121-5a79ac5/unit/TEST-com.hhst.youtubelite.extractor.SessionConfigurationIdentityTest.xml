@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:29" hostname="MINHNH-LAPTOP" time="0.024">
+  <properties/>
+  <testcase name="pageRedirectUsesOnlyTheFrozenCookieForTheActualOrigin" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.0"/>
+  <testcase name="pageRedirectRejectsForeignOrInsecureOrigins" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.0"/>
+  <testcase name="sessionHashKeepsItsStableEncoding" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.0"/>
+  <testcase name="identityAndExperimentChangesInvalidateTheSharedConfiguration" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.004"/>
+  <testcase name="videoAndLiveHintsDoNotChangeTheAccountConfiguration" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.0"/>
+  <testcase name="mediaAudienceIgnoresVisitorChurnButNotAccountCookies" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.014"/>
+  <testcase name="repeatedMediaChecksReuseCookieIdentityButAccountChangesAreImmediate" classname="com.hhst.youtubelite.extractor.SessionConfigurationIdentityTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

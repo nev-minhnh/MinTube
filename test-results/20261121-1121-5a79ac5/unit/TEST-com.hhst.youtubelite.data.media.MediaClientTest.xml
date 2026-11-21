@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.MediaClientTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:05" hostname="MINHNH-LAPTOP" time="1.372">
+  <properties/>
+  <testcase name="authHttpParseAndCancellationFailuresAreNeverRetried" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.032"/>
+  <testcase name="optionalRepairsAcrossClientsLeaveRoomForForegroundWork" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.028"/>
+  <testcase name="preservesEveryCookieHeaderRegardlessOfHeaderCasing" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.014"/>
+  <testcase name="saturationSuspendsAdmissionWithoutRunningOnTheCaller" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.017"/>
+  <testcase name="refusesOversizedResponses" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.196"/>
+  <testcase name="cancelledQueuedAndWaitingReadsNeverExecuteAndReleaseAdmission" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.013"/>
+  <testcase name="anAccountChangePreventsTheNextRequestInAMultiRequestOperation" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.01"/>
+  <testcase name="aChangedSessionCannotDeliverThePreviousAccountsResult" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.217"/>
+  <testcase name="acquiringAnIdempotentReadsContextNeverRetries" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.004"/>
+  <testcase name="aSessionChangeDuringARetryWindowStillAborts" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.258"/>
+  <testcase name="anIdempotentReadUsesItsFirstAdmissionBeforeLaterSlowReads" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.019"/>
+  <testcase name="aSecondTransportFailureSurfacesWithItsCauseAndStopsRetrying" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.265"/>
+  <testcase name="redirectsReachTheCoreWithoutFollowingTheChallenge" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.01"/>
+  <testcase name="aNetworkShapedTransportFailureRetriesOnceAndThenSucceeds" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.27"/>
+  <testcase name="cancellationAbortsTheActiveHttpCall" classname="com.hhst.youtubelite.data.media.MediaClientTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 21, 2026 11:16:06 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[57994] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.004">
+  <properties/>
+  <testcase name="closeTarget_requiresWindowCenterInsideBothAxes" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.002"/>
+  <testcase name="snapX_tightWindowReducesMarginsSymmetrically" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="collapsedPlacement_leavesOnlyPeekVisibleAndScalesWithWindowSize" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.001"/>
+  <testcase name="collapse_requiresHorizontalOverscrollBeyondEitherWall" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="computeGapByRatio_scalesWithWidth" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="computeSpec_compactScreenUsesMinWidthAndBottomDock" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.001"/>
+  <testcase name="snapX_picksNearestInsetEdgeAndCorrectsOldFlushPlacement" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="fixedDock_sitsAtTheBottomEndCornerOfTheContentAndMirrorsInRtl" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="computeSpec_marginGrowsWithWindowWidthAndKeepsBottomInset" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="computeSpec_resizeLeavesRoomForBothMarginsOnNarrowScreens" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="popupWidthPx_wrapsThenCapsAtEightyPercent" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="clampTranslation_keepsMarginsOnBothAxes" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="closeTarget_rejectsInvalidOrUnmeasuredTarget" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <testcase name="controlGap_atMinWidth" classname="com.hhst.youtubelite.player.surface.MiniPlayerLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

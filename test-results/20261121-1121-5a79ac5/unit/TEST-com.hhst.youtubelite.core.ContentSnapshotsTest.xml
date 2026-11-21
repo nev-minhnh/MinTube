@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.core.ContentSnapshotsTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:15:50" hostname="MINHNH-LAPTOP" time="8.503">
+  <properties/>
+  <testcase name="sanitizedAccountNamesCannotCollideAndEmptyResultsClearTheSnapshot" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.236"/>
+  <testcase name="leftoverTempsDoNotCountTowardTheKindCap" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="2.159"/>
+  <testcase name="privateRowsStayScopedToTheCapturingAccount" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.046"/>
+  <testcase name="staleAndCorruptSnapshotsAreDiscarded" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.067"/>
+  <testcase name="futureCapturesAndOversizedFilesAreDiscarded" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.155"/>
+  <testcase name="concurrentWritersOfOneKeyNeverLeaveATornSnapshot" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="2.662"/>
+  <testcase name="anInterruptedAtomicWriteRetainsThePreviousCapture" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.034"/>
+  <testcase name="theSnapshotSetStaysBoundedPerKind" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="3.017"/>
+  <testcase name="rowsAreCappedAndNoTempFilesSurviveAWrite" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.056"/>
+  <testcase name="aSnapshotRoundTripsForItsOwnAccountAndQuery" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.054"/>
+  <testcase name="aSnapshotForAnotherQueryDoesNotAnswer" classname="com.hhst.youtubelite.core.ContentSnapshotsTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

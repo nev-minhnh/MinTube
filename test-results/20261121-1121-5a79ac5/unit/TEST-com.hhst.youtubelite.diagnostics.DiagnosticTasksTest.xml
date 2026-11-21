@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.diagnostics.DiagnosticTasksTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:47" hostname="MINHNH-LAPTOP" time="0.307">
+  <properties/>
+  <testcase name="failuresAndExpiredBudgetsRemainUnknown" classname="com.hhst.youtubelite.diagnostics.DiagnosticTasksTest" time="0.022"/>
+  <testcase name="unresponsiveProvidersCannotBlockOrGrowTheWorkerPool" classname="com.hhst.youtubelite.diagnostics.DiagnosticTasksTest" time="0.285"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:37" hostname="MINHNH-LAPTOP" time="0.102">
+  <properties/>
+  <testcase name="aCompletedSendDoesNotEraseTextTypedWhileWaiting" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.016"/>
+  <testcase name="aRestrictedChatPreservesTheDraftAndExplainsTheRestriction" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.002"/>
+  <testcase name="signingInRefreshesTheComposerWithoutRecreatingTheWatchPage" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.002"/>
+  <testcase name="aLiveStreamThatEndsSwitchesToReplayWithoutDroppingMessages" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.008"/>
+  <testcase name="tvPollingUsesTheKnownBroadcastAddressAndPreservesPhotos" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.006"/>
+  <testcase name="anEndedStreamReplaysAtThePlayerPosition" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.004"/>
+  <testcase name="fixtureGatewayRendersAnEmptyReadyState" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.005"/>
+  <testcase name="genericSendFailuresKeepTheDraftAndNotify" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.005"/>
+  <testcase name="messagesAreCappedAtTheWindow" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.004"/>
+  <testcase name="endedPollingCannotReenablePostingWithBroadcastParams" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.003"/>
+  <testcase name="anotherStreamCancelsTheOldSendAndClearsItsDraft" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.003"/>
+  <testcase name="aChatWithoutASendEndpointStaysReadOnly" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.004"/>
+  <testcase name="aFinishedLiveStreamKeepsItsTranscriptAndStopsPosting" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.002"/>
+  <testcase name="sendingClearsTheDraftAndHitsTheGateway" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.002"/>
+  <testcase name="signedOutSendsRouteToTheSignInNotice" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.008"/>
+  <testcase name="streamMessagesAppearDeduplicatedAndRemovalsApply" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.005"/>
+  <testcase name="webAuthorizationIsLazyKeepsDraftAndNeverAutomaticallyPosts" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.005"/>
+  <testcase name="moderationActionsApplyInOrderIncludingAuthorWideRemovals" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.008"/>
+  <testcase name="listenFailuresShowTheRetryableError" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.003"/>
+  <testcase name="authFailuresFromTheGatewayAlsoRouteToSignIn" classname="com.hhst.youtubelite.watch.chat.LiveChatViewModelTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

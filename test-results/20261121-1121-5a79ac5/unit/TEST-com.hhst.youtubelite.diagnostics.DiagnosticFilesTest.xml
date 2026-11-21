@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:39" hostname="MINHNH-LAPTOP" time="0.28">
+  <properties/>
+  <testcase name="oversizedLegacySegmentsAreReportedAsPartialInsteadOfSilentlyTruncated" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.145"/>
+  <testcase name="pruningExpiresOldFilesAndPreservesCriticalBeforeOrdinary" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.044"/>
+  <testcase name="boundedSnapshotPrefersRecentFilesAndLeavesStoredEvidenceIntact" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.034"/>
+  <testcase name="redactsCredentialsQueriesAndPrivatePaths" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.002"/>
+  <testcase name="exceptionReportsKeepCallSitesWithoutResponseBodies" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.009"/>
+  <testcase name="boundedSnapshotOnlyKeepsCompleteUtf8RowsFromTheTail" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.042"/>
+  <testcase name="ipv6AddressesAndPrivatePathsRemainCorrelatableWithoutDisclosure" classname="com.hhst.youtubelite.diagnostics.DiagnosticFilesTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

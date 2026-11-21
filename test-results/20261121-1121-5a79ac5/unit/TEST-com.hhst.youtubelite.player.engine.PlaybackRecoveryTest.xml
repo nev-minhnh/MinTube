@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:32" hostname="MINHNH-LAPTOP" time="0.001">
+  <properties/>
+  <testcase name="errorBodiesDoNotRemainUnclassifiedIoFailures" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="unavailableManifestsChangeSourceWithoutTreatingLiveEdgeChunksAsExpired" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.001"/>
+  <testcase name="localSessionFenceIsNeverConvertedToAServer403" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="transportFailuresThroughNestedWrappersNeverEscalateToTokenRefresh" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="cancellationAndUnclassifiedFailuresDoNotRequestSourceRefresh" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="cyclicCauseChainDoesNotHangRecovery" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="sessionFenceTakesPrecedenceOverAnOuterTransportFailure" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <testcase name="staleUrlsKeepTheirExistingFallbackAndUnclassifiedIoDoesNotRefreshTokens" classname="com.hhst.youtubelite.player.engine.PlaybackRecoveryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

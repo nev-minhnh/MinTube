@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:27" hostname="MINHNH-LAPTOP" time="0.013">
+  <properties/>
+  <testcase name="phases_showPipelineNotOnlyStatus" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.002"/>
+  <testcase name="audioBitratesContainOnlyTheSelectedPlayableTrack" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <testcase name="failureReason_isBrief_andOnlyShownForCurrentFailures" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <testcase name="qualityOptions_includeFpsButExcludeGatedCodecsAndUnpairedVideo" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.002"/>
+  <testcase name="complete_onlyWhenPublished_fileMissingIsDistinct" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.0"/>
+  <testcase name="filters_mapToCoordinatorPhases" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.0"/>
+  <testcase name="size_exactEstimateUnknown" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <testcase name="snapshot_over1MiB_rejectedWithoutTruncate" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.002"/>
+  <testcase name="snapshot_over500_rejectedWithoutTruncate" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <testcase name="waitingNetwork_copyAndResume" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <testcase name="progress_zeroIsDeterminate_unknownTotalIsNot" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.0"/>
+  <testcase name="qualityOptions_fromCatalog" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.0"/>
+  <testcase name="allSkip_snackbar" classname="com.hhst.youtubelite.downloader.ui.DownloadPresentationTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:37" hostname="MINHNH-LAPTOP" time="0.003">
+  <properties/>
+  <testcase name="hiddenPanelsRouteNowhere" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.001"/>
+  <testcase name="normalVideosStayOnComments" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.0"/>
+  <testcase name="postingAddressesTheBroadcasterFromTheCurrentVideo" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.001"/>
+  <testcase name="aKnownLivePageCanOpenChatBeforeThePlayerIsReady" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.001"/>
+  <testcase name="aLiveStreamWithoutAChatKeyNeverFallsBackToComments" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.0"/>
+  <testcase name="aLiveStreamOpensTheLiveContinuation" classname="com.hhst.youtubelite.watch.chat.LiveChatRoutingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

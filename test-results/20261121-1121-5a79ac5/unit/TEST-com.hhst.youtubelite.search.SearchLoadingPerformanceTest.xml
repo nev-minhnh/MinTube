@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.061">
+  <properties/>
+  <testcase name="repeatedVisibleEventsDoNotLoopOnFailureButReentryCanRetry" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.006"/>
+  <testcase name="aFlingCancelsOldMetadataAndScrollingBackCanRepairThoseRows" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.006"/>
+  <testcase name="metadataFailureWaitsForViewportReentryAndKeepsAlreadyValidFields" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.003"/>
+  <testcase name="liveCardsRepairRealFieldsWithoutRequestingANonexistentDuration" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.003"/>
+  <testcase name="aLaterPageUsesTheAvatarAlreadyResolvedForTheSameChannel" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.01"/>
+  <testcase name="shortsFilterHydratesItsGridAndLaterVisibleRowsWithoutRequestingAnAge" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.004"/>
+  <testcase name="duplicateContinuationRowsCompleteMissingFieldsWithoutErasingGoodValues" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.003"/>
+  <testcase name="staleViewportEventsCannotHydrateAnotherSearch" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.005"/>
+  <testcase name="theFinalEmptySearchContinuationShowsAnEmptyResultInsteadOfABlankList" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.004"/>
+  <testcase name="emptySearchPagesPauseAutomaticReadsAndOneManualPageCanRecover" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.007"/>
+  <testcase name="duplicateSearchPagesPauseEvenWhenTheirMetadataChangesAndManualReadAddsRows" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.004"/>
+  <testcase name="aSparseSuccessfulResponseWaitsForReentryBeforeRepairingTheRemainingFields" classname="com.hhst.youtubelite.search.SearchLoadingPerformanceTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

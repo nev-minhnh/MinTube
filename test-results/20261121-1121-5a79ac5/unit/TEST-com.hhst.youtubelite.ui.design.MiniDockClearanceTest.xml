@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:36" hostname="MINHNH-LAPTOP" time="0.002">
+  <properties/>
+  <testcase name="listEndingAboveTheMiniAddsNothing" classname="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" time="0.001"/>
+  <testcase name="railWindowDocksAtTheBottomWithItsMargin" classname="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" time="0.001"/>
+  <testcase name="listAboveTheTabBarClearsTheMiniHeightPlusItsMargin" classname="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" time="0.0"/>
+  <testcase name="listToTheScreenBottomAlsoClearsTheBarFloor" classname="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" time="0.0"/>
+  <testcase name="noMiniOrUnmeasuredListAddsNothing" classname="com.hhst.youtubelite.ui.design.MiniDockClearanceTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:27" hostname="MINHNH-LAPTOP" time="0.043">
+  <properties/>
+  <testcase name="fileMissing_mapsOnCompletedTask" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.004"/>
+  <testcase name="snapshotOverLimit_rejectedBeforeEnqueue" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.003"/>
+  <testcase name="liveReason_fromPreview" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.005"/>
+  <testcase name="preview_doesNotEnqueue" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.003"/>
+  <testcase name="allSkip_snackbarKind" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.003"/>
+  <testcase name="confirm_enqueuesOnce_processDeathDoesNotReplay" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.003"/>
+  <testcase name="attachmentsOnly_notWatchPageDownloaded" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.004"/>
+  <testcase name="localPreviewsDoNotReloadCatalogAndCancellationPropagates" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.007"/>
+  <testcase name="clearHistory_defaultTerminalRecords" classname="com.hhst.youtubelite.downloader.ui.DownloadViewModelConfirmTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

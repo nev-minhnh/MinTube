@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.shorts.ShortsRatingHydrationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:33" hostname="MINHNH-LAPTOP" time="0.027">
+  <properties/>
+  <testcase name="aServerLikeSeedsTheButtonAndTheFirstTapRemovesIt" classname="com.hhst.youtubelite.shorts.ShortsRatingHydrationTest" time="0.007"/>
+  <testcase name="lateHydrationCannotReplaceANewerConfirmedRating" classname="com.hhst.youtubelite.shorts.ShortsRatingHydrationTest" time="0.016"/>
+  <testcase name="hydrationCannotSelectTheOldRatingWhileAWriteIsPending" classname="com.hhst.youtubelite.shorts.ShortsRatingHydrationTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

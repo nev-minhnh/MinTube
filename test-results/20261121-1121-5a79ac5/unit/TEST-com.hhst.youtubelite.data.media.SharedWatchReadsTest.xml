@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.data.media.SharedWatchReadsTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:26" hostname="MINHNH-LAPTOP" time="0.209">
+  <properties/>
+  <testcase name="freshCallersNeverReuseACompletedResponse" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.002"/>
+  <testcase name="aFailedResponseIsNeverSharedAndTheNextCallerReadsAgain" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.021"/>
+  <testcase name="equivalentOauthRefreshesShareButProfilesVisitorsCookiesAndLocalesDoNot" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.004"/>
+  <testcase name="differentIdentitiesNeverShare" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.001"/>
+  <testcase name="identicalConcurrentReadsShareOneNetworkResponse" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.165"/>
+  <testcase name="aFreshResponseReplacesThePreviouslyCachedPage" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.007"/>
+  <testcase name="expiredResponsesAreReRead" classname="com.hhst.youtubelite.data.media.SharedWatchReadsTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

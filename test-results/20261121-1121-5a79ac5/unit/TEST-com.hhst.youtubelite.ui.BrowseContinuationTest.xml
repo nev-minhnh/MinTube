@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.ui.BrowseContinuationTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:34" hostname="MINHNH-LAPTOP" time="0.028">
+  <properties/>
+  <testcase name="aSelfPointingDirectoryPageEndsWithoutDroppingNewChannels" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.003"/>
+  <testcase name="quietDirectoryRefreshCannotAppendThePreviousSnapshotsCursor" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.004"/>
+  <testcase name="subscriptionFeedAndDirectoryStopCyclesIndependentlyAndKeepTheirRows" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.003"/>
+  <testcase name="searchStopsACursorCycleAndKeepsTheLastPagesRows" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.007"/>
+  <testcase name="aFailedSearchPageCanRetryAndANewQueryCanReuseCursors" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.005"/>
+  <testcase name="searchKeepsRowsFromASelfPointingPageInsteadOfDiscardingThemAsAnError" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.003"/>
+  <testcase name="failedDirectoryPagesCanRetryAndAnAccountSwitchStartsANewWalk" classname="com.hhst.youtubelite.ui.BrowseContinuationTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

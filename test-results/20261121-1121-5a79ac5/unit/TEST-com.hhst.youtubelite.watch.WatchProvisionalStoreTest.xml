@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.watch.WatchProvisionalStoreTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:36" hostname="MINHNH-LAPTOP" time="0.0">
+  <properties/>
+  <testcase name="rePutReplacesAndTheStoreStaysBounded" classname="com.hhst.youtubelite.watch.WatchProvisionalStoreTest" time="0.0"/>
+  <testcase name="consumeRemovesTheEntrySoARepeatVisitStartsClean" classname="com.hhst.youtubelite.watch.WatchProvisionalStoreTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

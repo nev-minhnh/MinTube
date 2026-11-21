@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:48" hostname="MINHNH-LAPTOP" time="0.061">
+  <properties/>
+  <testcase name="api34_confirm_registersOneUidtJobPerBatch" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.022"/>
+  <testcase name="foregroundTypes_api35MuxUsesMediaProcessing_saveUsesDataSync" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.001"/>
+  <testcase name="api33_enqueue_usesLongRunningWmWithNetwork_finalizeHasNone" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.007"/>
+  <testcase name="userResumeKeepsAnActiveWorkManagerBatch" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.005"/>
+  <testcase name="api34_resume_registersUidt_networkDoesNot" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.015"/>
+  <testcase name="duplicateSchedule_orSystemRestore_doesNotDoubleRun" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.005"/>
+  <testcase name="rejectedUidtFallsBackToExecutableWork" classname="com.hhst.youtubelite.downloader.engine.BackgroundDownloadSchedulerTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

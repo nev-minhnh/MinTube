@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.core.DownloadGenerationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:16:48" hostname="MINHNH-LAPTOP" time="0.029">
+  <properties/>
+  <testcase name="staleGeneration_chunkAndPublishIgnored" classname="com.hhst.youtubelite.downloader.core.DownloadGenerationTest" time="0.017"/>
+  <testcase name="currentGeneration_isApplied" classname="com.hhst.youtubelite.downloader.core.DownloadGenerationTest" time="0.006"/>
+  <testcase name="staleGeneration_runningCallbackIgnored" classname="com.hhst.youtubelite.downloader.core.DownloadGenerationTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.comments.CommentsRequestCountTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:15:50" hostname="MINHNH-LAPTOP" time="0.124">
+  <properties/>
+  <testcase name="aFailedRepliesPageRetriesExactlyThatPage" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.009"/>
+  <testcase name="firstOpenMakesExactlyOneRequest" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.005"/>
+  <testcase name="aRepliesCursorLoopEndsTheThread" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="reopeningResumesOnlyTheCancelledExpandedFirstReplyRead" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="onlyAnExhaustedEmptyContinuationShowsNoComments" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.005"/>
+  <testcase name="switchingVideosCancelsInFlightReadsAndNeverPublishesStalePages" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.006"/>
+  <testcase name="distinctCursorsWithoutNewCommentsPauseAutomaticReadsAndAllowRetry" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.005"/>
+  <testcase name="cancelledAppendCanBeRequestedAgain" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.006"/>
+  <testcase name="closingPanelDoesNotRefetchAnsweredEmptyReplies" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.006"/>
+  <testcase name="aCommentsCursorLoopClosesTheList" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.004"/>
+  <testcase name="switchingSortIssuesExactlyOneFreshFirstPage" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.004"/>
+  <testcase name="aFailedPageIsRetriedAsExactlyThatPage" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.004"/>
+  <testcase name="recreationRefetchesOnlyTheLoadedDepth" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.005"/>
+  <testcase name="anEmptyOpeningPageKeepsItsContinuationUntilCommentsArrive" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="aReplyContinuationPointingToItsOpeningKeyIsNeverFetchedTwice" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="repliesPaginateOnePagePerActionAndSurviveCollapse" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.005"/>
+  <testcase name="selectingAnotherVideoIssuesOneRequestAndForgetsLoadedDepth" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="aReplyCycleReturningToItsOpeningKeyStopsBeforeRefetchingIt" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.007"/>
+  <testcase name="emptyRepliesFetchOnceAndNeverAgain" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.009"/>
+  <testcase name="reopeningAClosedPanelRestartsOnlyACancelledFirstRead" classname="com.hhst.youtubelite.comments.CommentsRequestCountTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:22" hostname="MINHNH-LAPTOP" time="0.064">
+  <properties/>
+  <testcase name="aNewExecutionCanTransferAfterResume" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" time="0.015"/>
+  <testcase name="aLateFailureCannotFailTheResumedGeneration" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" time="0.011"/>
+  <testcase name="aLateTransferCannotAdvanceTheResumedGenerationToFinalization" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" time="0.012"/>
+  <testcase name="aLateResolveCannotStartTransferForTheResumedGeneration" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" time="0.012"/>
+  <testcase name="anExceptionStillFailsItsOwnGeneration" classname="com.hhst.youtubelite.downloader.engine.DownloadEngineGenerationTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

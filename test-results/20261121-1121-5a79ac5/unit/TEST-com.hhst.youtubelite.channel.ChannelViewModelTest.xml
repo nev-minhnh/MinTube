@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.channel.ChannelViewModelTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:15:49" hostname="MINHNH-LAPTOP" time="0.178">
+  <properties/>
+  <testcase name="deferredTabsLoadOnDemandWithTabLocalFailures" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.009"/>
+  <testcase name="restoredServerSearchLoadsTheSubmittedQueryAndKeepsTheDraft" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.006"/>
+  <testcase name="loadsPageForTheRequestedChannelAndKeepsItsIdentity" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.006"/>
+  <testcase name="channelSearchAndAboutRestoreWithChannelIdentityAndSeparateDraft" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.023"/>
+  <testcase name="aRestoredTabReceivesTheOpenedPageAndLaterReadsUseItsCanonicalChannel" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.011"/>
+  <testcase name="playlistsTabAppendsServerPagesAndStopsOnARepeatedCursor" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.006"/>
+  <testcase name="videosNextPageAppendsAndClearsTheContinuation" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.006"/>
+  <testcase name="submitSearchHitsTheServerAndRendersResults" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.005"/>
+  <testcase name="restoredIdentityAndLocalTabStayConsistent" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.005"/>
+  <testcase name="emptyChannelKeepsAReadyPageWithoutVideos" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.007"/>
+  <testcase name="failedSubscribeKeepsMembershipAndNotifies" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.01"/>
+  <testcase name="selectedTabSurvivesViewModelRecreation" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.007"/>
+  <testcase name="appendedShortsPagesRenumberLoadedOrderForLocalSorts" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.007"/>
+  <testcase name="allChannelTabsSwitchLocallyAndLoadTheirOwnSection" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.006"/>
+  <testcase name="playlistSortAndMenuRestoreWithoutLosingTheShareIdentity" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.008"/>
+  <testcase name="signedInNavigationSurvivesLoadingAndAccountRefresh" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.01"/>
+  <testcase name="failedLoadAndRetryClearTheWholePage" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.009"/>
+  <testcase name="videoWatchAndHeaderRequestsAreTypedOnly" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.014"/>
+  <testcase name="subscribeWritesThroughTheServerAndUpdatesTheButton" classname="com.hhst.youtubelite.channel.ChannelViewModelTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

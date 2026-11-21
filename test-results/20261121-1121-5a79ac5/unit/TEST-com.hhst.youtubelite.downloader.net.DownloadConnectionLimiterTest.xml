@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.net.DownloadConnectionLimiterTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:23" hostname="MINHNH-LAPTOP" time="0.055">
+  <properties/>
+  <testcase name="liveResizeWakesWaitersAndShrinkLetsExistingTransfersFinish" classname="com.hhst.youtubelite.downloader.net.DownloadConnectionLimiterTest" time="0.025"/>
+  <testcase name="pausingAWaitingCallAndAFailedTransferBothReleaseTheirSlots" classname="com.hhst.youtubelite.downloader.net.DownloadConnectionLimiterTest" time="0.009"/>
+  <testcase name="hostLimitsDoNotBlockOtherHostsAndTotalStillApplies" classname="com.hhst.youtubelite.downloader.net.DownloadConnectionLimiterTest" time="0.01"/>
+  <testcase name="cancellationImmediatelyAfterAdmissionDoesNotLeakCapacity" classname="com.hhst.youtubelite.downloader.net.DownloadConnectionLimiterTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

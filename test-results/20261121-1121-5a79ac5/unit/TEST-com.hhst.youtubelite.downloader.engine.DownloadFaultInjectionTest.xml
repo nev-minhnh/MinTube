@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:22" hostname="MINHNH-LAPTOP" time="0.22">
+  <properties/>
+  <testcase name="externallyDeletedFile_isMissingAndOffersRedownload" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.074"/>
+  <testcase name="engineTransfer_enospcFailsAsset" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.01"/>
+  <testcase name="invalidPublishedUri_isInaccessibleNotOpenable" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.006"/>
+  <testcase name="shareQueueAndPlaylistUseTheSameCoordinatorFingerprint" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.01"/>
+  <testcase name="isNoSpace_matchesEnospcAndWindowsCopy" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.001"/>
+  <testcase name="engineMux_enospcFailsAsset" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.02"/>
+  <testcase name="listAndNotificationShareTheSameRoomState" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.059"/>
+  <testcase name="enginePublish_enospcFailsAsset" classname="com.hhst.youtubelite.downloader.engine.DownloadFaultInjectionTest" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

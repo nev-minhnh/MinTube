@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hhst.youtubelite.extension.SettingsBackupTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-21T04:17:28" hostname="MINHNH-LAPTOP" time="0.018">
+  <properties/>
+  <testcase name="invalidDirectBackupIsRejectedBeforeAnySettingChanges" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.005"/>
+  <testcase name="apply_restoresDownloadPreferences" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.005"/>
+  <testcase name="importPreferences_noChange_noVersionBump" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.0"/>
+  <testcase name="parse_rejectsInvalidJson" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.001"/>
+  <testcase name="parseRejectsOutOfRangeAndFractionalSettings" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.001"/>
+  <testcase name="importPreferences_nullHaptic_keepsCurrent" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.0"/>
+  <testcase name="importPreferences_notifiesOnceWithWildcardAndBumpsVersionOnce" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.0"/>
+  <testcase name="hapticOnlyBackupIsApplied" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.002"/>
+  <testcase name="exportParseApply_roundTripsEveryValue" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.001"/>
+  <testcase name="parseRejectsInvalidVersionsAndCoercedToggleValues" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.001"/>
+  <testcase name="importPreferences_ignoresUnknownKeys" classname="com.hhst.youtubelite.extension.SettingsBackupTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
