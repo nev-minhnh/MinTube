@@ -46,11 +46,8 @@ class HomeViewModel(
     private val avatars: com.hhst.youtubelite.data.media.MediaAvatarDirectory? = null,
     private val snapshots: com.hhst.youtubelite.core.ContentSnapshots? = null,
     private val accountKey: () -> String = { "visitor" },
-    /** Identity-scoped anonymous watch-report counter; null in fixtures. */
-    private val reportSignal: (() -> Long)? = null,
     /** Speculative warm-up for the first card of the first page; keeps setup off the tap path. */
     private val warm: (String) -> Unit = {},
-    private val now: () -> Long = System::currentTimeMillis,
     /** Snapshot seeding IO runs here; tests inject the runTest scheduler. */
     private val seedDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.IO,
 ) : ViewModel() {
@@ -123,10 +120,6 @@ class HomeViewModel(
     }
 
     private var sessionKey: Long? = null
-    private var lastFeedLoadedAtMs = 0L
-    private var lastSeenReportSignal = -1L
-    /** A progress signal arrived for a request still in flight; consumed once it completes. */
-    private var pendingReportRevision = false
 
     fun updateSession(signedIn: Boolean, key: Long, avatar: String? = null) {
         val changed = sessionKey != null && sessionKey != key
@@ -150,43 +143,12 @@ class HomeViewModel(
                 selectedChip = it.selectedChip.takeIf(repository.filters::contains) ?: "All") }
             savedState["chip"] = _state.value.selectedChip
             overlay(HomeOverlay.None)
-            lastSeenReportSignal = reportSignal?.invoke() ?: -1L
             load(append = false, userInitiated = true)
         }
     }
 
     /** A request already owns the slot; a user refresh must not restart it. */
     private fun refreshInFlight() = loadJob?.isActive == true
-
-    /**
-     * Quiet refresh at most once per report signal or staleness window, on feed and
-     * empty alike; a busy load merges the signal as a pending revision instead of
-     * discarding it — the finished request consumes it.
-     */
-    fun onForeground() {
-        val signal = reportSignal?.invoke() ?: -1L
-        if (signal > lastSeenReportSignal) {
-            if (lastSeenReportSignal >= 0) pendingReportRevision = true
-            lastSeenReportSignal = signal
-        }
-        when (val content = _state.value.content) {
-            is HomeContent.Feed -> {
-                if (content.refreshing || loadJob?.isActive == true) return
-                val stale = lastFeedLoadedAtMs > 0 && now() - lastFeedLoadedAtMs >= QUIET_REFRESH_AFTER_MS
-                if (pendingReportRevision || stale) {
-                    pendingReportRevision = false
-                    load(append = false)
-                }
-            }
-            // Staleness must not disturb an honest empty state; only a real watch signal refreshes it.
-            is HomeContent.Empty ->
-                if (pendingReportRevision && loadJob?.isActive != true) {
-                    pendingReportRevision = false
-                    load(append = false, keepEmpty = true)
-                }
-            else -> {}
-        }
-    }
 
     fun onAction(action: HomeAction) {
         when (action) {
@@ -716,7 +678,6 @@ class HomeViewModel(
                 // Warm the top card's session/solver while the user browses so opening
                 // it does not pay the watch-page read on the tap path.
                 if (!append) (page.items.firstOrNull { it is FeedItem.Video } as? FeedItem.Video)?.id?.let(warm)
-                if (!append) lastFeedLoadedAtMs = now()
                 val currentFeed = _state.value.content as? HomeContent.Feed
                 val loadedItems = currentFeed?.page?.items ?: feed?.page?.items.orEmpty()
                 var combined = if (append && feed != null) page.copy(
@@ -727,6 +688,7 @@ class HomeViewModel(
                 if (!page.partialFailure && combined.nextKey in consumedContinuations) combined = combined.copy(nextKey = null)
                 savedState["catalog"] = combined.catalog != null
                 _state.update { it.copy(chips = if (combined.catalog != null) HomeCatalog.filters else repository.filters,
+                    completedUserRefreshes = if (userInitiated && !append) it.completedUserRefreshes + 1 else it.completedUserRefreshes,
                     content = if (combined.items.isEmpty() && combined.nextKey == null) HomeContent.Empty(
                     title = combined.messages.firstOrNull() ?: HomeContent.Empty().title,
                 ) else HomeContent.Feed(combined, append = if (combined.partialFailure) AppendState.Failed else AppendState.Idle,
@@ -740,7 +702,6 @@ class HomeViewModel(
                 if (requestGeneration != generation) return@launch
                 fillMissingAvatars(combined.items, persist = true)
                 loadMenu()
-                consumePendingRevisionAfterLoad()
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: com.hhst.youtubelite.data.media.MediaException) {
@@ -759,7 +720,6 @@ class HomeViewModel(
                 } else {
                     _state.update { it.copy(content = if (feed != null) feed.copy(refreshing = false,
                         append = if (append) AppendState.Failed else AppendState.Idle, refreshFailed = !append) else HomeContent.Failed) }
-                    consumePendingRevisionAfterLoad()
                 }
             } catch (_: Exception) {
                 if (requestGeneration != generation) return@launch
@@ -767,25 +727,9 @@ class HomeViewModel(
                 val feed = _state.value.content as? HomeContent.Feed ?: feed
                 _state.update { it.copy(content = if (feed != null) feed.copy(refreshing = false,
                     append = if (append) AppendState.Failed else AppendState.Idle, refreshFailed = !append) else HomeContent.Failed) }
-                consumePendingRevisionAfterLoad()
             }
         }
     }
 
-    /**
-     * Consumes a signal merged while a request was in flight — one quiet re-check,
-     * never discarded. Traffic challenges excluded: their banner owns the retry.
-     */
-    private fun consumePendingRevisionAfterLoad() {
-        if (!pendingReportRevision) return
-        pendingReportRevision = false
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Main) { load(append = false, keepEmpty = true) }
-    }
-
     override fun onCleared() { navigation.close() }
-
-    private companion object {
-        /** A feed older than this refreshes quietly when the screen returns to front. */
-        const val QUIET_REFRESH_AFTER_MS = 15 * 60 * 1000L
-    }
 }

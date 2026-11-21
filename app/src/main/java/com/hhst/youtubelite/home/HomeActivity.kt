@@ -114,10 +114,6 @@ class HomeActivity : com.hhst.youtubelite.ui.ContentActivity() {
                         val owner = account ?: "visitor"
                         com.hhst.youtubelite.data.media.MediaSession.contentLocale()?.scope(owner) ?: owner
                     } },
-                    reportSignal = if (fixtures) null else {
-                        { org.koin.java.KoinJavaComponent.getKoin()
-                            .get<com.hhst.youtubelite.data.media.PlaybackWatchReporting>().anonymousReportSignal.value }
-                    },
                     warm = if (fixtures) {
                         {}
                     } else {
@@ -251,8 +247,8 @@ class HomeActivity : com.hhst.youtubelite.ui.ContentActivity() {
             val session = com.hhst.youtubelite.data.media.MediaSession.snapshot()
             homeViewModel.updateSession(session.signedIn, session.generation,
                 com.hhst.youtubelite.data.media.MediaSession.selectedAccount()?.photo)
-            // A watch-report signal or a stale feed triggers one quiet refresh.
-            homeViewModel.onForeground()
+            // Only an identity change (account, sign-in, anonymous mode, content hl/gl) reloads;
+            // a plain return keeps the feed and its scroll position until the user pulls.
         }
         val preferences = org.koin.java.KoinJavaComponent.getKoin().get<com.hhst.youtubelite.extension.ExtensionManager>()
         homeViewModel.setHideShorts(preferences.isEnabled(com.hhst.youtubelite.extension.PreferenceKeys.ENABLE_HIDE_SHORTS))
