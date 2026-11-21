@@ -137,3 +137,13 @@ Coverage is PARTIAL. Not shot: phone-size set (`docs/screens/phone/` is empty), 
 - `docs/screens/qa\settings-playback.png`
 - `docs/screens/qa\watchlater-light.png`
 - `docs/screens/qa\you-light.png`
+
+
+## Pass 2 additions (build cabf459, AVD `mintube_phone`, 1080x2400, 420 dpi, anonymous, live network)
+
+`docs/screens/phone/<screen>-<light|dark>.png` (phone, 52 shots plus extras below). Light and dark exist for: home, explore, search-panel (with suggestions), search-results, watch-top, watch-scrolled (now-playing strip and "All / From <channel>" chips), comments, player-controls, fullscreen (landscape 2400x1080), shorts, channel, you, history, playlists, downloads, download-sheet, settings, settings-general, settings-playback, settings-notifications, settings-advanced (+2, +3 scrolled), about, signin, mini-over-home.
+Light only: `history-menu`, `history-paused`, `history-menu-paused`, `history-clear-dialog`, `pip-home`, `pip-watch`, `watch-glow-on`, `watch-glow-off`.
+`docs/screens/phone/font2/` (font scale 2.0, light): home, watch, you, settings, settings-general, download-sheet, channel.
+`docs/screens/phone/vi/` (Tieng Viet, light): home, watch-top, comments, you, settings, settings-general.
+Evidence for the language-dialog ANR: `docs/screens/qa/DEF-anr-language-dialog.png`.
+NOT shot in pass 2: any tablet screen (AVD busy, see QA_REPORT Pass 2), Subscriptions (tab absent signed-out), dark variants of the history dialogs, post detail.
