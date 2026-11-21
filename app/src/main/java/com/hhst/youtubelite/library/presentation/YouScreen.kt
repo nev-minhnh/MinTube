@@ -139,7 +139,7 @@ private fun LibraryList(listState: LazyListState, content: LibraryContent.Ready,
                 add(Triple(LibraryRow.Queue, AppIcon.Queue, LibraryAction.OpenQueue))
                 add(Triple(LibraryRow.Downloads, AppIcon.Download, LibraryAction.OpenDownloads))
             }
-            val columns = libraryTileColumns(window)
+            val columns = libraryTileColumns(window, androidx.compose.ui.platform.LocalDensity.current.fontScale)
             Column(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.sm),
                 verticalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
                 tiles.chunked(columns).forEach { line ->

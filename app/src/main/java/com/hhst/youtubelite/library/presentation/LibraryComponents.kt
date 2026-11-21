@@ -127,7 +127,7 @@ internal fun LibrarySkeleton(tag: String, window: WindowClass = WindowClass.Comp
                 SkeletonLine(fraction = 0.3f, height = 12.dp)
             }
         }
-        val columns = libraryTileColumns(window)
+        val columns = libraryTileColumns(window, androidx.compose.ui.platform.LocalDensity.current.fontScale)
         repeat(if (columns == 2) 3 else 2) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MinSpace.sm)) {
                 repeat(columns) { SkeletonBox(Modifier.weight(1f).height(56.dp), MinRadius.Field) }
@@ -153,7 +153,15 @@ internal fun LibraryListSkeleton(tag: String, window: WindowClass = WindowClass.
     }
 }
 
-internal fun libraryTileColumns(window: WindowClass): Int = if (window == WindowClass.Compact) 2 else 3
+/**
+ * Two tiles per line on phones, three from medium width. At large font scales (>= 1.5) phones use
+ * one tile per line so a label never breaks mid-word ("Download/s" at font scale 2.0).
+ */
+internal fun libraryTileColumns(window: WindowClass, fontScale: Float = 1f): Int = when {
+    window != WindowClass.Compact -> 3
+    fontScale >= 1.5f -> 1
+    else -> 2
+}
 
 internal fun libraryThumbnailWidth(window: WindowClass): Dp = if (window == WindowClass.Compact) 160.dp else 200.dp
 

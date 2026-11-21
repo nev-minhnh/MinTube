@@ -22,15 +22,26 @@ issues to Litube.
   - One shared navigation bar and one card family across feeds.
   - Every list has loading skeletons, plus empty and error states with a retry button.
   - The design plan is in [docs/UI_PLAN.md](docs/UI_PLAN.md).
-- **Signature details.** The played part of the seek bar is drawn in the icon's cyan-to-pink gradient.
+- **Signature details.**
+  - The played part of the seek bar is drawn in the icon's cyan-to-pink gradient. The bar is inset from the
+    screen edges and lines up with the player controls.
+  - A soft glow in the video's own colours sits behind the player. It can be turned off in Settings > Playback.
 - **Phones and tablets.**
   - Phones stay in portrait. Only fullscreen video rotates.
   - Tablets rotate freely. In landscape they get a side navigation rail and a two-column watch page: the video and
     its details on the left, related videos on the right, and each column scrolls on its own.
-  - The playing video stays pinned at the top while you scroll, with a filter row under it.
+  - The playing video stays pinned at the top while you scroll. A "now playing" strip with the title and channel
+    appears under it once the title scrolls away, followed by a filter row for the related videos.
+- **Mini-player and picture-in-picture.**
+  - Inside the app, the mini-player always sits at the bottom-right corner, above the navigation bar, and
+    cannot be dragged around.
+  - Leaving MinTube from any screen while a video plays turns it into a movable picture-in-picture window.
 - **New name and application ID.** The app is `com.nevminhnh.mintube` (`com.nevminhnh.mintube.debug` for debug
   builds), so it installs side by side with Litube and never replaces it.
 - **New icon.** A gradient "m" with a play mark. It is an adaptive launcher icon with a themed (monochrome) layer.
+- **Fixes on top of Litube 4.0.0.** Remote search suggestions work again: the suggestion server wraps its
+  reply in a JavaScript callback, which the bundled parser rejected. Channel avatars appear on the Home feed
+  for signed-out users.
 - **Its own update check.** The About screen points at the MinTube repository and links back to the original project.
 - **Local testing.** All tests run on the developer machine and their results are committed with the code; GitHub
   Actions only builds and publishes releases (see *Tests and verification*).
@@ -40,8 +51,9 @@ backups keep the `litube-settings` format, so a Litube backup can be restored in
 
 ## Screenshots
 
-New screenshots live in [`docs/screens/`](docs/screens/). They are added once the redesigned screens have been
-verified on a device.
+Screenshots of every screen, light and dark, on phone and tablet, live in
+[`docs/screens/`](docs/screens/) (see [`docs/screens/index.md`](docs/screens/index.md)). They were taken on the
+emulator during QA; the QA results are in [`docs/QA_REPORT.md`](docs/QA_REPORT.md).
 
 ## Features
 
