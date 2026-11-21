@@ -1,11 +1,13 @@
 package com.hhst.youtubelite.player.surface
 
+import com.hhst.youtubelite.ui.design.GestureResistance
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
  * Pure gesture math for the player surface (no Android deps).
- * Zone model: left 35% brightness, right 35% volume, center fullscreen swipe;
+ * Zone model: in fullscreen, left 35% brightness, right 35% volume, center fullscreen swipe;
+ * on the embedded player every vertical drag is the window swipe (down = mini, up = fullscreen);
  * horizontal drag seek scrub (±120 s full-width); double-tap thirds −10/play-pause/+10.
  */
 object GestureMath {
@@ -93,6 +95,12 @@ object GestureMath {
         return -dy / height * VOLUME_FACTOR
     }
 
+    /**
+     * Brightness and volume edge sliders exist only in fullscreen: never on the embedded
+     * watch player (its vertical drags minimize or enter fullscreen) and never on the mini.
+     */
+    fun edgeSlidersActive(fullscreen: Boolean, mini: Boolean): Boolean = fullscreen && !mini
+
     /** Chooses drag mode once touch slop is exceeded. */
     fun resolveDragMode(
         dx: Float,
@@ -101,17 +109,51 @@ object GestureMath {
         width: Float,
         verticalFeed: Boolean = false,
         fullscreenEntry: Boolean = false,
+        /** See [edgeSlidersActive]; false routes every vertical drag to the window swipe. */
+        edgeSliders: Boolean = true,
     ): DragMode {
         if (abs(dx) > abs(dy)) return DragMode.SEEK
         // Shorts (and similar vertical feeds): every vertical drag switches
         // the page video; brightness/volume must not eat the swipe.
         if (verticalFeed) return DragMode.NONE
+        if (!edgeSliders) return DragMode.NONE
         if (fullscreenEntry && dy < 0f && startX >= width * .2f && startX <= width * .8f) return DragMode.NONE
         return when {
             startX < width * BRIGHTNESS_ZONE_END -> DragMode.BRIGHTNESS
             startX > width * VOLUME_ZONE_START -> DragMode.VOLUME
             else -> DragMode.NONE
         }
+    }
+
+    /** A downward release at least this fast (dp/s) minimizes the embedded player at any distance past slop. */
+    const val MINI_FLING_MIN_VELOCITY_DP_PER_SEC = 1000f
+
+    /** "Mostly vertical": sideways travel may be at most this fraction of the downward travel (about 35 degrees). */
+    const val MINI_FLING_MAX_HORIZONTAL_RATIO = 0.7f
+
+    /** A quick, mostly vertical downward flick past [touchSlop]; distance alone does not matter. */
+    fun isMiniFling(dx: Float, dy: Float, velocityY: Float, touchSlop: Float, density: Float): Boolean =
+        dy > 0f && dy >= touchSlop &&
+            velocityY >= MINI_FLING_MIN_VELOCITY_DP_PER_SEC * density &&
+            abs(dx) <= dy * MINI_FLING_MAX_HORIZONTAL_RATIO
+
+    /**
+     * Release decision for the embedded swipe-down-to-minimize drag. A slow drag keeps the
+     * distance rule ([GestureResistance.commits] against [distanceThreshold]); a fling commits
+     * regardless of distance. Fullscreen never minimizes: its downward swipe exits fullscreen.
+     */
+    fun commitsMiniSwipe(
+        dx: Float,
+        dy: Float,
+        velocityY: Float,
+        distanceThreshold: Float,
+        touchSlop: Float,
+        density: Float,
+        fullscreen: Boolean,
+    ): Boolean {
+        if (fullscreen) return false
+        return GestureResistance.commits(dy, velocityY, distanceThreshold, density) ||
+            isMiniFling(dx, dy, velocityY, touchSlop, density)
     }
 
     /** Gesture-session level: apply [delta] without re-reading a quantized system value. */

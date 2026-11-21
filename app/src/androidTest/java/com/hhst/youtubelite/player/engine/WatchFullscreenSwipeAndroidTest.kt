@@ -559,4 +559,63 @@ class WatchFullscreenSwipeAndroidTest {
         }
     }
 
+    /** Fling with explicit event times, so the release speed does not depend on emulator pacing. */
+    private fun flick(fixture: OfflineWatchFixture, x: Float, fromY: Float, path: List<Float>, stepMs: Long) {
+        // Times count from the DOWN event itself: the player measures fling speed from it,
+        // however long a loaded device takes to dispatch it.
+        val downTime = SystemClock.uptimeMillis()
+        fixture.instrumentation.sendPointerSync(MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, fromY, 0))
+        val base = downTime
+        path.forEachIndexed { index, y ->
+            fixture.instrumentation.sendPointerSync(MotionEvent.obtain(
+                downTime, base + stepMs * (index + 1), MotionEvent.ACTION_MOVE, x, y, 0))
+        }
+        fixture.instrumentation.sendPointerSync(MotionEvent.obtain(
+            downTime, base + stepMs * (path.size + 1), MotionEvent.ACTION_UP, x, path.last(), 0))
+    }
+
+    @Test fun quickShortDownwardFlickMinimizesButASlowShortDragSpringsBack() = withAutoRotateOff {
+        OfflineWatchFixture("flickMini01").use { fixture ->
+            val sourceIntent = android.content.Intent(fixture.app, com.hhst.youtubelite.home.HomeActivity::class.java)
+                .putExtra("playback_test", true)
+            androidx.test.core.app.ActivityScenario.launch<com.hhst.youtubelite.home.HomeActivity>(sourceIntent).use { source ->
+                lateinit var sourceActivity: com.hhst.youtubelite.home.HomeActivity
+                source.onActivity { sourceActivity = it }
+                fixture.launch(source = sourceActivity)
+                val model = fixture.model
+                fixture.instrumentation.runOnMainSync { fixture.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                fixture.await { fixture.activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT }
+                fixture.instrumentation.runOnMainSync { model.setFullscreenManual(false) }
+                fixture.await { val frame = windowBounds(fixture); !model.uiState.value.fullscreen && abs(frame.height - frame.width * 9f / 16f) < 4f }
+                hideChrome(fixture)
+                val originalHost = fixture.activity
+                val surface = fixture.surface()!!
+                val embedded = surfaceBounds(fixture)!!
+                val prepares = fixture.engine.mediaPrepareCount
+                val density = fixture.activity.resources.displayMetrics.density
+                val x = embedded.centerX().toFloat()
+                val y = embedded.centerY().toFloat()
+                // 40 dp is well short of the distance threshold; slowly it must spring back.
+                swipe(fixture, x, y, y + 40f * density, 8, 70)
+                Thread.sleep(600)
+                assertFalse("A slow short drag stays on the watch page", model.uiState.value.mini)
+                fixture.await { surfaceBounds(fixture) == embedded }
+                assertSame(surface, fixture.surface())
+                assertFalse(originalHost.isFinishing)
+
+                // Start on the centre control and cross the touch slop only on the last move,
+                // right before release: the flick must minimize without clicking play/pause.
+                if (!model.uiState.value.controlsVisible) fixture.instrumentation.runOnMainSync { model.onToggleControls() }
+                fixture.await { model.uiState.value.controlsVisible }
+                Thread.sleep(300)
+                fixture.await { model.uiState.value.isPlaying }
+                flick(fixture, x, y, listOf(y + 4f * density, y + 40f * density), stepMs = 8)
+                fixture.await { model.uiState.value.mini && originalHost.isFinishing && sourceActivity.hasWindowFocus() }
+                Thread.sleep(300)
+                assertTrue("The flick neither paused nor reloaded playback", model.uiState.value.isPlaying)
+                assertEquals(prepares, fixture.engine.mediaPrepareCount)
+            }
+        }
+    }
+
 }

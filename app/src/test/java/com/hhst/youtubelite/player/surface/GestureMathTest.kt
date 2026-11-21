@@ -1,6 +1,8 @@
 package com.hhst.youtubelite.player.surface
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GestureMathTest {
@@ -70,20 +72,44 @@ class GestureMathTest {
     }
 
     @Test fun embeddedUpwardEntryHasAWiderZoneWithoutTakingOverFullscreenEdgeSliders() {
-        for (x in listOf(250f, 750f)) {
-            assertEquals(GestureMath.DragMode.NONE,
-                GestureMath.resolveDragMode(10f, -50f, x, 1000f, fullscreenEntry = true))
+        // Embedded (owner rule 2026-11-21): no edge sliders at all, so every vertical drag,
+        // up or down, centre or edge, is the window swipe; horizontal stays seek.
+        for (x in listOf(100f, 250f, 500f, 750f, 900f)) {
+            for (dy in listOf(-50f, 50f)) {
+                assertEquals(GestureMath.DragMode.NONE,
+                    GestureMath.resolveDragMode(10f, dy, x, 1000f, fullscreenEntry = true, edgeSliders = false))
+            }
         }
-        assertEquals(GestureMath.DragMode.BRIGHTNESS,
-            GestureMath.resolveDragMode(10f, -50f, 100f, 1000f, fullscreenEntry = true))
-        assertEquals(GestureMath.DragMode.VOLUME,
-            GestureMath.resolveDragMode(10f, -50f, 900f, 1000f, fullscreenEntry = true))
+        assertEquals(GestureMath.DragMode.SEEK,
+            GestureMath.resolveDragMode(100f, -50f, 500f, 1000f, fullscreenEntry = true, edgeSliders = false))
+        // Fullscreen keeps its edge sliders in both directions.
         assertEquals(GestureMath.DragMode.BRIGHTNESS,
             GestureMath.resolveDragMode(10f, -50f, 250f, 1000f))
+        assertEquals(GestureMath.DragMode.BRIGHTNESS,
+            GestureMath.resolveDragMode(10f, 50f, 100f, 1000f, edgeSliders = true))
         assertEquals(GestureMath.DragMode.VOLUME,
-            GestureMath.resolveDragMode(10f, 50f, 750f, 1000f, fullscreenEntry = true))
-        assertEquals(GestureMath.DragMode.SEEK,
-            GestureMath.resolveDragMode(100f, -50f, 500f, 1000f, fullscreenEntry = true))
+            GestureMath.resolveDragMode(10f, -50f, 900f, 1000f, edgeSliders = true))
+    }
+
+    @Test
+    fun edgeSliders_fullscreenOnly_neverEmbeddedOrMini() {
+        assertTrue(GestureMath.edgeSlidersActive(fullscreen = true, mini = false))
+        assertFalse("Embedded watch player", GestureMath.edgeSlidersActive(fullscreen = false, mini = false))
+        assertFalse("In-app mini player", GestureMath.edgeSlidersActive(fullscreen = false, mini = true))
+        assertFalse(GestureMath.edgeSlidersActive(fullscreen = true, mini = true))
+    }
+
+    @Test
+    fun embeddedEdgeSwipeDownMinimizesInsteadOfBrightnessOrVolume() {
+        for (x in listOf(100f, 900f)) {
+            val mode = GestureMath.resolveDragMode(5f, 60f, x, 1000f, fullscreenEntry = true,
+                edgeSliders = GestureMath.edgeSlidersActive(fullscreen = false, mini = false))
+            assertEquals(GestureMath.DragMode.NONE, mode)
+            assertTrue(commitsMini(dxDp = 2f, dyDp = 30f, velocityDpS = 1_500f))
+        }
+        val miniMode = GestureMath.resolveDragMode(5f, 60f, 100f, 1000f,
+            edgeSliders = GestureMath.edgeSlidersActive(fullscreen = false, mini = true))
+        assertEquals("The mini routes nothing to brightness", GestureMath.DragMode.NONE, miniMode)
     }
 
     @Test
@@ -104,7 +130,52 @@ class GestureMathTest {
         assertEquals(67, GestureMath.levelPercent(10f, 15f))
     }
 
+    // Phone: 2.625 density, 144 dp distance threshold, 8 dp touch slop.
+    private val miniDensity = 2.625f
+    private val miniThreshold = 144f * miniDensity
+    private val miniSlop = 8f * miniDensity
 
+    private fun commitsMini(dxDp: Float, dyDp: Float, velocityDpS: Float, fullscreen: Boolean = false) =
+        GestureMath.commitsMiniSwipe(dxDp * miniDensity, dyDp * miniDensity, velocityDpS * miniDensity,
+            miniThreshold, miniSlop, miniDensity, fullscreen)
+
+    @Test
+    fun miniSwipe_fastShortFlickCommits() {
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 1_200f))
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 9f, velocityDpS = GestureMath.MINI_FLING_MIN_VELOCITY_DP_PER_SEC))
+        assertTrue("A slightly diagonal flick is still mostly vertical", commitsMini(dxDp = 15f, dyDp = 30f, velocityDpS = 1_500f))
+    }
+
+    @Test
+    fun miniSwipe_slowShortDragDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 150f))
+        assertFalse("Just under the fling speed", commitsMini(dxDp = 0f, dyDp = 60f, velocityDpS = 990f))
+    }
+
+    @Test
+    fun miniSwipe_longSlowDragCommits() {
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 150f, velocityDpS = 100f))
+        assertTrue("A drag held still past the threshold", commitsMini(dxDp = 0f, dyDp = 144f, velocityDpS = 0f))
+    }
+
+    @Test
+    fun miniSwipe_mostlyHorizontalFlingDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 40f, dyDp = 30f, velocityDpS = 2_000f))
+        assertFalse(commitsMini(dxDp = 25f, dyDp = 30f, velocityDpS = 2_000f))
+    }
+
+    @Test
+    fun miniSwipe_flickBelowTouchSlopOrUpwardDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 5f, velocityDpS = 3_000f))
+        assertFalse(commitsMini(dxDp = 0f, dyDp = -30f, velocityDpS = 3_000f))
+        assertFalse("Flicking back up cancels even a long drag", commitsMini(dxDp = 0f, dyDp = 150f, velocityDpS = -1_200f))
+    }
+
+    @Test
+    fun miniSwipe_fullscreenNeverMinimizes() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 1_500f, fullscreen = true))
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 300f, velocityDpS = 0f, fullscreen = true))
+    }
 }
 
 class VelocityTrackerTest {

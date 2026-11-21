@@ -69,13 +69,15 @@ fun Modifier.playerGestures(
     /** Shorts (vertical feed): vertical drag switches video, not brightness/volume. */
     verticalFeed: Boolean = false,
     fullscreenEntry: Boolean = false,
+    /** Brightness/volume side zones; [GestureMath.edgeSlidersActive] (fullscreen only). */
+    edgeSliders: Boolean = true,
 ): Modifier = composed {
     val tapGuard = remember { TapGuard() }
     val coordinates = remember { GestureCoordinates() }
     val density = LocalDensity.current.density
     this
         .onGloballyPositioned { coordinates.layout = it }
-        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry) {
+        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry, edgeSliders) {
             if (!enabled) return@pointerInput
             detectTapGestures(
                 onTap = {
@@ -95,9 +97,9 @@ fun Modifier.playerGestures(
                 },
             )
         }
-        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry) {
+        .pointerInput(enabled, callbacks, zoomEnabled, restartKey, verticalFeed, fullscreenEntry, edgeSliders) {
             if (!enabled) return@pointerInput
-            awaitEachGesture { trackDrag(callbacks, zoneEnabled, tapGuard, zoomEnabled, verticalFeed, fullscreenEntry, density, coordinates::toWindow) }
+            awaitEachGesture { trackDrag(callbacks, zoneEnabled, tapGuard, zoomEnabled, verticalFeed, fullscreenEntry, edgeSliders, density, coordinates::toWindow) }
         }
 }
 
@@ -115,6 +117,7 @@ private suspend fun AwaitPointerEventScope.trackDrag(
     zoomEnabled: Boolean,
     verticalFeed: Boolean,
     fullscreenEntry: Boolean,
+    edgeSliders: Boolean,
     density: Float,
     toWindow: (Offset) -> Offset,
 ) {
@@ -143,7 +146,8 @@ private suspend fun AwaitPointerEventScope.trackDrag(
     var lastCy = 0f
     var released = false
     val velocity = GestureMath.VelocityTracker()
-    velocity.add(startTime, startInWindow.y)
+    // Event time, not handling time: a late-dispatched down must not shorten the fling's clock.
+    velocity.add(down.uptimeMillis, startInWindow.y)
 
     try {
     while (true) {
@@ -213,7 +217,25 @@ private suspend fun AwaitPointerEventScope.trackDrag(
             released = true
             // Include the release timestamp: a fast move followed by a hold
             // must settle by distance rather than reuse its old fling speed.
-            velocity.add(change.uptimeMillis, toWindow(change.position).y)
+            val upInWindow = toWindow(change.position)
+            velocity.add(change.uptimeMillis, upInWindow.y)
+            // A flick shorter than a frame can arrive as down + up with no move between them.
+            // Only the window swipe takes it over; seek and the edge sliders keep needing moves.
+            if (!dragResolved && !longPressActive && !change.isConsumed && !verticalFeed &&
+                zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)) {
+                val dx = upInWindow.x - startInWindow.x
+                val dy = upInWindow.y - startInWindow.y
+                if (max(abs(dx), abs(dy)) > viewConfiguration.touchSlop && abs(dy) > abs(dx) &&
+                    GestureMath.resolveDragMode(dx, dy, start.x, width, verticalFeed, fullscreenEntry, edgeSliders) ==
+                    GestureMath.DragMode.NONE) {
+                    dragResolved = true
+                    totalDx = dx
+                    totalDy = dy
+                    change.consume()
+                    tapGuard.suppressUntil = SystemClock.uptimeMillis() + GestureMath.TAP_SUPPRESS_MS
+                    callbacks.onWindowSwipeProgress(dx, dy)
+                }
+            }
             break
         }
         if (!change.positionChanged()) continue
@@ -238,7 +260,7 @@ private suspend fun AwaitPointerEventScope.trackDrag(
                 if (change.isConsumed) return // a child owns this drag
                 dragResolved = true
                 rawMode = GestureMath.resolveDragMode(totalDx, totalDy, start.x, width, verticalFeed,
-                    fullscreenEntry && zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE))
+                    fullscreenEntry && zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE), edgeSliders)
                 dragMode = when (rawMode) {
                     GestureMath.DragMode.SEEK ->
                         if (zoneEnabled(GestureMath.GestureZone.SEEK)) rawMode else GestureMath.DragMode.NONE
@@ -248,9 +270,12 @@ private suspend fun AwaitPointerEventScope.trackDrag(
                         if (zoneEnabled(GestureMath.GestureZone.VOLUME)) rawMode else GestureMath.DragMode.NONE
                     GestureMath.DragMode.NONE -> GestureMath.DragMode.NONE
                 }
-                if (dragMode != GestureMath.DragMode.NONE) change.consume()
-                if (!verticalFeed && rawMode == GestureMath.DragMode.NONE &&
-                    zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)) callbacks.onWindowSwipeProgress(totalDx, totalDy)
+                val windowSwipe = !verticalFeed && rawMode == GestureMath.DragMode.NONE &&
+                    zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)
+                // Claim the slop-crossing move too: a flick can release right after it, and a
+                // control under the finger would otherwise still see a clean tap and click.
+                if (dragMode != GestureMath.DragMode.NONE || windowSwipe) change.consume()
+                if (windowSwipe) callbacks.onWindowSwipeProgress(totalDx, totalDy)
             }
             continue
         }
