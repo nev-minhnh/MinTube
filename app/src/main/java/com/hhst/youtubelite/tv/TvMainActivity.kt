@@ -5,12 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import com.hhst.youtubelite.tv.home.TvHomeController
-import com.hhst.youtubelite.tv.search.TvSearchController
 import com.hhst.youtubelite.tv.library.TvLibraryController
-import com.hhst.youtubelite.tv.shell.TvComingSoon
+import com.hhst.youtubelite.tv.search.TvSearchController
+import com.hhst.youtubelite.tv.settings.TvSettingsController
 import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
-import com.hhst.youtubelite.tv.shell.TvShellState
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
 import com.hhst.youtubelite.tv.subscriptions.TvSubscriptionsController
 
@@ -22,6 +21,7 @@ import com.hhst.youtubelite.tv.subscriptions.TvSubscriptionsController
 class TvMainActivity : TvActivity() {
     private lateinit var home: TvHomeController
     private lateinit var search: TvSearchController
+    private lateinit var settings: TvSettingsController
     // Created on first visit: their ViewModels start reading when built.
     private var subscriptions: TvSubscriptionsController? = null
     private var library: TvLibraryController? = null
@@ -30,21 +30,21 @@ class TvMainActivity : TvActivity() {
         super.onCreate(savedInstanceState)
         home = TvHomeController(this)
         search = TvSearchController(this)
+        settings = TvSettingsController(this)
         setTvContent {
             val shell = rememberTvShellState()
-            TvShell(shell, onExit = ::finish) { destination -> Destination(destination, shell) }
+            TvShell(shell, onExit = ::finish) { destination -> Destination(destination) }
         }
     }
 
     @Composable
-    private fun Destination(destination: TvDestination, shell: TvShellState) {
+    private fun Destination(destination: TvDestination) {
         when (destination) {
             TvDestination.Home -> home.Content()
             TvDestination.Search -> search.Content()
             TvDestination.Subscriptions -> (subscriptions ?: TvSubscriptionsController(this).also { subscriptions = it }).Content()
             TvDestination.Library -> (library ?: TvLibraryController(this).also { library = it }).Content()
-            TvDestination.Settings ->
-                TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
+            TvDestination.Settings -> settings.Content()
         }
     }
 
@@ -52,6 +52,7 @@ class TvMainActivity : TvActivity() {
         super.onResume()
         if (::home.isInitialized) home.onResume()
         if (::search.isInitialized) search.onResume()
+        if (::settings.isInitialized) settings.onResume()
         subscriptions?.onResume()
         library?.onResume()
     }

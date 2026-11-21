@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +67,7 @@ import com.hhst.youtubelite.tv.design.TvType
 import com.hhst.youtubelite.tv.design.TvVideo
 import com.hhst.youtubelite.ui.YoutubeThumb
 import com.hhst.youtubelite.ui.design.AppIcon
+import com.hhst.youtubelite.watch.domain.VideoRating
 import kotlinx.coroutines.delay
 
 /** Title block shown over the video. */
@@ -94,6 +97,11 @@ fun TvPlayerScreen(
     callbacks: TvPlayerCallbacks,
     modifier: Modifier = Modifier,
     keyMapper: TvPlayerKeyMapper = remember { TvPlayerKeyMapper() },
+    /** Page details and account state for the Info / like / subscribe / save buttons. */
+    extras: TvWatchExtras = TvWatchExtras(),
+    actions: TvWatchActions = TvWatchActions.None,
+    /** Clock for the SponsorBlock skip toast (tests pass a fake). */
+    clockMs: () -> Long = { System.nanoTime() / 1_000_000 },
     video: @Composable () -> Unit = {},
 ) {
     var mode by remember { mutableStateOf(TvOverlayMode.Hidden) }
@@ -110,6 +118,10 @@ fun TvPlayerScreen(
     val upNextRow = remember { FocusRequester() }
     val retry = remember { FocusRequester() }
     val latestPlayer by rememberUpdatedState(player)
+    var infoOpen by remember { mutableStateOf(false) }
+    var promptOpen by remember { mutableStateOf(false) }
+    var skipped by remember { mutableStateOf<String?>(null) }
+    val skips = remember { TvSponsorSkipDetector() }
     val candidate = upNext.firstOrNull { it.id != player.videoId }
     val countdown by remember(player.videoId, player.durationMs, player.isLive, player.ended, player.error, autoplayEnabled,
         candidate, cancelledFor) {
@@ -144,6 +156,7 @@ fun TvPlayerScreen(
                 }
             }
             TvPlayerAction.CommitSeek -> if (seekOffset != 0L) {
+                skips.onUserSeek(clockMs())
                 callbacks.seekCommit(seekOffset)
                 seekOffset = 0L
             }
@@ -182,6 +195,39 @@ fun TvPlayerScreen(
         show(TvOverlayMode.Hidden)
     }
     LaunchedEffect(error) { if (error) show(TvOverlayMode.Controls) }
+    // SponsorBlock auto-skip toast, read from the shared position and segments only.
+    LaunchedEffect(player.videoId) {
+        skips.reset()
+        skipped = null
+        snapshotFlow { position.value }.collect { positionMs ->
+            skips.onPosition(positionMs, latestPlayer.sponsorSegments, clockMs())?.let { skipped = it.category }
+        }
+    }
+    LaunchedEffect(skipped) {
+        if (skipped == null) return@LaunchedEffect
+        delay(TvSponsorSkipDetector.TOAST_MS)
+        skipped = null
+    }
+    LaunchedEffect(extras.notice) {
+        if (extras.notice == null) return@LaunchedEffect
+        delay(NOTICE_MS)
+        actions.dismissNotice()
+    }
+
+    fun press(button: TvWatchButton) {
+        if (TvWatchButtons.needsSignIn(button) && !extras.signedIn) {
+            promptOpen = true
+            return
+        }
+        when (button) {
+            TvWatchButton.Info -> infoOpen = true
+            TvWatchButton.Like -> actions.like()
+            TvWatchButton.Dislike -> actions.dislike()
+            TvWatchButton.Subscribe -> actions.subscribe()
+            TvWatchButton.WatchLater -> actions.watchLater()
+            TvWatchButton.Verify -> actions.verify()
+        }
+    }
     // Each mode owns a focus target; the root keeps focus with the overlay hidden so keys arrive.
     LaunchedEffect(mode, options, error) {
         withFrameNanos { }
@@ -245,9 +291,12 @@ fun TvPlayerScreen(
                                 options = kind
                             },
                             onPick = { kind, option ->
+                                if (kind == TvSettingKind.Chapters) skips.onUserSeek(clockMs())
                                 apply(kind, option, player, callbacks)
                                 options = null
-                            })
+                            },
+                            extras = extras,
+                            onButton = ::press)
                     }
                     TimeRow(player, position, seekTarget)
                     TvSeekBar(
@@ -277,6 +326,18 @@ fun TvPlayerScreen(
                 }
             }
         }
+        val toasts = listOfNotNull(
+            skipped?.let { sponsorSkippedLabel(it) },
+            player.sponsorCountdownSec?.let { stringResource(R.string.sponsor_skip_in, it) },
+            extras.notice,
+        )
+        if (toasts.isNotEmpty()) {
+            Column(Modifier.align(Alignment.TopEnd)
+                .padding(horizontal = TvSpacing.OverscanHorizontal, vertical = TvSpacing.OverscanVertical)
+                .testTag(TAG_TOAST), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(TvSpacing.sm)) {
+                toasts.forEach { TvToast(it) }
+            }
+        }
         countdown?.let { seconds ->
             if (candidate != null) {
                 AutoplayCard(candidate, seconds, Modifier.align(Alignment.BottomEnd)
@@ -284,6 +345,23 @@ fun TvPlayerScreen(
                     .padding(bottom = if (mode == TvOverlayMode.Hidden) 0.dp else 120.dp))
             }
         }
+    }
+    if (infoOpen) {
+        TvInfoPanel(extras.details ?: TvWatchDetails(title = info.title, channel = info.channel), info.title.ifBlank { player.title },
+            onDismiss = { infoOpen = false })
+    }
+    if (promptOpen || extras.signInPrompt) {
+        TvSignInPromptPanel(
+            onSignIn = {
+                promptOpen = false
+                actions.dismissSignInPrompt()
+                actions.signIn()
+            },
+            onDismiss = {
+                promptOpen = false
+                actions.dismissSignInPrompt()
+            },
+        )
     }
 }
 
@@ -347,8 +425,11 @@ private fun SettingsRows(
     optionList: FocusRequester,
     onOpen: (TvSettingKind) -> Unit,
     onPick: (TvSettingKind, TvOption) -> Unit,
+    extras: TvWatchExtras,
+    onButton: (TvWatchButton) -> Unit,
 ) {
     val kinds = settingKinds(player)
+    val buttons = TvWatchButtons.visible(extras)
     if (open != null) {
         val choices = optionsFor(open, player, position.value)
         val selected = choices.indexOfFirst { it.selected }.coerceAtLeast(0)
@@ -375,8 +456,33 @@ private fun SettingsRows(
                 modifier = (if (index == 0) Modifier.focusRequester(settings) else Modifier).testTag("$TAG_SETTING-${kind.name}"),
                 detail = settingValue(kind, player, position.value))
         }
+        items(buttons, key = { "button:${it.name}" }) { button ->
+            val details = extras.details
+            TvChip(
+                text = button.label(details),
+                selected = when (button) {
+                    TvWatchButton.Like -> details?.rating == VideoRating.Like
+                    TvWatchButton.Dislike -> details?.rating == VideoRating.Dislike
+                    TvWatchButton.Subscribe -> details?.subscribed == true
+                    else -> false
+                },
+                onClick = { onButton(button) },
+                modifier = Modifier.testTag("$TAG_ACTION-${button.name}"),
+                detail = if (button == TvWatchButton.Like) details?.likes?.takeIf(String::isNotBlank) else null,
+            )
+        }
     }
 }
+
+@Composable
+private fun TvWatchButton.label(details: TvWatchDetails?): String = stringResource(when (this) {
+    TvWatchButton.Info -> R.string.info
+    TvWatchButton.Like -> R.string.tv_watch_like
+    TvWatchButton.Dislike -> R.string.tv_watch_dislike
+    TvWatchButton.Subscribe -> if (details?.subscribed == true) R.string.subscribed else R.string.subscribe
+    TvWatchButton.WatchLater -> R.string.ui_watch_later
+    TvWatchButton.Verify -> R.string.tv_watch_verify
+})
 
 @Composable
 private fun settingValue(kind: TvSettingKind, player: PlayerUiState, positionMs: Long): String? = when (kind) {
@@ -474,6 +580,7 @@ private const val AUTO = "auto"
 private const val OFF = "off"
 private const val CONTROLS_AUTO_HIDE_MS = 5_000L
 private const val SEEK_COMMIT_FALLBACK_MS = 900L
+private const val NOTICE_MS = 3_000L
 
 const val TAG_PLAYER = "tv-player"
 const val TAG_SEEK_BAR = "tv-player-seekbar"

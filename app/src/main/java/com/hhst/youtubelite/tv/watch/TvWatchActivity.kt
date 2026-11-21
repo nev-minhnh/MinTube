@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
@@ -17,6 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.hhst.youtubelite.App
+import com.hhst.youtubelite.core.AppNotice
+import com.hhst.youtubelite.data.media.MediaSession
 import com.hhst.youtubelite.data.media.ContentRepositories
 import com.hhst.youtubelite.data.media.PlaybackWatchReporting
 import com.hhst.youtubelite.data.media.toReportingVideo
@@ -26,12 +30,16 @@ import com.hhst.youtubelite.player.GestureUi
 import com.hhst.youtubelite.player.PlayerViewModel
 import com.hhst.youtubelite.player.engine.LoopMode
 import com.hhst.youtubelite.tv.TvActivity
+import com.hhst.youtubelite.tv.account.TvSignInRoute
+import com.hhst.youtubelite.tv.verify.TvVerification
+import com.hhst.youtubelite.ui.noticeText
 import com.hhst.youtubelite.tv.design.TvVideo
 import com.hhst.youtubelite.ui.observeAccountChanges
 import com.hhst.youtubelite.watch.domain.WatchAction
 import com.hhst.youtubelite.watch.domain.WatchContent
 import com.hhst.youtubelite.watch.domain.WatchNavigationRequest
 import com.hhst.youtubelite.watch.domain.WatchRelated
+import com.hhst.youtubelite.watch.domain.WatchVideoMenuAction
 import com.hhst.youtubelite.watch.presentation.WatchPlayer
 import com.hhst.youtubelite.watch.presentation.WatchViewModel
 import kotlinx.coroutines.awaitCancellation
@@ -55,6 +63,13 @@ class TvWatchActivity : TvActivity() {
     /** Loop mode to restore after "Cancel" on the autoplay card (that cancel pauses at the end). */
     private var loopBeforeCancel: LoopMode? = null
     private var cancelledVideo: String? = null
+    private var signedIn by mutableStateOf(MediaSession.snapshot().signedIn)
+    private var signInPrompt by mutableStateOf(false)
+    private var notice by mutableStateOf<String?>(null)
+    /** A solved traffic check grants the page read one retry, as on phone. */
+    private val verification = registerForActivityResult(TvVerification.Contract) { challenge ->
+        if (challenge != null) watchViewModel.verificationCompleted(challenge)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +84,10 @@ class TvWatchActivity : TvActivity() {
                     loadOnStart = false, avatars = null) as T
             }
         })[WatchViewModel::class.java]
-        observeAccountChanges { watchViewModel.refreshSession() }
+        observeAccountChanges {
+            signedIn = MediaSession.snapshot().signedIn
+            watchViewModel.refreshSession()
+        }
         (application as App).startMediaRuntime()
         playerViewModel.openVideo(videoId, if (savedInstanceState == null) intent.startSeconds() else null)
         bindWatchPage(videoId)
@@ -79,17 +97,53 @@ class TvWatchActivity : TvActivity() {
                     when (request) {
                         is WatchNavigationRequest.Watch -> openVideo(request.videoId)
                         is WatchNavigationRequest.SeekTo -> playerViewModel.onSeek(request.seconds * 1000)
+                        is WatchNavigationRequest.OpenVerification -> verification.launch(request.challengeUrl)
                         // The TV overlay issues no other page requests yet. No `else`: a new type must be
                         // considered here.
                         is WatchNavigationRequest.Search, WatchNavigationRequest.VoiceSearch, WatchNavigationRequest.PageMenu,
                         is WatchNavigationRequest.Channel, is WatchNavigationRequest.Comments, is WatchNavigationRequest.OpenLink,
-                        is WatchNavigationRequest.OpenVerification, is WatchNavigationRequest.Like, is WatchNavigationRequest.Dislike,
+                        is WatchNavigationRequest.Like, is WatchNavigationRequest.Dislike,
                         is WatchNavigationRequest.Subscribe, is WatchNavigationRequest.SaveToWatchLater,
                         is WatchNavigationRequest.SaveToPlaylist, is WatchNavigationRequest.CreatePlaylist,
                         is WatchNavigationRequest.Feedback, is WatchNavigationRequest.Share, is WatchNavigationRequest.Download,
                         is WatchNavigationRequest.Queue, is WatchNavigationRequest.OpenWith -> Unit
                     }
                 }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Phone notices open the phone sign-in or a touch dialog; on TV they become the
+                // sign-in panel or a short line in the overlay.
+                watchViewModel.actionNotices.collect { item ->
+                    when (item) {
+                        AppNotice.SignIn -> signInPrompt = true
+                        is AppNotice.LocalizedMessage -> notice = getString(item.resource, *item.arguments.toTypedArray())
+                        is AppNotice.Message -> notice = noticeText(item.text)
+                        is AppNotice.Failure -> notice = noticeText(item.text, failure = true)
+                    }
+                }
+            }
+        }
+        val actions = object : TvWatchActions {
+            override fun like() = watchViewModel.onAction(WatchAction.Like)
+            override fun dislike() = watchViewModel.onAction(WatchAction.Dislike)
+            override fun subscribe() = watchViewModel.onAction(WatchAction.Subscribe)
+            override fun watchLater() {
+                // The view model's Watch-later write lives behind its item menu: open it for the
+                // playing video and pick Watch later, exactly as the phone's menu does.
+                val id = watchViewModel.uiState.value.videoId
+                if (id.isBlank()) return
+                watchViewModel.onAction(WatchAction.OpenItemMenu(id))
+                watchViewModel.onAction(WatchAction.MenuAction(WatchVideoMenuAction.WatchLater))
+            }
+            override fun verify() = watchViewModel.onAction(WatchAction.OpenVerification)
+            override fun signIn() = startActivity(TvSignInRoute.intent(this@TvWatchActivity))
+            override fun dismissSignInPrompt() {
+                signInPrompt = false
+            }
+            override fun dismissNotice() {
+                notice = null
             }
         }
         val callbacks = PlayerViewModelTvCallbacks(
@@ -123,6 +177,22 @@ class TvWatchActivity : TvActivity() {
                 autoplayEnabled = prefs.isEnabled(PreferenceKeys.ENABLE_AUTOPLAY) && player.loopMode == LoopMode.QUEUE_NEXT &&
                     !player.queueEnabled,
                 callbacks = callbacks,
+                extras = TvWatchExtras(
+                    details = ready?.video?.let { video ->
+                        TvWatchDetails(
+                            title = video.title, channel = video.channel, date = video.age, views = video.views,
+                            description = video.description,
+                            likes = video.likeCount?.takeIf { prefs.isEnabled(PreferenceKeys.ENABLE_SHOW_LIKES) }.orEmpty(),
+                            rating = video.rating, subscribed = video.subscribed, canSubscribe = video.channelId.isNotBlank(),
+                        )
+                    },
+                    signedIn = signedIn,
+                    pending = page.actionPending,
+                    verification = page.verification != null,
+                    signInPrompt = signInPrompt,
+                    notice = notice,
+                ),
+                actions = actions,
                 video = {
                     // pip = true is PlayerSurface's chrome-free presentation: the one SurfaceView,
                     // subtitles and failure dialog, without touch controls or gestures.
@@ -207,6 +277,11 @@ class TvWatchActivity : TvActivity() {
         playerViewModel.onLeaveWatch()
         // Background play keeps audio running after onLeaveWatch; on TV leaving means stop.
         if (!state.casting && playerViewModel.uiState.value.userWantsPlay) playerViewModel.onPlayPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        signedIn = MediaSession.snapshot().signedIn
     }
 
     override fun onNewIntent(intent: Intent) {

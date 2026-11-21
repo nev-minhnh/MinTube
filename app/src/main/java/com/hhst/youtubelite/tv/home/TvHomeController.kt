@@ -1,6 +1,7 @@
 package com.hhst.youtubelite.tv.home
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +28,8 @@ import com.hhst.youtubelite.home.domain.HomeCatalog
 import com.hhst.youtubelite.home.domain.HomeContent
 import com.hhst.youtubelite.home.presentation.HomeViewModel
 import com.hhst.youtubelite.tv.design.TvVideo
+import com.hhst.youtubelite.tv.verify.TvVerification
+import com.hhst.youtubelite.tv.verify.TvVerificationNotice
 import com.hhst.youtubelite.tv.watch.TvWatchActivity
 import com.hhst.youtubelite.ui.observeAccountChanges
 import org.koin.java.KoinJavaComponent.getKoin
@@ -87,6 +90,11 @@ class TvHomeController(private val activity: ComponentActivity) {
             ) as T
         }
     })["tv-home-main", HomeViewModel::class.java]
+
+    /** A solved traffic check grants the feed one retry, as on phone. */
+    private val verification = activity.registerForActivityResult(TvVerification.Contract) { challenge ->
+        if (challenge != null) main.verificationCompleted(challenge)
+    }
 
     init {
         activity.observeAccountChanges { refreshSession() }
@@ -168,6 +176,19 @@ class TvHomeController(private val activity: ComponentActivity) {
                 chipStates.clear()
             }
         }
+        val challenge = mainState.verification
+        if (challenge != null && mainState.content !is HomeContent.Feed) {
+            TvVerificationNotice(onVerify = { verification.launch(challenge.challengeUrl) }, blocking = true, modifier = modifier)
+            return
+        }
+        Column(modifier) {
+            if (challenge != null) TvVerificationNotice(onVerify = { verification.launch(challenge.challengeUrl) }, blocking = false)
+            HomeScreen(state)
+        }
+    }
+
+    @Composable
+    private fun HomeScreen(state: TvHomeUiState) {
         TvHomeScreen(
             state = state,
             onOpen = ::open,
@@ -176,7 +197,6 @@ class TvHomeController(private val activity: ComponentActivity) {
             onRetry = { main.onAction(HomeAction.Refresh) },
             onRowShown = { row -> row.chip?.let(::chip) },
             onFocusDwell = { video -> if (!video.short) warm(video.id) },
-            modifier = modifier,
         )
     }
 }

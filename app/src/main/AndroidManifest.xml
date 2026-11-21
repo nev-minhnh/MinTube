@@ -125,6 +125,17 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
             android:theme="@style/Theme.App.Tv" />
+        <!-- TV device-code sign-in and the remote-friendly traffic-check page. -->
+        <activity
+            android:name=".tv.account.TvSignInActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
+        <activity
+            android:name=".tv.verify.TvVerificationActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
         <!-- Stand-in for TV channel, playlist and sign-in screens until they merge (tv/routes/TvRoutes.kt). -->
         <activity
             android:name=".tv.routes.TvPlaceholderActivity"
