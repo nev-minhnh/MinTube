@@ -5,6 +5,9 @@
     <!-- The optional sandbox is only loaded on API 26+; older systems use WebView. -->
     <uses-sdk tools:overrideLibrary="androidx.javascriptengine" />
     <uses-feature android:name="android.software.picture_in_picture" android:required="false" />
+    <!-- MinTube TV: listed by TV launchers, still installable on devices without a touchscreen or leanback. -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -44,8 +47,9 @@
         android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
+        android:banner="@drawable/tv_banner"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/tv_app_name"
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -62,18 +66,43 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.App.Home"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize" />
+        <!-- The tv branch builds the TV APK: the phone Home is not a launcher entry here, so a TV
+             launcher shows MinTube TV once. TvMainActivity is the only MAIN entry. -->
+
+        <!-- Phone link router, kept for in-app use. Its VIEW/SEND filters moved to TvLinkActivity. -->
+        <activity
+            android:name=".navigation.ContentLinkActivity"
+            android:exported="false"
+            android:theme="@style/Theme.App.Home" />
+
+        <!-- MinTube TV. -->
+        <activity
+            android:name=".tv.TvMainActivity"
+            android:banner="@drawable/tv_banner"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="true"
+            android:label="@string/tv_app_name"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.App.Tv">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <!-- One entry on a phone or tablet too (sideloaded TV APK); never a second icon on TV. -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Route external playback links before composing or loading the home feed. -->
         <activity
-            android:name=".navigation.ContentLinkActivity"
+            android:name=".tv.watch.TvWatchActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv.Player" />
+        <!-- Route external playback links straight to the TV watch screen. -->
+        <activity
+            android:name=".tv.TvLinkActivity"
             android:exported="true"
-            android:theme="@style/Theme.App.Home">
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.App.Tv">
             <!-- autoVerify=false: this app does not own the domains, so no App Link verification. -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />

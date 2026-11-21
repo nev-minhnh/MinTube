@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MinTube TV windows: dark only, #0A0A0A from the starting window on. -->
+    <style name="Theme.App.Tv" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/tv_background</item>
+        <item name="android:colorBackground">@color/tv_background</item>
+        <item name="android:statusBarColor">@color/tv_background</item>
+        <item name="android:navigationBarColor">@color/tv_background</item>
+        <item name="android:colorAccent">@color/tv_accent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+    <!-- The player window stays black under the first video frame. -->
+    <style name="Theme.App.Tv.Player">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+    <color name="tv_background">#0A0A0A</color>
+    <color name="tv_accent">#4DD4F5</color>
+</resources>

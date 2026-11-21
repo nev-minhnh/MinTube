@@ -29,11 +29,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.nevminhnh.mintube"
+        // The tv branch builds MinTube TV: its own package installs beside the phone app.
+        applicationId = "com.nevminhnh.mintube.tv"
         minSdk = 24
         targetSdk = 36
-        versionCode = 10001
-        versionName = "1.0.1"
+        // TV range: 2MMmmpp (phone builds stay below 2000000).
+        versionCode = 2010000
+        versionName = "1.0.0"
         buildConfigField("String", "DIAGNOSTIC_BUILD_ID", "\"$diagnosticBuildId\"")
         buildConfigField("String", "DIAGNOSTIC_DEPENDENCIES", "\"Media3=${libs.versions.media3.get()};OkHttp=${libs.versions.okhttp.get()};kotlinx-serialization=${libs.versions.kotlinxSerialization.get()};UPnPCast=${libs.versions.upnpcast.get()};MSC=${libs.versions.msc.get()}\"")
         testInstrumentationRunner = "com.hhst.youtubelite.ContentTestRunner"
@@ -186,6 +188,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.tv.material)
     implementation(libs.androidx.webkit)
     implementation(libs.androidx.javascriptengine)
     implementation(libs.kotlinx.coroutines.android)

@@ -26,6 +26,8 @@ msc = "v1.0.0"
 coil = "3.3.0"
 leakcanary = "2.14"
 turbine = "1.2.1"
+# Compose for TV. 1.1.0 needs Compose 1.10 (it would upgrade the phone UI past BOM 2025.06.01); 1.0.1 runs on the BOM's Compose 1.8.
+tvMaterial = "1.0.1"
 
 [libraries]
 coil-core = { module = "io.coil-kt.coil3:coil-core", version.ref = "coil" }
@@ -49,6 +51,7 @@ androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-tv-material = { group = "androidx.tv", name = "tv-material", version.ref = "tvMaterial" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
