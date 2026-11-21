@@ -32,6 +32,7 @@ issues to Litube.
     its details on the left, related videos on the right, and each column scrolls on its own.
   - The playing video stays pinned at the top while you scroll. A "now playing" strip with the title and channel
     appears under it once the title scrolls away, followed by a filter row for the related videos.
+- **Content language and region.** Settings > General has "Translate titles to English" and "Trending in Vietnam" (both on by default); see [docs/CONTENT_LOCALE.md](docs/CONTENT_LOCALE.md).
 - **Gestures.** Flick down on the video to minimize it, on phones and tablets. Brightness and volume swipes
   work only in fullscreen, so they never fight with minimizing.
 - **Mini-player and picture-in-picture.**
