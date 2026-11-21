@@ -157,13 +157,14 @@ private fun TvHomeRows(
     val focusRows = remember(rows) {
         rows.map { row -> TvFocusRow(row.key, (row.state as? TvRowState.Ready)?.videos?.map(TvVideo::id).orEmpty()) }
     }
-    // Focus must never be lost: when this screen is resumed and visible but nothing in it (or the
-    // rail) holds focus while it had focus before, put focus back on the remembered card.
+    // Focus must never be lost: when this screen is resumed but neither it nor a rail the user chose
+    // holds focus while it had focus before, put focus back on the remembered card.
     LaunchedEffect(focusRows, resumed.isAtLeast(Lifecycle.State.RESUMED)) {
         if (!resumed.isAtLeast(Lifecycle.State.RESUMED) || memory.lastRowKey == null) return@LaunchedEffect
         withFrameNanos { }
         delay(RESTORE_SETTLE_MS)
-        if (homeFocused || shell?.railFocused == true) return@LaunchedEffect
+        // Compose may hand focus to the rail when the focused card leaves; only a user's move there counts.
+        if (homeFocused || shell?.railFocusedByUser == true) return@LaunchedEffect
         val target = memory.restoreTarget(focusRows) ?: return@LaunchedEffect
         val key = focusRows[target.rowIndex].key
         column.scrollToItem(target.rowIndex + ROW_OFFSET)

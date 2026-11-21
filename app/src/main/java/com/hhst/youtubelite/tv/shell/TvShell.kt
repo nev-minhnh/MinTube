@@ -1,6 +1,7 @@
 package com.hhst.youtubelite.tv.shell
 
 import androidx.activity.compose.BackHandler
+import android.os.SystemClock
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -41,6 +42,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -91,6 +97,15 @@ class TvShellState(initial: TvDestination) {
         private set
     var railFocused by mutableStateOf(false)
         internal set
+    /**
+     * The rail holds focus because the user went there (D-pad or Back). False when Compose moved
+     * focus there by itself after the focused card left the content (a refresh): the screen should
+     * then put focus back on its remembered card.
+     */
+    var railFocusedByUser by mutableStateOf(false)
+        internal set
+    /** Uptime of the last Left press or Back-to-rail: the only ways a user enters the rail from content. */
+    internal var railIntentAt = 0L
     var contentFocused by mutableStateOf(false)
         internal set
     /** Set while the shell keeps trying to put focus in the content (first launch, after a selection). */
@@ -107,8 +122,16 @@ class TvShellState(initial: TvDestination) {
     /** Enters the content group (its focus restorer picks the card). False when nothing is focusable yet. */
     fun focusContent(): Boolean = runCatching { contentRequester.requestFocus(FocusDirection.Enter) }.getOrDefault(false)
 
-    fun focusRail(): Boolean =
-        runCatching { railRequesters.getValue(selected).requestFocus(FocusDirection.Enter) }.getOrDefault(false)
+    fun focusRail(): Boolean {
+        railIntentAt = SystemClock.uptimeMillis()
+        return runCatching { railRequesters.getValue(selected).requestFocus(FocusDirection.Enter) }.getOrDefault(false)
+    }
+
+    internal fun onRailFocus(hasFocus: Boolean) {
+        if (hasFocus && !railFocused) railFocusedByUser = SystemClock.uptimeMillis() - railIntentAt < USER_FOCUS_WINDOW_MS
+        if (!hasFocus) railFocusedByUser = false
+        railFocused = hasFocus
+    }
 
     companion object {
         val Saver: Saver<TvShellState, String> = Saver(save = { it.selected.name },
@@ -155,7 +178,10 @@ fun TvShell(
             }
             state.pendingContentFocus = false
         }
-        Box(modifier.fillMaxSize().background(TvColors.Background)) {
+        Box(modifier.fillMaxSize().background(TvColors.Background).onPreviewKeyEvent { event ->
+            if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionLeft) state.railIntentAt = SystemClock.uptimeMillis()
+            false
+        }) {
             Box(
                 Modifier
                     .fillMaxSize()
@@ -192,7 +218,7 @@ private fun TvRail(state: TvShellState) {
                 .fillMaxHeight()
                 .padding(start = TvSpacing.xl, end = TvSpacing.lg, top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical)
                 .focusRestorer(state.railRequesters.getValue(state.selected))
-                .onFocusChanged { state.railFocused = it.hasFocus }
+                .onFocusChanged { state.onRailFocus(it.hasFocus) }
                 .focusGroup()
                 .selectableGroup()
                 .semantics { contentDescription = rail }
@@ -261,6 +287,7 @@ private fun TvRailItem(
     }
 }
 
+private const val USER_FOCUS_WINDOW_MS = 600L
 private const val CONTENT_FOCUS_ATTEMPTS = 100
 private const val CONTENT_FOCUS_RETRY_MS = 120L
 
