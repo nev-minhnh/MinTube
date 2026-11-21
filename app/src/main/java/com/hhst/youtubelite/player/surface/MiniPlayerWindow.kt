@@ -45,6 +45,7 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -234,6 +235,7 @@ fun MiniPlayerWindow(
     val currentOnContentFullscreenPull by rememberUpdatedState(onContentFullscreenPull)
     val currentOnMiniSwipe by rememberUpdatedState(onMiniSwipe)
     val swipeThreshold = remember { GestureThreshold() }
+    val touchSlop = LocalViewConfiguration.current.touchSlop
 
     val widthPx = with(density) { spec.widthDp.dp.toPx() }
     val heightPx = with(density) { spec.heightDp.dp.toPx() }
@@ -577,7 +579,9 @@ fun MiniPlayerWindow(
             if (mini || !fullscreenSwipeEnabled || dismissing) return false
             if (!swiping) return true
             if (swipeToMini) {
-                val commit = GestureResistance.commits(distance, velocityPxPerSec, commitDistance(), density.density)
+                // A quick downward flick minimizes too; a slow drag still needs the distance.
+                val commit = GestureMath.commitsMiniSwipe(fullscreenSwipe.horizontal, distance, velocityPxPerSec,
+                    commitDistance(), touchSlop, density.density, fullscreen = swipeStartedFullscreen)
                 if (commit) cue(commitDistance())
                 awaitingFullscreen = null
                 transitionToMini = commit

@@ -248,9 +248,12 @@ private suspend fun AwaitPointerEventScope.trackDrag(
                         if (zoneEnabled(GestureMath.GestureZone.VOLUME)) rawMode else GestureMath.DragMode.NONE
                     GestureMath.DragMode.NONE -> GestureMath.DragMode.NONE
                 }
-                if (dragMode != GestureMath.DragMode.NONE) change.consume()
-                if (!verticalFeed && rawMode == GestureMath.DragMode.NONE &&
-                    zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)) callbacks.onWindowSwipeProgress(totalDx, totalDy)
+                val windowSwipe = !verticalFeed && rawMode == GestureMath.DragMode.NONE &&
+                    zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)
+                // Claim the slop-crossing move too: a flick can release right after it, and a
+                // control under the finger would otherwise still see a clean tap and click.
+                if (dragMode != GestureMath.DragMode.NONE || windowSwipe) change.consume()
+                if (windowSwipe) callbacks.onWindowSwipeProgress(totalDx, totalDy)
             }
             continue
         }

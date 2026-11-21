@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.player.surface
 
+import com.hhst.youtubelite.ui.design.GestureResistance
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -112,6 +113,37 @@ object GestureMath {
             startX > width * VOLUME_ZONE_START -> DragMode.VOLUME
             else -> DragMode.NONE
         }
+    }
+
+    /** A downward release at least this fast (dp/s) minimizes the embedded player at any distance past slop. */
+    const val MINI_FLING_MIN_VELOCITY_DP_PER_SEC = 1000f
+
+    /** "Mostly vertical": sideways travel may be at most this fraction of the downward travel (about 35 degrees). */
+    const val MINI_FLING_MAX_HORIZONTAL_RATIO = 0.7f
+
+    /** A quick, mostly vertical downward flick past [touchSlop]; distance alone does not matter. */
+    fun isMiniFling(dx: Float, dy: Float, velocityY: Float, touchSlop: Float, density: Float): Boolean =
+        dy > 0f && dy >= touchSlop &&
+            velocityY >= MINI_FLING_MIN_VELOCITY_DP_PER_SEC * density &&
+            abs(dx) <= dy * MINI_FLING_MAX_HORIZONTAL_RATIO
+
+    /**
+     * Release decision for the embedded swipe-down-to-minimize drag. A slow drag keeps the
+     * distance rule ([GestureResistance.commits] against [distanceThreshold]); a fling commits
+     * regardless of distance. Fullscreen never minimizes: its downward swipe exits fullscreen.
+     */
+    fun commitsMiniSwipe(
+        dx: Float,
+        dy: Float,
+        velocityY: Float,
+        distanceThreshold: Float,
+        touchSlop: Float,
+        density: Float,
+        fullscreen: Boolean,
+    ): Boolean {
+        if (fullscreen) return false
+        return GestureResistance.commits(dy, velocityY, distanceThreshold, density) ||
+            isMiniFling(dx, dy, velocityY, touchSlop, density)
     }
 
     /** Gesture-session level: apply [delta] without re-reading a quantized system value. */

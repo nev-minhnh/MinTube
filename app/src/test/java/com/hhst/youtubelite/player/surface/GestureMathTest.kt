@@ -1,6 +1,8 @@
 package com.hhst.youtubelite.player.surface
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GestureMathTest {
@@ -104,7 +106,52 @@ class GestureMathTest {
         assertEquals(67, GestureMath.levelPercent(10f, 15f))
     }
 
+    // Phone: 2.625 density, 144 dp distance threshold, 8 dp touch slop.
+    private val miniDensity = 2.625f
+    private val miniThreshold = 144f * miniDensity
+    private val miniSlop = 8f * miniDensity
 
+    private fun commitsMini(dxDp: Float, dyDp: Float, velocityDpS: Float, fullscreen: Boolean = false) =
+        GestureMath.commitsMiniSwipe(dxDp * miniDensity, dyDp * miniDensity, velocityDpS * miniDensity,
+            miniThreshold, miniSlop, miniDensity, fullscreen)
+
+    @Test
+    fun miniSwipe_fastShortFlickCommits() {
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 1_200f))
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 9f, velocityDpS = GestureMath.MINI_FLING_MIN_VELOCITY_DP_PER_SEC))
+        assertTrue("A slightly diagonal flick is still mostly vertical", commitsMini(dxDp = 15f, dyDp = 30f, velocityDpS = 1_500f))
+    }
+
+    @Test
+    fun miniSwipe_slowShortDragDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 150f))
+        assertFalse("Just under the fling speed", commitsMini(dxDp = 0f, dyDp = 60f, velocityDpS = 990f))
+    }
+
+    @Test
+    fun miniSwipe_longSlowDragCommits() {
+        assertTrue(commitsMini(dxDp = 0f, dyDp = 150f, velocityDpS = 100f))
+        assertTrue("A drag held still past the threshold", commitsMini(dxDp = 0f, dyDp = 144f, velocityDpS = 0f))
+    }
+
+    @Test
+    fun miniSwipe_mostlyHorizontalFlingDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 40f, dyDp = 30f, velocityDpS = 2_000f))
+        assertFalse(commitsMini(dxDp = 25f, dyDp = 30f, velocityDpS = 2_000f))
+    }
+
+    @Test
+    fun miniSwipe_flickBelowTouchSlopOrUpwardDoesNotCommit() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 5f, velocityDpS = 3_000f))
+        assertFalse(commitsMini(dxDp = 0f, dyDp = -30f, velocityDpS = 3_000f))
+        assertFalse("Flicking back up cancels even a long drag", commitsMini(dxDp = 0f, dyDp = 150f, velocityDpS = -1_200f))
+    }
+
+    @Test
+    fun miniSwipe_fullscreenNeverMinimizes() {
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 30f, velocityDpS = 1_500f, fullscreen = true))
+        assertFalse(commitsMini(dxDp = 0f, dyDp = 300f, velocityDpS = 0f, fullscreen = true))
+    }
 }
 
 class VelocityTrackerTest {
