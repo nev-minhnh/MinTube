@@ -26,6 +26,18 @@ import java.io.IOException
 class DownloadOptionsAndroidTest {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
 
+    /**
+     * Picker rows live in a separate dialog window, which the test only sees once that window
+     * is attached and composed; on a loaded emulator that lags the click that opened it. Wait
+     * for the row itself, then click it.
+     */
+    private fun option(text: String, substring: Boolean = false): SemanticsNodeInteraction {
+        val row = hasText(text, substring = substring) and
+            SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+        compose.waitUntil(8_000) { compose.onAllNodes(row).fetchSemanticsNodes().isNotEmpty() }
+        return compose.onNode(row)
+    }
+
     @Test fun audioQualityKeepsTrackAndCatalog() {
         var loads = 0
         val initial = sampleCatalog()
@@ -50,18 +62,18 @@ class DownloadOptionsAndroidTest {
         compose.onNodeWithText(compose.activity.getString(R.string.download_audio)).performScrollTo().performClick()
         compose.waitUntil(8_000) { compose.onAllNodesWithText(compose.activity.getString(R.string.player_quality_auto)).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText(compose.activity.getString(R.string.download_quality)).performClick()
-        compose.onNodeWithText("64 kbps").performClick()
+        option("64 kbps").performClick()
         compose.onNodeWithText("64 kbps").assertIsDisplayed()
         compose.onNodeWithText(compose.activity.getString(R.string.audio_track)).performClick()
-        compose.onNode(hasText("Japanese", substring = true) and SemanticsMatcher.expectValue(
-            SemanticsProperties.Role, Role.RadioButton)).performClick()
+        option("Japanese", substring = true).performClick()
         compose.onNodeWithText(compose.activity.getString(R.string.download_quality)).performClick()
+        // The dialog is open (its 256 kbps row exists) before checking the other track's bitrates are gone.
+        val japaneseTop = option("256 kbps")
         compose.onNodeWithText("64 kbps").assertDoesNotExist()
         compose.onNodeWithText("128 kbps").assertDoesNotExist()
-        compose.onNodeWithText("256 kbps").performClick()
+        japaneseTop.performClick()
         compose.onNodeWithText(compose.activity.getString(R.string.download_quality)).performClick()
-        compose.onNode(hasText("96 kbps") and SemanticsMatcher.expectValue(
-            SemanticsProperties.Role, Role.RadioButton)).performClick()
+        option("96 kbps").performClick()
         compose.onNodeWithContentDescription(compose.activity.getString(R.string.download)).assertIsEnabled().performClick()
         compose.waitUntil(8_000) { submitted }
         val task = runBlocking { harness.repo.transact { allTasks().single() } }
@@ -123,18 +135,16 @@ class DownloadOptionsAndroidTest {
             compose.onNodeWithText(compose.activity.getString(R.string.download_quality)).performClick()
             compose.waitForIdle()
             DeviceEvidence.captureScene("download-quality")
-            compose.onNodeWithText(quality).performClick()
+            option(quality).performClick()
             compose.onNodeWithText(quality).assertIsDisplayed()
         }
         compose.onNodeWithText(compose.activity.getString(R.string.audio_track)).performClick()
-        compose.onNode(hasText("Japanese", substring = true) and SemanticsMatcher.expectValue(
-            SemanticsProperties.Role, Role.RadioButton)).performClick()
+        option("Japanese", substring = true).performClick()
         compose.onNodeWithText("Japanese", substring = true).assertIsDisplayed()
         compose.onNodeWithText(compose.activity.getString(R.string.subtitles)).performClick()
         compose.waitForIdle()
         DeviceEvidence.captureScene("download-subtitles")
-        compose.onNode(hasText("Japanese", substring = true) and SemanticsMatcher.expectValue(
-            SemanticsProperties.Role, Role.RadioButton)).performClick()
+        option("Japanese", substring = true).performClick()
         compose.onNodeWithText(compose.activity.getString(R.string.download_sub_auto), substring = true).assertIsDisplayed()
         compose.onNodeWithContentDescription(compose.activity.getString(R.string.download)).assertIsEnabled().performClick()
         compose.waitUntil(8_000) { submitted }
