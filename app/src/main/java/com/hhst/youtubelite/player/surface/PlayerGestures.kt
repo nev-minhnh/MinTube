@@ -143,7 +143,8 @@ private suspend fun AwaitPointerEventScope.trackDrag(
     var lastCy = 0f
     var released = false
     val velocity = GestureMath.VelocityTracker()
-    velocity.add(startTime, startInWindow.y)
+    // Event time, not handling time: a late-dispatched down must not shorten the fling's clock.
+    velocity.add(down.uptimeMillis, startInWindow.y)
 
     try {
     while (true) {
@@ -213,7 +214,25 @@ private suspend fun AwaitPointerEventScope.trackDrag(
             released = true
             // Include the release timestamp: a fast move followed by a hold
             // must settle by distance rather than reuse its old fling speed.
-            velocity.add(change.uptimeMillis, toWindow(change.position).y)
+            val upInWindow = toWindow(change.position)
+            velocity.add(change.uptimeMillis, upInWindow.y)
+            // A flick shorter than a frame can arrive as down + up with no move between them.
+            // Only the window swipe takes it over; seek and the edge sliders keep needing moves.
+            if (!dragResolved && !longPressActive && !change.isConsumed && !verticalFeed &&
+                zoneEnabled(GestureMath.GestureZone.FULLSCREEN_SWIPE)) {
+                val dx = upInWindow.x - startInWindow.x
+                val dy = upInWindow.y - startInWindow.y
+                if (max(abs(dx), abs(dy)) > viewConfiguration.touchSlop && abs(dy) > abs(dx) &&
+                    GestureMath.resolveDragMode(dx, dy, start.x, width, verticalFeed, fullscreenEntry) ==
+                    GestureMath.DragMode.NONE) {
+                    dragResolved = true
+                    totalDx = dx
+                    totalDy = dy
+                    change.consume()
+                    tapGuard.suppressUntil = SystemClock.uptimeMillis() + GestureMath.TAP_SUPPRESS_MS
+                    callbacks.onWindowSwipeProgress(dx, dy)
+                }
+            }
             break
         }
         if (!change.positionChanged()) continue
