@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.home.domain.AppendState
 import com.hhst.youtubelite.library.presentation.LibrarySpinner
 import com.hhst.youtubelite.playlist.domain.PlaylistAction
@@ -55,7 +56,7 @@ import com.hhst.youtubelite.ui.design.rememberHapticAction
 @Composable
 internal fun PlaylistOwner(owner: String, artwork: String, local: Boolean, onOpen: () -> Unit) {
     if (local) {
-        AppText(owner, MinType.Label, Modifier.padding(top = MinSpace.xs), color = DesignTokens.Secondary, maxLines = 1)
+        AppText(localLabel(owner), MinType.Label, Modifier.padding(top = MinSpace.xs), color = DesignTokens.Secondary, maxLines = 1)
     } else {
         Row(Modifier.heightIn(min = MinSpace.Touch).clip(MinRadius.Badge).clickable(role = Role.Button, onClick = onOpen),
             verticalAlignment = Alignment.CenterVertically) {

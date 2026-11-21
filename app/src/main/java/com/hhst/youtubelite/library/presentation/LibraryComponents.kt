@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.dearrow.VideoArtwork
 import com.hhst.youtubelite.dearrow.rememberDeArrowTitle
 import com.hhst.youtubelite.home.domain.AppendState
@@ -228,7 +229,7 @@ internal fun PlaylistListRow(playlist: PlaylistSummary, thumbnailWidth: Dp, modi
         Spacer(Modifier.width(MinSpace.md))
         Column(Modifier.weight(1f).padding(vertical = MinSpace.xs)) {
             AppText(playlist.title, MinType.Subtitle, maxLines = 2)
-            val metadata = listOfNotNull(playlist.owner.takeIf(String::isNotBlank), playlist.countLabel).joinToString(" · ")
+            val metadata = listOfNotNull(playlist.owner.takeIf(String::isNotBlank)?.let { localLabel(it) }, playlist.countLabel).joinToString(" · ")
             if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xs),
                 color = DesignTokens.Secondary, maxLines = 2)
         }
@@ -243,7 +244,7 @@ internal fun PlaylistShelf(playlists: List<PlaylistSummary>, inset: Dp, cardWidt
         items(playlists, key = { it.id }) { playlist ->
             PlaylistCard(
                 title = playlist.title,
-                metadata = playlist.owner,
+                metadata = localLabel(playlist.owner),
                 artwork = playlist.artwork,
                 onClick = { onOpen(playlist.id) },
                 modifier = Modifier.width(cardWidth).testTag("library-playlist-${playlist.id}"),

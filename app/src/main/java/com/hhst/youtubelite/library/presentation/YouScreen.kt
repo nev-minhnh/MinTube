@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.account.domain.AccountMenuAction
 import com.hhst.youtubelite.library.domain.AccountProfile
 import com.hhst.youtubelite.library.domain.LibraryAction
@@ -207,8 +208,8 @@ private fun AccountHeader(account: AccountProfile, inset: androidx.compose.ui.un
         }
         Spacer(Modifier.width(MinSpace.lg))
         Column(Modifier.weight(1f)) {
-            AppText(account.name, MinType.Title, maxLines = 2)
-            if (account.handle.isNotBlank()) AppText(account.handle, MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
+            AppText(localLabel(account.name), MinType.Title, maxLines = 2)
+            if (account.handle.isNotBlank()) AppText(localLabel(account.handle), MinType.Body, color = DesignTokens.Secondary, maxLines = 1)
         }
         AppIcon(AppIcon.ChevronRight, Modifier.padding(start = MinSpace.sm).size(20.dp), color = DesignTokens.Secondary)
     }

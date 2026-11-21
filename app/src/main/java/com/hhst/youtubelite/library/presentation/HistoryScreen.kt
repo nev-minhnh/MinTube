@@ -34,6 +34,7 @@ import com.hhst.youtubelite.library.domain.HistoryUiState
 import com.hhst.youtubelite.library.domain.LibraryAction
 import com.hhst.youtubelite.library.domain.LibraryOverlay
 import com.hhst.youtubelite.ui.components.MinTopBar
+import com.hhst.youtubelite.ui.localLabel
 import com.hhst.youtubelite.ui.design.AppIcon
 import com.hhst.youtubelite.ui.design.AppIconButton
 import com.hhst.youtubelite.ui.design.CollapsingAppBar
@@ -116,7 +117,7 @@ private fun HistoryList(content: HistoryContent.Ready, append: AppendState, list
                 val name = section.trim()
                 // The top bar already reads "History"; the body adds only the section groups.
                 if (name.isNotEmpty() && !name.equals("History", ignoreCase = true) && name !in RedundantHistorySections) item(key = "section-$section") {
-                    LibrarySectionTitle(section, Modifier.padding(top = MinSpace.sm, bottom = MinSpace.md))
+                    LibrarySectionTitle(localLabel(section), Modifier.padding(top = MinSpace.sm, bottom = MinSpace.md))
                 }
                 items(entries.chunked(columns), key = { it.first().id }) { line ->
                     Row(Modifier.fillMaxWidth().padding(bottom = MinSpace.lg), horizontalArrangement = Arrangement.spacedBy(MinSpace.xxl)) {

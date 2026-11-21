@@ -594,7 +594,7 @@
     <string name="ui_new_playlist">Danh sách phát mới</string>
     <string name="a11y_play_title">Chơi %1$s</string>
     <string name="ui_shorts_actions">Thao tác với video Shorts</string>
-    <string name="ui_playlist_owner">%1$s · Playlist</string>
+    <string name="ui_playlist_owner">%1$s · Danh sách phát</string>
     <string name="ui_playlist_loading_count">Đang tải toàn bộ danh sách phát… %1$d đã tải</string>
     <string name="ui_verification_explanation">YouTube đã yêu cầu xác minh trước khi có thể tải thêm nội dung. Bạn có thể xác minh trong trình duyệt rồi thử lại hoặc tiếp tục duyệt những gì đã tải.</string>
     <string name="ui_search_no_playlists">Tìm kiếm \"%1$s\" của bạn không khớp với bất kỳ danh sách phát nào.</string>
@@ -764,4 +764,5 @@
     <string name="search_field_label">Nội dung tìm kiếm</string>
     <string name="qa1_history_paused_banner">Lịch sử xem đang tạm dừng. Các video bạn xem trên thiết bị này sẽ không được lưu.</string>
     <string name="qa1_clear_history_device_body">Lịch sử xem trên thiết bị này sẽ bị xóa. Bạn không thể hoàn tác thao tác này.</string>
+    <string name="qa2_local_history_and_playlists">Lịch sử và danh sách phát trên máy</string>
 </resources>
