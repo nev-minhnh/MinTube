@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import com.hhst.youtubelite.tv.home.TvHomeController
+import com.hhst.youtubelite.tv.library.TvLibraryController
 import com.hhst.youtubelite.tv.shell.TvComingSoon
 import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
@@ -21,6 +22,7 @@ class TvMainActivity : TvActivity() {
     private lateinit var home: TvHomeController
     // Created on first visit: their ViewModels start reading when built.
     private var subscriptions: TvSubscriptionsController? = null
+    private var library: TvLibraryController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +38,8 @@ class TvMainActivity : TvActivity() {
         when (destination) {
             TvDestination.Home -> home.Content()
             TvDestination.Subscriptions -> (subscriptions ?: TvSubscriptionsController(this).also { subscriptions = it }).Content()
-            TvDestination.Search, TvDestination.Library, TvDestination.Settings ->
+            TvDestination.Library -> (library ?: TvLibraryController(this).also { library = it }).Content()
+            TvDestination.Search, TvDestination.Settings ->
                 TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
         }
     }
@@ -45,6 +48,7 @@ class TvMainActivity : TvActivity() {
         super.onResume()
         if (::home.isInitialized) home.onResume()
         subscriptions?.onResume()
+        library?.onResume()
     }
 
     companion object {
