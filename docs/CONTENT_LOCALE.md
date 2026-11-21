@@ -33,15 +33,30 @@ non-English videos translated to English when YouTube has a translation.
   (`vi`, `zh-CN`/`zh-TW`, `iw`, `no`, ...), with English for languages YouTube lacks. OFF also
   makes the watch page prefer the player's original title and description.
 - **Trending in Vietnam** (`trending_region_vietnam`, default ON): ON is `gl=VN`; OFF is the device country, else `US`.
+  This region applies only to the reads listed under "gl scope" below.
 - Both keys are in `PreferenceKeys.DEFAULTS`, so backup and restore include them.
 
-**gl scope (chosen):** gl applies to all requests, not only trending. One session value keeps
-Home, discovery, Explore, search and suggestions consistent, so trending and search never disagree.
-gl does not affect account data.
+**gl scope (v1.0.1):** the region override applies only to Home (signed-in feed and signed-out
+discovery/trending), Explore, search with its filters and metadata repair, and search suggestions.
+All other requests keep MSC's default `gl=US`, as pristine Litube did: player, watch/next, Shorts
+and their hydration, stream and download resolution, comments, channels, playlists, library and account data.
+`hl` is unchanged and still applies to every request.
+
+Why: v1.0.0 sent `gl=VN` on every request, including `/player`. The owner watches a
+geo-restricted live stream over a VPN to another country. With "Trending in Vietnam" ON the
+player response resolved (`prepared=true`), but googlevideo answered every media request
+with HTTP 403 `text/plain` (VISIONOS itag 299, then ANDROID_VR itag 18 after the full refresh),
+error 2004. With the setting OFF the same video played over the same VPN at once (confirmed on
+his phone, 2026-11-21). A probe from a Vietnamese IP with ANDROID_VR showed that `gcr` and `ip` in the
+media URL follow the requesting IP, not `gl`. The exact server-side rule is not documented, so
+playback no longer sends a region that may disagree with the network.
 
 ## Data-layer changes
-- `MediaSession.setContentLocale` overlays hl/gl on `snapshot()`, so it also applies to `freshContext()`
-  and `anonymous()`. A change after the first value bumps the generation, as the anonymous-mode
+- `MediaSession.setContentLocale` overlays `hl` on `snapshot()`, so it also applies to `freshContext()`
+  and `anonymous()`. `snapshot()` never carries the region. `MediaSession.withContentRegion` adds it, and
+  `ContentRepositories` gives only `home`, `search`, `explore` and `suggestions` a
+  `MediaClient.withRequestContext(MediaSession::withContentRegion)` client (same admission and identity checks).
+  `ContentRegionScopeTest` checks that search sends `gl=VN` while watch/next and Shorts player reads send `gl=US`. A change after the first value bumps the generation, as the anonymous-mode
   switch does. In-flight reads of the old locale abort, pagination cursors and generation-keyed
   caches stop matching, and Home and Explore reload on resume, so no rows mix locales.
   An account write still being confirmed during the switch is treated as after an identity

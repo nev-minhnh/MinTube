@@ -17,8 +17,10 @@ class ContentRepositories(val client: MediaClient,
         }
     }
     val localLibrary by lazy { LocalLibraryStore(authKv, writer = LocalLibraryStore.backgroundWriter()) }
-    val home by lazy { MediaHomeRepository(client) }
-    val search by lazy { MediaSearchRepository(client) }
+    /** Only these discovery reads carry the region override; see [MediaSession.withContentRegion]. */
+    private val regional by lazy { client.withRequestContext(MediaSession::withContentRegion) }
+    val home by lazy { MediaHomeRepository(regional) }
+    val search by lazy { MediaSearchRepository(regional) }
     val watch by lazy { CachedWatchRepository(MediaWatchRepository(client, sharedWatchReads), identity = { MediaSession.snapshot().generation }) }
     val playlist by lazy { MediaPlaylistRepository(client, localLibrary) }
     val posts by lazy { MediaPostRepository(client, postWebContext) }
@@ -31,9 +33,9 @@ class ContentRepositories(val client: MediaClient,
     val saves by lazy { MediaSaveRepository(client, localLibrary) }
     val library by lazy { MediaLibraryRepository(client, localLibrary) }
     val subscriptions by lazy { MediaSubscriptionsRepository(client, avatars = avatars) }
-    val explore by lazy { MediaExploreRepository(client) }
+    val explore by lazy { MediaExploreRepository(regional) }
     val avatars by lazy { MediaAvatarDirectory(client, disk = kv?.let { com.hhst.youtubelite.core.PreferenceJsonCache(it) }) }
-    val suggestions by lazy { MediaSearchSuggestions(client, kv ?: error("search_history_store_missing"),
+    val suggestions by lazy { MediaSearchSuggestions(regional, kv ?: error("search_history_store_missing"),
         privateBrowsing = MediaSession::privateBrowsing) }
     val shortsEntry by lazy { com.hhst.youtubelite.shorts.data.ShortsEntryPreparation(
         load = { MediaShortsRepository(client).shorts() },

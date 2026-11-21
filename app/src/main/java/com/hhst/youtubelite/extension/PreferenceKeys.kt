@@ -7,7 +7,7 @@ object PreferenceKeys {
     const val APP_LANGUAGE = "app_language"
     /** Requests YouTube content with `hl=en`; off follows the app language. */
     const val CONTENT_LANGUAGE_ENGLISH = "content_language_english"
-    /** Requests YouTube content with `gl=VN`; off follows the device region. */
+    /** Sends `gl=VN` with Home, Explore, search and suggestions only (never playback); off follows the device region. */
     const val TRENDING_REGION_VIETNAM = "trending_region_vietnam"
     const val ENABLE_DISPLAY_DISLIKES = "enable_display_dislikes"
     const val ENABLE_HIDE_SHORTS = "enable_hide_shorts"

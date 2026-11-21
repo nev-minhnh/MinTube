@@ -55,6 +55,10 @@ class MediaClient private constructor(
     fun forWrites(): MediaClient = if (singleAttemptWrites) this else
         MediaClient(http.newBuilder().retryOnConnectionFailure(false).build(), context, true)
 
+    /** The same admission, cancellation and identity checks; every block sees [transform] of the session. */
+    fun withRequestContext(transform: (RequestContext) -> RequestContext): MediaClient =
+        MediaClient(http, { transform(context()) }, singleAttemptWrites)
+
     /** Preparation, mutation and optional readback share one session and cancellation lifetime. */
     suspend fun <T> write(block: (RequestContext, HttpClient) -> T): T = writer.read(block)
 
