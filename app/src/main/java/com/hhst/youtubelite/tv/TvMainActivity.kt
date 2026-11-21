@@ -10,6 +10,7 @@ import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.TvShellState
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
+import com.hhst.youtubelite.tv.subscriptions.TvSubscriptionsController
 
 /**
  * LEANBACK_LAUNCHER entry of MinTube TV: the shell (rail + content) hosting the top-level
@@ -18,6 +19,8 @@ import com.hhst.youtubelite.tv.shell.rememberTvShellState
  */
 class TvMainActivity : TvActivity() {
     private lateinit var home: TvHomeController
+    // Created on first visit: their ViewModels start reading when built.
+    private var subscriptions: TvSubscriptionsController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +35,8 @@ class TvMainActivity : TvActivity() {
     private fun Destination(destination: TvDestination, shell: TvShellState) {
         when (destination) {
             TvDestination.Home -> home.Content()
-            TvDestination.Search, TvDestination.Subscriptions,
-            TvDestination.Library, TvDestination.Settings ->
+            TvDestination.Subscriptions -> (subscriptions ?: TvSubscriptionsController(this).also { subscriptions = it }).Content()
+            TvDestination.Search, TvDestination.Library, TvDestination.Settings ->
                 TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
         }
     }
@@ -41,6 +44,7 @@ class TvMainActivity : TvActivity() {
     override fun onResume() {
         super.onResume()
         if (::home.isInitialized) home.onResume()
+        subscriptions?.onResume()
     }
 
     companion object {

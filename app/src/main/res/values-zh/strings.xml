@@ -771,4 +771,26 @@
     <string name="locale_translate_titles_summary">Off shows original titles, with views and dates in the app language</string>
     <string name="locale_trending_vietnam">Trending in Vietnam</string>
     <string name="locale_trending_vietnam_summary">Off uses your device region for trending and search</string>
+    <string name="tv_route_channel">Channel</string>
+    <string name="tv_go_back">Go back</string>
+    <string name="tv_loading">Loading…</string>
+    <string name="tv_subscriptions_signed_out_title">Sign in to see your subscriptions</string>
+    <string name="tv_subscriptions_signed_out_message">New videos from the channels you subscribe to show up here.</string>
+    <string name="tv_subscriptions_failed_title">Couldn\'t load subscriptions</string>
+    <string name="tv_subscriptions_latest">Latest videos</string>
+    <string name="tv_subscriptions_empty">No new videos from your channels yet.</string>
+    <string name="tv_subscriptions_channels_failed">Couldn\'t load your channels.</string>
+    <string name="tv_library_history">History</string>
+    <string name="tv_library_signed_out_title">Sign in to see your library</string>
+    <string name="tv_library_signed_out_message">Your history, playlists and saved videos show up here.</string>
+    <string name="tv_library_failed_title">Couldn\'t load your library</string>
+    <string name="tv_library_empty_title">Nothing here yet</string>
+    <string name="tv_library_history_empty">Videos you watch show up here.</string>
+    <string name="tv_library_queue_empty">Add videos to the queue to play them next.</string>
+    <string name="tv_library_hold_hint">Hold OK on a video to remove it from your history.</string>
+    <string name="tv_shorts_failed_title">Couldn\'t load Shorts</string>
+    <string name="tv_shorts_empty_title">No Shorts right now</string>
+    <string name="tv_shorts_like">Like</string>
+    <string name="tv_shorts_hint">Up / Down: change Short · OK: play or pause · Left / Right: seek 5 s · Back: exit</string>
+    <string name="tv_shorts_hint_rate">Up / Down: change Short · OK: play or pause · Left / Right: seek 5 s · Hold OK: like · Back: exit</string>
 </resources>

@@ -100,6 +100,11 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:theme="@style/Theme.App.Tv.Player" />
+        <!-- Stand-in for TV channel, playlist and sign-in screens until they merge (tv/routes/TvRoutes.kt). -->
+        <activity
+            android:name=".tv.routes.TvPlaceholderActivity"
+            android:exported="false"
+            android:theme="@style/Theme.App.Tv" />
         <!-- Route external playback links straight to the TV watch screen. -->
         <activity
             android:name=".tv.TvLinkActivity"

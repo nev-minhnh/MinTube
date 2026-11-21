@@ -769,4 +769,26 @@
     <string name="locale_translate_titles_summary">Tắt để xem tiêu đề gốc, lượt xem và ngày theo ngôn ngữ ứng dụng</string>
     <string name="locale_trending_vietnam">Thịnh hành tại Việt Nam</string>
     <string name="locale_trending_vietnam_summary">Tắt để dùng khu vực của thiết bị cho thịnh hành và tìm kiếm</string>
+    <string name="tv_route_channel">Kênh</string>
+    <string name="tv_go_back">Quay lại</string>
+    <string name="tv_loading">Đang tải…</string>
+    <string name="tv_subscriptions_signed_out_title">Đăng nhập để xem kênh đăng ký</string>
+    <string name="tv_subscriptions_signed_out_message">Video mới từ các kênh bạn đăng ký sẽ hiện ở đây.</string>
+    <string name="tv_subscriptions_failed_title">Không tải được kênh đăng ký</string>
+    <string name="tv_subscriptions_latest">Video mới nhất</string>
+    <string name="tv_subscriptions_empty">Chưa có video mới từ các kênh của bạn.</string>
+    <string name="tv_subscriptions_channels_failed">Không tải được danh sách kênh.</string>
+    <string name="tv_library_history">Lịch sử</string>
+    <string name="tv_library_signed_out_title">Đăng nhập để xem thư viện</string>
+    <string name="tv_library_signed_out_message">Lịch sử, danh sách phát và video đã lưu của bạn sẽ hiện ở đây.</string>
+    <string name="tv_library_failed_title">Không tải được thư viện</string>
+    <string name="tv_library_empty_title">Chưa có gì ở đây</string>
+    <string name="tv_library_history_empty">Video bạn đã xem sẽ hiện ở đây.</string>
+    <string name="tv_library_queue_empty">Thêm video vào hàng đợi để phát tiếp.</string>
+    <string name="tv_library_hold_hint">Giữ OK trên một video để xoá khỏi lịch sử.</string>
+    <string name="tv_shorts_failed_title">Không tải được Shorts</string>
+    <string name="tv_shorts_empty_title">Hiện chưa có Shorts</string>
+    <string name="tv_shorts_like">Thích</string>
+    <string name="tv_shorts_hint">Lên / Xuống: đổi Short · OK: phát hoặc tạm dừng · Trái / Phải: tua 5 giây · Quay lại: thoát</string>
+    <string name="tv_shorts_hint_rate">Lên / Xuống: đổi Short · OK: phát hoặc tạm dừng · Trái / Phải: tua 5 giây · Giữ OK: thích · Quay lại: thoát</string>
 </resources>
