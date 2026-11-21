@@ -129,9 +129,11 @@ class PlaybackWatchReportingTest {
         anonymousVisitor()
         var now = 0L
         var reads = 0
+        val retryAllowed = CompletableDeferred<Unit>()
         val reporting = reporting(clock = { now }) { id ->
             reads++
             if (reads == 1) throw IOException("offline")
+            retryAllowed.await()
             video(id).copy(sessionGeneration = MediaSession.snapshot().generation)
         }
         try {
@@ -147,12 +149,14 @@ class PlaybackWatchReportingTest {
             assertEquals(1, reads)
             now = 30_000
             reporting.tick(PlaybackSample("v1", 10_000, 100_000, true))
+            // The retry runs on another thread; it may publish only after the tick that started it returns.
+            retryAllowed.complete(Unit)
             reporting.awaitContextRefresh()
             reporting.tick(PlaybackSample("v1", 11_000, 100_000, true))
             awaitRequests(1)
             assertEquals(2, reads)
             assertTrue(requests.single().url.contains("cmt=11.0"))
-        } finally { reporting.detach(); ContentSource.fixtures = previousFixtures }
+        } finally { retryAllowed.complete(Unit); reporting.detach(); ContentSource.fixtures = previousFixtures }
     }
 
     @Test fun detachAllowsAnIdentityRefreshWhenPlaybackReattaches() = runBlocking {
