@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -100,7 +101,11 @@ fun AppTheme(content: @Composable () -> Unit) {
 fun androidx.activity.ComponentActivity.setAppContent(navigationRail: Boolean = false, content: @Composable () -> Unit) {
     setContent {
         AppTheme {
-            Box(Modifier.fillMaxSize().background(DesignTokens.Background)) {
+            // The screen root is the first focus target in traversal order, so the focus Android
+            // assigns when a window opens outside touch mode (adb/launcher start before any touch,
+            // keyboard) lands here, invisibly, instead of drawing the first clickable's (the Home
+            // wordmark's) focus highlight. Tab and D-pad then move on to the first control as before.
+            Box(Modifier.fillMaxSize().background(DesignTokens.Background).focusTarget()) {
                 // Wide landscape windows move the screen's tab bar to a start-edge rail.
                 com.hhst.youtubelite.ui.components.NavigationFrame(navigationRail, content)
             }
