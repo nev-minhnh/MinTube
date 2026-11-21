@@ -253,7 +253,10 @@ private fun TvRail(state: TvShellState) {
                 )
             }
             Spacer(Modifier.weight(1f))
-            // An action, not a destination: at the bottom, never shown as selected.
+            // An action, not a destination: at the bottom under a short divider, never shown as selected,
+            // and visible (icon only) while the rail is collapsed too.
+            Box(Modifier.padding(start = (TvSizes.RailItemHeight - TvSizes.RailIcon) / 2, top = TvSpacing.sm)
+                .size(width = TvSizes.RailIcon, height = 1.dp).background(TvColors.Ghost).testTag(TAG_RAIL_DIVIDER))
             TvRailItem(
                 label = stringResource(R.string.tv_nav_refresh),
                 icon = AppIcon.Refresh,
@@ -329,5 +332,6 @@ private const val CONTENT_FOCUS_RETRY_MS = 120L
 const val TAG_RAIL = "tv-rail"
 const val TAG_RAIL_PANEL = "tv-rail-panel"
 const val TAG_RAIL_REFRESH = "tv-rail-refresh"
+const val TAG_RAIL_DIVIDER = "tv-rail-divider"
 const val TAG_CONTENT = "tv-shell-content"
 fun railItemTag(destination: TvDestination) = "tv-rail-${destination.name}"

@@ -23,6 +23,7 @@ import com.hhst.youtubelite.tv.shell.TvDestination
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.TvShellState
 import com.hhst.youtubelite.tv.shell.TAG_CONTENT
+import com.hhst.youtubelite.tv.shell.TAG_RAIL_DIVIDER
 import com.hhst.youtubelite.tv.shell.TAG_RAIL_PANEL
 import com.hhst.youtubelite.tv.shell.TAG_RAIL_REFRESH
 import com.hhst.youtubelite.tv.shell.railItemTag
@@ -80,6 +81,12 @@ class TvShellAndroidTest {
         val panel = compose.onNodeWithTag(TAG_RAIL_PANEL).getUnclippedBoundsInRoot()
         assertEquals(84f, panel.right.value, 1f)
         assertTrue(compose.onAllNodesWithText("Subscriptions").fetchSemanticsNodes().isEmpty())
+        // Refresh shows as an icon at the bottom of the collapsed rail, below a divider.
+        val refresh = compose.onNodeWithTag(TAG_RAIL_REFRESH).getUnclippedBoundsInRoot()
+        assertEquals(48f, refresh.width.value, 1f)
+        val divider = compose.onNodeWithTag(TAG_RAIL_DIVIDER).getUnclippedBoundsInRoot()
+        val settings = compose.onNodeWithTag(railItemTag(TvDestination.Settings)).getUnclippedBoundsInRoot()
+        assertTrue(divider.top > settings.bottom && refresh.top > divider.bottom)
         val content = compose.onNodeWithTag(TAG_CONTENT).getUnclippedBoundsInRoot()
         assertEquals(84f, content.left.value, 1f)
         // Expanded on focus: wider pills with labels, over the content (which does not move).

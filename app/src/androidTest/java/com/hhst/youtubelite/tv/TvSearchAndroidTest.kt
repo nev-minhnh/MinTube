@@ -32,6 +32,8 @@ import com.hhst.youtubelite.tv.shell.rememberTvShellState
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -93,6 +95,9 @@ class TvSearchAndroidTest {
         host(TvSearchUiState(voiceAvailable = true))
         compose.awaitFocus(TAG_FIELD)
         compose.onNodeWithTag(TAG_START).assertExists()
+        // Plain hint, no YouTube name.
+        compose.onNodeWithText("Search").assertExists()
+        assertTrue(compose.onAllNodesWithText("YouTube", substring = true).fetchSemanticsNodes().isEmpty())
         compose.press(Key.DirectionRight)
         compose.awaitFocus(TAG_VOICE)
         compose.press(Key.DirectionCenter)

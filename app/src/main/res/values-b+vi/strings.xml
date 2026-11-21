@@ -770,7 +770,6 @@
     <string name="locale_trending_vietnam">Thịnh hành tại Việt Nam</string>
     <string name="locale_trending_vietnam_summary">Tắt để dùng khu vực của thiết bị cho thịnh hành và tìm kiếm</string>
     <string name="tv_loading_more">Đang tải thêm…</string>
-    <string name="tv_search_hint">Tìm kiếm trên YouTube</string>
     <string name="tv_search_voice">Tìm bằng giọng nói</string>
     <string name="tv_search_start_title">Tìm kiếm trên MinTube</string>
     <string name="tv_search_start_message">Nhấn OK vào ô tìm kiếm để nhập, hoặc dùng tìm kiếm bằng giọng nói.</string>

@@ -262,7 +262,7 @@ private fun TvSearchField(
     if (field.text != value) field = TextFieldValue(value, TextRange(value.length))
     var focused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-    val hint = stringResource(R.string.tv_search_hint)
+    val hint = stringResource(R.string.a11y_search)
     BasicTextField(
         value = field,
         onValueChange = { next ->
