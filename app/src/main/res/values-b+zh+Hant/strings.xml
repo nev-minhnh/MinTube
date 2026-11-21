@@ -771,4 +771,20 @@
     <string name="locale_translate_titles_summary">Off shows original titles, with views and dates in the app language</string>
     <string name="locale_trending_vietnam">Trending in Vietnam</string>
     <string name="locale_trending_vietnam_summary">Off uses your device region for trending and search</string>
+    <string name="tv_loading_more">Loading more…</string>
+    <string name="tv_search_hint">Search YouTube</string>
+    <string name="tv_search_voice">Voice search</string>
+    <string name="tv_search_start_title">Search MinTube</string>
+    <string name="tv_search_start_message">Press OK on the search box to type, or use voice search.</string>
+    <string name="tv_search_recent">Recent searches</string>
+    <string name="tv_search_remove_hint">Hold OK to remove</string>
+    <string name="tv_search_remove">Remove %1$s from recent searches</string>
+    <string name="tv_search_suggestions">Suggestions</string>
+    <string name="tv_search_failed_title">Couldn\'t load results</string>
+    <string name="tv_search_empty_title">No results</string>
+    <string name="tv_channel_failed_title">Couldn\'t load this channel</string>
+    <string name="tv_playlist_failed_title">Couldn\'t load this playlist</string>
+    <string name="tv_playlist_unavailable">This playlist is unavailable</string>
+    <string name="tv_playlist_empty">This playlist has no videos</string>
+    <string name="tv_playlist_loading_all">Loading the whole playlist… %1$d videos</string>
 </resources>
