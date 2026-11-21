@@ -87,6 +87,7 @@ MinTube TV then appears in the TV's app row. Check the file against the `.sha256
 | | OK | Open or activate |
 | | Back | Close the panel, then return to the menu, then leave |
 | Menu rail | Left (from content) | Open the menu: Home, Search, Subscriptions, Library, Settings |
+| | Refresh (bottom of the menu) | Reload Home and put focus on its first video |
 | Home, Search | Hold OK on a video | Open its channel (when the feed names the channel) |
 | Search | Mic button or remote's mic key | Voice search (when the TV has a recognizer) |
 | | Hold OK on a recent search | Remove it |

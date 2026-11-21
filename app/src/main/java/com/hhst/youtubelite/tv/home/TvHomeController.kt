@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,14 +27,20 @@ import com.hhst.youtubelite.extension.PreferenceKeys
 import com.hhst.youtubelite.home.domain.HomeAction
 import com.hhst.youtubelite.home.domain.HomeCatalog
 import com.hhst.youtubelite.home.domain.HomeContent
+import com.hhst.youtubelite.home.domain.HomeUiState
 import com.hhst.youtubelite.home.presentation.HomeViewModel
 import com.hhst.youtubelite.tv.design.TvVideo
 import com.hhst.youtubelite.tv.routes.TvChannelRoute
+import com.hhst.youtubelite.tv.shell.LocalTvShell
 import com.hhst.youtubelite.tv.verify.TvVerification
 import com.hhst.youtubelite.tv.verify.TvVerificationNotice
 import com.hhst.youtubelite.tv.watch.TvWatchActivity
 import com.hhst.youtubelite.ui.observeAccountChanges
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.java.KoinJavaComponent.getKoin
+
+private const val REFRESH_START_MS = 2_000L
 
 /**
  * Chip rows: one unchanged [HomeViewModel] per Home chip, created when its row is first shown
@@ -75,6 +82,11 @@ class TvHomeController(private val activity: ComponentActivity) {
     private val chipStates = mutableStateMapOf<String, HomeViewModel>()
     private var trendingInVietnam by mutableStateOf(prefs.isEnabled(PreferenceKeys.TRENDING_REGION_VIETNAM))
     private var warmed: Pair<Long, String>? = null
+    /** Rows, scroll and focus survive leaving Home for another rail destination. */
+    private val view = TvHomeViewState()
+    /** Last rail Refresh handled, and the focus request for the first card of its new rows. */
+    private var handledRefresh = 0
+    private var focusFirst by mutableIntStateOf(0)
 
     val main: HomeViewModel = ViewModelProvider(activity, object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -110,18 +122,42 @@ class TvHomeController(private val activity: ComponentActivity) {
 
     fun onResume() = refreshSession()
 
+    /**
+     * Follows the session (an account or content-locale change still reloads, as it must). Unlike
+     * phone Home there is no quiet refresh on resume (watch-report signal, staleness): coming back
+     * from Watch or to the app keeps the rows and the focused card; the rail's Refresh reloads.
+     */
     private fun refreshSession() {
         val session = MediaSession.snapshot()
         main.updateSession(session.signedIn, session.generation, null)
         main.setHideShorts(prefs.isEnabled(PreferenceKeys.ENABLE_HIDE_SHORTS))
-        // A watch-report signal or a stale feed triggers one quiet refresh, as on phone.
-        main.onForeground()
         trendingInVietnam = prefs.isEnabled(PreferenceKeys.TRENDING_REGION_VIETNAM)
         if (chipStates.values.any { it.uiState.value.sessionGeneration != session.generation }) {
             chipModels.reset(session.generation)
             chipStates.clear()
         }
-        chipStates.values.forEach { it.onForeground() }
+    }
+
+    /** The rail's Refresh: Home's own refresh on every row, then focus on the first new card. */
+    private suspend fun refresh() {
+        view.refreshPending = true
+        try {
+            view.memory.clear()
+            main.onAction(HomeAction.Refresh)
+            chipStates.values.forEach { it.onAction(HomeAction.Refresh) }
+            withTimeoutOrNull(REFRESH_START_MS) { main.uiState.first { it.busy() } }
+            main.uiState.first { !it.busy() }
+            focusFirst++
+        } finally {
+            view.refreshPending = false
+        }
+    }
+
+    private fun HomeUiState.busy(): Boolean = when (val current = content) {
+        HomeContent.Loading -> true
+        is HomeContent.Feed -> current.refreshing
+        is HomeContent.Empty -> current.refreshing
+        HomeContent.Failed -> false
     }
 
     private fun chip(chip: String): HomeViewModel {
@@ -161,6 +197,12 @@ class TvHomeController(private val activity: ComponentActivity) {
 
     @Composable
     fun Content(modifier: Modifier = Modifier) {
+        val refreshRequests = LocalTvShell.current?.refreshRequests ?: 0
+        LaunchedEffect(refreshRequests) {
+            if (refreshRequests == handledRefresh) return@LaunchedEffect
+            handledRefresh = refreshRequests
+            refresh()
+        }
         val mainState by main.uiState.collectAsStateWithLifecycle()
         val chipUiStates = buildMap {
             chipStates.forEach { (chip, model) -> key(chip) { put(chip, model.uiState.collectAsState().value) } }
@@ -199,6 +241,8 @@ class TvHomeController(private val activity: ComponentActivity) {
             onRowShown = { row -> row.chip?.let(::chip) },
             onFocusDwell = { video -> if (!video.short) warm(video.id) },
             onOpenChannel = { video -> activity.startActivity(TvChannelRoute.intent(activity, video.channelId)) },
+            view = view,
+            focusFirst = focusFirst,
         )
     }
 }

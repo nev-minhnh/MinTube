@@ -24,6 +24,7 @@ import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.TvShellState
 import com.hhst.youtubelite.tv.shell.TAG_CONTENT
 import com.hhst.youtubelite.tv.shell.TAG_RAIL_PANEL
+import com.hhst.youtubelite.tv.shell.TAG_RAIL_REFRESH
 import com.hhst.youtubelite.tv.shell.railItemTag
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
 import org.junit.Assert.assertEquals
@@ -88,6 +89,22 @@ class TvShellAndroidTest {
         compose.onNodeWithText("Subscriptions").assertExists()
         assertTrue(compose.onNodeWithTag(railItemTag(TvDestination.Search)).getUnclippedBoundsInRoot().width.value > 150f)
         assertEquals(84f, compose.onNodeWithTag(TAG_CONTENT).getUnclippedBoundsInRoot().left.value, 1f)
+    }
+
+    @Test fun refreshIsARailActionBelowTheDestinations() {
+        host()
+        compose.awaitFocus("card-0")
+        compose.press(Key.DirectionLeft)
+        compose.awaitFocus(railItemTag(TvDestination.Home))
+        compose.onNodeWithText("Refresh").assertExists()
+        repeat(5) { compose.press(Key.DirectionDown) }
+        compose.awaitFocus(TAG_RAIL_REFRESH)
+        val settings = compose.onNodeWithTag(railItemTag(TvDestination.Settings)).getUnclippedBoundsInRoot()
+        assertTrue(compose.onNodeWithTag(TAG_RAIL_REFRESH).getUnclippedBoundsInRoot().top > settings.bottom)
+        compose.press(Key.DirectionCenter)
+        assertEquals(1, shell.refreshRequests)
+        assertEquals(TvDestination.Home, shell.selected)
+        compose.onNodeWithTag(railItemTag(TvDestination.Home)).assertIsSelected()
     }
 
     @Test fun backWalksContentToRailThenExits() {

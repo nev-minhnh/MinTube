@@ -23,6 +23,19 @@ import com.hhst.youtubelite.tv.home.cardTag
 import com.hhst.youtubelite.tv.home.rowRetryTag
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.onNodeWithText
+import com.hhst.youtubelite.tv.home.TvHomeViewState
+import com.hhst.youtubelite.tv.shell.TAG_RAIL_REFRESH
+import com.hhst.youtubelite.tv.shell.TvComingSoon
+import com.hhst.youtubelite.tv.shell.TvDestination
+import com.hhst.youtubelite.tv.shell.TvShellState
+import com.hhst.youtubelite.tv.shell.railItemTag
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -31,6 +44,8 @@ import org.junit.Test
 /** Home rows driven with the D-pad inside the shell, on fake row state (no network). */
 class TvHomeAndroidTest {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
+    private lateinit var shell: TvShellState
+    private var refreshes = 0
     private var state by mutableStateOf(TvHomeUiState(TvHomeStatus.Loading))
     private val opened = mutableListOf<String>()
     private val loadMore = mutableListOf<String>()
@@ -113,6 +128,82 @@ class TvHomeAndroidTest {
         compose.onNodeWithTag(TAG_SKELETON).assertExists()
         state = rows()
         compose.awaitFocus(cardTag("main", 0))
+    }
+
+    /** Like the activity: Home keeps its view state outside the composition; Refresh comes from the rail. */
+    private fun hostInShell(initial: TvHomeUiState) {
+        state = initial
+        compose.setContent {
+            TvCanvas {
+                shell = rememberTvShellState()
+                val view = remember { TvHomeViewState() }
+                var handled by remember { mutableIntStateOf(0) }
+                var focusFirst by remember { mutableIntStateOf(0) }
+                TvShell(shell, onExit = {}) { destination ->
+                    if (destination == TvDestination.Home) {
+                        val requests = shell.refreshRequests
+                        LaunchedEffect(requests) {
+                            if (requests == handled) return@LaunchedEffect
+                            handled = requests
+                            refreshes++
+                            state = rows(main = videos("new", 6))
+                            focusFirst++
+                        }
+                        TvHomeScreen(state = state, onOpen = { opened += it.id }, onLoadMore = {}, onRetryRow = {},
+                            onRetry = {}, view = view, focusFirst = focusFirst)
+                    } else {
+                        TvComingSoon(destination, onHome = { shell.select(TvDestination.Home) })
+                    }
+                }
+            }
+        }
+    }
+
+    @Test fun switchingDestinationsKeepsTheRowsAndTheFocusedCard() {
+        hostInShell(rows())
+        compose.awaitFocus(cardTag("main", 0))
+        repeat(3) { compose.press(Key.DirectionRight) }
+        compose.press(Key.DirectionDown)
+        compose.press(Key.DirectionRight)
+        compose.awaitFocus(cardTag("shorts", 1))
+        compose.runOnUiThread { shell.select(TvDestination.Library) }
+        compose.onNodeWithTag(cardTag("main", 0)).assertDoesNotExist()
+        compose.runOnUiThread { shell.select(TvDestination.Home) }
+        compose.awaitFocus(cardTag("shorts", 1))
+        // Up still lands on the card the main row was left on: nothing reloaded or reset.
+        compose.press(Key.DirectionUp)
+        compose.awaitFocus(cardTag("main", 3))
+        assertEquals(0, refreshes)
+    }
+
+    @Test fun theRailRefreshReloadsAndFocusesTheFirstNewCard() {
+        hostInShell(rows())
+        compose.awaitFocus(cardTag("main", 0))
+        repeat(2) { compose.press(Key.DirectionRight) }
+        compose.press(Key.DirectionDown)
+        compose.awaitFocus(cardTag("shorts", 0))
+        compose.press(Key.DirectionLeft)
+        compose.awaitAnyFocus(railItemTag(TvDestination.Home), railItemTag(TvDestination.Search))
+        // Refresh sits below the destinations and is not one of them.
+        repeat(6) { compose.press(Key.DirectionDown) }
+        compose.awaitFocus(TAG_RAIL_REFRESH)
+        compose.onNodeWithTag(TAG_RAIL_REFRESH).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Selected))
+        compose.press(Key.DirectionCenter)
+        compose.waitUntil(3_000) { refreshes == 1 }
+        compose.onNodeWithText("Video new0").assertExists()
+        compose.awaitFocus(cardTag("main", 0))
+        assertEquals(TvDestination.Home, shell.selected)
+    }
+
+    @Test fun refreshFromAnotherDestinationShowsHome() {
+        hostInShell(rows())
+        compose.awaitFocus(cardTag("main", 0))
+        compose.runOnUiThread { shell.select(TvDestination.Settings) }
+        compose.onNodeWithTag(cardTag("main", 0)).assertDoesNotExist()
+        compose.runOnUiThread { shell.refresh() }
+        compose.awaitFocus(cardTag("main", 0))
+        assertEquals(1, refreshes)
+        assertEquals(TvDestination.Home, shell.selected)
     }
 
     @Test fun failedHomeOffersAFocusableRetry() {

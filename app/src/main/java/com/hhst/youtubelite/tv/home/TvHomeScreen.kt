@@ -20,12 +20,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -68,9 +69,33 @@ import kotlinx.coroutines.delay
 private val RowStart = TvSpacing.ContentStart
 
 /**
+ * Scroll positions and focus memory of TV Home, kept outside the composition by
+ * [TvHomeController] so switching rail destinations and coming back keeps the same rows,
+ * scroll and focused card.
+ */
+@Stable
+class TvHomeViewState(val memory: TvFocusMemory = TvFocusMemory()) {
+    internal val column = LazyListState()
+    internal val rows = TvRowScrollStates()
+    internal val requesters = TvFocusRequesters()
+    /** Last [TvHomeScreen] focusFirst request handled. */
+    internal var handledFocusFirst = 0
+    /** A user refresh is in flight: focus waits for its new rows instead of the remembered card. */
+    var refreshPending = false
+}
+
+@Composable
+fun rememberTvHomeViewState(): TvHomeViewState {
+    val memory = rememberTvFocusMemory()
+    return remember(memory) { TvHomeViewState(memory) }
+}
+
+/**
  * TV Home: one row per Home section. State-hoisted; [TvHomeController] wires the ViewModels.
  * Focus is remembered per row ([TvFocusMemory]) and restored when the screen resumes without
- * focus (Back from Watch after a refresh replaced the rows) or a row is re-entered.
+ * focus (Back from Watch after a refresh replaced the rows), when Home is shown again from the
+ * rail, or a row is re-entered. Each new [focusFirst] value puts focus on the first card (the
+ * rail's Refresh, once its new rows are in).
  */
 @Composable
 fun TvHomeScreen(
@@ -82,8 +107,9 @@ fun TvHomeScreen(
     modifier: Modifier = Modifier,
     onRowShown: (TvHomeRow) -> Unit = {},
     onFocusDwell: (TvVideo) -> Unit = {},
-    focusMemory: TvFocusMemory = rememberTvFocusMemory(),
+    view: TvHomeViewState = rememberTvHomeViewState(),
     onOpenChannel: (TvVideo) -> Unit = {},
+    focusFirst: Int = 0,
 ) {
     Box(modifier.fillMaxSize().testTag(TAG_HOME)) {
         when (val status = state.status) {
@@ -114,7 +140,8 @@ fun TvHomeScreen(
                     actionModifier = Modifier.testTag(TAG_RETRY),
                 )
             }
-            TvHomeStatus.Ready -> TvHomeRows(state.rows, onOpen, onLoadMore, onRetryRow, onRowShown, onFocusDwell, focusMemory, onOpenChannel)
+            TvHomeStatus.Ready -> TvHomeRows(state.rows, onOpen, onLoadMore, onRetryRow, onRowShown, onFocusDwell, view, onOpenChannel,
+                focusFirst)
         }
     }
 }
@@ -134,9 +161,11 @@ private fun TvHomeBrand() {
 }
 
 /** Per-row horizontal scroll state, kept while rows scroll out of the column. */
-private class TvRowScrollStates {
+internal class TvRowScrollStates {
     private val states = mutableMapOf<String, LazyListState>()
     fun of(key: String) = states.getOrPut(key) { LazyListState() }
+    /** Not suspending: a row that is not composed (scrolled away, loading) has no layout to wait for. */
+    fun scrollAllToStart() = states.values.forEach { it.requestScrollToItem(0) }
 }
 
 @Composable
@@ -147,13 +176,19 @@ private fun TvHomeRows(
     onRetryRow: (String) -> Unit,
     onRowShown: (TvHomeRow) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
-    memory: TvFocusMemory,
+    view: TvHomeViewState,
     onOpenChannel: (TvVideo) -> Unit,
+    focusFirst: Int,
 ) {
-    val column = rememberLazyListState()
-    val requesters = remember { TvFocusRequesters() }
-    val scrolls = remember { TvRowScrollStates() }
+    val memory = view.memory
+    val column = view.column
+    val requesters = view.requesters
+    val scrolls = view.rows
     var homeFocused by remember { mutableStateOf(false) }
+    // Bumped after the focus memory is cleared, so every row re-anchors its requester on card 0.
+    var anchorEpoch by remember { mutableIntStateOf(0) }
+    // The card focused when Home was last left; the shell's Enter may land on another one first.
+    val entry = remember { TvFocusMemory.restore(memory.save()) }
     val shell = LocalTvShell.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resumed by lifecycle.currentStateFlow.collectAsState()
@@ -177,6 +212,49 @@ private fun TvHomeRows(
         withFrameNanos { }
         requesters.request(key)
     }
+    val latestRows by rememberUpdatedState(focusRows)
+    // Home shown again (from the rail, or Back from a page): back to the card it was left on.
+    LaunchedEffect(Unit) {
+        if (entry.lastRowKey == null) return@LaunchedEffect
+        withFrameNanos { }
+        delay(RESTORE_SETTLE_MS)
+        if (view.refreshPending || shell?.railFocused == true) return@LaunchedEffect
+        val target = entry.restoreTarget(latestRows) ?: return@LaunchedEffect
+        val key = latestRows[target.rowIndex].key
+        memory.record(key, target.rowIndex, latestRows[target.rowIndex].itemKeys[target.itemIndex], target.itemIndex)
+        if (requesters.request(key)) return@LaunchedEffect
+        scrolls.of(key).requestScrollToItem(target.itemIndex)
+        column.requestScrollToItem(target.rowIndex + ROW_OFFSET)
+        withFrameNanos { }
+        withFrameNanos { }
+        requesters.request(key)
+    }
+    // A user refresh landed: the first card of the new rows takes focus.
+    LaunchedEffect(focusFirst) {
+        if (focusFirst == view.handledFocusFirst) return@LaunchedEffect
+        view.handledFocusFirst = focusFirst
+        memory.clear()
+        anchorEpoch++
+        // Requests applied by the next layout pass: a suspending scroll in the frame that re-anchors
+        // every row remeasures mid-placement ("Place was called on a node which was placed already").
+        column.requestScrollToItem(0)
+        scrolls.scrollAllToStart()
+        repeat(FOCUS_FIRST_ATTEMPTS) {
+            withFrameNanos { }
+            val first = latestRows.firstOrNull { it.itemKeys.isNotEmpty() }
+            if (first != null) {
+                // From the rail: enter the content first (its restorer may pick the last card), then move within it.
+                if (!homeFocused && shell?.focusContent() == true) withFrameNanos { }
+                requesters.request(first.key)
+                withFrameNanos { }
+                withFrameNanos { }
+                if (homeFocused && memory.lastRowKey == first.key && memory.indexIn(first.key, first.itemKeys) == 0) {
+                    return@LaunchedEffect
+                }
+            }
+            delay(RESTORE_SETTLE_MS)
+        }
+    }
     LazyColumn(
         state = column,
         modifier = Modifier.fillMaxSize().onFocusChanged { homeFocused = it.hasFocus }.testTag(TAG_ROWS),
@@ -186,7 +264,8 @@ private fun TvHomeRows(
         item(key = "brand", contentType = "brand") { Box(Modifier.padding(start = RowStart)) { TvHomeBrand() } }
         itemsIndexed(rows, key = { _, row -> row.key }, contentType = { _, row -> row.kind }) { index, row ->
             LaunchedEffect(row.key) { onRowShown(row) }
-            TvHomeRowItem(row, index, memory, requesters, scrolls.of(row.key), onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel)
+            TvHomeRowItem(row, index, memory, requesters, scrolls.of(row.key), onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel,
+                anchorEpoch)
         }
     }
 }
@@ -203,6 +282,7 @@ private fun TvHomeRowItem(
     onRetryRow: (String) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
     onOpenChannel: (TvVideo) -> Unit,
+    anchorEpoch: Int,
 ) {
     val cardWidth = if (row.kind == TvRowKind.Shorts) TvSizes.ShortCardWidth else TvSizes.CardWidth
     val aspect = if (row.kind == TvRowKind.Shorts) 9f / 16f else 16f / 9f
@@ -219,7 +299,7 @@ private fun TvHomeRowItem(
                     icon = AppIcon.Refresh)
             }
             is TvRowState.Ready -> ReadyRow(row, state, rowIndex, cardWidth, aspect, memory, requesters, scroll,
-                onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel)
+                onOpen, onLoadMore, onRetryRow, onFocusDwell, onOpenChannel, anchorEpoch)
         }
     }
 }
@@ -239,9 +319,11 @@ private fun ReadyRow(
     onRetryRow: (String) -> Unit,
     onFocusDwell: (TvVideo) -> Unit,
     onOpenChannel: (TvVideo) -> Unit,
+    anchorEpoch: Int,
 ) {
     val keys = remember(state.videos) { state.videos.map(TvVideo::id) }
-    val anchor = memory.indexIn(row.key, keys)
+    // Read on every recomposition; [anchorEpoch] forces one after the memory was cleared.
+    val anchor = anchorEpoch.let { memory.indexIn(row.key, keys) }
     val requester = requesters.of(row.key)
     val nearEnd by remember(scroll) { derivedStateOf {
         val info = scroll.layoutInfo
@@ -304,6 +386,7 @@ private fun TvRowTitle.text(): String = when (this) {
 private const val ROW_OFFSET = 1
 private const val PAGE_AHEAD = 4
 private const val RESTORE_SETTLE_MS = 150L
+private const val FOCUS_FIRST_ATTEMPTS = 10
 
 const val TAG_HOME = "tv-home"
 const val TAG_ROWS = "tv-home-rows"

@@ -29,6 +29,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -114,6 +115,16 @@ class TvShellState(initial: TvDestination) {
 
     internal val contentRequester = FocusRequester()
     internal val railRequesters: Map<TvDestination, FocusRequester> = TvDestination.entries.associateWith { FocusRequester() }
+
+    /** Bumped by the rail's Refresh; Home reloads and then focuses its first card. */
+    var refreshRequests by mutableIntStateOf(0)
+        private set
+
+    /** The rail's Refresh action (not a destination): shows Home and asks it to reload. */
+    fun refresh() {
+        selected = TvDestination.Home
+        refreshRequests++
+    }
 
     fun select(destination: TvDestination, focusContent: Boolean = true) {
         selected = destination
@@ -228,8 +239,9 @@ private fun TvRail(state: TvShellState) {
                 .selectableGroup()
                 .semantics { contentDescription = rail }
                 .testTag(TAG_RAIL),
-            verticalArrangement = Arrangement.spacedBy(TvSpacing.sm, Alignment.CenterVertically),
+            verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         ) {
+            Spacer(Modifier.weight(1f))
             TvDestination.entries.forEach { destination ->
                 TvRailItem(
                     label = stringResource(destination.label),
@@ -240,6 +252,17 @@ private fun TvRail(state: TvShellState) {
                     modifier = Modifier.focusRequester(state.railRequesters.getValue(destination)).testTag(railItemTag(destination)),
                 )
             }
+            Spacer(Modifier.weight(1f))
+            // An action, not a destination: at the bottom, never shown as selected.
+            TvRailItem(
+                label = stringResource(R.string.tv_nav_refresh),
+                icon = AppIcon.Refresh,
+                selected = false,
+                expanded = expanded,
+                onClick = state::refresh,
+                modifier = Modifier.testTag(TAG_RAIL_REFRESH),
+                selectable = false,
+            )
         }
     }
 }
@@ -305,5 +328,6 @@ private const val CONTENT_FOCUS_RETRY_MS = 120L
 
 const val TAG_RAIL = "tv-rail"
 const val TAG_RAIL_PANEL = "tv-rail-panel"
+const val TAG_RAIL_REFRESH = "tv-rail-refresh"
 const val TAG_CONTENT = "tv-shell-content"
 fun railItemTag(destination: TvDestination) = "tv-rail-${destination.name}"

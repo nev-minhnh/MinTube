@@ -5,6 +5,7 @@
     <string name="tv_nav_subscriptions">Kênh đăng ký</string>
     <string name="tv_nav_library">Thư viện</string>
     <string name="tv_nav_settings">Cài đặt</string>
+    <string name="tv_nav_refresh">Làm mới</string>
     <string name="tv_nav_label">Điều hướng</string>
 
     <string name="tv_coming_soon_title">%1$s sắp có trên TV</string>
