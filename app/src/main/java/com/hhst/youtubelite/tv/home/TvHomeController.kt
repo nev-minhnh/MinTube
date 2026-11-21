@@ -135,7 +135,9 @@ class TvHomeController(private val activity: ComponentActivity) {
     }
 
     private fun open(video: TvVideo) {
-        activity.startActivity(TvWatchActivity.intent(activity, video.id))
+        // Shorts row cards open the TV Shorts player at that Short.
+        activity.startActivity(if (video.short) com.hhst.youtubelite.tv.shorts.TvShortsActivity.intent(activity, video.id)
+            else TvWatchActivity.intent(activity, video.id))
     }
 
     private fun model(rowKey: String): HomeViewModel? = when {
