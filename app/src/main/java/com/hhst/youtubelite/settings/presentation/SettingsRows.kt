@@ -79,12 +79,12 @@ internal fun SettingsPageFrame(
         MinTopBar(title = title, onBack = onBack, privateBrowsing = privateBrowsing, tag = topBarTag)
         Box(Modifier.fillMaxWidth().weight(1f)) {
             key(pageKey) {
-                Column(
-                    Modifier.align(Alignment.TopCenter).widthIn(max = SettingsLayout.MaxWidth).fillMaxWidth().fillMaxHeight()
-                        .verticalScroll(rememberScrollState()).testTag(pageTag),
-                ) {
-                    content()
-                    Spacer(Modifier.height(MinSpace.xxl))
+                // The scroll spans the window so the side strips scroll too; rows keep the reading width.
+                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag(pageTag), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(Modifier.widthIn(max = SettingsLayout.MaxWidth).fillMaxWidth()) {
+                        content()
+                        Spacer(Modifier.height(MinSpace.xxl))
+                    }
                 }
             }
         }

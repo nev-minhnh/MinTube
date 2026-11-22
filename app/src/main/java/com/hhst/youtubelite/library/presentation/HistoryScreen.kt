@@ -45,6 +45,7 @@ import com.hhst.youtubelite.ui.design.VerificationCard
 import com.hhst.youtubelite.ui.design.WindowClass
 import com.hhst.youtubelite.ui.design.rememberAppBarCollapseState
 import com.hhst.youtubelite.ui.design.rememberWindowClass
+import com.hhst.youtubelite.ui.design.CenteredListGutter
 import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Section names that only repeat the page title; the bar already reads "History". */
@@ -111,10 +112,10 @@ private fun HistoryList(content: HistoryContent.Ready, append: AppendState, list
     LaunchedEffect(nearEnd, content.page.nextKey, append) {
         if (nearEnd && content.page.nextKey != null && append == AppendState.Idle) onAction(LibraryAction.LoadHistoryNext)
     }
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    CenteredListGutter(if (columns == 2) 1280.dp else LibraryContentMaxWidth) { gutter ->
         val dock = miniDockListPadding(MinSpace.xxl)
-        LazyColumn(Modifier.widthIn(max = if (columns == 2) 1280.dp else LibraryContentMaxWidth).fillMaxSize().then(dock.modifier).testTag("history-list"),
-            state = listState, contentPadding = PaddingValues(start = inset, end = inset, top = MinSpace.sm, bottom = dock.bottom)) {
+        LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("history-list"),
+            state = listState, contentPadding = PaddingValues(start = inset + gutter, end = inset + gutter, top = MinSpace.sm, bottom = dock.bottom)) {
             grouped.forEach { (section, entries) ->
                 val name = section.trim()
                 // The top bar already reads "History"; the body adds only the section groups.

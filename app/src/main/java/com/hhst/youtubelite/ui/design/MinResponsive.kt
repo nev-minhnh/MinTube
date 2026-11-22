@@ -1,5 +1,7 @@
 package com.hhst.youtubelite.ui.design
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -13,6 +15,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * Device class by `smallestScreenWidthDp`: phones (< 600dp) run portrait-only outside video
@@ -119,4 +122,16 @@ fun miniDockListPadding(base: Dp): MiniDockListPadding {
     }
     val extraPx = MiniDock.listClearancePx(listBottom.value, area?.topInWindowPx)
     return MiniDockListPadding(base + with(LocalDensity.current) { extraPx.toDp() }, modifier)
+}
+
+/**
+ * Hosts a full-width scrolling list whose rows stay in a [maxWidth] reading column. [content] gets the
+ * side gutter to add to the list's horizontal content padding: the list itself spans the window, so a
+ * swipe in the empty side strips still scrolls it (a centred, width-capped list leaves them dead).
+ */
+@Composable
+fun CenteredListGutter(maxWidth: Dp, content: @Composable (gutter: Dp) -> Unit) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        content(((this.maxWidth - maxWidth) / 2).coerceAtLeast(0.dp))
+    }
 }

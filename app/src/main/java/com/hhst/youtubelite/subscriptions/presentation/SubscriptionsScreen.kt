@@ -115,6 +115,7 @@ import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
 import kotlin.math.roundToInt
+import com.hhst.youtubelite.ui.design.CenteredListGutter
 import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /**
@@ -499,8 +500,8 @@ private fun ChannelsOverlay(channels: SubscriptionsChannels, listState: LazyList
                             onAction = { onAction(SubscriptionsAction.RetryChannels) }, tag = "channels-error",
                         )
                     }
-                    is SubscriptionsChannels.Ready -> LazyColumn(page.then(dock.modifier).testTag("channels-list"), state = listState,
-                        contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom)) {
+                    is SubscriptionsChannels.Ready -> CenteredListGutter(720.dp) { gutter -> LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("channels-list"), state = listState,
+                        contentPadding = PaddingValues(start = gutter, end = gutter, top = MinSpace.sm, bottom = dock.bottom)) {
                         if (channels.channels.isEmpty()) {
                             item {
                                 StateMessage(stringResource(R.string.ui_no_channels_yet), icon = AppIcon.Subscriptions, tag = "channels-empty")
@@ -521,7 +522,7 @@ private fun ChannelsOverlay(channels: SubscriptionsChannels, listState: LazyList
                                 DirectoryAppendFooter(channels.append) { onAction(SubscriptionsAction.LoadMoreChannels) }
                             }
                         }
-                    }
+                    } }
                 }
             }
         }
