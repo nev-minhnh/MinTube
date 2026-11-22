@@ -501,7 +501,7 @@ private fun ChannelsOverlay(channels: SubscriptionsChannels, listState: LazyList
                         )
                     }
                     is SubscriptionsChannels.Ready -> CenteredListGutter(720.dp) { gutter -> LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("channels-list"), state = listState,
-                        contentPadding = PaddingValues(start = gutter, end = gutter, top = MinSpace.sm, bottom = dock.bottom)) {
+                        contentPadding = PaddingValues(start = gutter.start, end = gutter.end, top = MinSpace.sm, bottom = dock.bottom)) {
                         if (channels.channels.isEmpty()) {
                             item {
                                 StateMessage(stringResource(R.string.ui_no_channels_yet), icon = AppIcon.Subscriptions, tag = "channels-empty")

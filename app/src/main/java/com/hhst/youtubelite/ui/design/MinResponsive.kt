@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 /**
  * Device class by `smallestScreenWidthDp`: phones (< 600dp) run portrait-only outside video
@@ -124,14 +125,21 @@ fun miniDockListPadding(base: Dp): MiniDockListPadding {
     return MiniDockListPadding(base + with(LocalDensity.current) { extraPx.toDp() }, modifier)
 }
 
+/** Side gutters, in whole pixels, that centre a reading column inside a full-width list. */
+class ListGutter(val start: Dp, val end: Dp)
+
 /**
- * Hosts a full-width scrolling list whose rows stay in a [maxWidth] reading column. [content] gets the
- * side gutter to add to the list's horizontal content padding: the list itself spans the window, so a
+ * Hosts a full-width scrolling list whose rows stay in a [columnMax] reading column. [content] gets the
+ * side gutters to add to the list's horizontal content padding: the list itself spans the window, so a
  * swipe in the empty side strips still scrolls it (a centred, width-capped list leaves them dead).
+ * The gutters split the spare width the way centring does, in whole pixels, so rows keep exact sizes.
  */
 @Composable
-fun CenteredListGutter(maxWidth: Dp, content: @Composable (gutter: Dp) -> Unit) {
+fun CenteredListGutter(columnMax: Dp, content: @Composable (gutter: ListGutter) -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        content(((this.maxWidth - maxWidth) / 2).coerceAtLeast(0.dp))
+        val density = LocalDensity.current
+        val spare = (constraints.maxWidth - with(density) { columnMax.roundToPx() }).coerceAtLeast(0)
+        val start = (spare / 2f).roundToInt()
+        content(with(density) { ListGutter(start.toDp(), (spare - start).toDp()) })
     }
 }

@@ -115,7 +115,7 @@ private fun HistoryList(content: HistoryContent.Ready, append: AppendState, list
     CenteredListGutter(if (columns == 2) 1280.dp else LibraryContentMaxWidth) { gutter ->
         val dock = miniDockListPadding(MinSpace.xxl)
         LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("history-list"),
-            state = listState, contentPadding = PaddingValues(start = inset + gutter, end = inset + gutter, top = MinSpace.sm, bottom = dock.bottom)) {
+            state = listState, contentPadding = PaddingValues(start = inset + gutter.start, end = inset + gutter.end, top = MinSpace.sm, bottom = dock.bottom)) {
             grouped.forEach { (section, entries) ->
                 val name = section.trim()
                 // The top bar already reads "History"; the body adds only the section groups.

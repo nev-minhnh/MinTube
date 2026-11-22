@@ -126,7 +126,7 @@ internal fun SearchAllList(
         LazyColumn(
             Modifier.fillMaxSize().then(dock.modifier).testTag("search-results-list"),
             state = listState,
-            contentPadding = PaddingValues(start = gutter, end = gutter, top = MinSpace.sm, bottom = dock.bottom),
+            contentPadding = PaddingValues(start = gutter.start, end = gutter.end, top = MinSpace.sm, bottom = dock.bottom),
             verticalArrangement = Arrangement.spacedBy(spec.spacing),
         ) {
             items(leading, key = { "all-channel-${it.id}" }, contentType = { "channel" }) { channel ->

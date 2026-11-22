@@ -95,7 +95,7 @@ private fun CollectionList(content: CollectionContent.Ready, append: AppendState
     CenteredListGutter(if (columns == 2) 1280.dp else LibraryContentMaxWidth) { gutter ->
         val dock = miniDockListPadding(MinSpace.xxl)
         LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("playlists-list"),
-            state = listState, contentPadding = PaddingValues(start = inset + gutter, end = inset + gutter, top = MinSpace.sm, bottom = dock.bottom)) {
+            state = listState, contentPadding = PaddingValues(start = inset + gutter.start, end = inset + gutter.end, top = MinSpace.sm, bottom = dock.bottom)) {
             items(content.playlists.chunked(columns), key = { it.first().id }) { line ->
                 Row(Modifier.fillMaxWidth().padding(bottom = MinSpace.lg), horizontalArrangement = Arrangement.spacedBy(MinSpace.xxl)) {
                     line.forEach { playlist ->

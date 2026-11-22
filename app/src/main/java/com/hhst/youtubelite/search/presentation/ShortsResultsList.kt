@@ -35,7 +35,7 @@ fun ShortsResultsList(shorts: List<SearchResult>, state: LazyGridState, onAction
             columns = GridCells.Fixed(columns),
             state = state,
             modifier = Modifier.fillMaxSize().then(dock.modifier).testTag("search-shorts-list"),
-            contentPadding = PaddingValues(top = MinSpace.sm, start = inset + gutter, end = inset + gutter, bottom = dock.bottom),
+            contentPadding = PaddingValues(top = MinSpace.sm, start = inset + gutter.start, end = inset + gutter.end, bottom = dock.bottom),
             horizontalArrangement = Arrangement.spacedBy(MinSpace.md),
             verticalArrangement = Arrangement.spacedBy(MinSpace.md),
         ) {

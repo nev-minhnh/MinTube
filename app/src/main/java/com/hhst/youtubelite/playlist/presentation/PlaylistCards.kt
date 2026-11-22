@@ -69,7 +69,7 @@ fun PlaylistSearchList(
     CenteredListGutter(840.dp) { gutter ->
         val dock = miniDockListPadding(24.dp)
         LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("playlist-search-list"), state = listState,
-            contentPadding = PaddingValues(start = gutter, end = gutter, top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
+            contentPadding = PaddingValues(start = gutter.start, end = gutter.end, top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
             items(playlists, key = { it.id }) { playlist ->
                 val (w, h) = viewport.value
                 val row = SearchResultsLayout.listLockup(w, h)

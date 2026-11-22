@@ -157,7 +157,8 @@ class SearchResultsScreenshotAndroidTest {
         val list = compose.onNodeWithTag("search-results-list").fetchSemanticsNode().boundsInRoot
         assertEquals(1280f, list.width, 0.5f)
         val before = compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot
-        assertEquals(220f, before.left, 0.5f)
+        // Rows stay in the centred 840dp column: a 220dp strip on each side of the list.
+        assertEquals(220f, before.left - list.left, 0.5f)
         assertEquals(840f, before.width, 0.5f)
         compose.onNodeWithTag("search-results-list").performTouchInput {
             swipe(Offset(40f, bottom - 20f), Offset(40f, top + 20f), durationMillis = 300)

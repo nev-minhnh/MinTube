@@ -27,7 +27,7 @@ fun ChannelResultsList(channels: List<SearchChannel>, state: LazyListState, onAc
     CenteredListGutter(SearchResultsLayout.ColumnMaxWidth.dp) { gutter ->
         val dock = miniDockListPadding(MinSpace.xxl)
         LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("search-channels-list"), state = state,
-            contentPadding = PaddingValues(start = inset + gutter, end = inset + gutter, top = MinSpace.sm, bottom = dock.bottom)) {
+            contentPadding = PaddingValues(start = inset + gutter.start, end = inset + gutter.end, top = MinSpace.sm, bottom = dock.bottom)) {
             items(channels, key = { it.id }) { channel ->
                 SearchChannelRow(channel, onAction, subscribed = subscriptions[channel.id] == true,
                     pending = channel.id in subscriptionsPending, enabled = subscriptionsPending.isEmpty())
