@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -251,7 +253,12 @@ fun NavigationFrame(reserveRail: Boolean = false, content: @Composable () -> Uni
             }
             Box(Modifier.weight(1f).fillMaxHeight().then(
                 if (railShown) Modifier.consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)) else Modifier,
-            )) { content() }
+            )) {
+                content()
+                // Under the status bar beside the rail: a translucent strip in the rail's colour with
+                // a hairline, so the clock and icons never sit on the screen's content. No bar, no strip.
+                if (railShown) StatusBarStrip()
+            }
         }
     }
 }
@@ -297,5 +304,15 @@ private fun NavigationTab(tab: MainTab, selected: Boolean, avatarAsset: String?,
                 color = if (selected) DesignTokens.AccentText else DesignTokens.Secondary, maxLines = 1,
             )
         }
+    }
+}
+
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.StatusBarStrip() {
+    val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    if (top <= 0.dp) return
+    Column(Modifier.align(Alignment.TopStart).fillMaxWidth().testTag("status-bar-strip")) {
+        Box(Modifier.fillMaxWidth().height(top).background(DesignTokens.Panel.copy(alpha = 0.92f)))
+        Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.NavigationDivider))
     }
 }
