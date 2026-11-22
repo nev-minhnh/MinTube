@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
@@ -142,6 +143,29 @@ class SearchResultsScreenshotAndroidTest {
         assertEquals(380f, compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot.left, 0.5f)
         compose.runOnIdle { width = 840 }
         assertEquals(0f, compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot.left, 0.5f)
+    }
+
+    /** Tablet landscape: the side strips beside the 840dp column belong to the list, so a swipe there scrolls it. */
+    @Test fun wideWindowGuttersScrollTheList() {
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
+                TestWindowBox(Modifier.requiredSize(1280.dp, 360.dp)) {
+                    SearchResultsScreen(SearchUiState(query = QUERY, content = results()), {}, {})
+                }
+            }
+        }
+        val list = compose.onNodeWithTag("search-results-list").fetchSemanticsNode().boundsInRoot
+        assertEquals(1280f, list.width, 0.5f)
+        val before = compose.onNodeWithTag("search-result-harbour").fetchSemanticsNode().boundsInRoot
+        // Rows stay in the centred 840dp column: a 220dp strip on each side of the list.
+        assertEquals(220f, before.left - list.left, 0.5f)
+        assertEquals(840f, before.width, 0.5f)
+        compose.onNodeWithTag("search-results-list").performTouchInput {
+            swipe(Offset(40f, bottom - 20f), Offset(40f, top + 20f), durationMillis = 300)
+        }
+        compose.waitForIdle()
+        val after = compose.onAllNodesWithTag("search-result-harbour").fetchSemanticsNodes().firstOrNull()?.boundsInRoot
+        assertTrue("a swipe in the left gutter must scroll the results", after == null || after.top < before.top - 20f)
     }
 
     @Test fun emptyAndErrorStatesStayDistinctFromResults() {

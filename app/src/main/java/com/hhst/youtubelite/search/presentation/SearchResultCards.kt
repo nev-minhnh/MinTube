@@ -73,6 +73,7 @@ import com.hhst.youtubelite.ui.design.appDescription
 import com.hhst.youtubelite.ui.design.labelResource
 import com.hhst.youtubelite.watch.domain.WatchProvisionalStore
 import com.hhst.youtubelite.watch.domain.toProvisional
+import com.hhst.youtubelite.ui.design.CenteredListGutter
 import com.hhst.youtubelite.ui.design.miniDockListPadding
 
 /** Geometry shared by the result list and its skeleton, derived from the available window. */
@@ -120,12 +121,12 @@ internal fun SearchAllList(
     val leading = channels.take(LeadingChannels)
     val shortsAfter = minOf(VideosBeforeShorts, results.size)
     val playlistsAfter = minOf(VideosBeforePlaylists, results.size)
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    CenteredListGutter(SearchResultsLayout.ColumnMaxWidth.dp) { gutter ->
         val dock = miniDockListPadding(MinSpace.xxl)
         LazyColumn(
-            Modifier.widthIn(max = SearchResultsLayout.ColumnMaxWidth.dp).fillMaxSize().then(dock.modifier).testTag("search-results-list"),
+            Modifier.fillMaxSize().then(dock.modifier).testTag("search-results-list"),
             state = listState,
-            contentPadding = PaddingValues(top = MinSpace.sm, bottom = dock.bottom),
+            contentPadding = PaddingValues(start = gutter.start, end = gutter.end, top = MinSpace.sm, bottom = dock.bottom),
             verticalArrangement = Arrangement.spacedBy(spec.spacing),
         ) {
             items(leading, key = { "all-channel-${it.id}" }, contentType = { "channel" }) { channel ->
