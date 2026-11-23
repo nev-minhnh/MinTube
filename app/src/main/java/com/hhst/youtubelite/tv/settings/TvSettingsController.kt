@@ -2,7 +2,14 @@ package com.hhst.youtubelite.tv.settings
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.lifecycleScope
+import com.hhst.youtubelite.BuildConfig
+import com.hhst.youtubelite.tv.update.TvUpdateActions
+import com.hhst.youtubelite.tv.update.TvUpdateController
+import com.hhst.youtubelite.tv.update.TvUpdateGatewayImpl
+import okhttp3.OkHttpClient
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +41,20 @@ class TvSettingsController(private val activity: ComponentActivity) {
     private var account by mutableStateOf(readAccount())
     /** Read lazily: resolving the player builds the engine, which Settings alone should not do. */
     private var captionStyle by mutableStateOf<SubtitleStyle?>(null)
+    private val appVersion =
+        runCatching { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName }.getOrNull().orEmpty()
+    private val updater = TvUpdateController(
+        activity.lifecycleScope,
+        TvUpdateGatewayImpl(activity, getKoin().get<OkHttpClient>()),
+        currentVersion = appVersion,
+        canInstallBuild = canInstallBuild(appVersion),
+    )
+    private val updateActions = object : TvUpdateActions {
+        override fun check() = updater.check()
+        override fun download() = updater.download()
+        override fun retry() = updater.retry()
+        override fun dismiss() = updater.dismiss()
+    }
     private val listener: (String) -> Unit = { preferences = prefs.allPreferences() }
 
     init {
@@ -45,6 +66,7 @@ class TvSettingsController(private val activity: ComponentActivity) {
     }
 
     fun onResume() {
+        updater.onResume()
         preferences = prefs.allPreferences()
         account = readAccount()
         if (captionStyle != null) captionStyle = player().uiState.value.subtitleStyle
@@ -124,6 +146,7 @@ class TvSettingsController(private val activity: ComponentActivity) {
             version = stringResource(R.string.account_about_version, version),
             captionSize = selectedScale?.let { "${(it * 100).toInt()}%" },
             captionBackground = style?.let { backgroundLabels[it.background.ordinal] },
+            showUpdate = true,
         )
         val choices = TvSettingsChoices(
             languages = languages,
@@ -134,10 +157,14 @@ class TvSettingsController(private val activity: ComponentActivity) {
                 TvPanelOption(label, style?.background?.ordinal == index)
             },
         )
-        TvSettingsScreen(rows, account, choices, callbacks, modifier)
+        val update by updater.state.collectAsState()
+        TvSettingsScreen(rows, account, choices, callbacks, modifier, update, updateActions)
     }
 
     companion object {
+        /** Only a signed release build with an x.y.z version can be replaced by a release APK (as on the phone). */
+        fun canInstallBuild(version: String) = !BuildConfig.DEBUG && Regex("""\d+\.\d+\.\d+""").matches(version)
+
         /** The stored account as Settings shows it; same identity rules as YouActivity's switcher. */
         fun readAccount(): TvAccountState {
             val snapshot = MediaSession.snapshot()

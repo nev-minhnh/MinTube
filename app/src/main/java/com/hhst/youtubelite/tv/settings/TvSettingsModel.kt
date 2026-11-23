@@ -66,6 +66,9 @@ sealed interface TvSettingRow {
         @param:StringRes val summaryRes: Int? = null,
     ) : TvSettingRow
 
+    /** "Check for updates" button with its inline status; state lives in the TV update controller. */
+    data class Update(override val section: TvSettingsSection, override val key: String) : TvSettingRow
+
     /** The source link: shown as text plus a QR code. */
     data class Link(override val section: TvSettingsSection, override val key: String, @param:StringRes val title: Int, val url: String) :
         TvSettingRow
@@ -98,6 +101,7 @@ object TvSettingsCatalog {
         PreferenceKeys.ENABLE_BACKGROUND_PLAY, PreferenceKeys.REMEMBER_RESIZE_MODE, PreferenceKeys.DATA_SAVER,
     ) + PreferenceKeys.GESTURE_KEYS
 
+    const val KEY_UPDATE = "about:update"
     const val SOURCE_URL = "https://github.com/nev-minhnh/MinTube"
 
     fun rows(
@@ -107,6 +111,7 @@ object TvSettingsCatalog {
         version: String,
         captionSize: String? = null,
         captionBackground: String? = null,
+        showUpdate: Boolean = false,
     ): List<TvSettingRow> = buildList {
         fun toggle(section: TvSettingsSection, key: String, title: Int, summary: Int? = null) {
             add(TvSettingRow.Toggle(section, key, title, summary, preferences[key] ?: PreferenceKeys.DEFAULTS[key] ?: false))
@@ -153,6 +158,7 @@ object TvSettingsCatalog {
 
         val about = TvSettingsSection.About
         add(TvSettingRow.Info(about, "about:version", title = version))
+        if (showUpdate) add(TvSettingRow.Update(about, KEY_UPDATE))
         add(TvSettingRow.Info(about, "about:fork", titleRes = R.string.about_fork_notice, summaryRes = R.string.about_credits))
         add(TvSettingRow.Info(about, "about:license", titleRes = R.string.account_about_license,
             summaryRes = R.string.account_about_license_name))

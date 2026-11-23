@@ -850,4 +850,10 @@
     <string name="update_permission_needed">Allow MinTube to install apps, then come back and tap Retry.</string>
     <string name="update_install_failed">The update could not be installed.</string>
     <string name="update_no_package">The latest release has no installable file.</string>
+    <string name="tv_update_check">Check for updates</string>
+    <string name="tv_update_checking">Checking…</string>
+    <string name="tv_update_up_to_date">Up to date: version %1$s</string>
+    <string name="tv_update_error_check">Could not check for updates. Check your connection and retry.</string>
+    <string name="tv_update_permission_needed">Allow \"Install unknown apps\" for MinTube TV, then come back and choose Retry.</string>
+    <string name="tv_update_permission_manual">This device could not open that setting. In system Settings, open Apps, then Special app access, then Install unknown apps. Allow MinTube TV, come back and choose Retry.</string>
 </resources>

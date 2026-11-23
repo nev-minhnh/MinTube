@@ -850,4 +850,10 @@
     <string name="update_permission_needed">Hãy cho phép MinTube cài đặt ứng dụng, rồi quay lại và nhấn Thử lại.</string>
     <string name="update_install_failed">Không cài đặt được bản cập nhật.</string>
     <string name="update_no_package">Bản phát hành mới nhất không có tệp cài đặt.</string>
+    <string name="tv_update_check">Kiểm tra cập nhật</string>
+    <string name="tv_update_checking">Đang kiểm tra…</string>
+    <string name="tv_update_up_to_date">Đã là bản mới nhất: phiên bản %1$s</string>
+    <string name="tv_update_error_check">Không thể kiểm tra cập nhật. Hãy kiểm tra kết nối và thử lại.</string>
+    <string name="tv_update_permission_needed">Hãy cho phép \"Cài đặt ứng dụng không rõ nguồn gốc\" cho MinTube TV, rồi quay lại và chọn Thử lại.</string>
+    <string name="tv_update_permission_manual">Thiết bị không mở được mục cài đặt này. Trong Cài đặt hệ thống, mở Ứng dụng, rồi Quyền truy cập đặc biệt, rồi Cài đặt ứng dụng không rõ nguồn gốc. Cho phép MinTube TV, quay lại và chọn Thử lại.</string>
 </resources>
