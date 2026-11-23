@@ -86,6 +86,18 @@ class PublishedAgeTest {
         assertEquals(399L * 24, parse("October 20, 2025")?.hours)
     }
 
+    @Test fun youTubesRoundedTextAlsoReadsInWholeUnits() {
+        assertEquals(1 to Unit.Week, shape("7 days ago"))
+        assertEquals(2 to Unit.Week, shape("14 days ago"))
+        assertEquals(1 to Unit.Month, shape("30 days ago"))
+        assertEquals(1 to Unit.Day, shape("24 hours ago"))
+        assertEquals(2 to Unit.Day, shape("48 giờ trước"))
+        assertEquals(6 to Unit.Day, shape("6 days ago"))
+        assertEquals(13 to Unit.Day, shape("13 ngày trước"))
+        assertEquals(23 to Unit.Hour, shape("23 hours ago"))
+        assertEquals(168L, parse("7 days ago")?.hours)
+    }
+
     @Test fun futureAndGarbage() {
         for (raw in listOf("2026-11-24T00:00:00Z", "2027-01-01", "Dec 31, 2026", null, "", "   ", "LIVE",
             "Scheduled for 11/25/26", "1.2M views", "Premieres in 2 hours", "5 days", "ago", "0 days ago", "not a date"))
