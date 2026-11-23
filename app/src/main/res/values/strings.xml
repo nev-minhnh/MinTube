@@ -842,4 +842,17 @@
     <string name="tv_watch_no_description">No description.</string>
     <string name="tv_watch_sign_in_message">Sign in to like videos, subscribe to channels and save to Watch later.</string>
     <string name="tv_watch_verify">Verify</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_version_change">%1$s → %2$s</string>
+    <string name="update_size">Size: %1$s</string>
+    <string name="update_download_install">Download and install</string>
+    <string name="update_later">Later</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_progress_percent">%1$d%%</string>
+    <string name="update_error_network">Could not download the update. Check your connection and retry.</string>
+    <string name="update_error_checksum">The downloaded file failed verification and was removed.</string>
+    <string name="update_error_no_checksum">The release has no checksum, so it was not installed.</string>
+    <string name="update_permission_needed">Allow MinTube to install apps, then come back and tap Retry.</string>
+    <string name="update_install_failed">The update could not be installed.</string>
+    <string name="update_no_package">The latest release has no installable file.</string>
 </resources>

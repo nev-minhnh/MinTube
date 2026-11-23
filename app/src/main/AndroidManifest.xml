@@ -38,6 +38,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
     <uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- In-app update: PackageInstaller session after the user allows installs from MinTube. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission
@@ -64,6 +66,8 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:usesCleartextTraffic">
         <!-- Device discovery and transport control require HTTP to local renderer addresses. -->
+
+        <receiver android:name=".core.update.UpdateInstallReceiver" android:exported="false" />
 
         <service android:name=".extractor.EjsRuntimeService"
             android:exported="false" android:process=":youtube_ejs" />

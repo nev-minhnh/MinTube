@@ -34,8 +34,8 @@ android {
         minSdk = 24
         targetSdk = 36
         // TV range: 2MMmmpp (phone builds stay below 2000000).
-        versionCode = 2010004
-        versionName = "1.0.4"
+        versionCode = 2010005
+        versionName = "1.0.5"
         buildConfigField("String", "DIAGNOSTIC_BUILD_ID", "\"$diagnosticBuildId\"")
         buildConfigField("String", "DIAGNOSTIC_DEPENDENCIES", "\"Media3=${libs.versions.media3.get()};OkHttp=${libs.versions.okhttp.get()};kotlinx-serialization=${libs.versions.kotlinxSerialization.get()};UPnPCast=${libs.versions.upnpcast.get()};MSC=${libs.versions.msc.get()}\"")
         testInstrumentationRunner = "com.hhst.youtubelite.ContentTestRunner"
