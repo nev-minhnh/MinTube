@@ -92,6 +92,10 @@ class AppUpdaterTest {
         assertEquals(UpdateChannel.Tv, UpdateChannel.forPackage("com.nevminhnh.mintube.tv.debug"))
     }
 
+    @Test fun plainNotesHideTheChecksumLineCiAppends() {
+        assertEquals("Fixed a thing.", AppUpdater.plainNotes("Fixed a thing.\n\nSHA-256: `4c70150055`\n"))
+    }
+
     @Test fun plainNotesStripsMarkdown() {
         assertEquals("New\n• fast thing and link", AppUpdater.plainNotes("## New\n- **fast** thing and [link](http://x)"))
     }
