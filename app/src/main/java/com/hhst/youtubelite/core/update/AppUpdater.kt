@@ -37,6 +37,8 @@ data class AppRelease(
     val sha256Url: String,
     val notes: String,
     val pageUrl: String,
+    /** GitHub `published_at` (ISO-8601), for the changelog list; blank when unknown. */
+    val publishedAt: String = "",
 )
 
 /** Typed update failures; the UI maps [kind] to a message. */
