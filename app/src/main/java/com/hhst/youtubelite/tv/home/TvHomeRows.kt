@@ -62,10 +62,10 @@ object TvHomeRows {
     fun chipKey(chip: String) = "chip:$chip"
 
     fun video(item: FeedItem.Video, short: Boolean = item.short): TvVideo = TvVideo(
-        // The phone card shows author · metadata (views and age already joined by the data layer).
+        // metadata carries views; the raw publish text (or a fixture's age) becomes the localized age.
         id = item.id, title = item.title, channel = item.author, metadata = item.metadata,
         artwork = item.artwork, duration = item.duration, live = item.live, progress = item.progress, short = short,
-        channelId = item.channelId, published = item.age.orEmpty(),
+        channelId = item.channelId, published = item.published.ifBlank { item.age.orEmpty() },
     )
 
     fun videos(page: HomePage): List<TvVideo> = page.items.filterIsInstance<FeedItem.Video>()

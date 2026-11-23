@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.home.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -71,7 +72,7 @@ internal fun FeedCard(item: FeedItem, window: WindowClass, live: Boolean = false
     when (item) {
         is FeedItem.Video -> VideoCard(
             title = rememberDeArrowTitle(item.id, item.title),
-            metadata = listOf(item.author, item.metadata).filter(String::isNotBlank).joinToString(" · "),
+            metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · "),
             artwork = item.artwork,
             onClick = {
                 WatchProvisionalStore.put(item.toProvisional())

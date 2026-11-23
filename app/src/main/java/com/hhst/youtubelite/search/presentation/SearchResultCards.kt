@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.search.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -288,7 +289,7 @@ private fun ResultText(result: SearchResult, modifier: Modifier, onAction: (Sear
             Modifier.fillMaxWidth().testTag("search-title-${result.id}"), maxLines = 2)
         // Only non-empty fields join: a missing view count or date must not leave
         // orphan separators. All fields blank renders nothing.
-        val byline = listOf(result.channel, result.views, result.age).filter(String::isNotBlank).joinToString(" · ")
+        val byline = listOf(result.channel, result.views, publishedAgeText(result.age)).filter(String::isNotBlank).joinToString(" · ")
         if (byline.isNotBlank()) AppText(byline, MinType.Caption,
             Modifier.fillMaxWidth().padding(top = MinSpace.xxs).testTag("search-byline-${result.id}"),
             color = DesignTokens.Secondary, maxLines = 2)

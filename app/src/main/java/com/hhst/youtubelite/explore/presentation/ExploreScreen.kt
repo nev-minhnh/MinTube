@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.explore.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -330,7 +331,7 @@ private fun ExplorePlaylistCard(playlist: PlaylistSummary, modifier: Modifier, o
 private fun ExploreVideoCard(item: FeedItem.Video, modifier: Modifier, onAction: (ExploreAction) -> Unit) {
     VideoCard(
         title = rememberDeArrowTitle(item.id, item.title),
-        metadata = listOf(item.author, item.metadata).filter(String::isNotBlank).joinToString(" · "),
+        metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · "),
         artwork = item.artwork,
         onClick = {
             WatchProvisionalStore.put(item.toProvisional())

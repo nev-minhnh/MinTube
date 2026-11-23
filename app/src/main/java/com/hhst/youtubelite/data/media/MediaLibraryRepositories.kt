@@ -60,7 +60,7 @@ class MediaLibraryRepository(private val client: MediaClient, private val local:
         val page = loadLibrary(LibrarySection.HISTORY, context, continuation, http = http).requireValue()
         return HistoryPage(page.items.filter { it.kind == "video" }.map { HistoryEntry(it.id, it.id, it.title.orEmpty(),
             it.author.orEmpty(), it.channelId.orEmpty(), it.thumbnail.orEmpty(), it.duration.orEmpty(), it.progressPercent?.div(100f), "History",
-            removeToken = it.actions.firstNotNullOfOrNull { action -> action.feedbackToken() }) }, page.nextKey)
+            views = it.viewCount.orEmpty(), published = it.published.orEmpty(), removeToken = it.actions.firstNotNullOfOrNull { action -> action.feedbackToken() }) }, page.nextKey)
     }
     override suspend fun removeFromHistory(feedbackToken: String): RemovedHistoryEntry? {
         if (useDevice()) return device { it.remove(feedbackToken) }
