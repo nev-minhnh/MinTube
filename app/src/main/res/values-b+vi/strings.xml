@@ -769,4 +769,17 @@
     <string name="locale_translate_titles_summary">Tắt để xem tiêu đề gốc, lượt xem và ngày theo ngôn ngữ ứng dụng</string>
     <string name="locale_trending_vietnam">Thịnh hành tại Việt Nam</string>
     <string name="locale_trending_vietnam_summary">Tắt để dùng khu vực của thiết bị cho thịnh hành và tìm kiếm</string>
+    <string name="update_available_title">Có bản cập nhật</string>
+    <string name="update_version_change">%1$s → %2$s</string>
+    <string name="update_size">Dung lượng: %1$s</string>
+    <string name="update_download_install">Tải về và cài đặt</string>
+    <string name="update_later">Để sau</string>
+    <string name="update_downloading">Đang tải bản cập nhật…</string>
+    <string name="update_progress_percent">%1$d%%</string>
+    <string name="update_error_network">Không tải được bản cập nhật. Hãy kiểm tra kết nối và thử lại.</string>
+    <string name="update_error_checksum">Tệp tải về không vượt qua kiểm tra toàn vẹn nên đã bị xoá.</string>
+    <string name="update_error_no_checksum">Bản phát hành không có mã kiểm tra nên không được cài đặt.</string>
+    <string name="update_permission_needed">Hãy cho phép MinTube cài đặt ứng dụng, rồi quay lại và nhấn Thử lại.</string>
+    <string name="update_install_failed">Không cài đặt được bản cập nhật.</string>
+    <string name="update_no_package">Bản phát hành mới nhất không có tệp cài đặt.</string>
 </resources>
