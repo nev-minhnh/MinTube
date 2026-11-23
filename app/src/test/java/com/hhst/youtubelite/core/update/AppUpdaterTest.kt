@@ -93,10 +93,7 @@ class AppUpdaterTest {
     }
 
     @Test fun plainNotesHideTheChecksumLineCiAppends() {
-        assertEquals("Fixed a thing.", AppUpdater.plainNotes("Fixed a thing.
-
-SHA-256: `4c70150055`
-"))
+        assertEquals("Fixed a thing.", AppUpdater.plainNotes("Fixed a thing.\n\nSHA-256: `4c70150055`\n"))
     }
 
     @Test fun plainNotesStripsMarkdown() {
