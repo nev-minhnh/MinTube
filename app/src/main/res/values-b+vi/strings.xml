@@ -919,4 +919,7 @@
     <string name="update_channel_name">Cập nhật ứng dụng</string>
     <string name="update_notification_title">MinTube %1$s đã sẵn sàng</string>
     <string name="update_notification_text">Chạm để xem thay đổi và cài đặt</string>
+    <string name="tv_settings_display">Hiển thị</string>
+    <string name="tv_settings_ui_scale">Cỡ giao diện</string>
+    <string name="tv_settings_ui_scale_summary">Thu nhỏ chữ và bố cục để mọi thứ vừa màn hình, như mã đăng nhập</string>
 </resources>

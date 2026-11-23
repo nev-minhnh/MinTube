@@ -44,7 +44,7 @@ import com.hhst.youtubelite.tv.qr.TvQrImage
 import com.hhst.youtubelite.ui.design.AppIcon
 
 /** Which picker is open over the list. */
-enum class TvSettingsPanel { Language, CaptionSize, CaptionBackground, Accounts, SignOut }
+enum class TvSettingsPanel { Language, CaptionSize, CaptionBackground, Accounts, SignOut, UiScale }
 
 /** Callbacks of [TvSettingsScreen]; the controller wires them to ExtensionManager, MediaSession and AppLocale. */
 interface TvSettingsCallbacks {
@@ -58,6 +58,8 @@ interface TvSettingsCallbacks {
     fun captionBackground(index: Int)
     /** Opens the Updates page. */
     fun openUpdates() = Unit
+    /** Interface size picked from [TvSettingsChoices.uiScales]. */
+    fun uiScale(index: Int) = Unit
     /** A caption picker is about to open (lazy player-style read). */
     fun captionsOpened() = Unit
 }
@@ -67,6 +69,7 @@ data class TvSettingsChoices(
     val languages: List<TvPanelOption> = emptyList(),
     val captionSizes: List<TvPanelOption> = emptyList(),
     val captionBackgrounds: List<TvPanelOption> = emptyList(),
+    val uiScales: List<TvPanelOption> = emptyList(),
 )
 
 /**
@@ -168,6 +171,8 @@ fun TvSettingsScreen(
     when (panel) {
         TvSettingsPanel.Language -> TvOptionPanel(stringResource(R.string.settings_language), choices.languages,
             onSelect = { index -> close(); callbacks.language(index) }, onDismiss = ::close, tag = TAG_PANEL_LANGUAGE)
+        TvSettingsPanel.UiScale -> TvOptionPanel(stringResource(R.string.tv_settings_ui_scale), choices.uiScales,
+            onSelect = { index -> close(); callbacks.uiScale(index) }, onDismiss = ::close, tag = TAG_PANEL_UI_SCALE)
         TvSettingsPanel.CaptionSize -> TvOptionPanel(stringResource(R.string.tv_settings_caption_size), choices.captionSizes,
             onSelect = { index -> close(); callbacks.captionSize(index) }, onDismiss = ::close, tag = TAG_PANEL_CAPTION_SIZE)
         TvSettingsPanel.CaptionBackground -> TvOptionPanel(stringResource(R.string.tv_settings_caption_background),
@@ -218,7 +223,7 @@ private fun SettingRow(
                 TvSettingAction.SignOut -> AppIcon.Close
                 TvSettingAction.Language -> AppIcon.Globe
                 TvSettingAction.Updates -> AppIcon.Refresh
-                TvSettingAction.CaptionSize, TvSettingAction.CaptionBackground -> null
+                TvSettingAction.CaptionSize, TvSettingAction.CaptionBackground, TvSettingAction.UiScale -> null
             },
             onClick = {
                 when (row.action) {
@@ -227,6 +232,7 @@ private fun SettingRow(
                     TvSettingAction.SignOut -> onOpen(TvSettingsPanel.SignOut)
                     TvSettingAction.Language -> onOpen(TvSettingsPanel.Language)
                     TvSettingAction.Updates -> callbacks.openUpdates()
+                    TvSettingAction.UiScale -> onOpen(TvSettingsPanel.UiScale)
                     TvSettingAction.CaptionSize -> {
                         callbacks.captionsOpened()
                         onOpen(TvSettingsPanel.CaptionSize)
@@ -284,6 +290,7 @@ const val TAG_SECTION = "tv-settings-section"
 const val TAG_ROW = "tv-settings-row"
 const val TAG_PANEL_LANGUAGE = "tv-settings-language"
 const val TAG_PANEL_CAPTION_SIZE = "tv-settings-caption-size"
+const val TAG_PANEL_UI_SCALE = "tv-settings-ui-scale"
 const val TAG_PANEL_CAPTION_BACKGROUND = "tv-settings-caption-background"
 const val TAG_PANEL_ACCOUNTS = "tv-settings-accounts"
 const val TAG_PANEL_SIGN_OUT = "tv-settings-sign-out"

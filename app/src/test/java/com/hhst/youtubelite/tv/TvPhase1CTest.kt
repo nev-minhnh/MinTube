@@ -23,7 +23,7 @@ import org.junit.Test
 class TvSettingsCatalogTest {
     private fun rows(prefs: Map<String, Boolean> = emptyMap(), account: TvAccountState = TvAccountState()) =
         TvSettingsCatalog.rows(prefs, account, languageLabel = "English", version = "Version 1.0.0",
-            updatesSummary = "MinTube TV is up to date")
+            updatesSummary = "MinTube TV is up to date", uiScale = "100%")
 
     @Test fun sectionsAppearOnceInOrder() {
         val sections = rows().map { it.section }.distinct()
@@ -37,6 +37,20 @@ class TvSettingsCatalogTest {
         assertEquals("MinTube TV is up to date", row.summaryText)
         // Without a status the row is hidden (the page is not wired).
         assertFalse(TvSettingsCatalog.rows(emptyMap(), TvAccountState(), "English", "v").any { it.section == TvSettingsSection.Updates })
+    }
+
+    /** Owner request (tv-v1.0.7): Interface size sits right under Account so a too-large TV can still reach it. */
+    @Test fun interfaceSizeIsTheDisplaySectionUnderAccount() {
+        val row = rows().single { it.section == TvSettingsSection.Display } as TvSettingRow.Action
+        assertEquals(TvSettingAction.UiScale, row.action)
+        assertEquals("100%", row.value)
+        assertEquals(listOf(TvSettingsSection.Account, TvSettingsSection.Display), TvSettingsSection.entries.take(2))
+        assertFalse(TvSettingsCatalog.rows(emptyMap(), TvAccountState(), "English", "v").any { it.section == TvSettingsSection.Display })
+    }
+
+    @Test fun interfaceSizesAreTheFourOwnerSteps() {
+        assertEquals(listOf("25%", "50%", "75%", "100%"),
+            com.hhst.youtubelite.tv.design.TvUiScale.OPTIONS.map(com.hhst.youtubelite.tv.design.TvUiScale::label))
     }
 
     @Test fun keysAreUnique() {

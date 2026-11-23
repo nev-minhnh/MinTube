@@ -919,4 +919,7 @@
     <string name="update_channel_name">App updates</string>
     <string name="update_notification_title">MinTube %1$s is available</string>
     <string name="update_notification_text">Tap to see what changed and install it</string>
+    <string name="tv_settings_display">Display</string>
+    <string name="tv_settings_ui_scale">Interface size</string>
+    <string name="tv_settings_ui_scale_summary">Makes text and layout smaller so everything fits on screen, such as the sign-in code</string>
 </resources>

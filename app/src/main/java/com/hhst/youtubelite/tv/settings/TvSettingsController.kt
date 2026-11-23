@@ -112,6 +112,10 @@ class TvSettingsController(private val activity: ComponentActivity) {
             captionStyle = player.uiState.value.subtitleStyle
         }
 
+        override fun uiScale(index: Int) {
+            com.hhst.youtubelite.tv.design.TvUiScale.set(activity, com.hhst.youtubelite.tv.design.TvUiScale.OPTIONS.getOrNull(index) ?: return)
+        }
+
         override fun captionBackground(index: Int) {
             val background = SubtitleStyle.Background.entries.getOrNull(index) ?: return
             val player = player()
@@ -174,6 +178,7 @@ class TvSettingsController(private val activity: ComponentActivity) {
             captionSize = selectedScale?.let { "${(it * 100).toInt()}%" },
             captionBackground = style?.let { backgroundLabels[it.background.ordinal] },
             updatesSummary = tvUpdatesRowSummary(update, appVersion),
+            uiScale = com.hhst.youtubelite.tv.design.TvUiScale.label(com.hhst.youtubelite.tv.design.TvUiScale.current),
         )
         val choices = TvSettingsChoices(
             languages = languages,
@@ -182,6 +187,9 @@ class TvSettingsController(private val activity: ComponentActivity) {
             },
             captionBackgrounds = backgroundLabels.mapIndexed { index, label ->
                 TvPanelOption(label, style?.background?.ordinal == index)
+            },
+            uiScales = com.hhst.youtubelite.tv.design.TvUiScale.OPTIONS.map {
+                TvPanelOption(com.hhst.youtubelite.tv.design.TvUiScale.label(it), it == com.hhst.youtubelite.tv.design.TvUiScale.current)
             },
         )
         val initialFocus = remember { if (focusUpdatesRow) TvSettingsCatalog.KEY_UPDATES else null }

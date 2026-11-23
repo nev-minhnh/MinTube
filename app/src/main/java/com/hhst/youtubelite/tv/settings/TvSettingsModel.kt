@@ -7,6 +7,7 @@ import com.hhst.youtubelite.extension.PreferenceKeys
 /** Settings sections, in list order. */
 enum class TvSettingsSection(@param:StringRes val title: Int) {
     Account(R.string.tv_settings_account),
+    Display(R.string.tv_settings_display),
     Playback(R.string.settings_playback),
     Content(R.string.tv_settings_content),
     SponsorBlock(R.string.sponsorblock),
@@ -74,7 +75,7 @@ sealed interface TvSettingRow {
         TvSettingRow
 }
 
-enum class TvSettingAction { SignIn, SwitchAccount, SignOut, CaptionSize, CaptionBackground, Language, Updates }
+enum class TvSettingAction { SignIn, SwitchAccount, SignOut, CaptionSize, CaptionBackground, Language, Updates, UiScale }
 
 /**
  * The TV settings list as plain data (unit-tested). The phone's keys and defaults apply; only
@@ -114,6 +115,8 @@ object TvSettingsCatalog {
         captionBackground: String? = null,
         /** Live status under the Updates row; null hides the row. */
         updatesSummary: String? = null,
+        /** Current interface size ("100%"); null hides the Display section. */
+        uiScale: String? = null,
     ): List<TvSettingRow> = buildList {
         fun toggle(section: TvSettingsSection, key: String, title: Int, summary: Int? = null) {
             add(TvSettingRow.Toggle(section, key, title, summary, preferences[key] ?: PreferenceKeys.DEFAULTS[key] ?: false))
@@ -133,6 +136,9 @@ object TvSettingsCatalog {
             add(TvSettingRow.Action(accountSection, TvSettingAction.SignIn, R.string.ui_sign_in, R.string.tv_settings_sign_in_summary))
         }
         toggle(accountSection, PreferenceKeys.PRIVATE_BROWSING, R.string.settings_private_browsing, R.string.settings_private_browsing_summary)
+
+        if (uiScale != null) add(TvSettingRow.Action(TvSettingsSection.Display, TvSettingAction.UiScale,
+            R.string.tv_settings_ui_scale, R.string.tv_settings_ui_scale_summary, uiScale))
 
         val playback = TvSettingsSection.Playback
         toggle(playback, PreferenceKeys.REMEMBER_QUALITY, R.string.remember_quality)

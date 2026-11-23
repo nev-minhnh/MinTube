@@ -34,8 +34,15 @@ private val TvColorScheme = darkColorScheme(
 /** Dark-only TV theme. Every TV screen composes inside it. */
 @Composable
 fun TvTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = TvColorScheme) {
-        CompositionLocalProvider(LocalContentColor provides TvColors.Ink, content = content)
+    TvUiScale.ensureLoaded(androidx.compose.ui.platform.LocalContext.current)
+    val scale = TvUiScale.current
+    val base = androidx.compose.ui.platform.LocalDensity.current
+    // Interface size: a smaller density draws every dp and sp of the TV UI proportionally smaller.
+    val density = if (scale == 1f) base else androidx.compose.ui.unit.Density(base.density * scale, base.fontScale)
+    CompositionLocalProvider(androidx.compose.ui.platform.LocalDensity provides density) {
+        MaterialTheme(colorScheme = TvColorScheme) {
+            CompositionLocalProvider(LocalContentColor provides TvColors.Ink, content = content)
+        }
     }
 }
 
