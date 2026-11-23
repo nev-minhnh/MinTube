@@ -126,6 +126,22 @@ val appModule = module {
         )
     }
     single<PrefStore> { PreferenceStore.app(androidContext()) }
+    single {
+        val context = androidContext()
+        com.hhst.youtubelite.core.update.DefaultUpdateCenter(
+            source = com.hhst.youtubelite.core.update.AppUpdaterSource(
+                com.hhst.youtubelite.core.update.AppUpdater(get<OkHttpClient>(), context.cacheDir)),
+            prefsSettings = com.hhst.youtubelite.core.update.PreferenceUpdateSettings(get<PrefStore>()),
+            scheduler = com.hhst.youtubelite.core.update.WorkUpdateScheduler(context),
+            channel = com.hhst.youtubelite.core.update.UpdateChannel.current(),
+            currentVersion = com.hhst.youtubelite.BuildConfig.VERSION_NAME,
+            debugBuild = com.hhst.youtubelite.BuildConfig.DEBUG,
+            sourceApk = { java.io.File(context.applicationInfo.sourceDir) },
+            shareDir = { java.io.File(context.cacheDir, com.hhst.youtubelite.core.update.DefaultUpdateCenter.SHARE_DIR) },
+            authority = { "${context.packageName}.download.fileprovider" },
+        )
+    }
+    single<com.hhst.youtubelite.core.update.UpdateCenter> { get<com.hhst.youtubelite.core.update.DefaultUpdateCenter>() }
     single<DownloadPrefs> { PreferenceDownloadPrefs(get()) }
     single { ExtensionManager(get()) }
     single { HapticsController(androidContext(), get()) }

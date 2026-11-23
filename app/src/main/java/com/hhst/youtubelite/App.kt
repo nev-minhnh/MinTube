@@ -62,6 +62,10 @@ class App : Application(), Configuration.Provider {
         get<com.hhst.youtubelite.extension.ExtensionManager>().let { prefs ->
             com.hhst.youtubelite.ui.theme.AppAppearance.update(prefs.themeMode())
         }
+        // Daily background update check follows the Updates toggle.
+        Promise.DEFAULT_SCOPE.launch {
+            runCatching { get<com.hhst.youtubelite.core.update.UpdateCenter>().reschedule() }
+        }
     }
 
     @Synchronized fun startMediaRuntime() {

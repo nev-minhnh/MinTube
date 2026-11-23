@@ -104,6 +104,7 @@
         <activity android:name=".library.HistoryActivity" android:supportsPictureInPicture="true" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" android:exported="false" android:theme="@style/Theme.App.Home" />
         <activity android:name=".library.PlaylistsActivity" android:supportsPictureInPicture="true" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout" android:exported="false" android:theme="@style/Theme.App.Home" />
         <activity android:name=".settings.SettingsActivity" android:exported="false" android:theme="@style/Theme.App.Home" />
+        <activity android:name=".ui.updates.UpdatesActivity" android:exported="false" android:theme="@style/Theme.App.Home" />
         <activity android:name=".settings.AdvancedActivity" android:exported="false" android:theme="@style/Theme.App.Home" />
         <activity android:name=".account.SignInActivity" android:exported="false" android:theme="@style/Theme.App.Home" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".account.ChatWebSignInActivity" android:exported="false" android:theme="@style/Theme.App.Home" android:windowSoftInputMode="adjustResize" />
