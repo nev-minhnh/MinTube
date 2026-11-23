@@ -49,7 +49,9 @@ class PublishedAgeTest {
             "2026-11-22T13:00:00Z" to (23 to Unit.Hour),
             "2026-11-22T12:00:00Z" to (1 to Unit.Day),
             "2026-11-22T11:00:00Z" to (25 to Unit.Hour),
-            "2026-11-20T10:00:00Z" to (74 to Unit.Hour),
+            "2026-11-20T10:00:00Z" to (3 to Unit.Day),
+            "2026-11-21T13:00:00Z" to (47 to Unit.Hour),
+            "2026-11-21T12:00:00Z" to (2 to Unit.Day),
             "2026-11-20T12:00:00Z" to (3 to Unit.Day),
             "2026-11-17T12:00:00Z" to (6 to Unit.Day),
             "2026-11-16T12:00:00Z" to (1 to Unit.Week),
@@ -72,6 +74,15 @@ class PublishedAgeTest {
             "October 20, 2025" to (1 to Unit.Date),
         )
         for ((raw, expected) in table) assertEquals(raw, expected, shape(raw))
+    }
+
+    /** Owner report (v1.0.9): a video from ~2 years ago read "16931 hours ago". */
+    @Test fun oldTimestampsNeverReadInHours() {
+        assertEquals(1 to Unit.Date, shape("2024-12-28T05:00:00Z"))
+        assertEquals(java.time.LocalDate.of(2024, 12, 28), parse("2024-12-28T05:00:00Z")?.date)
+        assertEquals(1 to Unit.Date, shape("2020-03-01T23:59:00Z"))
+        assertEquals(5 to Unit.Month, shape("2026-06-26T07:00:00Z")) // 150 days and 5 hours
+        assertEquals(10 to Unit.Day, shape("2026-11-13T03:00:00Z"))
     }
 
     @Test fun datesOlderThanTwelveMonthsKeepTheirDay() {
