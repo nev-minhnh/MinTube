@@ -75,8 +75,15 @@ data class TvVideo(
     @Composable
     fun captionText(): String = captionParts(publishedAgeText(published.takeIf(String::isNotBlank)))
 
-    private fun captionParts(age: String): String = listOf(
-        channel, metadata, age.takeUnless { published.isNotBlank() && metadata.contains(published) }.orEmpty(),
+    /** Views and publish age without the channel ("1.2M views · 5 days ago"): the card's second caption line. */
+    @Composable
+    fun statsText(): String = statsParts(publishedAgeText(published.takeIf(String::isNotBlank)))
+
+    private fun captionParts(age: String): String = listOf(channel, statsParts(age))
+        .filter(String::isNotBlank).joinToString(" · ")
+
+    private fun statsParts(age: String): String = listOf(
+        metadata, age.takeUnless { published.isNotBlank() && metadata.contains(published) }.orEmpty(),
     ).filter(String::isNotBlank).joinToString(" · ")
 }
 
@@ -151,9 +158,13 @@ fun TvCard(
         Spacer(Modifier.height(TvSpacing.md))
         Column(Modifier.graphicsLayer { this.alpha = alpha }) {
             Text(video.title, style = TvType.BodyStrong, color = TvColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            val caption = video.captionText()
-            if (caption.isNotBlank()) {
-                Text(caption, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            // Channel and "views · age" on their own lines, so a long channel name never hides the age.
+            if (video.channel.isNotBlank()) {
+                Text(video.channel, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            val stats = video.statsText()
+            if (stats.isNotBlank()) {
+                Text(stats, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

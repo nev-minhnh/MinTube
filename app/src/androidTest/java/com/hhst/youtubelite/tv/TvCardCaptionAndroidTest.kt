@@ -4,6 +4,8 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,8 +38,10 @@ class TvCardCaptionAndroidTest {
                 }
             }
         }
-        compose.onNodeWithText("Chan · 1.2M views · 5 days ago").assertIsDisplayed()
-        compose.onNodeWithText("Chan · 2 hours ago").assertIsDisplayed()
+        // Channel on its own line; views and age on the next, so the age is never cut by a long channel.
+        compose.onAllNodesWithText("Chan").assertCountEquals(2)
+        compose.onNodeWithText("1.2M views · 5 days ago").assertIsDisplayed()
+        compose.onNodeWithText("2 hours ago").assertIsDisplayed()
         compose.awaitFocus("card-a")
         compose.press(Key.DirectionRight)
         compose.awaitFocus("card-b")
