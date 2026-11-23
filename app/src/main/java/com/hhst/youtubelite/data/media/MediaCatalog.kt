@@ -2,6 +2,9 @@ package com.hhst.youtubelite.data.media
 
 import com.hhst.youtubelite.home.domain.*
 import com.hhst.youtubelite.search.domain.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.sync.withPermit
 import com.hhst.youtubelite.playlist.domain.PlaylistSummary
 import com.liskovsoft.youtubeapi.videoinfo.V2.MediaItem
 import com.liskovsoft.youtubeapi.videoinfo.V2.HomeSection
@@ -195,9 +198,10 @@ class MediaSearchRepository(private val client: MediaClient,
                 java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(it) + " views"
             }.orEmpty() },
             duration = result.duration.ifBlank { duration },
-            age = result.age.ifBlank { details.published?.substringBefore('T').orEmpty() })
+            // The full timestamp: a date alone turns "9 hours ago" into "1 day ago" after midnight.
+            age = result.age.ifBlank { details.published.orEmpty() })
     }
-    override suspend fun search(query: String, filters: SearchFilters): SearchPage = client.read { context, http ->
+    override suspend fun search(query: String, filters: SearchFilters): SearchPage = uploadFiltered(client.read { context, http ->
         val identity = filterIdentity(context)
         val direct = filterPanel?.takeIf { it.identity == identity && it.query == query && now() - it.at in 0..60_000 }
             ?.transition(filters)
@@ -228,9 +232,45 @@ class MediaSearchRepository(private val client: MediaClient,
             }
         }
         filterPanel = if (anonymousFallback) null else FilterPanel(identity, query, filters, page.filters, now())
-        filterUploadPaging(page.toSearchPage(query, context), filters.uploaded, java.time.Instant.ofEpochMilli(now())) { cursor ->
-            loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+        page.toSearchPage(query, context)
+    }, query, filters)
+
+    /**
+     * With an upload date selected, a page is shown only once filtered: rows whose publish time is missing
+     * get it first (several at a time), rows older than the limit are dropped, and a page left empty
+     * follows its continuation (at most 3 more), so nothing appears and then vanishes.
+     */
+    private suspend fun uploadFiltered(first: SearchPage, query: String, filters: SearchFilters): SearchPage {
+        if (filters.uploaded.maxAgeHours == null) return first
+        val at = java.time.Instant.ofEpochMilli(now())
+        var page = withAges(first).filteredByUpload(filters.uploaded, at)
+        var extra = 0
+        while (extra < 3 && page.results.isEmpty() && page.shorts.isEmpty() && page.playlists.isEmpty() &&
+            page.channels.isEmpty() && page.nextCursor != null) {
+            val cursor = page.nextCursor!!
+            val raw = client.read { context, http ->
+                loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+            }
+            page = withAges(raw).filteredByUpload(filters.uploaded, at).copy(query = page.query)
+            extra++
         }
+        return page
+    }
+
+    private suspend fun withAges(page: SearchPage): SearchPage = kotlinx.coroutines.coroutineScope {
+        val gate = kotlinx.coroutines.sync.Semaphore(6)
+        val at = java.time.Instant.ofEpochMilli(now())
+        suspend fun List<SearchResult>.complete(): List<SearchResult> = map { row ->
+            async {
+                if (row.badge == "LIVE" || com.hhst.youtubelite.core.time.PublishedAges.parse(row.age, at) != null) row
+                else gate.withPermit {
+                    try { metadata(row).let { it.copy(uploadedDays = uploadedDaysOf(it.age, at)) } }
+                    catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+                    catch (_: Exception) { row } // Unknown age stays visible, as before.
+                }
+            }
+        }.awaitAll()
+        page.copy(results = page.results.complete(), shorts = page.shorts.complete())
     }
 
     private fun filterIdentity(context: com.liskovsoft.youtubeapi.videoinfo.V2.RequestContext): FilterIdentity {
@@ -305,12 +345,9 @@ class MediaSearchRepository(private val client: MediaClient,
         SearchResultType.All -> null
     }
 
-    override suspend fun next(query: String, filters: SearchFilters, cursor: String): SearchPage = client.read { context, http ->
-        val first = loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
-        filterUploadPaging(first, filters.uploaded, java.time.Instant.ofEpochMilli(now())) { next ->
-            loadSearch(query, context, continuation = next, http = http).requireValue().toSearchPage(query, context)
-        }
-    }
+    override suspend fun next(query: String, filters: SearchFilters, cursor: String): SearchPage = uploadFiltered(client.read { context, http ->
+        loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+    }, query, filters)
 
     override suspend fun menu(result: SearchResult): SearchResult {
         val endpoint = result.menuEndpoint ?: return result

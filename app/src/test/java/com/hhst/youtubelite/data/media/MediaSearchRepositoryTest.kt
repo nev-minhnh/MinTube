@@ -70,4 +70,18 @@ class MediaSearchRepositoryTest {
         assertEquals(2, calls.size)
         assertEquals(listOf("v1"), page.results.map { it.id })
     }
+
+    /** Owner fix (v1.0.8): with an upload date selected, a returned page is already filtered (no row appears, then vanishes). */
+    @Test fun aFilteredPageIsFilteredBeforeItIsReturned() = runBlocking {
+        fun video(id: String, age: String) =
+            """{"videoRenderer":{"videoId":"$id","title":{"simpleText":"$id"},"publishedTimeText":{"simpleText":"$age"}}}"""
+        val (client, calls) = client(mapOf(
+            0 to (200 to """{"contents":[${video("old", "3 weeks ago")}]}"""),
+            1 to (200 to """{"contents":[${video("fresh", "2 days ago")},${video("old", "3 weeks ago")}]}"""),
+        ))
+        val page = MediaSearchRepository(client).search("conan",
+            SearchFilters(uploaded = com.hhst.youtubelite.search.domain.SearchUploadDate.ThisWeek))
+        assertEquals(2, calls.size)
+        assertEquals(listOf("fresh"), page.results.map { it.id })
+    }
 }
