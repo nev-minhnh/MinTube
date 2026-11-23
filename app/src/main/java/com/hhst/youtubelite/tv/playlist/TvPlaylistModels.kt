@@ -35,7 +35,7 @@ sealed interface TvPlaylistStatus {
 object TvPlaylistModel {
     fun video(entry: PlaylistEntry) = TvVideo(
         id = entry.videoId, title = entry.title, channel = entry.channel,
-        metadata = listOf(entry.views, entry.age).filter(String::isNotBlank).joinToString(" · "),
+        metadata = entry.views, published = entry.age,
         artwork = entry.artwork, duration = entry.duration,
     )
 

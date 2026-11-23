@@ -26,6 +26,7 @@ import com.hhst.youtubelite.tv.search.TvSearchUiState
 import com.hhst.youtubelite.tv.search.recentRemoveTag
 import com.hhst.youtubelite.tv.search.recentTag
 import com.hhst.youtubelite.tv.search.resultTag
+import com.hhst.youtubelite.tv.search.dateTag
 import com.hhst.youtubelite.tv.search.typeTag
 import com.hhst.youtubelite.tv.shell.TvShell
 import com.hhst.youtubelite.tv.shell.rememberTvShellState
@@ -47,6 +48,7 @@ class TvSearchAndroidTest {
     private val removed = mutableListOf<String>()
     private val opened = mutableListOf<String>()
     private val types = mutableListOf<SearchResultType>()
+    private val dates = mutableListOf<com.hhst.youtubelite.search.domain.SearchUploadDate>()
     private var retries = 0
     private var voice = 0
 
@@ -75,7 +77,10 @@ class TvSearchAndroidTest {
                             types += type
                             state = state.copy(filters = SearchFilters(type))
                         },
-                        onSelectDate = {},
+                        onSelectDate = { date ->
+                            dates += date
+                            state = state.copy(filters = state.filters.copy(uploaded = date))
+                        },
                         onOpen = { opened += it.key },
                         onOpenChannel = {},
                         onLoadMore = {},
@@ -166,6 +171,22 @@ class TvSearchAndroidTest {
         assertEquals(1, opened.size)
         compose.press(Key.DirectionUp)
         compose.waitUntil(5_000) { SearchResultType.entries.any { compose.isFocused(typeTag(it)) } }
+    }
+
+    @Test fun uploadDateChipsFollowTheTypeChipsAndSelectTheSharedFilter() {
+        host(TvSearchUiState(draft = "cats", query = "cats", results = results()))
+        compose.awaitFocus(TAG_FIELD)
+        compose.press(Key.DirectionDown)
+        compose.awaitFocus(typeTag(SearchResultType.All))
+        val target = dateTag(com.hhst.youtubelite.search.domain.SearchUploadDate.ThisWeek)
+        var presses = 0
+        while (!compose.isFocused(target) && presses++ < 20) compose.press(Key.DirectionRight)
+        compose.awaitFocus(target)
+        compose.press(Key.DirectionCenter)
+        assertEquals(listOf(com.hhst.youtubelite.search.domain.SearchUploadDate.ThisWeek), dates)
+        assertEquals(com.hhst.youtubelite.search.domain.SearchUploadDate.ThisWeek, state.filters.uploaded)
+        compose.press(Key.DirectionLeft)
+        compose.awaitFocus(dateTag(com.hhst.youtubelite.search.domain.SearchUploadDate.Today))
     }
 
     @Test fun aFailedSearchOffersAFocusableRetry() {

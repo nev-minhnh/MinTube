@@ -70,7 +70,7 @@ object TvSearchModel {
 
     fun video(result: SearchResult, short: Boolean = false): TvVideo = TvVideo(
         id = result.id, title = result.title, channel = result.channel,
-        metadata = listOf(result.views, result.age).filter(String::isNotBlank).joinToString(" · "),
+        metadata = result.views, published = result.age,
         artwork = result.artwork, duration = result.duration,
         live = result.badge?.trim()?.equals("live", ignoreCase = true) == true,
         progress = result.progress, short = short,

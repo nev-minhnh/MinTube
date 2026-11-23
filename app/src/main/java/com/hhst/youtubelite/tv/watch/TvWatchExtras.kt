@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.tv.watch
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -171,7 +172,7 @@ internal fun TvToast(text: String, modifier: Modifier = Modifier) {
 @Composable
 internal fun TvInfoPanel(details: TvWatchDetails, fallbackTitle: String, onDismiss: () -> Unit) {
     TvSidePanel(details.title.ifBlank { fallbackTitle }, onDismiss, Modifier.testTag(TAG_INFO_PANEL), width = 640.dp) {
-        val meta = listOf(details.channel, details.views, details.date, details.likes.takeIf(String::isNotBlank)?.let {
+        val meta = listOf(details.channel, details.views, publishedAgeText(details.date.takeIf(String::isNotBlank)), details.likes.takeIf(String::isNotBlank)?.let {
             stringResource(R.string.tv_watch_likes, it)
         }.orEmpty()).filter(String::isNotBlank).joinToString(" · ")
         if (meta.isNotBlank()) Text(meta, style = TvType.Body, color = TvColors.Secondary)

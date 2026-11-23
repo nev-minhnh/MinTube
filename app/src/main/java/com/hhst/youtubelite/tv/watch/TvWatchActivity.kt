@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.tv.watch
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -167,7 +168,7 @@ class TvWatchActivity : TvActivity() {
             val info = TvWatchInfo(
                 title = ready?.video?.title ?: player.title,
                 channel = ready?.video?.channel ?: player.author.orEmpty(),
-                detail = listOfNotNull(ready?.video?.views?.takeIf(String::isNotBlank), ready?.video?.age?.takeIf(String::isNotBlank))
+                detail = listOfNotNull(ready?.video?.views?.takeIf(String::isNotBlank), ready?.video?.age?.takeIf(String::isNotBlank)?.let { publishedAgeText(it) })
                     .joinToString(" · "),
             )
             // Playlist playback (Play all / Shuffle): the card follows the playlist, not related videos.
@@ -338,6 +339,6 @@ internal fun QueueItem.toTvVideo() = TvVideo(
 
 internal fun WatchRelated.toTvVideo() = TvVideo(
     id = id, title = title, channel = channel,
-    metadata = listOf(views, age).filter(String::isNotBlank).joinToString(" · "),
+    metadata = views, published = age,
     artwork = artwork, duration = duration, progress = progress,
 )

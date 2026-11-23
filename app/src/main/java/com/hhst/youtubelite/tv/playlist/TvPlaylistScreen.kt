@@ -259,8 +259,9 @@ private fun PlaylistRow(index: Int, row: TvPlaylistRow, onClick: () -> Unit, mod
             }
             Column(Modifier.weight(1f)) {
                 Text(row.video.title, style = TvType.BodyStrong, color = TvColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (row.video.subtitle.isNotBlank()) {
-                    Text(row.video.subtitle, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1,
+                val caption = row.video.captionText()
+                if (caption.isNotBlank()) {
+                    Text(caption, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
             }

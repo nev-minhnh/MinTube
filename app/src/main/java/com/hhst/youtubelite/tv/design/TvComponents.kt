@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -64,8 +65,19 @@ data class TvVideo(
     val short: Boolean = false,
     /** Uploader channel; blank when unknown. Long-press of OK opens it where a screen supports that. */
     val channelId: String = "",
+    /** Raw publish text from the data layer ("5 days ago"); shown localized via [captionText]. */
+    val published: String = "",
 ) {
-    val subtitle: String get() = listOf(channel, metadata).filter(String::isNotBlank).joinToString(" · ")
+    /** Raw caption (channel, views, publish text); the published part is dropped when [metadata] already holds it. */
+    val subtitle: String get() = captionParts(published)
+
+    /** The card caption with the publish text in the UI language. */
+    @Composable
+    fun captionText(): String = captionParts(publishedAgeText(published.takeIf(String::isNotBlank)))
+
+    private fun captionParts(age: String): String = listOf(
+        channel, metadata, age.takeUnless { published.isNotBlank() && metadata.contains(published) }.orEmpty(),
+    ).filter(String::isNotBlank).joinToString(" · ")
 }
 
 /**
@@ -139,8 +151,9 @@ fun TvCard(
         Spacer(Modifier.height(TvSpacing.md))
         Column(Modifier.graphicsLayer { this.alpha = alpha }) {
             Text(video.title, style = TvType.BodyStrong, color = TvColors.Ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            if (video.subtitle.isNotBlank()) {
-                Text(video.subtitle, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val caption = video.captionText()
+            if (caption.isNotBlank()) {
+                Text(caption, style = TvType.Caption, color = TvColors.Secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

@@ -69,7 +69,7 @@ object TvChannelModel {
 
     fun video(video: ChannelVideo, channel: String) = TvVideo(
         id = video.id, title = video.title, channel = channel,
-        metadata = listOf(video.views, video.age).filter(String::isNotBlank).joinToString(" · "),
+        metadata = video.views, published = video.age,
         artwork = video.artwork, duration = video.duration, live = video.live,
     )
 
@@ -78,7 +78,7 @@ object TvChannelModel {
 
     fun live(video: ChannelLiveVideo) = TvVideo(
         id = video.id, title = video.title,
-        metadata = listOf(video.views, video.time).filter(String::isNotBlank).joinToString(" · "),
+        metadata = video.views, published = video.time,
         artwork = video.artwork, duration = video.duration, live = video.liveNow,
     )
 
