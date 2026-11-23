@@ -49,14 +49,25 @@ class MediaSearchRepositoryTest {
         assertEquals(listOf("PL1"), page.playlists.map { it.id })
     }
 
-    @Test fun aMissingFilterPanelFailsTypedInsteadOfRequestingAgain() = runBlocking {
+    /** Owner fix (v1.0.6): signed-in responses come without a filter panel; send YouTube's own params instead of failing. */
+    @Test fun aMissingFilterPanelSendsYouTubesOwnParamsInsteadOfFailing() = runBlocking {
         val (client, calls) = client(mapOf(
             0 to (200 to """{"contents":[{"videoRenderer":{"videoId":"v1"}}]}"""),
+            1 to (200 to """{"contents":[{"gridPlaylistRenderer":{"playlistId":"PL1","title":{"simpleText":"Open Movies"}}}]}"""),
         ))
-        val failure = runCatching {
-            MediaSearchRepository(client).search("open movie", SearchFilters(type = SearchResultType.Playlists))
-        }.exceptionOrNull()
-        assertTrue("expected a typed failure for a missing chip", failure is MediaException)
-        assertEquals(1, calls.size)
+        val page = MediaSearchRepository(client).search("open movie", SearchFilters(type = SearchResultType.Playlists))
+        assertEquals(2, calls.size)
+        assertTrue("built type params must ride the second request: ${calls[1]}", calls[1].contains("EgIQAw=="))
+        assertEquals(listOf("PL1"), page.playlists.map { it.id })
+    }
+
+    @Test fun aRejectedBuiltFilterKeepsTheUnfilteredPageInsteadOfFailing() = runBlocking {
+        val (client, calls) = client(mapOf(
+            0 to (200 to """{"contents":[{"videoRenderer":{"videoId":"v1"}}]}"""),
+            1 to (400 to ""),
+        ))
+        val page = MediaSearchRepository(client).search("open movie", SearchFilters(type = SearchResultType.Playlists))
+        assertEquals(2, calls.size)
+        assertEquals(listOf("v1"), page.results.map { it.id })
     }
 }

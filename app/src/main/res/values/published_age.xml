@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="published_today">Today</string>
     <string name="published_just_now">Just now</string>
     <plurals name="published_age_minutes">
         <item quantity="one">%1$d minute ago</item>
