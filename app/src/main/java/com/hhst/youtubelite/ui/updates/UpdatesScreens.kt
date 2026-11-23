@@ -150,8 +150,17 @@ fun AppUpdateScreen(
         footer = {
             Box(Modifier.fillMaxWidth().background(DesignTokens.Background)
                 .padding(horizontal = settingsInset(), vertical = MinSpace.md)) {
-                MinButton(stringResource(R.string.updates_check), onCheck, Modifier.fillMaxWidth(),
-                    icon = AppIcon.Refresh, enabled = !checking, pending = checking, testTag = "app-update-check")
+                val available = state.status as? UpdateStatus.Available
+                Column(Modifier.fillMaxWidth()) {
+                    // With an update on offer the primary action is installing it, always in view (as in MinMusic).
+                    if (available != null) {
+                        InstallActions(available.release, state.install, onInstall, onCancel, onRetry)
+                        Spacer(Modifier.height(MinSpace.sm))
+                    }
+                    MinButton(stringResource(R.string.updates_check), onCheck, Modifier.fillMaxWidth(),
+                        icon = AppIcon.Refresh, enabled = !checking, pending = checking, testTag = "app-update-check",
+                        kind = if (available != null) MinButtonKind.Tonal else MinButtonKind.Primary)
+                }
             }
         },
     ) {
@@ -179,7 +188,7 @@ fun AppUpdateScreen(
         )
         (state.status as? UpdateStatus.Available)?.let { available ->
             Spacer(Modifier.height(MinSpace.lg))
-            InstallSection(available.release, state.currentVersion, state.install, onInstall, onCancel, onRetry)
+            InstallSection(available.release, state.currentVersion)
         }
     }
 }
@@ -205,6 +214,14 @@ fun ReleaseNotesScreen(
         topBarTag = "release-topbar",
         pageTag = "release-page",
         modifier = modifier,
+        footer = if (newer && installable && release.apkUrl.isNotBlank()) {
+            {
+                Box(Modifier.fillMaxWidth().background(DesignTokens.Background)
+                    .padding(horizontal = settingsInset(), vertical = MinSpace.md)) {
+                    InstallActions(release, install, onInstall, onCancel, onRetry)
+                }
+            }
+        } else null,
     ) {
         val inset = settingsInset()
         val date = UpdateFormat.releaseDate(release.publishedAt)
@@ -216,7 +233,7 @@ fun ReleaseNotesScreen(
             Spacer(Modifier.height(MinSpace.md))
         }
         if (newer && installable && release.apkUrl.isNotBlank()) {
-            InstallSection(release, currentVersion, install, onInstall, onCancel, onRetry)
+            InstallSection(release, currentVersion)
         } else {
             val note = if (release.version == currentVersion) R.string.updates_release_installed else R.string.updates_release_not_newer
             AppText(stringResource(note), MinType.Body, Modifier.padding(horizontal = inset).testTag("release-installed-note"),
@@ -234,15 +251,11 @@ private fun ReleaseNotes(release: AppRelease) {
         Modifier.padding(horizontal = settingsInset(), vertical = MinSpace.sm).fillMaxWidth().testTag("update-notes"))
 }
 
-/** Version change, size, notes and the install action or its progress. */
+/** Version change, size and notes; the install action sits in the page footer ([InstallActions]). */
 @Composable
 private fun InstallSection(
     release: AppRelease,
     currentVersion: String,
-    install: InstallState,
-    onInstall: (AppRelease) -> Unit,
-    onCancel: () -> Unit,
-    onRetry: () -> Unit,
 ) {
     val inset = settingsInset()
     val size = Formatter.formatShortFileSize(LocalContext.current, release.apkSize)
@@ -252,8 +265,18 @@ private fun InstallSection(
         Modifier.padding(horizontal = inset).testTag("update-size"), color = DesignTokens.Secondary)
     Spacer(Modifier.height(MinSpace.sm))
     ReleaseNotes(release)
-    Spacer(Modifier.height(MinSpace.md))
-    Column(Modifier.padding(horizontal = inset).fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+}
+
+/** Download and install, or its progress with Cancel, or the error with Retry; kept in the footer. */
+@Composable
+private fun InstallActions(
+    release: AppRelease,
+    install: InstallState,
+    onInstall: (AppRelease) -> Unit,
+    onCancel: () -> Unit,
+    onRetry: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
         when {
             install is InstallState.Downloading && install.release.tag == release.tag -> {
                 val percent = (install.progress * 100).toInt().coerceIn(0, 100)

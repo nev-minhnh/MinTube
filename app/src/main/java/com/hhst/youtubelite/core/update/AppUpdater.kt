@@ -185,7 +185,9 @@ class AppUpdater(
             candidates(channel, releases).firstNotNullOfOrNull { toRelease(channel, it) }
 
         /** Release-note markdown reduced to readable plain text. */
-        fun plainNotes(markdown: String): String = markdown.lines().joinToString("\n") { line ->
+        fun plainNotes(markdown: String): String = markdown.lines()
+            // CI appends the APK checksum to the notes; the app verifies it, readers need not see it.
+            .filterNot { it.trimStart().startsWith("SHA-256", ignoreCase = true) }.joinToString("\n") { line ->
             line.replace(Regex("^\\s{0,3}#{1,6}\\s*"), "")
                 .replace(Regex("^(\\s*)[*+-]\\s+"), "$1• ")
                 .replace(Regex("!?\\[([^\\]]*)]\\([^)]*\\)"), "$1")
