@@ -219,7 +219,9 @@ class MediaSearchRepository(private val client: MediaClient,
             }
         }
         filterPanel = if (anonymousFallback) null else FilterPanel(identity, query, filters, page.filters, now())
-        page.toSearchPage(query, context)
+        filterUploadPaging(page.toSearchPage(query, context), filters.uploaded, java.time.Instant.ofEpochMilli(now())) { cursor ->
+            loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+        }
     }
 
     private fun filterIdentity(context: com.liskovsoft.youtubeapi.videoinfo.V2.RequestContext): FilterIdentity {
@@ -295,7 +297,10 @@ class MediaSearchRepository(private val client: MediaClient,
     }
 
     override suspend fun next(query: String, filters: SearchFilters, cursor: String): SearchPage = client.read { context, http ->
-        loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+        val first = loadSearch(query, context, continuation = cursor, http = http).requireValue().toSearchPage(query, context)
+        filterUploadPaging(first, filters.uploaded, java.time.Instant.ofEpochMilli(now())) { next ->
+            loadSearch(query, context, continuation = next, http = http).requireValue().toSearchPage(query, context)
+        }
     }
 
     override suspend fun menu(result: SearchResult): SearchResult {
@@ -330,12 +335,13 @@ class MediaSearchRepository(private val client: MediaClient,
 }
 
 private fun com.liskovsoft.youtubeapi.videoinfo.V2.SearchPage.toSearchPage(query: String,
-    context: com.liskovsoft.youtubeapi.videoinfo.V2.RequestContext): SearchPage {
+    context: com.liskovsoft.youtubeapi.videoinfo.V2.RequestContext, nowMillis: Long = System.currentTimeMillis()): SearchPage {
     // Anonymous sessions never carry feedback capabilities, so a forged menu action
     // cannot even be attempted from a stale card.
     val signedIn = context.signedIn
     fun MediaItem.result() = SearchResult(id, title.orEmpty(), author.orEmpty(), channelId.orEmpty(), viewCount.orEmpty(), published.orEmpty(),
-        duration.orEmpty(), thumbnail.orEmpty(), if (live) "LIVE" else null, progressPercent?.div(100f), avatar = authorThumbnail?.takeIf(String::isNotBlank),
+        duration.orEmpty(), thumbnail.orEmpty(), if (live) "LIVE" else null, progressPercent?.div(100f),
+        uploadedDays = uploadedDaysOf(published.orEmpty(), java.time.Instant.ofEpochMilli(nowMillis)), avatar = authorThumbnail?.takeIf(String::isNotBlank),
         notInterestedToken = notInterestedToken()?.takeIf { signedIn },
         dontRecommendToken = dontRecommendToken()?.takeIf { signedIn },
         menuEndpoint = menuEndpoint?.takeIf { signedIn }?.let { FeedMenuEndpoint(it.panelId, it.params) },
