@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.playlist.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -146,7 +147,7 @@ internal fun PlaylistVideoRow(entry: PlaylistEntry, onAction: (PlaylistAction) -
                 AppText(entry.title, MinType.Body, Modifier.fillMaxWidth().testTag("playlist-entry-title-${entry.id}"), maxLines = 2)
                 if (entry.channel.isNotBlank()) AppText(entry.channel, MinType.Caption, Modifier.padding(top = MinSpace.xs),
                     color = DesignTokens.Secondary, maxLines = 1)
-                val metadata = listOf(entry.views, entry.age).filter(String::isNotBlank).joinToString(" · ")
+                val metadata = listOf(entry.views, publishedAgeText(entry.age)).filter(String::isNotBlank).joinToString(" · ")
                 if (metadata.isNotEmpty()) AppText(metadata, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
             }
             AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, entry.title),

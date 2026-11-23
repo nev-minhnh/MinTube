@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.watch.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -130,7 +131,7 @@ private fun WatchMetaRow(live: Boolean, views: String, age: String, liveBadgeTag
         if (views.isNotBlank()) AppText(views, MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
         if (!live && age.isNotBlank()) {
             if (views.isNotBlank()) AppText("•", MinType.Caption, Modifier.align(Alignment.CenterVertically).clearAndSetSemantics {}, color = DesignTokens.Secondary)
-            AppText(age, MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
+            AppText(publishedAgeText(age), MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
         }
     }
 }

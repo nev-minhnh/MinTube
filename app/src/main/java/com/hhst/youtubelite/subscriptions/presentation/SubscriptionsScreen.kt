@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.subscriptions.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -455,7 +456,7 @@ internal fun SubscriptionsVideoCard(item: FeedItem.Video, compact: Boolean, onAc
             Spacer(Modifier.width(MinSpace.xs))
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {
                 AppText(rememberDeArrowTitle(item.id, item.title), MinType.Subtitle, maxLines = 2)
-                val metadata = listOf(item.author, item.metadata).filter(String::isNotBlank).joinToString(" · ")
+                val metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · ")
                 if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs),
                     color = DesignTokens.Secondary, maxLines = 2)
             }
