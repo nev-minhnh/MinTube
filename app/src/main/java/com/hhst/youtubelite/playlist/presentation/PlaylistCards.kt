@@ -66,10 +66,10 @@ fun PlaylistSearchList(
     footer: (@Composable () -> Unit)? = null,
 ) {
     val viewport = rememberUpdatedState(width to height)
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    CenteredListGutter(840.dp) { gutter ->
         val dock = miniDockListPadding(24.dp)
-        LazyColumn(Modifier.widthIn(max = 840.dp).fillMaxSize().then(dock.modifier).testTag("playlist-search-list"), state = listState,
-            contentPadding = PaddingValues(top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
+        LazyColumn(Modifier.fillMaxSize().then(dock.modifier).testTag("playlist-search-list"), state = listState,
+            contentPadding = PaddingValues(start = gutter.start, end = gutter.end, top = SearchResultsLayout.listTopInset(width).dp, bottom = dock.bottom)) {
             items(playlists, key = { it.id }) { playlist ->
                 val (w, h) = viewport.value
                 val row = SearchResultsLayout.listLockup(w, h)
