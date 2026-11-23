@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
 import com.hhst.youtubelite.R
+import com.hhst.youtubelite.core.update.AppRelease
 import com.hhst.youtubelite.core.update.AppUpdater
 import com.hhst.youtubelite.tv.design.TvButton
 import com.hhst.youtubelite.tv.design.TvColors
@@ -48,21 +49,6 @@ import com.hhst.youtubelite.tv.design.TvSidePanel
 import com.hhst.youtubelite.tv.design.TvSpacing
 import com.hhst.youtubelite.tv.design.TvType
 import kotlinx.coroutines.launch
-
-/** Actions of the update UI; the controller wires them to [TvUpdateController]. */
-interface TvUpdateActions {
-    fun check()
-    fun download()
-    fun retry()
-    fun dismiss()
-
-    object None : TvUpdateActions {
-        override fun check() = Unit
-        override fun download() = Unit
-        override fun retry() = Unit
-        override fun dismiss() = Unit
-    }
-}
 
 @Composable
 fun tvUpdateErrorText(error: TvUpdateError): String = stringResource(when (error) {
@@ -75,21 +61,33 @@ fun tvUpdateErrorText(error: TvUpdateError): String = stringResource(when (error
 })
 
 /**
- * The panel over Settings for every state that needs a decision or shows progress. It is a
- * focus-trapping dialog: Back always calls [TvUpdateActions.dismiss] (Later / Cancel / Close).
+ * The panel over the Updates page: the release notes of an offer or a changelog row, the download
+ * progress, or an error/permission message. It is a focus-trapping dialog: Back always calls
+ * [TvUpdateActions.dismiss] (Later / Cancel / Close).
  */
 @Composable
-fun TvUpdatePanel(state: TvUpdateState, actions: TvUpdateActions) {
-    if (!state.isPanel) return
-    val title = stringResource(if (state is TvUpdateState.Downloading) R.string.update_downloading else R.string.update_available_title)
-    TvSidePanel(title, actions::dismiss, Modifier.testTag(TAG_UPDATE_PANEL), width = 640.dp) {
-        when (state) {
-            is TvUpdateState.Available -> AvailableContent(state, actions)
-            is TvUpdateState.Downloading -> DownloadingContent(state, actions)
-            is TvUpdateState.Failed -> MessageContent(tvUpdateErrorText(state.error), actions)
-            is TvUpdateState.NeedsPermission -> MessageContent(stringResource(
-                if (state.settingsOpened) R.string.tv_update_permission_needed else R.string.tv_update_permission_manual), actions)
-            else -> Unit
+fun TvUpdatePanel(ui: TvUpdatesUi, currentVersion: String, actions: TvUpdateActions) {
+    val state = ui.update
+    val detail = ui.detail
+    when {
+        state.isPanel -> {
+            val title = stringResource(if (state is TvUpdateState.Downloading) R.string.update_downloading else R.string.update_available_title)
+            TvSidePanel(title, actions::dismiss, Modifier.testTag(TAG_UPDATE_PANEL), width = 640.dp) {
+                when (state) {
+                    is TvUpdateState.Downloading -> DownloadingContent(state, actions)
+                    is TvUpdateState.Failed -> MessageContent(tvUpdateErrorText(state.error), actions)
+                    is TvUpdateState.NeedsPermission -> MessageContent(stringResource(
+                        if (state.settingsOpened) R.string.tv_update_permission_needed else R.string.tv_update_permission_manual), actions)
+                    else -> Unit
+                }
+            }
+        }
+        detail != null -> {
+            val title = if (ui.detailInstallable) stringResource(R.string.update_available_title)
+            else stringResource(R.string.tv_updates_release_title, detail.version)
+            TvSidePanel(title, actions::dismiss, Modifier.testTag(TAG_UPDATE_PANEL), width = 640.dp) {
+                ReleaseContent(detail, ui.detailInstallable, currentVersion, actions)
+            }
         }
     }
 }
@@ -103,24 +101,29 @@ private fun FocusOnShow(requester: FocusRequester) {
 }
 
 @Composable
-private fun ColumnScope.AvailableContent(state: TvUpdateState.Available, actions: TvUpdateActions) {
+private fun ColumnScope.ReleaseContent(release: AppRelease, installable: Boolean, currentVersion: String, actions: TvUpdateActions) {
     val context = LocalContext.current
-    val release = state.release
-    Text(stringResource(R.string.update_version_change, "MinTube TV ${state.current}", release.version),
-        style = TvType.Body, color = TvColors.Ink, modifier = Modifier.testTag(TAG_UPDATE_VERSION))
+    val versionText = if (installable) stringResource(R.string.update_version_change, "MinTube TV $currentVersion", release.version)
+    else stringResource(R.string.tv_updates_version, release.version)
+    Text(versionText, style = TvType.Body, color = TvColors.Ink, modifier = Modifier.testTag(TAG_UPDATE_VERSION))
     if (release.apkSize > 0) {
         Text(stringResource(R.string.update_size, Formatter.formatFileSize(context, release.apkSize)),
             style = TvType.Caption, color = TvColors.Secondary)
     }
-    val download = remember { FocusRequester() }
+    val first = remember { FocusRequester() }
     Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
-        TvButton(stringResource(R.string.update_download_install), actions::download,
-            Modifier.focusRequester(download).testTag(TAG_UPDATE_DOWNLOAD), primary = true)
-        TvButton(stringResource(R.string.update_later), actions::dismiss, Modifier.testTag(TAG_UPDATE_LATER))
+        if (installable) {
+            TvButton(stringResource(R.string.update_download_install), actions::download,
+                Modifier.focusRequester(first).testTag(TAG_UPDATE_DOWNLOAD), primary = true)
+            TvButton(stringResource(R.string.update_later), actions::dismiss, Modifier.testTag(TAG_UPDATE_LATER))
+        } else {
+            TvButton(stringResource(R.string.close), actions::dismiss, Modifier.focusRequester(first).testTag(TAG_UPDATE_LATER), primary = true)
+        }
     }
     val notes = remember(release.notes) { AppUpdater.plainNotes(release.notes) }
     if (notes.isNotBlank()) ScrollableNotes(notes, Modifier.weight(1f))
-    FocusOnShow(download)
+    else Text(stringResource(R.string.tv_updates_no_notes), style = TvType.Body, color = TvColors.Secondary)
+    FocusOnShow(first)
 }
 
 /** Release notes the D-pad scrolls: Down/Up scroll while there is more, then focus moves on. */

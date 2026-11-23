@@ -22,11 +22,21 @@ import org.junit.Test
 
 class TvSettingsCatalogTest {
     private fun rows(prefs: Map<String, Boolean> = emptyMap(), account: TvAccountState = TvAccountState()) =
-        TvSettingsCatalog.rows(prefs, account, languageLabel = "English", version = "Version 1.0.0")
+        TvSettingsCatalog.rows(prefs, account, languageLabel = "English", version = "Version 1.0.0",
+            updatesSummary = "MinTube TV is up to date")
 
     @Test fun sectionsAppearOnceInOrder() {
         val sections = rows().map { it.section }.distinct()
         assertEquals(TvSettingsSection.entries.toList(), sections)
+    }
+
+    @Test fun updatesRowOpensThePageAndShowsTheLiveStatus() {
+        val row = rows().single { it.key == TvSettingsCatalog.KEY_UPDATES } as TvSettingRow.Action
+        assertEquals(TvSettingsSection.Updates, row.section)
+        assertEquals(TvSettingAction.Updates, row.action)
+        assertEquals("MinTube TV is up to date", row.summaryText)
+        // Without a status the row is hidden (the page is not wired).
+        assertFalse(TvSettingsCatalog.rows(emptyMap(), TvAccountState(), "English", "v").any { it.section == TvSettingsSection.Updates })
     }
 
     @Test fun keysAreUnique() {

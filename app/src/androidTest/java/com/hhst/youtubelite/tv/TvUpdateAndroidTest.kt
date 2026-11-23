@@ -16,6 +16,7 @@ import com.hhst.youtubelite.tv.update.TAG_UPDATE_PERCENT
 import com.hhst.youtubelite.tv.update.TvUpdateActions
 import com.hhst.youtubelite.tv.update.TvUpdatePanel
 import com.hhst.youtubelite.tv.update.TvUpdateState
+import com.hhst.youtubelite.tv.update.TvUpdatesUi
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -27,17 +28,22 @@ class TvUpdateAndroidTest {
     private val calls = mutableListOf<String>()
     private val release = AppRelease("tv-v1.0.5", "1.0.5", "u", "MinTube-TV-v1.0.5.apk", 12_000_000, "s",
         (1..40).joinToString("\n") { "- note $it" }, "p")
-    private val state = mutableStateOf<TvUpdateState>(TvUpdateState.Available("1.0.4", release))
+    private val state = mutableStateOf(TvUpdatesUi(update = TvUpdateState.Available("1.0.4", release),
+        detail = release, detailInstallable = true))
 
     private val actions = object : TvUpdateActions {
         override fun check() { calls += "check" }
-        override fun download() { calls += "download"; state.value = TvUpdateState.Downloading(release, 0.4f) }
+        override fun download() { calls += "download"; state.value = TvUpdatesUi(update = TvUpdateState.Downloading(release, 0.4f)) }
         override fun retry() { calls += "retry" }
-        override fun dismiss() { calls += "dismiss"; state.value = TvUpdateState.Idle }
+        override fun dismiss() { calls += "dismiss"; state.value = TvUpdatesUi() }
+        override fun openRelease(release: AppRelease) = Unit
+        override fun setAutoCheck(enabled: Boolean) = Unit
+        override fun setNotify(enabled: Boolean) = Unit
+        override fun loadHistory(force: Boolean) = Unit
     }
 
     private fun host() {
-        compose.setContent { TvCanvas { TvUpdatePanel(state.value, actions) } }
+        compose.setContent { TvCanvas { TvUpdatePanel(state.value, "1.0.4", actions) } }
     }
 
     @Test fun availablePanelFocusesDownloadRightReachesLaterAndBackCloses() {

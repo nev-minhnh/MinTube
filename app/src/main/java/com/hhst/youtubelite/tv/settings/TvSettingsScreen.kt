@@ -41,13 +41,6 @@ import com.hhst.youtubelite.tv.design.TvSidePanel
 import com.hhst.youtubelite.tv.design.TvSpacing
 import com.hhst.youtubelite.tv.design.TvType
 import com.hhst.youtubelite.tv.qr.TvQrImage
-import com.hhst.youtubelite.tv.update.TAG_UPDATE_INLINE_RETRY
-import com.hhst.youtubelite.tv.update.TAG_UPDATE_STATUS
-import com.hhst.youtubelite.tv.update.TvUpdateActions
-import com.hhst.youtubelite.tv.update.TvUpdatePanel
-import com.hhst.youtubelite.tv.update.TvUpdateState
-import com.hhst.youtubelite.tv.update.isPanel
-import com.hhst.youtubelite.tv.update.tvUpdateErrorText
 import com.hhst.youtubelite.ui.design.AppIcon
 
 /** Which picker is open over the list. */
@@ -63,6 +56,8 @@ interface TvSettingsCallbacks {
     fun language(index: Int)
     fun captionSize(index: Int)
     fun captionBackground(index: Int)
+    /** Opens the Updates page. */
+    fun openUpdates() = Unit
     /** A caption picker is about to open (lazy player-style read). */
     fun captionsOpened() = Unit
 }
@@ -86,8 +81,8 @@ fun TvSettingsScreen(
     choices: TvSettingsChoices,
     callbacks: TvSettingsCallbacks,
     modifier: Modifier = Modifier,
-    update: TvUpdateState = TvUpdateState.Idle,
-    updateActions: TvUpdateActions = TvUpdateActions.None,
+    /** Row key to focus when the screen first shows (back from the Updates page). */
+    initialFocusKey: String? = null,
 ) {
     var panel by rememberSaveable { mutableStateOf<TvSettingsPanel?>(null) }
     var focusedKey by rememberSaveable { mutableStateOf<String?>(null) }
@@ -123,14 +118,13 @@ fun TvSettingsScreen(
         requesters.request(fallback)
     }
 
-    // Closing the update panel (Later, Cancel, Back) lands on "Check for updates".
-    var updatePanelWasOpen by remember { mutableStateOf(false) }
-    LaunchedEffect(update.isPanel) {
-        if (update.isPanel) { updatePanelWasOpen = true; return@LaunchedEffect }
-        if (!updatePanelWasOpen) return@LaunchedEffect
-        updatePanelWasOpen = false
-        withFrameNanos { }
-        requesters.request(TvSettingsCatalog.KEY_UPDATE)
+    // Back from a sub-page lands on the row that opened it.
+    LaunchedEffect(Unit) {
+        val target = initialFocusKey ?: return@LaunchedEffect
+        repeat(10) {
+            withFrameNanos { }
+            if (requesters.request(target)) return@LaunchedEffect
+        }
     }
 
     val list = rememberLazyListState()
@@ -165,13 +159,11 @@ fun TvSettingsScreen(
                         .tvAnchor(requesters.of(row.key))
                         .onFocusChanged { if (it.isFocused) focusedKey = row.key }
                         .testTag("$TAG_ROW-${row.key}")
-                    SettingRow(row, rowModifier, callbacks, update, updateActions, onOpen = { next -> open(next, row.key) })
+                    SettingRow(row, rowModifier, callbacks, onOpen = { next -> open(next, row.key) })
                 }
             }
         }
     }
-
-    TvUpdatePanel(update, updateActions)
 
     when (panel) {
         TvSettingsPanel.Language -> TvOptionPanel(stringResource(R.string.settings_language), choices.languages,
@@ -206,12 +198,9 @@ private fun SettingRow(
     row: TvSettingRow,
     modifier: Modifier,
     callbacks: TvSettingsCallbacks,
-    update: TvUpdateState,
-    updateActions: TvUpdateActions,
     onOpen: (TvSettingsPanel) -> Unit,
 ) {
     when (row) {
-        is TvSettingRow.Update -> UpdateRow(update, updateActions, modifier)
         is TvSettingRow.Toggle -> TvListRow(
             title = stringResource(row.title),
             summary = row.summary?.let { stringResource(it) },
@@ -221,13 +210,14 @@ private fun SettingRow(
         )
         is TvSettingRow.Action -> TvListRow(
             title = stringResource(row.title),
-            summary = row.summary?.let { stringResource(it) },
+            summary = row.summaryText ?: row.summary?.let { stringResource(it) },
             value = row.value,
             icon = when (row.action) {
                 TvSettingAction.SignIn -> AppIcon.Person
                 TvSettingAction.SwitchAccount -> AppIcon.Person
                 TvSettingAction.SignOut -> AppIcon.Close
                 TvSettingAction.Language -> AppIcon.Globe
+                TvSettingAction.Updates -> AppIcon.Refresh
                 TvSettingAction.CaptionSize, TvSettingAction.CaptionBackground -> null
             },
             onClick = {
@@ -236,6 +226,7 @@ private fun SettingRow(
                     TvSettingAction.SwitchAccount -> onOpen(TvSettingsPanel.Accounts)
                     TvSettingAction.SignOut -> onOpen(TvSettingsPanel.SignOut)
                     TvSettingAction.Language -> onOpen(TvSettingsPanel.Language)
+                    TvSettingAction.Updates -> callbacks.openUpdates()
                     TvSettingAction.CaptionSize -> {
                         callbacks.captionsOpened()
                         onOpen(TvSettingsPanel.CaptionSize)
@@ -265,30 +256,6 @@ private fun SettingRow(
                 TvQrImage(row.url, stringResource(R.string.tv_qr_description, row.url), size = 132.dp)
             },
         )
-    }
-}
-
-/** The Check for updates button, an inline Retry after a failed check, and a one-line status. */
-@Composable
-private fun UpdateRow(update: TvUpdateState, actions: TvUpdateActions, modifier: Modifier) {
-    val failedCheck = (update as? TvUpdateState.Failed)?.takeIf { it.release == null }
-    val status = when (update) {
-        is TvUpdateState.Checking -> stringResource(R.string.tv_update_checking)
-        is TvUpdateState.UpToDate -> stringResource(R.string.tv_update_up_to_date, update.version)
-        is TvUpdateState.Development -> stringResource(R.string.about_development_version, update.latest)
-        is TvUpdateState.Failed -> if (update.release == null) tvUpdateErrorText(update.error) else null
-        else -> null
-    }
-    Column(verticalArrangement = Arrangement.spacedBy(TvSpacing.sm)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(TvSpacing.md)) {
-            TvButton(stringResource(R.string.tv_update_check), actions::check, modifier)
-            if (failedCheck != null) {
-                TvButton(stringResource(R.string.retry), actions::retry, Modifier.testTag(TAG_UPDATE_INLINE_RETRY), primary = true)
-            }
-        }
-        if (status != null) {
-            Text(status, style = TvType.Body, color = TvColors.Secondary, modifier = Modifier.testTag(TAG_UPDATE_STATUS))
-        }
     }
 }
 

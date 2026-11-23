@@ -861,4 +861,27 @@
     <string name="tv_update_error_check">Could not check for updates. Check your connection and retry.</string>
     <string name="tv_update_permission_needed">Allow \"Install unknown apps\" for MinTube TV, then come back and choose Retry.</string>
     <string name="tv_update_permission_manual">This device could not open that setting. In system Settings, open Apps, then Special app access, then Install unknown apps. Allow MinTube TV, come back and choose Retry.</string>
+    <string name="tv_updates_row_idle">MinTube TV %1$s</string>
+    <string name="tv_updates_row_up_to_date">MinTube TV is up to date</string>
+    <string name="tv_updates_row_available">Update available %1$s</string>
+    <string name="tv_updates_development">Development build: updates are not installed</string>
+    <string name="tv_updates_app_update">App update</string>
+    <string name="tv_updates_version">MinTube TV version %1$s</string>
+    <string name="tv_updates_last_check">Last successful update check: %1$s</string>
+    <string name="tv_updates_never_checked">No successful update check yet</string>
+    <string name="tv_updates_view">View update</string>
+    <string name="tv_updates_general">General</string>
+    <string name="tv_updates_auto">Automatically check for updates</string>
+    <string name="tv_updates_auto_summary">Looks for a new release about once a day.</string>
+    <string name="tv_updates_notify">Update notifications</string>
+    <string name="tv_updates_notify_summary">Shows a notification when a new version is found. Some TVs do not display notifications.</string>
+    <string name="tv_updates_changelogs">Changelogs</string>
+    <string name="tv_updates_history_loading">Loading releases…</string>
+    <string name="tv_updates_history_error">Could not load the release list.</string>
+    <string name="tv_updates_history_empty">No releases found.</string>
+    <string name="tv_updates_release_meta">Release notes · %1$s · %2$s</string>
+    <string name="tv_updates_release_meta_short">Release notes</string>
+    <string name="tv_updates_release_title">MinTube TV %1$s</string>
+    <string name="tv_updates_installed">Installed</string>
+    <string name="tv_updates_no_notes">This release has no notes.</string>
 </resources>

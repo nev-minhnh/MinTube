@@ -6,14 +6,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import com.hhst.youtubelite.BuildConfig
-import com.hhst.youtubelite.tv.update.TvUpdateActions
+import com.hhst.youtubelite.tv.update.KoinUpdateCenter
+import com.hhst.youtubelite.tv.update.TvApkInstallImpl
 import com.hhst.youtubelite.tv.update.TvUpdateController
-import com.hhst.youtubelite.tv.update.TvUpdateGatewayImpl
-import okhttp3.OkHttpClient
+import com.hhst.youtubelite.tv.update.TvUpdateState
+import com.hhst.youtubelite.tv.update.TvUpdatesScreen
+import com.hhst.youtubelite.tv.update.tvUpdatesRowSummary
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.hhst.youtubelite.tv.update.TAG_UPDATES_SCREEN
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -43,18 +48,20 @@ class TvSettingsController(private val activity: ComponentActivity) {
     private var captionStyle by mutableStateOf<SubtitleStyle?>(null)
     private val appVersion =
         runCatching { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName }.getOrNull().orEmpty()
-    private val updater = TvUpdateController(
-        activity.lifecycleScope,
-        TvUpdateGatewayImpl(activity, getKoin().get<OkHttpClient>()),
-        currentVersion = appVersion,
-        canInstallBuild = canInstallBuild(appVersion),
-    )
-    private val updateActions = object : TvUpdateActions {
-        override fun check() = updater.check()
-        override fun download() = updater.download()
-        override fun retry() = updater.retry()
-        override fun dismiss() = updater.dismiss()
+    /** Built on first use; the UpdateCenter itself is resolved from Koin only when the Updates page needs it. */
+    private val updater by lazy {
+        TvUpdateController(
+            activity.lifecycleScope,
+            KoinUpdateCenter(),
+            TvApkInstallImpl(activity),
+            currentVersion = appVersion,
+            canInstallBuild = canInstallBuild(appVersion),
+        )
     }
+    /** The Updates page replaces the Settings list inside the Settings destination. */
+    private var updatesOpen by mutableStateOf(false)
+    /** Back from the Updates page: the Settings list focuses the Updates row once. */
+    private var focusUpdatesRow = false
     private val listener: (String) -> Unit = { preferences = prefs.allPreferences() }
 
     init {
@@ -112,6 +119,11 @@ class TvSettingsController(private val activity: ComponentActivity) {
             captionStyle = player.uiState.value.subtitleStyle
         }
 
+        override fun openUpdates() {
+            updatesOpen = true
+            updater.onPageOpened()
+        }
+
         override fun captionsOpened() {
             captionStyle = player().uiState.value.subtitleStyle
         }
@@ -119,6 +131,21 @@ class TvSettingsController(private val activity: ComponentActivity) {
 
     @Composable
     fun Content(modifier: Modifier = Modifier) {
+        val update by updater.ui.collectAsState()
+        // Leaving the Settings destination closes the Updates page too.
+        DisposableEffect(Unit) { onDispose { updatesOpen = false } }
+        if (updatesOpen) {
+            TvUpdatesScreen(update, appVersion, updater, onBack = {
+                updatesOpen = false
+                focusUpdatesRow = true
+            }, modifier = modifier.testTag(TAG_UPDATES_SCREEN))
+        } else {
+            SettingsList(modifier, update.update)
+        }
+    }
+
+    @Composable
+    private fun SettingsList(modifier: Modifier, update: TvUpdateState) {
         val currentTag = AppLocale.tag(activity)
         val systemLabel = stringResource(R.string.settings_language_system)
         val languages = AppLocale.OPTIONS.map { (tag, label) ->
@@ -146,7 +173,7 @@ class TvSettingsController(private val activity: ComponentActivity) {
             version = stringResource(R.string.account_about_version, version),
             captionSize = selectedScale?.let { "${(it * 100).toInt()}%" },
             captionBackground = style?.let { backgroundLabels[it.background.ordinal] },
-            showUpdate = true,
+            updatesSummary = tvUpdatesRowSummary(update, appVersion),
         )
         val choices = TvSettingsChoices(
             languages = languages,
@@ -157,8 +184,9 @@ class TvSettingsController(private val activity: ComponentActivity) {
                 TvPanelOption(label, style?.background?.ordinal == index)
             },
         )
-        val update by updater.state.collectAsState()
-        TvSettingsScreen(rows, account, choices, callbacks, modifier, update, updateActions)
+        val initialFocus = remember { if (focusUpdatesRow) TvSettingsCatalog.KEY_UPDATES else null }
+        focusUpdatesRow = false
+        TvSettingsScreen(rows, account, choices, callbacks, modifier, initialFocus)
     }
 
     companion object {

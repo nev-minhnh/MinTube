@@ -856,4 +856,27 @@
     <string name="tv_update_error_check">Không thể kiểm tra cập nhật. Hãy kiểm tra kết nối và thử lại.</string>
     <string name="tv_update_permission_needed">Hãy cho phép \"Cài đặt ứng dụng không rõ nguồn gốc\" cho MinTube TV, rồi quay lại và chọn Thử lại.</string>
     <string name="tv_update_permission_manual">Thiết bị không mở được mục cài đặt này. Trong Cài đặt hệ thống, mở Ứng dụng, rồi Quyền truy cập đặc biệt, rồi Cài đặt ứng dụng không rõ nguồn gốc. Cho phép MinTube TV, quay lại và chọn Thử lại.</string>
+    <string name="tv_updates_row_idle">MinTube TV %1$s</string>
+    <string name="tv_updates_row_up_to_date">MinTube TV đã là bản mới nhất</string>
+    <string name="tv_updates_row_available">Có bản cập nhật %1$s</string>
+    <string name="tv_updates_development">Bản phát triển: không cài đặt cập nhật</string>
+    <string name="tv_updates_app_update">Cập nhật ứng dụng</string>
+    <string name="tv_updates_version">MinTube TV phiên bản %1$s</string>
+    <string name="tv_updates_last_check">Lần kiểm tra cập nhật thành công gần nhất: %1$s</string>
+    <string name="tv_updates_never_checked">Chưa kiểm tra cập nhật thành công lần nào</string>
+    <string name="tv_updates_view">Xem bản cập nhật</string>
+    <string name="tv_updates_general">Chung</string>
+    <string name="tv_updates_auto">Tự động kiểm tra cập nhật</string>
+    <string name="tv_updates_auto_summary">Tìm bản phát hành mới khoảng một lần mỗi ngày.</string>
+    <string name="tv_updates_notify">Thông báo cập nhật</string>
+    <string name="tv_updates_notify_summary">Hiện thông báo khi có phiên bản mới. Một số TV không hiển thị thông báo.</string>
+    <string name="tv_updates_changelogs">Nhật ký thay đổi</string>
+    <string name="tv_updates_history_loading">Đang tải danh sách phiên bản…</string>
+    <string name="tv_updates_history_error">Không tải được danh sách phiên bản.</string>
+    <string name="tv_updates_history_empty">Không tìm thấy phiên bản nào.</string>
+    <string name="tv_updates_release_meta">Ghi chú phát hành · %1$s · %2$s</string>
+    <string name="tv_updates_release_meta_short">Ghi chú phát hành</string>
+    <string name="tv_updates_release_title">MinTube TV %1$s</string>
+    <string name="tv_updates_installed">Đã cài</string>
+    <string name="tv_updates_no_notes">Bản phát hành này không có ghi chú.</string>
 </resources>

@@ -12,6 +12,7 @@ enum class TvSettingsSection(@param:StringRes val title: Int) {
     SponsorBlock(R.string.sponsorblock),
     DeArrow(R.string.dearrow),
     Language(R.string.settings_language),
+    Updates(R.string.account_about_updates),
     About(R.string.about),
 }
 
@@ -52,6 +53,8 @@ sealed interface TvSettingRow {
         @param:StringRes val summary: Int? = null,
         /** Current value shown on the right (already resolved text). */
         val value: String? = null,
+        /** Resolved summary text (live status); wins over [summary]. */
+        val summaryText: String? = null,
     ) : TvSettingRow {
         override val key: String get() = "action:${action.name}"
     }
@@ -66,15 +69,12 @@ sealed interface TvSettingRow {
         @param:StringRes val summaryRes: Int? = null,
     ) : TvSettingRow
 
-    /** "Check for updates" button with its inline status; state lives in the TV update controller. */
-    data class Update(override val section: TvSettingsSection, override val key: String) : TvSettingRow
-
     /** The source link: shown as text plus a QR code. */
     data class Link(override val section: TvSettingsSection, override val key: String, @param:StringRes val title: Int, val url: String) :
         TvSettingRow
 }
 
-enum class TvSettingAction { SignIn, SwitchAccount, SignOut, CaptionSize, CaptionBackground, Language }
+enum class TvSettingAction { SignIn, SwitchAccount, SignOut, CaptionSize, CaptionBackground, Language, Updates }
 
 /**
  * The TV settings list as plain data (unit-tested). The phone's keys and defaults apply; only
@@ -101,7 +101,8 @@ object TvSettingsCatalog {
         PreferenceKeys.ENABLE_BACKGROUND_PLAY, PreferenceKeys.REMEMBER_RESIZE_MODE, PreferenceKeys.DATA_SAVER,
     ) + PreferenceKeys.GESTURE_KEYS
 
-    const val KEY_UPDATE = "about:update"
+    /** Focus key of the Settings row that opens the Updates page. */
+    val KEY_UPDATES = "action:${TvSettingAction.Updates.name}"
     const val SOURCE_URL = "https://github.com/nev-minhnh/MinTube"
 
     fun rows(
@@ -111,7 +112,8 @@ object TvSettingsCatalog {
         version: String,
         captionSize: String? = null,
         captionBackground: String? = null,
-        showUpdate: Boolean = false,
+        /** Live status under the Updates row; null hides the row. */
+        updatesSummary: String? = null,
     ): List<TvSettingRow> = buildList {
         fun toggle(section: TvSettingsSection, key: String, title: Int, summary: Int? = null) {
             add(TvSettingRow.Toggle(section, key, title, summary, preferences[key] ?: PreferenceKeys.DEFAULTS[key] ?: false))
@@ -156,9 +158,13 @@ object TvSettingsCatalog {
 
         add(TvSettingRow.Action(TvSettingsSection.Language, TvSettingAction.Language, R.string.settings_language, value = languageLabel))
 
+        if (updatesSummary != null) {
+            add(TvSettingRow.Action(TvSettingsSection.Updates, TvSettingAction.Updates, R.string.account_about_updates,
+                summaryText = updatesSummary))
+        }
+
         val about = TvSettingsSection.About
         add(TvSettingRow.Info(about, "about:version", title = version))
-        if (showUpdate) add(TvSettingRow.Update(about, KEY_UPDATE))
         add(TvSettingRow.Info(about, "about:fork", titleRes = R.string.about_fork_notice, summaryRes = R.string.about_credits))
         add(TvSettingRow.Info(about, "about:license", titleRes = R.string.account_about_license,
             summaryRes = R.string.account_about_license_name))
