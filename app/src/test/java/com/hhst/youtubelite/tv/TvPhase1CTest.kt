@@ -53,6 +53,16 @@ class TvSettingsCatalogTest {
             com.hhst.youtubelite.tv.design.TvUiScale.OPTIONS.map(com.hhst.youtubelite.tv.design.TvUiScale::label))
     }
 
+    @Test fun listIndexCountsTheTitleAndSectionHeaders() {
+        val rows = rows()
+        // Item 0 is the title, item 1 the Account header, item 2 the first Account row.
+        assertEquals(2, com.hhst.youtubelite.tv.settings.settingsListIndex(rows, rows.first().key))
+        val updates = com.hhst.youtubelite.tv.settings.settingsListIndex(rows, TvSettingsCatalog.KEY_UPDATES)!!
+        val headersBefore = rows.takeWhile { it.key != TvSettingsCatalog.KEY_UPDATES }.map { it.section }.distinct().size + 1
+        assertEquals(1 + headersBefore + rows.indexOfFirst { it.key == TvSettingsCatalog.KEY_UPDATES }, updates)
+        assertNull(com.hhst.youtubelite.tv.settings.settingsListIndex(rows, "missing"))
+    }
+
     @Test fun keysAreUnique() {
         val keys = rows().map { it.key }
         assertEquals(keys.size, keys.toSet().size)

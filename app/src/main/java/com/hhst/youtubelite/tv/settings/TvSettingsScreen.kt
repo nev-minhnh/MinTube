@@ -121,16 +121,19 @@ fun TvSettingsScreen(
         requesters.request(fallback)
     }
 
-    // Back from a sub-page lands on the row that opened it.
+    val list = rememberLazyListState()
+
+    // Back from a sub-page lands on the row that opened it; scroll it into the composed range first,
+    // since a row below the screen has no focus target yet.
     LaunchedEffect(Unit) {
         val target = initialFocusKey ?: return@LaunchedEffect
+        settingsListIndex(rows, target)?.let { list.scrollToItem(it) }
         repeat(10) {
             withFrameNanos { }
             if (requesters.request(target)) return@LaunchedEffect
         }
     }
 
-    val list = rememberLazyListState()
     val first = keys.firstOrNull()
     Box(modifier.fillMaxSize().testTag(TAG_SETTINGS_SCREEN)) {
         LazyColumn(
@@ -294,3 +297,15 @@ const val TAG_PANEL_UI_SCALE = "tv-settings-ui-scale"
 const val TAG_PANEL_CAPTION_BACKGROUND = "tv-settings-caption-background"
 const val TAG_PANEL_ACCOUNTS = "tv-settings-accounts"
 const val TAG_PANEL_SIGN_OUT = "tv-settings-sign-out"
+
+/** Lazy-list index of [key]: the title, then a header before each section's first row. */
+internal fun settingsListIndex(rows: List<TvSettingRow>, key: String): Int? {
+    var index = 1
+    var previous: TvSettingsSection? = null
+    for (row in rows) {
+        if (row.section != previous) { index++; previous = row.section }
+        if (row.key == key) return index
+        index++
+    }
+    return null
+}
