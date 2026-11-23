@@ -19,17 +19,28 @@ import java.util.Locale
  * "Streamed 2 hours ago", "5 ngày trước", "Premiered 3 weeks ago") or from an ISO date ("2026-11-20").
  * One place for every video card and for the search upload-date filter.
  */
-data class PublishedAge(val count: Int, val unit: Unit) {
-    enum class Unit { Second, Minute, Hour, Day, Week, Month, Year }
+data class PublishedAge(
+    val count: Int,
+    val unit: Unit,
+    /** Publish day when the source carried a real date; shown as dd/MM/yyyy for [Unit.Date]. */
+    val date: LocalDate? = null,
+    /** Exact age in whole hours (rounded up) when the source carried a real date; null for YouTube's rounded text. */
+    val exactHours: Long? = null,
+) {
+    /** [Today]: a date-only source dated today. [Date]: a real date older than 12 months. */
+    enum class Unit { Second, Minute, Hour, Day, Week, Month, Year, Today, Date }
 
-    /** Upper estimate of the age in hours (a month is 31 days, a year 366), for filtering. */
-    val hours: Long get() = when (unit) {
-        Unit.Second, Unit.Minute -> 1L
+    /**
+     * Age in hours for filtering: exact when the source had a date, otherwise an upper estimate of
+     * YouTube's rounded text (a month is 31 days, a year 366), so a filter never drops a video too early.
+     */
+    val hours: Long get() = exactHours ?: when (unit) {
+        Unit.Second, Unit.Minute, Unit.Today -> 1L
         Unit.Hour -> count.toLong()
         Unit.Day -> 24L * count
         Unit.Week -> 168L * count
         Unit.Month -> 31L * 24 * count
-        Unit.Year -> 366L * 24 * count
+        Unit.Year, Unit.Date -> 366L * 24 * count
     }
 }
 
@@ -42,7 +53,7 @@ object PublishedAges {
     private val longMonth = DateTimeFormatter.ofPattern("MMMM d, uuuu", Locale.ENGLISH)
 
     /** Null when [raw] carries no age ("", "LIVE", "Scheduled for ..."). */
-    fun parse(raw: String?, now: Instant = Instant.now()): PublishedAge? {
+    fun parse(raw: String?, now: Instant = Instant.now(), zone: java.time.ZoneId = java.time.ZoneId.systemDefault()): PublishedAge? {
         val text = Normalizer.normalize(raw.orEmpty().trim(), Normalizer.Form.NFC).lowercase(Locale.ROOT)
         if (text.isEmpty()) return null
         relative.find(text)?.let { match ->
@@ -59,8 +70,10 @@ object PublishedAges {
             }
             return PublishedAge(count, unit)
         }
+        val dateOnly = isoDate.matches(text) || !isoDateTime.matches(text)
         val published = absolute(text) ?: return null
-        return fromDuration(Duration.between(published, now))
+        return if (dateOnly) fromDate(published.atZone(ZoneOffset.UTC).toLocalDate(), now, zone)
+        else fromInstant(published, now, zone)
     }
 
     private fun absolute(text: String): Instant? = try {
@@ -80,19 +93,45 @@ object PublishedAges {
         }
     } catch (_: java.time.format.DateTimeParseException) { null }
 
-    private fun fromDuration(elapsed: Duration): PublishedAge? {
+    /** Older than this many days, a real date is shown as dd/MM/yyyy instead of an age. */
+    private const val DATE_AFTER_DAYS = 365L
+
+    /**
+     * A date with no time of day: whole days in the viewer's calendar. Today has no hour count.
+     * Days read in the largest unit they fill exactly (30 days = 1 month, 14 days = 2 weeks, 13 days stay days).
+     */
+    private fun fromDate(published: LocalDate, now: Instant, zone: java.time.ZoneId): PublishedAge? {
+        val today = now.atZone(zone).toLocalDate()
+        val days = java.time.temporal.ChronoUnit.DAYS.between(published, today)
+        if (days < 0) return null
+        val hours = maxOf(1L, days * 24)
+        if (days == 0L) return PublishedAge(0, PublishedAge.Unit.Today, published, hours)
+        return ofDays(days, published, hours)
+    }
+
+    /**
+     * A real timestamp: minutes under an hour; hours unless they make whole days (24 h = 1 day, 23 h and
+     * 25 h stay hours); whole days then read in the largest unit they fill exactly.
+     */
+    private fun fromInstant(published: Instant, now: Instant, zone: java.time.ZoneId): PublishedAge? {
+        val elapsed = Duration.between(published, now)
         if (elapsed.isNegative) return null
         val seconds = elapsed.seconds
-        val days = seconds / 86_400
+        val day = published.atZone(zone).toLocalDate()
+        val hours = maxOf(1L, (seconds + 3_599) / 3_600)
         return when {
-            seconds < 60 -> PublishedAge(seconds.toInt(), PublishedAge.Unit.Second)
-            seconds < 3_600 -> PublishedAge((seconds / 60).toInt(), PublishedAge.Unit.Minute)
-            seconds < 86_400 -> PublishedAge((seconds / 3_600).toInt(), PublishedAge.Unit.Hour)
-            days < 7 -> PublishedAge(days.toInt(), PublishedAge.Unit.Day)
-            days < 30 -> PublishedAge((days / 7).toInt(), PublishedAge.Unit.Week)
-            days < 365 -> PublishedAge((days / 30).toInt(), PublishedAge.Unit.Month)
-            else -> PublishedAge((days / 365).toInt(), PublishedAge.Unit.Year)
+            seconds < 60 -> PublishedAge(seconds.toInt(), PublishedAge.Unit.Second, day, hours)
+            seconds < 3_600 -> PublishedAge((seconds / 60).toInt(), PublishedAge.Unit.Minute, day, hours)
+            (seconds / 3_600) % 24 != 0L -> PublishedAge((seconds / 3_600).toInt(), PublishedAge.Unit.Hour, day, hours)
+            else -> ofDays(seconds / 86_400, day, hours)
         }
+    }
+
+    private fun ofDays(days: Long, published: LocalDate, hours: Long): PublishedAge = when {
+        days >= DATE_AFTER_DAYS -> PublishedAge(1, PublishedAge.Unit.Date, published, hours)
+        days % 30 == 0L -> PublishedAge((days / 30).toInt(), PublishedAge.Unit.Month, published, hours)
+        days % 7 == 0L -> PublishedAge((days / 7).toInt(), PublishedAge.Unit.Week, published, hours)
+        else -> PublishedAge(days.toInt(), PublishedAge.Unit.Day, published, hours)
     }
 }
 
@@ -103,6 +142,8 @@ fun publishedAgeText(raw: String?): String {
     if (age == null) return raw.orEmpty()
     val plural = when (age.unit) {
         PublishedAge.Unit.Second -> return stringResource(R.string.published_just_now)
+        PublishedAge.Unit.Today -> return stringResource(R.string.published_today)
+        PublishedAge.Unit.Date -> return age.date?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: raw.orEmpty()
         PublishedAge.Unit.Minute -> R.plurals.published_age_minutes
         PublishedAge.Unit.Hour -> R.plurals.published_age_hours
         PublishedAge.Unit.Day -> R.plurals.published_age_days

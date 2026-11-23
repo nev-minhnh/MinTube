@@ -8,7 +8,8 @@ import org.junit.Test
 
 class PublishedAgeTest {
     private val now = Instant.parse("2026-11-23T12:00:00Z")
-    private fun parse(raw: String?) = PublishedAges.parse(raw, now)
+    private fun parse(raw: String?) = PublishedAges.parse(raw, now, java.time.ZoneOffset.UTC)
+    private fun shape(raw: String) = parse(raw)?.let { it.count to it.unit }
 
     @Test fun englishRelative() {
         val table = mapOf(
@@ -38,29 +39,51 @@ class PublishedAgeTest {
         for ((raw, expected) in table) assertEquals(raw, expected, parse(raw))
     }
 
-    @Test fun absoluteDates() {
+    /** Owner rule: whole units only (24 h = 1 day, 23 h/25 h stay hours, 7 d = 1 week, 30 d = 1 month), dates after 12 months. */
+    @Test fun absoluteDatesUseTheLargestExactUnit() {
         val table = mapOf(
-            "2026-11-23T11:59:30Z" to PublishedAge(30, Unit.Second),
-            "2026-11-23T11:00:00Z" to PublishedAge(1, Unit.Hour),
-            "2026-11-23T11:30:00Z" to PublishedAge(30, Unit.Minute),
-            "2026-11-23T18:00:00+07:00" to PublishedAge(1, Unit.Hour),
-            "2026-11-18" to PublishedAge(5, Unit.Day),
-            "2026-11-20T10:00:00Z" to PublishedAge(3, Unit.Day),
-            "Nov 20, 2026" to PublishedAge(3, Unit.Day),
-            "November 20, 2026" to PublishedAge(3, Unit.Day),
-            "Nov 2, 2026" to PublishedAge(3, Unit.Week),
-            "Sep 14, 2026" to PublishedAge(2, Unit.Month),
-            "October 20, 2025" to PublishedAge(1, Unit.Year),
+            "2026-11-23T11:59:30Z" to (30 to Unit.Second),
+            "2026-11-23T11:30:00Z" to (30 to Unit.Minute),
+            "2026-11-23T11:00:00Z" to (1 to Unit.Hour),
+            "2026-11-23T18:00:00+07:00" to (1 to Unit.Hour),
+            "2026-11-22T13:00:00Z" to (23 to Unit.Hour),
+            "2026-11-22T12:00:00Z" to (1 to Unit.Day),
+            "2026-11-22T11:00:00Z" to (25 to Unit.Hour),
+            "2026-11-20T10:00:00Z" to (74 to Unit.Hour),
+            "2026-11-20T12:00:00Z" to (3 to Unit.Day),
+            "2026-11-17T12:00:00Z" to (6 to Unit.Day),
+            "2026-11-16T12:00:00Z" to (1 to Unit.Week),
+            "2026-11-15T12:00:00Z" to (8 to Unit.Day),
+            "2026-11-23" to (0 to Unit.Today),
+            "2026-11-18" to (5 to Unit.Day),
+            "Nov 20, 2026" to (3 to Unit.Day),
+            "November 20, 2026" to (3 to Unit.Day),
+            "Nov 10, 2026" to (13 to Unit.Day),
+            "Nov 9, 2026" to (2 to Unit.Week),
+            "Nov 8, 2026" to (15 to Unit.Day),
+            "Nov 2, 2026" to (3 to Unit.Week),
+            "Oct 24, 2026" to (1 to Unit.Month),
+            "Oct 23, 2026" to (31 to Unit.Day),
+            "Sep 24, 2026" to (2 to Unit.Month),
+            "Sep 14, 2026" to (10 to Unit.Week),
+            "Sep 13, 2026" to (71 to Unit.Day),
+            "Nov 28, 2025" to (12 to Unit.Month),
+            "Nov 23, 2025" to (1 to Unit.Date),
+            "October 20, 2025" to (1 to Unit.Date),
         )
-        for ((raw, expected) in table) assertEquals(raw, expected, parse(raw))
+        for ((raw, expected) in table) assertEquals(raw, expected, shape(raw))
     }
 
-    @Test fun absoluteUnitBoundaries() {
-        val at = { days: Long -> PublishedAges.parse(now.minusSeconds(days * 86_400).toString(), now) }
-        assertEquals(PublishedAge(5, Unit.Day), at(5))
-        assertEquals(PublishedAge(3, Unit.Week), at(21))
-        assertEquals(PublishedAge(2, Unit.Month), at(70))
-        assertEquals(PublishedAge(1, Unit.Year), at(400))
+    @Test fun datesOlderThanTwelveMonthsKeepTheirDay() {
+        assertEquals(java.time.LocalDate.of(2025, 10, 20), parse("October 20, 2025")?.date)
+        assertEquals(java.time.LocalDate.of(2024, 1, 5), parse("2024-01-05T08:00:00Z")?.date)
+    }
+
+    @Test fun realDatesFilterOnExactHours() {
+        assertEquals(74L, parse("2026-11-20T10:00:00Z")?.hours)
+        assertEquals(1L, parse("2026-11-23")?.hours)
+        assertEquals(120L, parse("2026-11-18")?.hours)
+        assertEquals(399L * 24, parse("October 20, 2025")?.hours)
     }
 
     @Test fun futureAndGarbage() {

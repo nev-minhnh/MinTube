@@ -208,14 +208,23 @@ class MediaSearchRepository(private val client: MediaClient,
             val steps = listOfNotNull(
                 filters.uploaded.label()?.let { Triple(it, SearchFilterParams.UPLOAD_DATE, filters.uploaded.code()) },
                 filters.type.label()?.let { Triple(it, SearchFilterParams.TYPE, filters.type.code()) })
+            var offered = true
             for ((label, field, code) in steps) {
                 // English labels first; any other hl is recognized by the option's params.
                 val filter = page.filters.firstOrNull { it.matches(label) }
                     ?: page.filters.firstOrNull { !it.selected && SearchFilterParams.value(it.params, field) == code }
-                    ?: throw MediaException(com.liskovsoft.youtubeapi.videoinfo.V2.RequestError(
-                        com.liskovsoft.youtubeapi.videoinfo.V2.RequestFailure.UNSUPPORTED, "filter_unavailable"))
+                if (filter == null) { offered = false; break }
                 page = loadSearch(query, context, filter.params, http = http).requireValue()
                 anonymousFallback = anonymousFallback || page.anonymousFallback
+            }
+            // Signed-in responses can come without a filter panel: send YouTube's own params for the
+            // whole selection instead of failing. If even that fails, the unfiltered page stays and the
+            // client-side upload-date filter below still applies.
+            if (!offered) SearchFilterParams.build(filters.uploaded.code(), filters.type.code())?.let { params ->
+                runCatching { loadSearch(query, context, params, http = http).requireValue() }.getOrNull()?.let {
+                    page = it
+                    anonymousFallback = anonymousFallback || it.anonymousFallback
+                }
             }
         }
         filterPanel = if (anonymousFallback) null else FilterPanel(identity, query, filters, page.filters, now())

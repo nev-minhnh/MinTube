@@ -88,4 +88,18 @@ internal object SearchFilterParams {
         val filters = ChannelTabKind.fields(bytes)?.get(2) as? ByteArray ?: return null
         return ChannelTabKind.fields(filters)?.get(field) as? Long
     }
+
+    /**
+     * Search params for an upload-date and/or type code, in YouTube's own layout (field 2 holds the
+     * filters: 1 = upload date, 2 = type), e.g. This week alone is "EgIIAw==". Null when both are absent.
+     */
+    fun build(uploadDate: Long?, type: Long?): String? {
+        val inner = buildList {
+            uploadDate?.let { add(0x08); add(it.toInt()) }
+            type?.let { add(0x10); add(it.toInt()) }
+        }
+        if (inner.isEmpty()) return null
+        val bytes = (listOf(0x12, inner.size) + inner).map(Int::toByte).toByteArray()
+        return java.util.Base64.getEncoder().encodeToString(bytes)
+    }
 }

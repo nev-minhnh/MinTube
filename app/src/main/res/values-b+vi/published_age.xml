@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="published_today">Hôm nay</string>
     <string name="published_just_now">Vừa xong</string>
     <plurals name="published_age_minutes">
         <item quantity="other">%1$d phút trước</item>
