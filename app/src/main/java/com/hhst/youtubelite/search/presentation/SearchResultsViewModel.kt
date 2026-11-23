@@ -468,7 +468,9 @@ class SearchResultsViewModel(
             }
             val results = ready.page.results.complete()
             val shorts = ready.page.shorts.complete()
-            if (!changed) state else state.copy(content = ready.copy(page = ready.page.copy(results = results, shorts = shorts)))
+            // A repaired row may only now carry its publish date: re-apply the upload-date filter to it.
+            if (!changed) state else state.copy(content = ready.copy(page = ready.page.copy(results = results, shorts = shorts)
+                .filteredByUpload(state.filters.uploaded)))
         }
         // A newly recovered channel can load its avatar while the repair read is pending.
         if (changed) (_state.value.content as? SearchContent.Results)?.page?.let(::fillMissingAvatars)
