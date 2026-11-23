@@ -12,6 +12,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.lifecycleScope
+import com.hhst.youtubelite.BuildConfig
+import com.hhst.youtubelite.core.update.ApkInstaller
+import com.hhst.youtubelite.core.update.AppRelease
+import com.hhst.youtubelite.core.update.AppUpdater
+import com.hhst.youtubelite.core.update.UpdateChannel
+import com.hhst.youtubelite.core.update.UpdateException
+import kotlinx.coroutines.Job
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,10 +39,66 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.koin.java.KoinJavaComponent.get
 
 class AboutActivity : ComponentActivity() {
+    private var updateState by mutableStateOf<UpdateUiState>(UpdateUiState.None)
+    private var pendingApk: File? = null
+    private var awaitingPermission: AppRelease? = null
+    private var downloadJob: Job? = null
+    private val installer by lazy { ApkInstaller(this) }
+    private val updater by lazy { AppUpdater(get<OkHttpClient>(OkHttpClient::class.java), cacheDir) }
+
+    /** Only a signed release build can be replaced by a release APK; debug and variant builds cannot. */
+    private fun canInstallBuild(version: String) = !BuildConfig.DEBUG && Regex("""\d+\.\d+\.\d+""").matches(version)
+
+    private fun startDownload(release: AppRelease) {
+        downloadJob?.cancel()
+        updateState = UpdateUiState.Downloading(release, 0f)
+        downloadJob = lifecycleScope.launch {
+            var last = -1
+            try {
+                pendingApk = updater.download(release) { p ->
+                    val percent = (p * 100).toInt()
+                    if (percent != last) { last = percent; updateState = UpdateUiState.Downloading(release, p) }
+                }
+                install(release)
+            } catch (c: CancellationException) { throw c
+            } catch (t: Throwable) {
+                AppLog.event(AppLog.Category.APP, "update_download_failed", failure = t)
+                updateState = UpdateUiState.Failed(release, getString(when {
+                    t is UpdateException && t.kind == UpdateException.Kind.ChecksumMismatch -> R.string.update_error_checksum
+                    t is UpdateException && t.kind == UpdateException.Kind.MissingChecksum -> R.string.update_error_no_checksum
+                    else -> R.string.update_error_network
+                }))
+            }
+        }
+    }
+
+    /** Installs the downloaded APK, first sending the user to the "install unknown apps" switch if needed. */
+    private fun install(release: AppRelease) {
+        val apk = pendingApk?.takeIf { it.exists() } ?: return startDownload(release)
+        if (!installer.canInstall()) {
+            awaitingPermission = release
+            updateState = UpdateUiState.Failed(release, getString(R.string.update_permission_needed))
+            runCatching { startActivity(installer.permissionIntent()) }
+            return
+        }
+        lifecycleScope.launch {
+            updateState = runCatching { withContext(Dispatchers.IO) { installer.install(apk) } }.fold(
+                { UpdateUiState.None },
+                { AppLog.event(AppLog.Category.APP, "update_install_failed", failure = it)
+                    UpdateUiState.Failed(release, getString(R.string.update_install_failed)) })
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val release = awaitingPermission ?: return
+        awaitingPermission = null
+        if (installer.canInstall()) install(release)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState); enableEdgeToEdge()
         com.hhst.youtubelite.ui.PhoneOrientation.lockOnPhone(this)
@@ -85,30 +149,23 @@ class AboutActivity : ComponentActivity() {
                 onSource = { openUrl(SOURCE) },
                 onUpstream = { openUrl(UPSTREAM) },
                 onUpdate = { action("check_update") {
-                    val latest = withContext(Dispatchers.IO) {
-                        val request = Request.Builder().url("https://api.github.com/repos/nev-minhnh/MinTube/releases/latest")
-                            .header("Accept", "application/vnd.github+json").build()
-                        get<OkHttpClient>(OkHttpClient::class.java).newCall(request).execute().use { response ->
-                            check(response.isSuccessful) { "HTTP ${response.code}" }
-                            val body = response.body?.string() ?: error("Empty release response")
-                            val json = kotlinx.serialization.json.Json.parseToJsonElement(body)
-                                as kotlinx.serialization.json.JsonObject
-                            fun flag(key: String): Boolean = (json[key] as? kotlinx.serialization.json.JsonPrimitive)
-                                ?.takeUnless { it is kotlinx.serialization.json.JsonNull }?.content?.toBoolean() == true
-                            fun text(key: String): String = (json[key] as? kotlinx.serialization.json.JsonPrimitive)
-                                ?.takeUnless { it is kotlinx.serialization.json.JsonNull }?.content
-                                ?: error("update_check_payload")
-                            check(!flag("prerelease") && !flag("draft"))
-                            text("tag_name")
-                        }
-                    }
+                    val release = updater.latest(UpdateChannel.current())
+                        ?: return@action getString(R.string.update_no_package)
                     when {
-                        StableVersion.isDevelopment(version) -> getString(R.string.about_development_version, latest)
-                        StableVersion.isNewer(version, latest) -> getString(R.string.about_update_available, latest)
-                        else -> getString(R.string.about_up_to_date, latest)
+                        StableVersion.isDevelopment(version) -> getString(R.string.about_development_version, release.version)
+                        updater.isNewer(version, release) -> {
+                            if (canInstallBuild(version)) updateState = UpdateUiState.Available(version, release)
+                            getString(R.string.about_update_available, release.version)
+                        }
+                        else -> getString(R.string.about_up_to_date, release.version)
                     }
                 } },
                 onRelease = { openUrl("$SOURCE/releases/latest") },
+                update = updateState,
+                onUpdateInstall = { (updateState as? UpdateUiState.Available)?.let { startDownload(it.release) } },
+                onUpdateLater = { updateState = UpdateUiState.None },
+                onUpdateCancel = { downloadJob?.cancel(); updateState = UpdateUiState.None },
+                onUpdateRetry = { (updateState as? UpdateUiState.Failed)?.let { install(it.release) } },
                 onClear = { action("clear_cache") {
                     // clearCache removes HTTP cache only; cookies and WebStorage keep the account.
                     WebView(this@AboutActivity).let { it.clearCache(true); it.destroy() }

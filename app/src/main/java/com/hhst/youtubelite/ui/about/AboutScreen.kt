@@ -50,8 +50,11 @@ import com.hhst.youtubelite.ui.design.MinType
 @Composable
 fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boolean, status: String,
     onSource: () -> Unit, onUpdate: () -> Unit, onRelease: () -> Unit, onClear: () -> Unit, onExport: () -> Unit,
-    onSave: () -> Unit = {}, onUpstream: () -> Unit = {}) {
+    onSave: () -> Unit = {}, onUpstream: () -> Unit = {},
+    update: UpdateUiState = UpdateUiState.None, onUpdateInstall: () -> Unit = {}, onUpdateLater: () -> Unit = {},
+    onUpdateCancel: () -> Unit = {}, onUpdateRetry: () -> Unit = {}) {
     BackHandler { onClose() }
+    AboutUpdateDialog(update, onUpdateInstall, onUpdateLater, onUpdateCancel)
     SettingsPageFrame(
         title = stringResource(R.string.about),
         onBack = onClose,
@@ -59,7 +62,10 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
         topBarTag = "about-topbar",
         pageTag = "about-page",
         modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
-        footer = { AboutStatus(busy, status) },
+        footer = {
+            if (update is UpdateUiState.Failed) AboutStatus(false, update.message, onUpdateRetry)
+            else AboutStatus(busy, status)
+        },
     ) {
         val inset = settingsInset()
         Row(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.xl).testTag("about-identity"),
@@ -108,7 +114,7 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
 
 /** Result line of the last action, pinned under the list so it is visible wherever the list is scrolled. */
 @Composable
-private fun AboutStatus(busy: Boolean, status: String) {
+private fun AboutStatus(busy: Boolean, status: String, onRetry: (() -> Unit)? = null) {
     if (!busy && status.isEmpty()) return
     Box(Modifier.fillMaxWidth().background(DesignTokens.Panel), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = SettingsLayout.MaxWidth).fillMaxWidth().testTag("about-status")
@@ -117,6 +123,10 @@ private fun AboutStatus(busy: Boolean, status: String) {
             else Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
             if (status.isNotEmpty()) AppText(status, MinType.Body,
                 Modifier.padding(horizontal = settingsInset(), vertical = MinSpace.md))
+            if (onRetry != null) com.hhst.youtubelite.ui.components.AppTextButton(onRetry,
+                Modifier.padding(horizontal = settingsInset()).testTag("update-retry")) {
+                androidx.compose.material3.Text(stringResource(R.string.retry))
+            }
         }
     }
 }
