@@ -24,6 +24,10 @@ class MediaSearchNavigationTest {
         val http = OkHttpClient.Builder().addInterceptor { chain ->
             val request = chain.request()
             val body = okio.Buffer().also { request.body!!.writeTo(it) }.readUtf8()
+            // Publish-time reads (player) made while filtering are not search navigation: answer them empty.
+            if (!request.url.encodedPath.endsWith("/search")) return@addInterceptor Response.Builder().request(request)
+                .protocol(okhttp3.Protocol.HTTP_1_1).code(200).message("fixture")
+                .body("{}".toResponseBody("application/json".toMediaType())).build()
             val param = Json.parseToJsonElement(body).jsonObject["params"]?.jsonPrimitive?.contentOrNull
             params += param
             authorizations += request.header("Authorization")

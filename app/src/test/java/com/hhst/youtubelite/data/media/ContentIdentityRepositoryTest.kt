@@ -28,8 +28,9 @@ class ContentIdentityRepositoryTest {
         val row = SearchResult("abcdefghijk", "Search title", "Artist", "UCartist", "2.5K views", "", "", "cover", avatar = "avatar")
         val result = MediaSearchRepository(client).metadata(row)
         assertEquals("3:41", result.duration)
-        assertEquals("2025-11-10", result.age)
-        assertEquals(row.copy(duration = "3:41", age = "2025-11-10"), result)
+        // Owner fix (v1.0.8): the repaired age keeps its time of day, so "9 hours ago" never reads "1 day ago".
+        assertEquals("2025-11-10T02:02:12-08:00", result.age)
+        assertEquals(row.copy(duration = "3:41", age = "2025-11-10T02:02:12-08:00"), result)
     }
 
     @Test fun topicChannelKeepsItsAlbumShelvesWithoutRequiringAPlaylistsTab() = runBlocking {
