@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -182,7 +183,7 @@ fun ChannelLiveTab(
 /** A current or past stream on the card family; a stream that is on air wears the Danger LIVE badge. */
 @Composable
 private fun ChannelLiveItem(video: ChannelLiveVideo, width: Float, card: Boolean, onAction: (ChannelAction) -> Unit) {
-    val metadata = if (video.liveNow) video.views else listOf(video.views, video.time).filter(String::isNotBlank).joinToString(" · ")
+    val metadata = if (video.liveNow) video.views else listOf(video.views, publishedAgeText(video.time)).filter(String::isNotBlank).joinToString(" · ")
     val badge = if (video.liveNow) stringResource(R.string.player_live) else video.duration
     val open = { onAction(ChannelAction.OpenLive(video.id)) }
     val tag = Modifier.testTag("channel-live-${video.id}")

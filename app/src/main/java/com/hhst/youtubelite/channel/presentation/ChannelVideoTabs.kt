@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.channel.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -99,7 +100,7 @@ internal fun <T> LazyListScope.channelGrid(
 @Composable
 internal fun ChannelVideoItem(video: ChannelVideo, width: Float, card: Boolean, onAction: (ChannelAction) -> Unit) {
     val title = rememberDeArrowTitle(video.id, video.title)
-    val metadata = listOf(video.views, video.age).filter(String::isNotBlank).joinToString(" · ")
+    val metadata = listOf(video.views, publishedAgeText(video.age)).filter(String::isNotBlank).joinToString(" · ")
     val badge = if (video.live) stringResource(R.string.player_live) else video.duration
     val thumbTag = "channel-thumb-${video.id}"
     val thumbLabel = stringResource(R.string.a11y_title_duration, video.title, video.duration)

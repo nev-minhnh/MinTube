@@ -17,8 +17,8 @@ import com.liskovsoft.youtubeapi.videoinfo.V2.ledgerScope
 // Blank halves are dropped so a missing part cannot leave an orphaned separator; a missing
 // avatar is null (not "") — that is the signal the shared avatar directory enriches from.
 internal fun MediaItem.feedVideo() = FeedItem.Video(id, title.orEmpty(), author.orEmpty(),
-    listOfNotNull(viewCount, published).filter(String::isNotBlank).joinToString(" · "), thumbnail.orEmpty(),
-    duration.orEmpty(), channelId.orEmpty(), live, progressPercent?.div(100f), avatar = authorThumbnail?.takeIf(String::isNotBlank),
+    viewCount.orEmpty(), thumbnail.orEmpty(),
+    duration.orEmpty(), channelId.orEmpty(), live, progressPercent?.div(100f), published = published.orEmpty(), avatar = authorThumbnail?.takeIf(String::isNotBlank),
     notInterestedToken = notInterestedToken(),
     dontRecommendToken = dontRecommendToken(),
     menuEndpoint = menuEndpoint?.let { FeedMenuEndpoint(it.panelId, it.params) }, short = kind == "short",

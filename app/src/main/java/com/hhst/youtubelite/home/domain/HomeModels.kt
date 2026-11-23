@@ -32,6 +32,8 @@ sealed interface FeedItem {
         val live: Boolean = false,
         val progress: Float? = null,
         val age: String? = null,
+        /** Raw publish text from the source ("5 days ago", ISO date); shown through publishedAgeText. */
+        val published: String = "",
         val isNew: Boolean = false,
         val avatar: String? = null,
         @kotlinx.serialization.Transient val notInterestedToken: String? = null,
@@ -66,6 +68,7 @@ fun FeedItem.Video.withMissingDisplayFrom(other: FeedItem.Video): FeedItem.Video
     metadata = metadata.ifBlank { other.metadata }, artwork = artwork.ifBlank { other.artwork },
     duration = duration.ifBlank { other.duration }, channelId = channelId.ifBlank { other.channelId },
     age = age?.takeIf(String::isNotBlank) ?: other.age?.takeIf(String::isNotBlank),
+    published = published.ifBlank { other.published },
     avatar = avatar?.takeIf(String::isNotBlank) ?: other.avatar?.takeIf(String::isNotBlank),
 )
 

@@ -1,5 +1,6 @@
 package com.hhst.youtubelite.library.presentation
 
+import com.hhst.youtubelite.core.time.publishedAgeText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -205,7 +206,7 @@ internal fun HistoryCard(entry: HistoryEntry, thumbnailWidth: Dp, modifier: Modi
         artwork = entry.artwork,
         onClick = onOpen,
         modifier = modifier.testTag("history-item-${entry.id}"),
-        secondaryMetadata = entry.views.takeIf(String::isNotEmpty),
+        secondaryMetadata = listOf(entry.views, publishedAgeText(entry.published)).filter(String::isNotBlank).joinToString(" · ").takeIf(String::isNotEmpty),
         durationLabel = entry.duration,
         live = entry.duration == "LIVE",
         progress = entry.progress,

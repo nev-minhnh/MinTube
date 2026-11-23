@@ -18,6 +18,8 @@ data class HistoryEntry(
     val views: String = "",
     /** Server token that removes this entry from watch history; null when the menu carried none. */
     val removeToken: String? = null,
+    /** Raw publish text when the source carries it (account history); local history has none. */
+    val published: String = "",
 )
 
 data class YouPage(
