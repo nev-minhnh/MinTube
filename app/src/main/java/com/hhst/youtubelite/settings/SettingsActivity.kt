@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
@@ -31,11 +32,16 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.hhst.youtubelite.extension.ExtensionManager
 import com.hhst.youtubelite.settings.domain.SettingsPage
 import com.hhst.youtubelite.settings.presentation.SettingsScreen
+import com.hhst.youtubelite.R
+import com.hhst.youtubelite.core.update.CachedUpdateStatus
+import com.hhst.youtubelite.core.update.DefaultUpdateCenter
 import com.hhst.youtubelite.ui.about.AboutActivity
+import com.hhst.youtubelite.ui.updates.UpdatesActivity
 import org.koin.android.ext.android.inject
 
 class SettingsActivity : com.hhst.youtubelite.ui.NativeActivity() {
     private val extensionManager: ExtensionManager by inject()
+    private val updateCenter: DefaultUpdateCenter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +52,13 @@ class SettingsActivity : com.hhst.youtubelite.ui.NativeActivity() {
             var preferences by remember { mutableStateOf(extensionManager.allPreferences()) }
             val context = LocalContext.current
             var notifications by remember { mutableStateOf(NotificationManagerCompat.from(context).areNotificationsEnabled()) }
+            var updateStatus by remember { mutableStateOf(updateCenter.cachedStatus()) }
             val lifecycleOwner = LocalLifecycleOwner.current
             DisposableEffect(lifecycleOwner) {
                 val observer = LifecycleEventObserver { _, event ->
                     if (event == Lifecycle.Event.ON_RESUME) {
                         notifications = NotificationManagerCompat.from(context).areNotificationsEnabled()
+                        updateStatus = updateCenter.cachedStatus()
                     }
                 }
                 // The Advanced host and backup imports write through the same manager; follow it.
@@ -75,6 +83,12 @@ class SettingsActivity : com.hhst.youtubelite.ui.NativeActivity() {
                 },
                 onAbout = { startActivity(Intent(this@SettingsActivity, AboutActivity::class.java)) },
                 onAdvanced = { startActivity(Intent(this@SettingsActivity, AdvancedActivity::class.java)) },
+                onUpdates = { startActivity(UpdatesActivity.intent(this@SettingsActivity)) },
+                updatesStatus = when (updateStatus) {
+                    CachedUpdateStatus.Development -> stringResource(R.string.updates_status_development)
+                    CachedUpdateStatus.Available -> stringResource(R.string.settings_updates_status_available, updateCenter.cachedLatestVersion)
+                    CachedUpdateStatus.UpToDate -> stringResource(R.string.updates_status_current)
+                },
                 onSelectTheme = { mode ->
                     extensionManager.setThemeMode(mode)
                     com.hhst.youtubelite.ui.theme.AppAppearance.update(mode)

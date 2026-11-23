@@ -30,6 +30,10 @@ fun SettingsScreen(
     onAdvanced: (() -> Unit)? = null,
     onSelectTheme: (ThemeMode) -> Unit = {},
     onSelectLanguage: (String) -> Unit = {},
+    /** Opens the Updates screen; the row is hidden when null. */
+    onUpdates: (() -> Unit)? = null,
+    /** Live status shown under the Updates row, e.g. "MinTube is up to date". */
+    updatesStatus: String? = null,
 ) {
     SettingsPageFrame(
         title = stringResource(when (page) {
@@ -47,7 +51,7 @@ fun SettingsScreen(
         pageKey = page,
     ) {
         when (page) {
-            SettingsPage.Home -> SettingsHome(onNavigate, onAbout, onAdvanced)
+            SettingsPage.Home -> SettingsHome(onNavigate, onAbout, onAdvanced, onUpdates, updatesStatus)
             SettingsPage.General -> GeneralSettings(preferences, onToggle, onSelectTheme, onSelectLanguage)
             SettingsPage.Playback -> PlaybackSettings(preferences, onToggle)
             SettingsPage.Notifications -> NotificationSettings(notificationsEnabled, onOpenNotificationSettings)
@@ -56,7 +60,8 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SettingsHome(onNavigate: (SettingsPage) -> Unit, onAbout: () -> Unit, onAdvanced: (() -> Unit)?) {
+private fun SettingsHome(onNavigate: (SettingsPage) -> Unit, onAbout: () -> Unit, onAdvanced: (() -> Unit)?,
+    onUpdates: (() -> Unit)?, updatesStatus: String?) {
     SettingsGroup(stringResource(R.string.settings_group_preferences))
     SettingsRow(stringResource(R.string.settings_general), stringResource(R.string.settings_general_summary),
         tag = "settings-row-general", icon = AppIcon.Settings, chevron = true) {
@@ -74,6 +79,12 @@ private fun SettingsHome(onNavigate: (SettingsPage) -> Unit, onAbout: () -> Unit
         stringResource(R.string.settings_advanced_summary), tag = "settings-row-advanced",
         icon = AppIcon.Filter, chevron = true, onClick = onAdvanced)
     SettingsGroup(stringResource(R.string.settings_group_about))
+    if (onUpdates != null) {
+        val summary = stringResource(R.string.settings_updates_summary)
+        SettingsRow(stringResource(R.string.settings_updates_title),
+            if (updatesStatus.isNullOrBlank()) summary else stringResource(R.string.settings_updates_row_summary, summary, updatesStatus),
+            tag = "settings-row-updates", icon = AppIcon.Download, chevron = true, onClick = onUpdates)
+    }
     SettingsRow(stringResource(R.string.settings_about_title), stringResource(R.string.settings_about_summary),
         tag = "settings-row-about", icon = AppIcon.Info, chevron = true, onClick = onAbout)
 }

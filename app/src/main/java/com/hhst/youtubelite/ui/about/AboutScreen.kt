@@ -50,11 +50,8 @@ import com.hhst.youtubelite.ui.design.MinType
 @Composable
 fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boolean, status: String,
     onSource: () -> Unit, onUpdate: () -> Unit, onRelease: () -> Unit, onClear: () -> Unit, onExport: () -> Unit,
-    onSave: () -> Unit = {}, onUpstream: () -> Unit = {},
-    update: UpdateUiState = UpdateUiState.None, onUpdateInstall: () -> Unit = {}, onUpdateLater: () -> Unit = {},
-    onUpdateCancel: () -> Unit = {}, onUpdateRetry: () -> Unit = {}) {
+    onSave: () -> Unit = {}, onUpstream: () -> Unit = {}) {
     BackHandler { onClose() }
-    AboutUpdateDialog(update, onUpdateInstall, onUpdateLater, onUpdateCancel)
     SettingsPageFrame(
         title = stringResource(R.string.about),
         onBack = onClose,
@@ -62,10 +59,7 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
         topBarTag = "about-topbar",
         pageTag = "about-page",
         modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
-        footer = {
-            if (update is UpdateUiState.Failed) AboutStatus(false, update.message, onUpdateRetry)
-            else AboutStatus(busy, status)
-        },
+        footer = { AboutStatus(busy, status) },
     ) {
         val inset = settingsInset()
         Row(Modifier.fillMaxWidth().padding(horizontal = inset, vertical = MinSpace.xl).testTag("about-identity"),
@@ -94,8 +88,8 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
             tag = "about-license", icon = AppIcon.Info)
 
         SettingsGroup(stringResource(R.string.account_about_updates))
-        SettingsRow(stringResource(R.string.about_check_update), tag = "about-check-update", icon = AppIcon.Refresh,
-            enabled = !busy, onClick = onUpdate)
+        SettingsRow(stringResource(R.string.settings_updates_title), stringResource(R.string.settings_updates_summary),
+            tag = "about-updates", icon = AppIcon.Refresh, chevron = true, onClick = onUpdate)
         SettingsRow(stringResource(R.string.about_releases), tag = "about-releases", icon = AppIcon.Globe, onClick = onRelease)
 
         SettingsGroup(stringResource(R.string.account_about_storage))
@@ -114,7 +108,7 @@ fun AboutScreen(label: String, version: String, onClose: () -> Unit, busy: Boole
 
 /** Result line of the last action, pinned under the list so it is visible wherever the list is scrolled. */
 @Composable
-private fun AboutStatus(busy: Boolean, status: String, onRetry: (() -> Unit)? = null) {
+private fun AboutStatus(busy: Boolean, status: String) {
     if (!busy && status.isEmpty()) return
     Box(Modifier.fillMaxWidth().background(DesignTokens.Panel), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = SettingsLayout.MaxWidth).fillMaxWidth().testTag("about-status")
@@ -123,10 +117,6 @@ private fun AboutStatus(busy: Boolean, status: String, onRetry: (() -> Unit)? = 
             else Box(Modifier.fillMaxWidth().height(1.dp).background(DesignTokens.Border))
             if (status.isNotEmpty()) AppText(status, MinType.Body,
                 Modifier.padding(horizontal = settingsInset(), vertical = MinSpace.md))
-            if (onRetry != null) com.hhst.youtubelite.ui.components.AppTextButton(onRetry,
-                Modifier.padding(horizontal = settingsInset()).testTag("update-retry")) {
-                androidx.compose.material3.Text(stringResource(R.string.retry))
-            }
         }
     }
 }
