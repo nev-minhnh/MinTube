@@ -68,7 +68,7 @@ object PublishedAges {
                 "month", "months", "tháng" -> PublishedAge.Unit.Month
                 else -> PublishedAge.Unit.Year
             }
-            return PublishedAge(count, unit)
+            return normalized(count, unit)
         }
         val dateOnly = isoDate.matches(text) || !isoDateTime.matches(text)
         val published = absolute(text) ?: return null
@@ -92,6 +92,14 @@ object PublishedAges {
             }
         }
     } catch (_: java.time.format.DateTimeParseException) { null }
+
+    /** YouTube's own text in the largest exact unit too: "24 hours" reads 1 day, "7 days" 1 week, "30 days" 1 month. */
+    private fun normalized(count: Int, unit: PublishedAge.Unit): PublishedAge = when {
+        unit == PublishedAge.Unit.Hour && count % 24 == 0 -> normalized(count / 24, PublishedAge.Unit.Day)
+        unit == PublishedAge.Unit.Day && count % 30 == 0 -> PublishedAge(count / 30, PublishedAge.Unit.Month)
+        unit == PublishedAge.Unit.Day && count % 7 == 0 -> PublishedAge(count / 7, PublishedAge.Unit.Week)
+        else -> PublishedAge(count, unit)
+    }
 
     /** Older than this many days, a real date is shown as dd/MM/yyyy instead of an age. */
     private const val DATE_AFTER_DAYS = 365L
