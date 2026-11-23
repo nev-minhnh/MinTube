@@ -47,7 +47,9 @@ class TvUpdateAndroidTest {
         compose.awaitFocus(TAG_UPDATE_LATER)
         compose.press(Key.DirectionLeft)
         compose.awaitFocus(TAG_UPDATE_DOWNLOAD)
-        compose.back()
+        // The panel is a dialog window: Back reaches it as the remote's key, like the Info panel test.
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+        compose.waitForIdle()
         assertEquals(listOf("dismiss"), calls)
     }
 
