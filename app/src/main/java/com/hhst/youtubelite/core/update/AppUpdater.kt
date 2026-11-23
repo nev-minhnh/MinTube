@@ -60,6 +60,7 @@ internal data class GhRelease(
     val prerelease: Boolean = false,
     val body: String? = null,
     @SerialName("html_url") val pageUrl: String = "",
+    @SerialName("published_at") val publishedAt: String? = null,
     val assets: List<GhAsset> = emptyList(),
 )
 
@@ -78,6 +79,12 @@ class AppUpdater(
             UpdateChannel.Tv -> json.decodeFromString<List<GhRelease>>(get("$apiBase/releases?per_page=30"))
         }
         select(channel, releases)
+    }
+
+    /** Newest-first stable releases of [channel], for the changelog list. Releases without an APK are kept (blank apk fields). */
+    suspend fun history(channel: UpdateChannel, limit: Int): List<AppRelease> = withContext(Dispatchers.IO) {
+        val releases = json.decodeFromString<List<GhRelease>>(get("$apiBase/releases?per_page=30"))
+        historyOf(channel, releases, limit)
     }
 
     fun isNewer(current: String, release: AppRelease): Boolean = StableVersion.isNewer(current, release.version)
@@ -152,21 +159,30 @@ class AppUpdater(
             return 0
         }
 
-        internal fun select(channel: UpdateChannel, releases: List<GhRelease>): AppRelease? {
-            val candidates = releases.filter { !it.draft && !it.prerelease }.filter {
+        private fun candidates(channel: UpdateChannel, releases: List<GhRelease>) =
+            releases.filter { !it.draft && !it.prerelease }.filter {
                 when (channel) {
                     UpdateChannel.Phone -> it.tag.startsWith("v")
                     UpdateChannel.Tv -> it.tag.startsWith("tv-v")
                 }
-            }
+            }.sortedWith { a, b -> compareKeys(versionKey(b.tag), versionKey(a.tag)) }
+
+        private fun toRelease(channel: UpdateChannel, r: GhRelease): AppRelease? {
             val pattern = if (channel == UpdateChannel.Tv) tvApk else phoneApk
-            return candidates.sortedWith { a, b -> compareKeys(versionKey(b.tag), versionKey(a.tag)) }
-                .firstNotNullOfOrNull { r ->
-                    val apk = r.assets.firstOrNull { pattern.matches(it.name) } ?: return@firstNotNullOfOrNull null
-                    val sha = r.assets.firstOrNull { it.name == apk.name + ".sha256" } ?: return@firstNotNullOfOrNull null
-                    AppRelease(r.tag, versionOf(r.tag), apk.url, apk.name, apk.size, sha.url, r.body.orEmpty(), r.pageUrl)
-                }
+            val apk = r.assets.firstOrNull { pattern.matches(it.name) } ?: return null
+            val sha = r.assets.firstOrNull { it.name == apk.name + ".sha256" } ?: return null
+            return AppRelease(r.tag, versionOf(r.tag), apk.url, apk.name, apk.size, sha.url, r.body.orEmpty(), r.pageUrl,
+                r.publishedAt.orEmpty())
         }
+
+        internal fun historyOf(channel: UpdateChannel, releases: List<GhRelease>, limit: Int): List<AppRelease> =
+            candidates(channel, releases).take(limit.coerceAtLeast(0)).map { r ->
+                toRelease(channel, r) ?: AppRelease(r.tag, versionOf(r.tag), "", "", 0, "", r.body.orEmpty(), r.pageUrl,
+                    r.publishedAt.orEmpty())
+            }
+
+        internal fun select(channel: UpdateChannel, releases: List<GhRelease>): AppRelease? =
+            candidates(channel, releases).firstNotNullOfOrNull { toRelease(channel, it) }
 
         /** Release-note markdown reduced to readable plain text. */
         fun plainNotes(markdown: String): String = markdown.lines().joinToString("\n") { line ->

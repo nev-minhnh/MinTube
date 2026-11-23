@@ -117,9 +117,12 @@ object PublishedAges {
         return ofDays(days, published, hours)
     }
 
+    /** Hours are shown up to this age; from here on whole days (and weeks, months, a date) take over. */
+    private const val HOURS_UNTIL = 48L
+
     /**
-     * A real timestamp: minutes under an hour; hours unless they make whole days (24 h = 1 day, 23 h and
-     * 25 h stay hours); whole days then read in the largest unit they fill exactly.
+     * A real timestamp: minutes under an hour; hours under [HOURS_UNTIL] (23 h and 25 h stay hours, exactly
+     * 24 h reads 1 day); then whole days in the largest unit they fill exactly, and a date after 12 months.
      */
     private fun fromInstant(published: Instant, now: Instant, zone: java.time.ZoneId): PublishedAge? {
         val elapsed = Duration.between(published, now)
@@ -127,10 +130,11 @@ object PublishedAges {
         val seconds = elapsed.seconds
         val day = published.atZone(zone).toLocalDate()
         val hours = maxOf(1L, (seconds + 3_599) / 3_600)
+        val wholeHours = seconds / 3_600
         return when {
             seconds < 60 -> PublishedAge(seconds.toInt(), PublishedAge.Unit.Second, day, hours)
             seconds < 3_600 -> PublishedAge((seconds / 60).toInt(), PublishedAge.Unit.Minute, day, hours)
-            (seconds / 3_600) % 24 != 0L -> PublishedAge((seconds / 3_600).toInt(), PublishedAge.Unit.Hour, day, hours)
+            wholeHours < HOURS_UNTIL && wholeHours != 24L -> PublishedAge(wholeHours.toInt(), PublishedAge.Unit.Hour, day, hours)
             else -> ofDays(seconds / 86_400, day, hours)
         }
     }
