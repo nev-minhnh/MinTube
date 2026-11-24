@@ -90,4 +90,18 @@ class ContentIdentityRepositoryTest {
         assertEquals("Artist", video.channel)
         assertEquals("", video.age)
     }
+
+    /** Owner report (v1.0.13): signed in, the watch page's Description card was empty. */
+    @Test fun signedInWatchWithoutDescriptionTakesItFromPublicDetails() = runBlocking {
+        val client = client { endpoint, signedIn -> when {
+            endpoint == "next" -> """{"videoDetails":{"videoId":"abcdefghijk","title":"Song","author":"Artist","channelId":"UCartist"}}"""
+            signedIn -> """{"videoDetails":{"videoId":"abcdefghijk","author":"Artist","channelId":"UCartist","lengthSeconds":"221","shortDescription":""},
+                "microformat":{"playerMicroformatRenderer":{"publishDate":"2025-11-10T02:02:12-08:00"}}}"""
+            else -> """{"videoDetails":{"videoId":"abcdefghijk","author":"Artist","channelId":"UCartist","title":"Song",
+                "lengthSeconds":"221","shortDescription":"The full description"}}"""
+        } }
+        val video = MediaWatchRepository(client).watch("abcdefghijk").video
+        assertEquals("The full description", video.description)
+        assertEquals("Artist", video.channel)
+    }
 }

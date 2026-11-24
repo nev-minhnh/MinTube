@@ -34,8 +34,11 @@ class MediaWatchRepository(private val client: MediaClient,
         // partial. Supplement display fields from public WEB metadata, retaining the
         // signed-in tracking identity used by playback/reporting.
         val (page, originalText) = read
+        // Signed-in /next also omits the description (owner report: empty "Description" card), so a
+        // missing description asks for the same public supplement.
         val details = if (page.third && (page.first.published.isNullOrBlank() && initialDetails?.published.isNullOrBlank() ||
-            page.first.author.isNullOrBlank() && initialDetails?.author.isNullOrBlank())) {
+            page.first.author.isNullOrBlank() && initialDetails?.author.isNullOrBlank() ||
+            page.first.description.isNullOrBlank() && initialDetails?.description.isNullOrBlank())) {
             val supplement = try { client.read { context, http ->
                 if (context.generation != page.second) throw kotlinx.coroutines.CancellationException("Session changed")
                 loadPlayerDetails(videoId, context.anonymous(), http).value
@@ -44,7 +47,7 @@ class MediaWatchRepository(private val client: MediaClient,
             initialDetails?.copy(title = initialDetails.title ?: supplement?.title,
                 author = initialDetails.author ?: supplement?.author,
                 channelId = initialDetails.channelId ?: supplement?.channelId,
-                description = initialDetails.description ?: supplement?.description,
+                description = initialDetails.description?.takeIf(String::isNotBlank) ?: supplement?.description,
                 published = initialDetails.published ?: supplement?.published)
                 ?: supplement?.copy(tracking = null)
         } else initialDetails
