@@ -206,7 +206,7 @@ internal fun HistoryCard(entry: HistoryEntry, thumbnailWidth: Dp, modifier: Modi
         artwork = entry.artwork,
         onClick = onOpen,
         modifier = modifier.testTag("history-item-${entry.id}"),
-        secondaryMetadata = listOf(entry.views, publishedAgeText(entry.published)).filter(String::isNotBlank).joinToString(" · ").takeIf(String::isNotEmpty),
+        secondaryMetadata = listOf(com.hhst.youtubelite.core.format.viewsText(entry.views), publishedAgeText(entry.published)).filter(String::isNotBlank).joinToString(" · ").takeIf(String::isNotEmpty),
         durationLabel = entry.duration,
         live = entry.duration == "LIVE",
         progress = entry.progress,

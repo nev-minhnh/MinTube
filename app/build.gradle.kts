@@ -32,8 +32,8 @@ android {
         applicationId = "com.nevminhnh.mintube"
         minSdk = 24
         targetSdk = 36
-        versionCode = 10011
-        versionName = "1.0.11"
+        versionCode = 10012
+        versionName = "1.0.12"
         buildConfigField("String", "DIAGNOSTIC_BUILD_ID", "\"$diagnosticBuildId\"")
         buildConfigField("String", "DIAGNOSTIC_DEPENDENCIES", "\"Media3=${libs.versions.media3.get()};OkHttp=${libs.versions.okhttp.get()};kotlinx-serialization=${libs.versions.kotlinxSerialization.get()};UPnPCast=${libs.versions.upnpcast.get()};MSC=${libs.versions.msc.get()}\"")
         testInstrumentationRunner = "com.hhst.youtubelite.ContentTestRunner"

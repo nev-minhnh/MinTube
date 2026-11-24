@@ -244,7 +244,7 @@ private fun ShortInfo(item: ShortItem, onAction: (ShortsAction) -> Unit, subscri
                 Column(Modifier.padding(start = MinSpace.sm, end = MinSpace.xs)) {
                     AppText(item.author, MinType.Body.copy(fontWeight = FontWeight.Medium).onVideo(),
                         color = Color.White, maxLines = 1)
-                    if (item.views.isNotBlank()) AppText(item.views, MinType.Caption.onVideo(),
+                    if (item.views.isNotBlank()) AppText(com.hhst.youtubelite.core.format.viewsText(item.views), MinType.Caption.onVideo(),
                         Modifier.testTag("short-views-${item.id}"), color = Color.White.copy(alpha = 0.8f), maxLines = 1)
                 }
             }

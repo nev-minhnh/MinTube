@@ -46,7 +46,7 @@ fun ShortsResultsList(shorts: List<SearchResult>, state: LazyGridState, onAction
                     onClick = { onAction(SearchAction.OpenResult(short.id)) },
                     modifier = Modifier.testTag("search-short-result-${short.id}"),
                     // Only non-empty fields join: no orphan separators on missing data.
-                    metadata = listOf(short.views, short.duration).filter(String::isNotBlank).joinToString(" · ").takeIf(String::isNotBlank),
+                    metadata = listOf(com.hhst.youtubelite.core.format.viewsText(short.views), short.duration).filter(String::isNotBlank).joinToString(" · ").takeIf(String::isNotBlank),
                     videoId = short.id,
                 )
             }

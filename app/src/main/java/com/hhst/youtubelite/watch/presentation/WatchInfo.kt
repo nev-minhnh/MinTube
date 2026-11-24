@@ -128,7 +128,7 @@ private fun WatchMetaRow(live: Boolean, views: String, age: String, liveBadgeTag
                 AppText(stringResource(R.string.player_live), MinType.Micro, color = DesignTokens.OnDanger, maxLines = 1)
             }
         }
-        if (views.isNotBlank()) AppText(views, MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
+        if (views.isNotBlank()) AppText(com.hhst.youtubelite.core.format.viewsText(views), MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
         if (!live && age.isNotBlank()) {
             if (views.isNotBlank()) AppText("•", MinType.Caption, Modifier.align(Alignment.CenterVertically).clearAndSetSemantics {}, color = DesignTokens.Secondary)
             AppText(publishedAgeText(age), MinType.Caption, Modifier.align(Alignment.CenterVertically), color = DesignTokens.Secondary)
