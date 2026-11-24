@@ -61,6 +61,13 @@ object TvSpacing {
     val CardGap = 20.dp
 }
 
+/**
+ * Widest a settings-style page column grows (dp). The Interface size shrinks the density, so the same
+ * physical width needs proportionally more dp; the page then stays a centred column at every scale.
+ */
+@androidx.compose.runtime.Composable
+fun tvPageMaxWidth(): androidx.compose.ui.unit.Dp = 980.dp / TvUiScale.current
+
 object TvSizes {
     val CardWidth = 216.dp
     val ShortCardWidth = 128.dp

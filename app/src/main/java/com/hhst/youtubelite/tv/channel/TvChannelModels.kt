@@ -73,11 +73,11 @@ object TvChannelModel {
         artwork = video.artwork, duration = video.duration, live = video.live,
     )
 
-    fun short(short: ChannelShort) = TvVideo(id = short.id, title = short.title, metadata = short.views,
-        artwork = short.artwork, short = true)
+    fun short(short: ChannelShort, channel: String = "") = TvVideo(id = short.id, title = short.title, channel = channel,
+        metadata = short.views, artwork = short.artwork, short = true)
 
-    fun live(video: ChannelLiveVideo) = TvVideo(
-        id = video.id, title = video.title,
+    fun live(video: ChannelLiveVideo, channel: String = "") = TvVideo(
+        id = video.id, title = video.title, channel = channel,
         metadata = video.views, published = video.time,
         artwork = video.artwork, duration = video.duration, live = video.liveNow,
     )
@@ -105,10 +105,10 @@ object TvChannelModel {
         val page = (state.content as? ChannelContent.Ready)?.page ?: return TvChannelGrid.Loading
         return when (tab) {
             ChannelTab.Shorts -> section(state.shorts) { shorts ->
-                ready(shorts.map { TvChannelCard(TvChannelCardKind.Short, short(it)) }, paging(state.shortsNextKey, state.shortsAppend))
+                ready(shorts.map { TvChannelCard(TvChannelCardKind.Short, short(it, page.profile.name)) }, paging(state.shortsNextKey, state.shortsAppend))
             }
             ChannelTab.Live -> section(state.live) { live ->
-                ready(live.all.map { TvChannelCard(TvChannelCardKind.Live, live(it)) }, paging(state.liveNextKey, state.liveAppend))
+                ready(live.all.map { TvChannelCard(TvChannelCardKind.Live, live(it, page.profile.name)) }, paging(state.liveNextKey, state.liveAppend))
             }
             ChannelTab.Playlists -> section(state.playlists) { playlists ->
                 ready(playlists.map { TvChannelCard(TvChannelCardKind.Playlist, playlist(it)) },

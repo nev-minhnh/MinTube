@@ -36,6 +36,10 @@ import com.hhst.youtubelite.tv.design.TvColors
 import com.hhst.youtubelite.tv.design.TvFocusRequesters
 import com.hhst.youtubelite.tv.design.TvListRow
 import com.hhst.youtubelite.tv.design.TvSpacing
+import com.hhst.youtubelite.tv.design.tvPageMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
 import com.hhst.youtubelite.tv.design.TvType
 import com.hhst.youtubelite.tv.design.tvAnchor
 import com.hhst.youtubelite.tv.design.tvFocusRestorer
@@ -91,17 +95,18 @@ fun TvUpdatesScreen(
     }
 
     fun Modifier.row(key: String, tag: String): Modifier = this
-        .widthIn(max = 980.dp)
+        .fillMaxWidth()
         .tvAnchor(requesters.of(key))
         .onFocusChanged { if (it.isFocused) focusedKey = key }
         .testTag(tag)
 
     val context = LocalContext.current
     val list = rememberLazyListState()
+    Box(modifier.fillMaxSize().padding(horizontal = TvSpacing.OverscanHorizontal), contentAlignment = Alignment.TopCenter) {
     LazyColumn(
         state = list,
-        modifier = modifier.fillMaxSize().tvFocusRestorer(requesters.of(KEY_CHECK)).testTag(TAG_UPDATES_LIST),
-        contentPadding = PaddingValues(start = TvSpacing.ContentStart, end = TvSpacing.OverscanHorizontal,
+        modifier = Modifier.widthIn(max = tvPageMaxWidth()).fillMaxHeight().tvFocusRestorer(requesters.of(KEY_CHECK)).testTag(TAG_UPDATES_LIST),
+        contentPadding = PaddingValues(start = TvSpacing.md, end = TvSpacing.md,
             top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical + 48.dp),
         verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
     ) {
@@ -113,7 +118,7 @@ fun TvUpdatesScreen(
         item(key = "card") {
             val update = ui.update
             Column(
-                Modifier.widthIn(max = 980.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
                     .background(TvColors.Surface.copy(alpha = 0.6f)).padding(TvSpacing.xl),
                 verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
             ) {
@@ -188,6 +193,8 @@ fun TvUpdatesScreen(
                 }
             }
         }
+    }
+
     }
 
     TvUpdatePanel(ui, currentVersion, actions)

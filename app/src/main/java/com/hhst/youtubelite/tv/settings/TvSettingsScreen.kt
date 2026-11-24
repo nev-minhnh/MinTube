@@ -39,6 +39,9 @@ import com.hhst.youtubelite.tv.design.TvOptionPanel
 import com.hhst.youtubelite.tv.design.TvPanelOption
 import com.hhst.youtubelite.tv.design.TvSidePanel
 import com.hhst.youtubelite.tv.design.TvSpacing
+import com.hhst.youtubelite.tv.design.tvPageMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.Alignment
 import com.hhst.youtubelite.tv.design.TvType
 import com.hhst.youtubelite.tv.qr.TvQrImage
 import com.hhst.youtubelite.ui.design.AppIcon
@@ -135,13 +138,15 @@ fun TvSettingsScreen(
     }
 
     val first = keys.firstOrNull()
-    Box(modifier.fillMaxSize().testTag(TAG_SETTINGS_SCREEN)) {
+    Box(modifier.fillMaxSize().padding(horizontal = TvSpacing.OverscanHorizontal).testTag(TAG_SETTINGS_SCREEN),
+        contentAlignment = Alignment.TopCenter) {
+        // A centred column: equal margins left and right of the area beside the rail at every Interface size.
         LazyColumn(
             state = list,
-            modifier = Modifier.fillMaxSize().let { base ->
+            modifier = Modifier.widthIn(max = tvPageMaxWidth()).fillMaxHeight().let { base ->
                 if (first != null) base.tvFocusRestorer(requesters.of(first)) else base
             }.testTag(TAG_SETTINGS_LIST),
-            contentPadding = PaddingValues(start = TvSpacing.ContentStart, end = TvSpacing.OverscanHorizontal,
+            contentPadding = PaddingValues(start = TvSpacing.md, end = TvSpacing.md,
                 top = TvSpacing.OverscanVertical, bottom = TvSpacing.OverscanVertical + 48.dp),
             verticalArrangement = Arrangement.spacedBy(TvSpacing.sm),
         ) {
@@ -161,7 +166,7 @@ fun TvSettingsScreen(
                 }
                 item(key = row.key) {
                     val rowModifier = Modifier
-                        .widthIn(max = 980.dp)
+                        .fillMaxWidth()
                         .tvAnchor(requesters.of(row.key))
                         .onFocusChanged { if (it.isFocused) focusedKey = row.key }
                         .testTag("$TAG_ROW-${row.key}")

@@ -53,7 +53,7 @@ object TvLibraryModel {
 
     fun video(entry: HistoryEntry) = TvVideo(
         id = entry.videoId, title = entry.title, channel = entry.author, metadata = entry.views,
-        artwork = entry.artwork, duration = entry.duration, progress = entry.progress,
+        published = entry.published, artwork = entry.artwork, duration = entry.duration, progress = entry.progress,
     )
 
     fun video(entry: PlaylistEntry) = TvVideo(
