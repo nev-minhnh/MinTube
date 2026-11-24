@@ -26,6 +26,20 @@ class PlaybackAttemptTest {
         assertEquals(1, attempt.fullRefreshes)
     }
 
+    /** Owner report (v1.0.11): a 68-minute video failed on its second spaced-out MEDIA_SESSION_CHANGED. */
+    @Test fun lightRefreshRenewsAfterHealthyPlaybackButNotForAnImmediateRepeat() {
+        val attempt = PlaybackAttempt("video-a")
+        assertTrue(attempt.tryLightRefresh(positionMs = 600_000, nowMs = 1_000_000))
+        // Fails again straight after the refresh: no loop.
+        assertFalse(attempt.tryLightRefresh(positionMs = 605_000, nowMs = 1_005_000))
+        // Played on for minutes before the next route change: recover again.
+        assertTrue(attempt.tryLightRefresh(positionMs = 1_713_287, nowMs = 2_200_000))
+        assertEquals(1, attempt.lightRefreshes)
+        // Progress alone (a seek forward) is not enough without wall time, and vice versa.
+        assertFalse(attempt.tryLightRefresh(positionMs = 2_000_000, nowMs = 2_210_000))
+        assertFalse(attempt.tryLightRefresh(positionMs = 1_720_000, nowMs = 3_000_000))
+    }
+
     @Test fun backupIsOnlyAvailableAfterAFullRefreshAndStaysConsumedWithoutACandidate() {
         val attempt = PlaybackAttempt("video-a")
         assertFalse(attempt.tryBackup())
