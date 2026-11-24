@@ -87,7 +87,8 @@ class SubscriptionsActivity : com.hhst.youtubelite.ui.ContentActivity() {
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == SubscriptionsViewModel::class.java)
                 return SubscriptionsViewModel(if (fixtures) FixtureSubscriptionsRepository(scenario) else sources.subscriptions, extras.createSavedStateHandle(), scenario, signedIn,
-                    if (fixtures) null else sources.saves) as T
+                    if (fixtures) null else sources.saves,
+                    displayRepair = if (fixtures) null else sources.videoDisplay) as T
             }
         })[SubscriptionsViewModel::class.java]
         if (!fixtures) observeAccountChanges(::syncSession)

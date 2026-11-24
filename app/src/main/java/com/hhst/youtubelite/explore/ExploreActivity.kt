@@ -45,12 +45,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.hhst.youtubelite.data.media.withDisplay
 
 class ExploreViewModel(private val repository: ExploreRepository, private val scenario: ExploreScenario,
     private val savedState: androidx.lifecycle.SavedStateHandle = androidx.lifecycle.SavedStateHandle(),
     /** Shared per-channel avatar completion; null in fixtures. */
     private val avatars: com.hhst.youtubelite.data.media.MediaAvatarDirectory? = null,
+    /** Background repair of rows without views or publish time; null in fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
     private val _uiState = MutableStateFlow(com.hhst.youtubelite.explore.domain.ExploreUiState(category =
         ExploreCategory.entries.firstOrNull { it.name == savedState.get<String>("category") } ?: ExploreCategory.Music))
     val uiState: StateFlow<com.hhst.youtubelite.explore.domain.ExploreUiState> = _uiState.asStateFlow()
@@ -73,6 +77,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
     fun updateSession(generation: Long) {
         if (generation == sessionGeneration) return
         sessionGeneration = generation
+        repairer.reset(forgetFailures = true)
         pages.clear()
         consumedPages.clear()
         consumedShelves.clear()
@@ -99,6 +104,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
                 } ?: current.content
                 loadJob?.cancel()
                 generation++
+                repairer.reset()
                 cancelAppends()
                 _uiState.update { it.copy(category = action.category) }
                 val retained = pages[action.category]
@@ -127,6 +133,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
     private fun load(category: ExploreCategory) {
         loadJob?.cancel()
         cancelAppends()
+        repairer.reset()
         val request = ++generation
         consumedPages.remove(category)
         consumedShelves.keys.removeAll { it.first == category }
@@ -139,6 +146,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
                     pages[category] = content
                     _uiState.update { it.copy(content = content) }
                     fillMissingAvatars(page.videos + page.sections.flatMap { it.videos })
+                    repairDisplay(page.videos + page.sections.flatMap { it.videos })
                 },
                 onFailure = { failure -> if (failure is kotlinx.coroutines.CancellationException) throw failure
                     if (request != generation) return@fold
@@ -169,6 +177,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
                     pages[category] = merged
                     _uiState.update { it.copy(content = merged) }
                     fillMissingAvatars(page.videos + page.sections.flatMap { it.videos })
+                    repairDisplay(page.videos + page.sections.flatMap { it.videos })
                 },
                 onFailure = { failure ->
                     if (failure is kotlinx.coroutines.CancellationException) throw failure
@@ -250,6 +259,7 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
                             append = AppendState.Idle, emptyAutoLoads = if (addedCards) 0 else it.emptyAutoLoads + 1)
                     }
                     fillMissingAvatars(result.videos)
+                    repairDisplay(result.videos)
                 },
                 onFailure = { failure ->
                     if (failure is kotlinx.coroutines.CancellationException) throw failure
@@ -269,6 +279,26 @@ class ExploreViewModel(private val repository: ExploreRepository, private val sc
         val sections = ready.page.sections.toMutableList()
         sections[index] = edit(section)
         _uiState.update { it.copy(content = ready.copy(page = ready.page.copy(sections = sections))) }
+    }
+
+    /** Fills views and publish time of incomplete rows after the page is painted; never overwrites. */
+    private fun repairDisplay(items: List<com.hhst.youtubelite.home.domain.FeedItem.Video>) {
+        val requestSession = sessionGeneration
+        repairer.repair(items) { id, display ->
+            if (requestSession != sessionGeneration) return@repair
+            fun patchContent(value: ExploreContent): ExploreContent {
+                val content = value as? ExploreContent.Ready ?: return value
+                fun patch(videos: List<com.hhst.youtubelite.home.domain.FeedItem.Video>) = videos.map { item ->
+                    if (item.id == id) item.withDisplay(display) else item
+                }
+                val page = content.page
+                return content.copy(page = page.copy(
+                    videos = patch(page.videos),
+                    sections = page.sections.map { section -> section.copy(videos = patch(section.videos)) }))
+            }
+            pages.replaceAll { _, content -> patchContent(content) }
+            _uiState.update { it.copy(content = patchContent(it.content)) }
+        }
     }
 
     /**
@@ -342,7 +372,8 @@ class ExploreActivity : com.hhst.youtubelite.ui.ContentActivity() {
                 val handle = extras.createSavedStateHandle()
                 if (!handle.contains("category")) handle["category"] = category.name
                 return ExploreViewModel(if (fixtures) FixtureExploreRepository(scenario) else sources.explore, scenario, handle,
-                    if (fixtures) null else sources.avatars) as T
+                    if (fixtures) null else sources.avatars,
+                    if (fixtures) null else sources.videoDisplay) as T
             }
         })[ExploreViewModel::class.java]
         lifecycleScope.launch {

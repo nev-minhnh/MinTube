@@ -23,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import com.hhst.youtubelite.data.media.withDisplay
 import com.hhst.youtubelite.core.AppNotice
 import com.hhst.youtubelite.core.ContinuationHistory
 
@@ -33,7 +34,10 @@ class SubscriptionsViewModel(
     private var signedIn: Boolean,
     saveRepository: com.hhst.youtubelite.saves.domain.SaveRepository? = null,
     private val clock: () -> Long = { System.nanoTime() / 1_000_000L },
+    /** Background repair of rows that arrive without views or publish time; null for fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
     private val readChannels = savedState.get<ArrayList<String>>("readChannels").orEmpty().toMutableSet()
     private val _uiState = MutableStateFlow(
         SubscriptionsUiState(signedIn = signedIn, query = savedState[QUERY_KEY] ?: "",
@@ -108,6 +112,7 @@ class SubscriptionsViewModel(
         writes.reset()
         ++generation
         ++channelsGeneration
+        repairer.reset(forgetFailures = true)
         loadJob?.cancel()
         pageJob?.cancel()
         channelsJob?.cancel()
@@ -312,10 +317,25 @@ class SubscriptionsViewModel(
         return SubscriptionsChannels.Ready(merged, page.nextKey, AppendState.Idle)
     }
 
+    /** Fills views and publish time of incomplete rows after the page is painted; never overwrites. */
+    private fun repairDisplay(items: List<com.hhst.youtubelite.home.domain.FeedItem.Video>) {
+        repairer.repair(items) { id, display ->
+            _uiState.update { state ->
+                val feed = state.content as? SubscriptionsContent.Feed ?: return@update state
+                var changed = false
+                val rows = feed.page.items.map { row ->
+                    if (row.id == id) row.withDisplay(display).also { if (it != row) changed = true } else row
+                }
+                if (!changed) state else state.copy(content = feed.copy(page = feed.page.copy(items = rows)))
+            }
+        }
+    }
+
     private fun refresh(filter: SubscriptionsFilter) {
         if (!signedIn) return
         loadJob?.cancel()
         pageJob?.cancel()
+        repairer.reset()
         val request = ++generation
         val channel = _uiState.value.selectedChannel
         _uiState.update { it.copy(content = SubscriptionsContent.Loading, menuLoading = false, menuFailed = false) }
@@ -326,6 +346,7 @@ class SubscriptionsViewModel(
                 if (request == generation) {
                     feedContinuations.clear()
                     _uiState.update { it.copy(content = SubscriptionsContent.Feed(page)) }
+                    repairDisplay(page.items)
                     // A filter can empty the first page while the server keeps going.
                     continuePastEmptyPage(autoLoads = 0)
                 }
@@ -380,6 +401,7 @@ class SubscriptionsViewModel(
                         nextKey = nextKey,
                     ), emptyAutoLoads = if (combinedEmpty) autoLoads else 0))
                 }
+                repairDisplay(page.items)
                 if (combinedEmpty) continuePastEmptyPage(autoLoads)
             } catch (cancelled: CancellationException) {
                 throw cancelled

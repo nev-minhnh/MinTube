@@ -20,6 +20,8 @@ class ContentRepositories(val client: MediaClient,
     /** Only these discovery reads carry the region override; see [MediaSession.withContentRegion]. */
     private val regional by lazy { client.withRequestContext(MediaSession::withContentRegion) }
     val home by lazy { MediaHomeRepository(regional) }
+    /** Shared anonymous display repair for feed rows that arrive without views or publish time. */
+    val videoDisplay: VideoDisplayRepair by lazy { CachedVideoDisplayRepair(client) }
     val search by lazy { MediaSearchRepository(regional) }
     val watch by lazy { CachedWatchRepository(MediaWatchRepository(client, sharedWatchReads), identity = { MediaSession.snapshot().generation }) }
     val playlist by lazy { MediaPlaylistRepository(client, localLibrary) }

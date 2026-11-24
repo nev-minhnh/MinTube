@@ -176,7 +176,8 @@ class WatchActivity : com.hhst.youtubelite.player.PlaybackActivity(), com.hhst.y
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == WatchViewModel::class.java)
-                return WatchViewModel(if (fixtures) FixtureWatchRepository(scenario, fixtureChatKey) else sources.watch, extras.createSavedStateHandle(), videoId, scenario, if (fixtures) null else sources.votes, if (fixtures) null else sources.videoActions, if (fixtures) null else sources.saves, provisional, loadOnStart = fixtures, avatars = if (fixtures) null else sources.avatars) as T
+                return WatchViewModel(if (fixtures) FixtureWatchRepository(scenario, fixtureChatKey) else sources.watch, extras.createSavedStateHandle(), videoId, scenario, if (fixtures) null else sources.votes, if (fixtures) null else sources.videoActions, if (fixtures) null else sources.saves, provisional, loadOnStart = fixtures, avatars = if (fixtures) null else sources.avatars,
+                    displayRepair = if (fixtures) null else sources.videoDisplay) as T
             }
         })[WatchViewModel::class.java]
         lifecycleScope.launch {

@@ -36,6 +36,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import com.hhst.youtubelite.data.media.needsDisplayRepair
+import com.hhst.youtubelite.data.media.withDisplay
+
 class WatchViewModel(
     private val repository: WatchRepository,
     private val savedState: SavedStateHandle,
@@ -47,7 +50,10 @@ class WatchViewModel(
     provisional: WatchProvisional? = null,
     loadOnStart: Boolean = true,
     private val avatars: com.hhst.youtubelite.data.media.MediaAvatarDirectory? = null,
+    /** Background repair of related rows without views or publish time; null for fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
     private var loadsEnabled = loadOnStart
 
     fun startLoading() {
@@ -678,9 +684,26 @@ class WatchViewModel(
                         relatedLoading = false, relatedFailed = false)
                 }
                 fillMissingAvatars()
+                repairRelated(page.items)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) {
                 if (requestGeneration == generation) _state.update { it.copy(relatedLoading = false, relatedFailed = true) }
+            }
+        }
+    }
+
+    /** Fills views and publish time of incomplete related rows after they are painted; never overwrites. */
+    private fun repairRelated(items: List<com.hhst.youtubelite.watch.domain.WatchRelated>) {
+        val requestGeneration = generation
+        repairer.repairIds(items.filter { it.needsDisplayRepair() }.map { it.id }) { id, display ->
+            if (requestGeneration != generation) return@repairIds
+            _state.update { state ->
+                val ready = state.content as? WatchContent.Ready ?: return@update state
+                var changed = false
+                val rows = ready.page.related.map { row ->
+                    if (row.id == id) row.withDisplay(display).also { if (it != row) changed = true } else row
+                }
+                if (!changed) state else state.copy(content = ready.copy(page = ready.page.copy(related = rows)))
             }
         }
     }
@@ -728,6 +751,7 @@ class WatchViewModel(
         menuRevision++
         relatedJob?.cancel()
         avatarJob?.cancel()
+        repairer.reset()
         consumedCursors.clear()
         val requestGeneration = ++generation
         _state.update { it.copy(content = WatchContent.Loading, verification = null, relatedLoading = false, relatedFailed = false,
@@ -756,6 +780,7 @@ class WatchViewModel(
                     state.copy(content = WatchContent.Ready(page.copy(video = filled)))
                 }
                 fillMissingAvatars()
+                repairRelated(page.related)
                 updateCounts()
                 (uiState.value.overlay as? WatchOverlay.ItemMenu)?.let { loadMenu(it.videoId) }
             } catch (cancelled: CancellationException) {

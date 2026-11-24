@@ -84,7 +84,8 @@ class ChannelActivity : com.hhst.youtubelite.ui.ContentActivity() {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == ChannelViewModel::class.java)
-                return ChannelViewModel(if (fixtures) FixtureChannelRepository(scenario) else sources.channel, extras.createSavedStateHandle(), resolvedChannelId, scenario, if (fixtures) null else sources.videoActions) as T
+                return ChannelViewModel(if (fixtures) FixtureChannelRepository(scenario) else sources.channel, extras.createSavedStateHandle(), resolvedChannelId, scenario, if (fixtures) null else sources.videoActions,
+                    if (fixtures) null else sources.videoDisplay) as T
             }
         })[ChannelViewModel::class.java]
         if (!fixtures) {

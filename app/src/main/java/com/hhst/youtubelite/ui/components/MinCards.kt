@@ -146,6 +146,8 @@ fun VideoCard(
     thumbnailTag: String? = null,
     /** Spoken label of the thumbnail node, e.g. "title, duration". */
     thumbnailDescription: String? = null,
+    /** One-line "views · publish time" under [metadata] (the channel); see [joinMeta]. */
+    meta: String = "",
 ) {
     Column(modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)) {
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(if (fullBleed) RectangleShape else MinRadius.Card)
@@ -167,13 +169,17 @@ fun VideoCard(
             }
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {
                 AppText(title, MinType.Subtitle, maxLines = 2)
-                if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs), color = DesignTokens.Secondary, maxLines = 2)
+                if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs), color = DesignTokens.Secondary, maxLines = if (meta.isBlank()) 2 else 1)
+                if (meta.isNotBlank()) AppText(meta, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
             }
             if (onMenu != null) AppIconButton(AppIcon.More, menuDescription, onClick = onMenu)
             else Spacer(Modifier.width(if (fullBleed) MinSpace.md else 0.dp))
         }
     }
 }
+
+/** Joins the non-blank parts with " · ", so a missing part never leaves a stray separator. */
+fun joinMeta(vararg parts: String?): String = parts.filter { !it.isNullOrBlank() }.joinToString(" · ")
 
 /** Compact list row: thumbnail at the start, title and metadata beside it. */
 @Composable

@@ -21,13 +21,33 @@ import com.hhst.youtubelite.core.AppNotice
 import com.hhst.youtubelite.core.ContinuationHistory
 import com.hhst.youtubelite.home.domain.AppendState
 
+import com.hhst.youtubelite.data.media.needsDisplayRepair
+import com.hhst.youtubelite.data.media.withDisplay
+
 class PlaylistViewModel(
     private val repository: PlaylistRepository,
     private val savedState: SavedStateHandle,
     playlistId: String,
     scenario: PlaylistScenario = PlaylistScenario.Content,
     saveRepository: com.hhst.youtubelite.saves.domain.SaveRepository? = null,
+    /** Background repair of entries without views, channel or publish time; null for fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
+
+    /** Fills incomplete entries after they are painted; never overwrites a present field. */
+    private fun repairEntries(entries: List<PlaylistEntry>) {
+        repairer.repairIds(entries.filter { it.needsDisplayRepair() }.map { it.videoId }) { videoId, display ->
+            state.update { current ->
+                val ready = current.content as? PlaylistContent.Ready ?: return@update current
+                var changed = false
+                val rows = ready.page.entries.map { row ->
+                    if (row.videoId == videoId) row.withDisplay(display).also { if (it != row) changed = true } else row
+                }
+                if (!changed) current else current.copy(content = PlaylistContent.Ready(ready.page.copy(entries = rows)))
+            }
+        }
+    }
     private val id = savedState.get<String>("playlistId") ?: playlistId
     private val state = MutableStateFlow(PlaylistUiState(id,
         content = when (scenario) {
@@ -174,6 +194,7 @@ class PlaylistViewModel(
         enumerationJob?.cancel()
         emptyAppends = 0
         pendingBatch = null
+        repairer.reset()
         val current = ++generation
         state.update { it.copy(content = PlaylistContent.Loading, append = AppendState.Idle, enumeration = PlaylistEnumeration.Idle) }
         loadJob = viewModelScope.launch {
@@ -183,6 +204,7 @@ class PlaylistViewModel(
                 continuations.clear()
                 paginationLoop = false
                 state.update { it.copy(content = page?.let(PlaylistContent::Ready) ?: PlaylistContent.Unavailable) }
+                page?.let { repairEntries(it.entries) }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: com.hhst.youtubelite.data.media.MediaException) {
                 if (current == generation) {
@@ -234,6 +256,7 @@ class PlaylistViewModel(
                         nextKey = nextKey,
                     )), append = nextAppend)
                 }
+                repairEntries(page.entries)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) {
                 currentCoroutineContext().ensureActive()

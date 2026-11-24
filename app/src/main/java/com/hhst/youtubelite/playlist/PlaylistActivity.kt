@@ -80,7 +80,8 @@ class PlaylistActivity : com.hhst.youtubelite.ui.ContentActivity() {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == PlaylistViewModel::class.java)
-                return PlaylistViewModel(if (fixtures) FixturePlaylistRepository(scenario) else sources.playlist, extras.createSavedStateHandle(), id, scenario, if (fixtures) null else sources.saves) as T
+                return PlaylistViewModel(if (fixtures) FixturePlaylistRepository(scenario) else sources.playlist, extras.createSavedStateHandle(), id, scenario, if (fixtures) null else sources.saves,
+                    if (fixtures) null else sources.videoDisplay) as T
             }
         })[PlaylistViewModel::class.java]
         if (!fixtures) {
