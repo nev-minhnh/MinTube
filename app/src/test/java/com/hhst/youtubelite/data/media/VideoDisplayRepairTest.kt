@@ -99,6 +99,7 @@ class VideoDisplayRepairTest {
         assertEquals("", joinMeta("", null))
     }
 
+    // backgroundScope work runs on runCurrent(); advanceUntilIdle() does not wait for background tasks.
     @Test fun repairerCancelsInFlightReadsOnReset() = runTest {
         val gate = CompletableDeferred<Unit>()
         val repair = object : VideoDisplayRepair {
@@ -110,10 +111,10 @@ class VideoDisplayRepairTest {
         runCurrent()
         repairer.reset()
         gate.complete(Unit)
-        advanceUntilIdle()
+        runCurrent()
         assertTrue(applied.isEmpty())
         repairer.repairIds(listOf("a")) { id, _ -> applied += id }
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(listOf("a"), applied)
     }
 
@@ -124,14 +125,14 @@ class VideoDisplayRepairTest {
         }
         val repairer = FeedDisplayRepairer(repair, backgroundScope)
         repairer.repairIds(listOf("a")) { _, _ -> }
-        advanceUntilIdle()
+        runCurrent()
         repairer.reset()
         repairer.repairIds(listOf("a")) { _, _ -> }
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(1, reads.get())
         repairer.reset(forgetFailures = true)
         repairer.repairIds(listOf("a")) { _, _ -> }
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(2, reads.get())
     }
 }
