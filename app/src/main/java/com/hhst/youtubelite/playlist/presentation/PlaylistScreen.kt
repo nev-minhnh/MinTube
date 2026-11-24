@@ -235,7 +235,7 @@ private fun PlaylistIdentity(page: PlaylistPage, descriptionExpanded: Boolean, o
         onAction(PlaylistAction.OpenOwner)
     }
     val metadata = listOfNotNull(stringResource(R.string.ui_playlist), page.summary.countLabel,
-        page.summary.views.takeIf(String::isNotBlank)).joinToString(" · ")
+        com.hhst.youtubelite.core.format.viewsText(page.summary.views).takeIf(String::isNotBlank)).joinToString(" · ")
     AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xs), color = DesignTokens.Secondary, maxLines = 2)
     if (page.description.isNotBlank()) AppText(page.description,
         MinType.Body, Modifier.padding(top = MinSpace.sm).animateContentSize(tween(180))

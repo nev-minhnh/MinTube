@@ -32,17 +32,20 @@ class PublishedAgeCardsAndroidTest {
         compose.setContent {
             AppTheme { FeedCard(FeedItem.Video("v1", "Title", "Author", "1.2M views", "", "3:00", "ch", published = "5 days ago"), WindowClass.Compact, onAction = {}) }
         }
-        val parts = parts("Author · 1.2M views")
-        assertEquals(3, parts.size)
-        assertEquals(listOf("Author", "1.2M views"), parts.take(2))
-        assert(parts[2].isNotBlank())
+        // v1.0.11 layout: the channel has its own line; "views · age" is the meta line under it.
+        compose.onNode(hasText("Author"), useUnmergedTree = true).assertExists()
+        val parts = parts("1.2M views")
+        assertEquals(2, parts.size)
+        assertEquals("1.2M views", parts[0])
+        assert(parts[1].isNotBlank())
     }
 
     @Test fun homeFeedCardWithoutPublishedLeavesNoOrphanSeparator() {
         compose.setContent {
             AppTheme { FeedCard(FeedItem.Video("v2", "Title", "Author", "1.2M views", "", "3:00", "ch"), WindowClass.Compact, onAction = {}) }
         }
-        assertEquals(listOf("Author", "1.2M views"), parts("Author · 1.2M views"))
+        compose.onNode(hasText("Author"), useUnmergedTree = true).assertExists()
+        assertEquals(listOf("1.2M views"), parts("1.2M views"))
     }
 
     @Test fun channelVideoRowShowsPublishedAfterViews() {

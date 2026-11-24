@@ -69,21 +69,21 @@ data class TvVideo(
     val published: String = "",
 ) {
     /** Raw caption (channel, views, publish text); the published part is dropped when [metadata] already holds it. */
-    val subtitle: String get() = captionParts(published)
+    val subtitle: String get() = captionParts(metadata, published)
 
     /** The card caption with the publish text in the UI language. */
     @Composable
-    fun captionText(): String = captionParts(publishedAgeText(published.takeIf(String::isNotBlank)))
+    fun captionText(): String = captionParts(com.hhst.youtubelite.core.format.viewsText(metadata), publishedAgeText(published.takeIf(String::isNotBlank)))
 
     /** Views and publish age without the channel ("1.2M views · 5 days ago"): the card's second caption line. */
     @Composable
-    fun statsText(): String = statsParts(publishedAgeText(published.takeIf(String::isNotBlank)))
+    fun statsText(): String = statsParts(com.hhst.youtubelite.core.format.viewsText(metadata), publishedAgeText(published.takeIf(String::isNotBlank)))
 
-    private fun captionParts(age: String): String = listOf(channel, statsParts(age))
+    private fun captionParts(views: String, age: String): String = listOf(channel, statsParts(views, age))
         .filter(String::isNotBlank).joinToString(" · ")
 
-    private fun statsParts(age: String): String = listOf(
-        metadata, age.takeUnless { published.isNotBlank() && metadata.contains(published) }.orEmpty(),
+    private fun statsParts(views: String, age: String): String = listOf(
+        views, age.takeUnless { published.isNotBlank() && metadata.contains(published) }.orEmpty(),
     ).filter(String::isNotBlank).joinToString(" · ")
 }
 

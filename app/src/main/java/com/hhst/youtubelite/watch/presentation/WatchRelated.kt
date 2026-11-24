@@ -214,7 +214,7 @@ private fun RelatedText(item: WatchRelated, modifier: Modifier, large: Boolean, 
         )
         if (item.channel.isNotBlank()) AppText(item.channel, MinType.Caption, Modifier.padding(top = MinSpace.xxs),
             color = DesignTokens.Secondary, maxLines = 1)
-        val stats = listOf(item.views, publishedAgeText(item.age)).filter { it.isNotBlank() }.joinToString(" • ")
+        val stats = listOf(com.hhst.youtubelite.core.format.viewsText(item.views), publishedAgeText(item.age)).filter { it.isNotBlank() }.joinToString(" • ")
         if (stats.isNotBlank()) AppText(stats, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
         item.badge?.let { badge ->
             AppText(badge, MinType.Micro, Modifier.padding(top = MinSpace.xs), color = DesignTokens.Secondary, maxLines = 1)

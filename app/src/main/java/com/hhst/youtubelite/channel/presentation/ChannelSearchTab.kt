@@ -165,7 +165,7 @@ private fun ChannelSearchVideoRow(video: ChannelVideo, channel: String, width: F
         rememberDeArrowTitle(video.id, video.title), channel, video.artwork,
         { onAction(ChannelAction.OpenVideo(video.id)) },
         Modifier.testTag("channel-search-video-${video.id}"),
-        secondaryMetadata = listOf(video.views, publishedAgeText(video.age)).filter(String::isNotBlank).joinToString(" · "),
+        secondaryMetadata = listOf(com.hhst.youtubelite.core.format.viewsText(video.views), publishedAgeText(video.age)).filter(String::isNotBlank).joinToString(" · "),
         durationLabel = video.duration,
         onMenu = { onAction(ChannelAction.OpenItemMenu(video.id)) },
         menuDescription = stringResource(R.string.a11y_more_search_actions_for, video.title),

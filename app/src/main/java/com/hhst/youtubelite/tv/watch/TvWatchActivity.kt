@@ -168,7 +168,7 @@ class TvWatchActivity : TvActivity() {
             val info = TvWatchInfo(
                 title = ready?.video?.title ?: player.title,
                 channel = ready?.video?.channel ?: player.author.orEmpty(),
-                detail = listOfNotNull(ready?.video?.views?.takeIf(String::isNotBlank), ready?.video?.age?.takeIf(String::isNotBlank)?.let { publishedAgeText(it) })
+                detail = listOfNotNull(ready?.video?.views?.takeIf(String::isNotBlank)?.let { com.hhst.youtubelite.core.format.viewsText(it) }, ready?.video?.age?.takeIf(String::isNotBlank)?.let { publishedAgeText(it) })
                     .joinToString(" · "),
             )
             // Playlist playback (Play all / Shuffle): the card follows the playlist, not related videos.

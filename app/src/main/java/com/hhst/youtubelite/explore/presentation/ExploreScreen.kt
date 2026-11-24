@@ -334,7 +334,7 @@ private fun ExploreVideoCard(item: FeedItem.Video, modifier: Modifier, onAction:
     VideoCard(
         title = rememberDeArrowTitle(item.id, item.title),
         metadata = item.author,
-        meta = com.hhst.youtubelite.ui.components.joinMeta(item.metadata, publishedAgeText(item.published)),
+        meta = com.hhst.youtubelite.ui.components.joinMeta(com.hhst.youtubelite.core.format.viewsText(item.metadata), publishedAgeText(item.published)),
         artwork = item.artwork,
         onClick = {
             WatchProvisionalStore.put(item.toProvisional())
