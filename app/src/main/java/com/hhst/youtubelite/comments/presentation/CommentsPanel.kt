@@ -222,7 +222,8 @@ private fun CommentsSurface(
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
     DisposableEffect(Unit) { onDispose { focusManager.clearFocus() } }
 
-    val shape = if (compact) MinRadius.Sheet else RectangleShape
+    // Square top corners on every form factor (owner request); the sheet keeps its drag handle.
+    val shape = RectangleShape
     val modal = state.overlay is CommentsOverlay.ThreadMenu || state.overlay is CommentsOverlay.ReplyMenu ||
         state.overlay is CommentsOverlay.Composer || state.overlay is CommentsOverlay.DeleteConfirm
     BoxWithConstraints(modifier) {
