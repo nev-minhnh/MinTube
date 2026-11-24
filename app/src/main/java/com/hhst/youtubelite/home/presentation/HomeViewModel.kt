@@ -7,6 +7,7 @@ import com.hhst.youtubelite.core.AppNotice
 import com.hhst.youtubelite.core.WriteFeedback
 import com.hhst.youtubelite.core.isTrafficChallenge
 import com.hhst.youtubelite.home.data.HomeScenario
+import com.hhst.youtubelite.data.media.withDisplay
 import com.hhst.youtubelite.home.domain.AppendState
 import com.hhst.youtubelite.home.domain.FeedItem
 import com.hhst.youtubelite.home.domain.FeedMenuAction
@@ -50,7 +51,10 @@ class HomeViewModel(
     private val warm: (String) -> Unit = {},
     /** Snapshot seeding IO runs here; tests inject the runTest scheduler. */
     private val seedDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.IO,
+    /** Background repair of rows that arrive without views or publish time; null for fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
     private val _state = MutableStateFlow(HomeUiState(
         content = scenario.initialContent(), query = savedState["query"] ?: "",
         selectedChip = savedState.get<String>("chip")?.takeIf {
@@ -132,6 +136,7 @@ class HomeViewModel(
             scopeEpoch++
             loadJob?.cancel()
             loadJob = null
+            repairer.reset(forgetFailures = true)
             feedbackJob?.cancel()
             feedbackJob = null
             sheetJob?.cancel()
@@ -640,6 +645,24 @@ class HomeViewModel(
         }
     }
 
+    /** Fills views and publish time of incomplete rows after the page is already painted. */
+    private fun repairDisplay(items: List<FeedItem>) {
+        val requestAccount = accountKey()
+        val requestFilter = _state.value.selectedChip
+        val requestSession = _state.value.sessionGeneration
+        repairer.repair(items.filterIsInstance<FeedItem.Video>()) { id, display ->
+            _state.update { state ->
+                if (requestAccount != accountKey() || requestFilter != state.selectedChip || requestSession != state.sessionGeneration) return@update state
+                val feed = state.content as? HomeContent.Feed ?: return@update state
+                var changed = false
+                val rows = feed.page.items.map { item ->
+                    if (item is FeedItem.Video && item.id == id) item.withDisplay(display).also { if (it != item) changed = true } else item
+                }
+                if (!changed) state else state.copy(content = feed.copy(page = feed.page.copy(items = rows)))
+            }
+        }
+    }
+
     private fun load(append: Boolean, keepEmpty: Boolean = false, userInitiated: Boolean = false, automatic: Boolean = false) {
         val feed = uiState.value.content as? HomeContent.Feed
         val empty = uiState.value.content as? HomeContent.Empty
@@ -647,6 +670,8 @@ class HomeViewModel(
         if (append && (feed?.append == AppendState.Loading || feed?.refreshing == true)) return
         if (automatic && feed?.automaticPagingPaused == true) return
         loadJob?.cancel()
+        // A refresh or chip change replaces the rows; an append keeps repairing the loaded ones.
+        if (!append) repairer.reset()
         menuJob?.cancel()
         menuRevision++
         _state.update { current ->
@@ -701,6 +726,7 @@ class HomeViewModel(
                 }
                 if (requestGeneration != generation) return@launch
                 fillMissingAvatars(combined.items, persist = true)
+                repairDisplay(page.items)
                 loadMenu()
             } catch (cancelled: CancellationException) {
                 throw cancelled
