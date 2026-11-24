@@ -1929,7 +1929,7 @@ class PlaybackEngine(
         // Refresh the source once with the current session and tokens. A transport failure
         // is evidence about the connection, so it must not reset tokens or blame a client.
         if (reason?.needsLightRefresh == true) {
-            if (videoId != null && attempt?.tryLightRefresh() == true) {
+            if (videoId != null && attempt?.tryLightRefresh(player.currentPosition, android.os.SystemClock.elapsedRealtime()) == true) {
                 playerLog("recovery_light_refresh", mapOf("reason" to reason.name, "attempt" to attempt.lightRefreshes))
                 val position = player.currentPosition
                 // The reload attaches a new source; until it renders, a user retry
