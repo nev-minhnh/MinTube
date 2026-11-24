@@ -190,7 +190,7 @@ private fun ShortsShelf(shorts: List<SearchResult>, spec: SearchListSpec, onActi
                     // In the mixed list a Short opens like any other result of this page.
                     onClick = { onAction(SearchAction.OpenResult(short.id)) },
                     modifier = Modifier.width(148.dp).testTag("search-all-short-${short.id}"),
-                    metadata = short.views.takeIf(String::isNotBlank),
+                    metadata = com.hhst.youtubelite.core.format.viewsText(short.views).takeIf(String::isNotBlank),
                     videoId = short.id,
                 )
             }
@@ -289,7 +289,7 @@ private fun ResultText(result: SearchResult, modifier: Modifier, onAction: (Sear
             Modifier.fillMaxWidth().testTag("search-title-${result.id}"), maxLines = 2)
         // Only non-empty fields join: a missing view count or date must not leave
         // orphan separators. All fields blank renders nothing.
-        val byline = listOf(result.channel, result.views, publishedAgeText(result.age)).filter(String::isNotBlank).joinToString(" · ")
+        val byline = listOf(result.channel, com.hhst.youtubelite.core.format.viewsText(result.views), publishedAgeText(result.age)).filter(String::isNotBlank).joinToString(" · ")
         if (byline.isNotBlank()) AppText(byline, MinType.Caption,
             Modifier.fillMaxWidth().padding(top = MinSpace.xxs).testTag("search-byline-${result.id}"),
             color = DesignTokens.Secondary, maxLines = 2)

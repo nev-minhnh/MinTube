@@ -129,7 +129,7 @@ private fun ChannelShortItem(short: ChannelShort, onAction: (ChannelAction) -> U
     // The anonymous page has no short menu; production hides the dead entry.
     ShortCard(
         short.title, short.artwork, { onAction(ChannelAction.OpenShort(short.id)) },
-        Modifier.fillMaxWidth().testTag("channel-short-${short.id}"), metadata = short.views,
+        Modifier.fillMaxWidth().testTag("channel-short-${short.id}"), metadata = com.hhst.youtubelite.core.format.viewsText(short.views),
         onMenu = if (production) null else ({ onAction(ChannelAction.OpenShortMenu(short.id)) }),
         menuDescription = stringResource(R.string.a11y_more_actions_for, short.title),
         menuTag = "channel-short-menu-${short.id}",
@@ -183,7 +183,7 @@ fun ChannelLiveTab(
 /** A current or past stream on the card family; a stream that is on air wears the Danger LIVE badge. */
 @Composable
 private fun ChannelLiveItem(video: ChannelLiveVideo, width: Float, card: Boolean, onAction: (ChannelAction) -> Unit) {
-    val metadata = if (video.liveNow) video.views else listOf(video.views, publishedAgeText(video.time)).filter(String::isNotBlank).joinToString(" · ")
+    val metadata = if (video.liveNow) video.views else listOf(com.hhst.youtubelite.core.format.viewsText(video.views), publishedAgeText(video.time)).filter(String::isNotBlank).joinToString(" · ")
     val badge = if (video.liveNow) stringResource(R.string.player_live) else video.duration
     val open = { onAction(ChannelAction.OpenLive(video.id)) }
     val tag = Modifier.testTag("channel-live-${video.id}")
