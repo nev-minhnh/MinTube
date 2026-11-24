@@ -10,7 +10,6 @@ import com.liskovsoft.youtubeapi.videoinfo.V2.MediaItem
 import com.liskovsoft.youtubeapi.videoinfo.V2.HomeSection
 import com.liskovsoft.youtubeapi.videoinfo.V2.MenuActionKind
 import com.liskovsoft.youtubeapi.videoinfo.V2.loadHome
-import com.liskovsoft.youtubeapi.videoinfo.V2.loadPlayerDetails
 import com.liskovsoft.youtubeapi.videoinfo.V2.loadSearch
 import com.liskovsoft.youtubeapi.videoinfo.V2.sendFeedback
 import com.liskovsoft.youtubeapi.videoinfo.V2.loadMenu
@@ -34,6 +33,16 @@ internal fun MediaItem.dontRecommendToken(): String? =
 
 internal fun MediaItem.playlistSummary() = PlaylistSummary(id.removePrefix("VL"), title.orEmpty(), author.orEmpty(),
     channelId.orEmpty(), null, thumbnail.orEmpty(), "", null, videoCountText = videoCountText)
+
+private val mixId = Regex("^RD[A-Za-z0-9_-]{11}$")
+
+/**
+ * Playlist rows for Explore. A radio/mix row can arrive with only its id (the parser had nothing else
+ * to read); the screen hides rows without a title, and a "RD<videoId>" mix borrows that video's thumbnail.
+ */
+internal fun List<MediaItem>.displayablePlaylists(): List<PlaylistSummary> = filter { it.kind == "playlist" }
+    .map { it.playlistSummary() }
+    .map { if (it.artwork.isBlank() && mixId.matches(it.id)) it.copy(artwork = "https://i.ytimg.com/vi/${it.id.drop(2)}/hqdefault.jpg") else it }
 
 /**
  * LRU of resolved get_panel capabilities, partitioned by identity (account, on-behalf channel,
@@ -185,21 +194,13 @@ class MediaSearchRepository(private val client: MediaClient,
     // Only navigation capabilities from the latest completed page; results are always fetched.
     @Volatile private var filterPanel: FilterPanel? = null
 
-    override suspend fun metadata(result: SearchResult): SearchResult = client.readBackgroundIdempotent { context, http ->
-        val details = loadPlayerDetails(result.id, context.anonymous(), http).requireValue()
-        val seconds = details.durationSeconds?.takeIf { it > 0 && !details.live }
-        val duration = seconds?.let {
-            if (it >= 3600) "%d:%02d:%02d".format(java.util.Locale.US, it / 3600, it / 60 % 60, it % 60)
-            else "%d:%02d".format(java.util.Locale.US, it / 60, it % 60)
-        }.orEmpty()
-        result.copy(channel = result.channel.ifBlank { details.author.orEmpty() },
-            channelId = result.channelId.ifBlank { details.channelId.orEmpty() },
-            views = result.views.ifBlank { details.viewCount?.takeIf { it >= 0 }?.let {
-                java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(it) + " views"
-            }.orEmpty() },
-            duration = result.duration.ifBlank { duration },
-            // The full timestamp: a date alone turns "9 hours ago" into "1 day ago" after midnight.
-            age = result.age.ifBlank { details.published.orEmpty() })
+    override suspend fun metadata(result: SearchResult): SearchResult {
+        val details = client.readVideoDisplay(result.id)
+        return result.copy(channel = result.channel.ifBlank { details.author },
+            channelId = result.channelId.ifBlank { details.channelId },
+            views = result.views.ifBlank { details.views },
+            duration = result.duration.ifBlank { details.duration },
+            age = result.age.ifBlank { details.published })
     }
     override suspend fun search(query: String, filters: SearchFilters): SearchPage = uploadFiltered(client.read { context, http ->
         val identity = filterIdentity(context)

@@ -456,9 +456,10 @@ internal fun SubscriptionsVideoCard(item: FeedItem.Video, compact: Boolean, onAc
             Spacer(Modifier.width(MinSpace.xs))
             Column(Modifier.weight(1f).padding(top = MinSpace.xs)) {
                 AppText(rememberDeArrowTitle(item.id, item.title), MinType.Subtitle, maxLines = 2)
-                val metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · ")
-                if (metadata.isNotBlank()) AppText(metadata, MinType.Caption, Modifier.padding(top = MinSpace.xxs),
-                    color = DesignTokens.Secondary, maxLines = 2)
+                val meta = com.hhst.youtubelite.ui.components.joinMeta(item.metadata, publishedAgeText(item.published))
+                if (item.author.isNotBlank()) AppText(item.author, MinType.Caption, Modifier.padding(top = MinSpace.xxs),
+                    color = DesignTokens.Secondary, maxLines = 1)
+                if (meta.isNotBlank()) AppText(meta, MinType.Caption, color = DesignTokens.Secondary, maxLines = 1)
             }
             AppIconButton(AppIcon.More, stringResource(R.string.a11y_more_actions_for, item.title)) {
                 onAction(SubscriptionsAction.OpenMenu(item.id))

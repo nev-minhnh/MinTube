@@ -114,6 +114,7 @@ class HomeActivity : com.hhst.youtubelite.ui.ContentActivity() {
                         val owner = account ?: "visitor"
                         com.hhst.youtubelite.data.media.MediaSession.contentLocale()?.scope(owner) ?: owner
                     } },
+                    displayRepair = if (fixtures) null else sources.videoDisplay,
                     warm = if (fixtures) {
                         {}
                     } else {

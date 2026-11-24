@@ -277,7 +277,7 @@ class MediaExploreRepository(private val client: MediaClient) : ExploreRepositor
         val source = group?.items ?: page.items
         val items = source.filter { it.kind == "video" }.map(MediaItem::feedVideo)
         ExploreSection(null, items, group?.nextKey ?: page.nextKey,
-            playlists = source.filter { it.kind == "playlist" }.map(MediaItem::playlistSummary))
+            playlists = source.displayablePlaylists())
     }
 
     private fun section(category: ExploreCategory) = HomeSection.valueOf(category.name.uppercase())
@@ -286,14 +286,14 @@ class MediaExploreRepository(private val client: MediaClient) : ExploreRepositor
         // Shelves stay carousels; the flat list keeps the fallback grid useful.
         val sections = groups.mapNotNull { group ->
             val videos = group.items.filter { it.kind == "video" }.map(MediaItem::feedVideo)
-            val playlists = group.items.filter { it.kind == "playlist" }.map(MediaItem::playlistSummary)
+            val playlists = group.items.displayablePlaylists()
             ExploreSection(group.title, videos, group.nextKey, playlists = playlists)
                 .takeIf { videos.isNotEmpty() || playlists.isNotEmpty() || group.nextKey != null }
         }
         return ExplorePage(category,
             sections.flatMap { it.videos }.ifEmpty { items.filter { it.kind == "video" }.map(MediaItem::feedVideo) },
             sections, nextKey, sections.flatMap { it.playlists }
-                .ifEmpty { items.filter { it.kind == "playlist" }.map(MediaItem::playlistSummary) })
+                .ifEmpty { items.displayablePlaylists() })
     }
 }
 

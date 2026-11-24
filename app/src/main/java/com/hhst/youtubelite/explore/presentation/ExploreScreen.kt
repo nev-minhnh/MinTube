@@ -200,7 +200,9 @@ private fun SectionedContainer(content: ExploreContent.Ready, inset: Dp, cardWid
         state = columnState,
         contentPadding = PaddingValues(bottom = dock.bottom),
     ) {
-        content.page.sections.forEachIndexed { index, section ->
+        content.page.sections.forEachIndexed { index, rawSection ->
+            // A radio/mix row that arrived with no title has nothing to draw: it would be a blank box.
+            val section = rawSection.copy(playlists = rawSection.playlists.filter { it.title.isNotBlank() })
             if (section.videos.isEmpty() && section.playlists.isEmpty()) {
                 if (section.nextKey != null || section.append != AppendState.Idle) {
                     item(key = "pending-$index", contentType = "pending-shelf") {
@@ -284,7 +286,7 @@ private fun CategoryContainer(category: ExploreCategory, content: ExploreContent
     gridState: LazyGridState, onAction: (ExploreAction) -> Unit) {
     val inset = MinSpace.pageInset(window)
     val page = content.page
-    val empty = page.videos.isEmpty() && page.playlists.isEmpty() && page.nextKey == null && content.append == AppendState.Idle
+    val empty = page.videos.isEmpty() && page.playlists.none { it.title.isNotBlank() } && page.nextKey == null && content.append == AppendState.Idle
     val dock = miniDockListPadding(MinSpace.xxl)
     LazyVerticalGrid(
         columns = GridCells.Fixed(window.feedColumns),
@@ -308,7 +310,7 @@ private fun CategoryContainer(category: ExploreCategory, content: ExploreContent
         gridItems(page.videos, key = { it.id }, contentType = { "video" }) { item ->
             ExploreVideoCard(item, Modifier.padding(bottom = MinSpace.xxl), onAction)
         }
-        gridItems(page.playlists, key = { "playlist-${it.id}" }, contentType = { "playlist" }) { playlist ->
+        gridItems(page.playlists.filter { it.title.isNotBlank() }, key = { "playlist-${it.id}" }, contentType = { "playlist" }) { playlist ->
             ExplorePlaylistCard(playlist, Modifier.padding(bottom = MinSpace.xxl), onAction)
         }
         item(key = "page-tail", span = { GridItemSpan(maxLineSpan) }, contentType = "page-tail") {
@@ -331,7 +333,8 @@ private fun ExplorePlaylistCard(playlist: PlaylistSummary, modifier: Modifier, o
 private fun ExploreVideoCard(item: FeedItem.Video, modifier: Modifier, onAction: (ExploreAction) -> Unit) {
     VideoCard(
         title = rememberDeArrowTitle(item.id, item.title),
-        metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · "),
+        metadata = item.author,
+        meta = com.hhst.youtubelite.ui.components.joinMeta(item.metadata, publishedAgeText(item.published)),
         artwork = item.artwork,
         onClick = {
             WatchProvisionalStore.put(item.toProvisional())

@@ -72,7 +72,8 @@ internal fun FeedCard(item: FeedItem, window: WindowClass, live: Boolean = false
     when (item) {
         is FeedItem.Video -> VideoCard(
             title = rememberDeArrowTitle(item.id, item.title),
-            metadata = listOf(item.author, item.metadata, publishedAgeText(item.published)).filter(String::isNotBlank).joinToString(" · "),
+            metadata = item.author,
+            meta = com.hhst.youtubelite.ui.components.joinMeta(item.metadata, publishedAgeText(item.published)),
             artwork = item.artwork,
             onClick = {
                 WatchProvisionalStore.put(item.toProvisional())

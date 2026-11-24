@@ -21,13 +21,33 @@ import com.hhst.youtubelite.core.AppNotice
 import com.hhst.youtubelite.core.ContinuationHistory
 import com.hhst.youtubelite.home.domain.AppendState
 
+import com.hhst.youtubelite.data.media.needsDisplayRepair
+import com.hhst.youtubelite.data.media.withDisplay
+
 class ChannelViewModel(
     private val repository: ChannelRepository,
     private val savedState: SavedStateHandle,
     channelId: String,
     scenario: ChannelScenario = ChannelScenario.Content,
     private val videoActions: com.hhst.youtubelite.watch.domain.VideoActions? = null,
+    /** Background repair of video rows without views or publish time; null for fixtures. */
+    displayRepair: com.hhst.youtubelite.data.media.VideoDisplayRepair? = null,
 ) : ViewModel() {
+    private val repairer = com.hhst.youtubelite.data.media.FeedDisplayRepairer(displayRepair, viewModelScope)
+
+    /** Fills views and publish time of incomplete channel videos after they are painted; never overwrites. */
+    private fun repairVideos(videos: List<com.hhst.youtubelite.channel.domain.ChannelVideo>) {
+        repairer.repairIds(videos.filter { it.needsDisplayRepair() }.map { it.id }) { id, display ->
+            _state.update { state ->
+                val ready = state.content as? ChannelContent.Ready ?: return@update state
+                var changed = false
+                val rows = ready.page.videos.map { row ->
+                    if (row.id == id) row.withDisplay(display).also { if (it != row) changed = true } else row
+                }
+                if (!changed) state else state.copy(content = ready.copy(page = ready.page.copy(videos = rows)))
+            }
+        }
+    }
     private val restoredId = savedState.get<String>("channelId") ?: channelId
     private val _state = MutableStateFlow(
         ChannelUiState(
@@ -379,6 +399,7 @@ class ChannelViewModel(
                                 videosTab = ChannelSection.Ready(Unit),
                                 videosAppend = com.hhst.youtubelite.home.domain.AppendState.Idle)
                         }
+                        repairVideos(page.videos)
                     }
                     ChannelTab.Playlists -> {
                         val page = opened?.let { repository.playlists(it.profile.channelId, it) }
@@ -625,6 +646,7 @@ class ChannelViewModel(
                         videosAppend = nextAppend,
                     )
                 }
+                repairVideos(page.videos)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) {
                 if (requestGeneration == generation && sectionGeneration == sectionGenerations[ChannelTab.Videos])
@@ -677,6 +699,7 @@ class ChannelViewModel(
         sectionJobs.values.forEach(Job::cancel)
         sectionJobs.clear()
         sectionGenerations.keys.toList().forEach { sectionGenerations[it] = sectionGenerations.getValue(it) + 1 }
+        repairer.reset()
         val requestGeneration = ++generation
         _state.update { it.copy(content = ChannelContent.Loading,
             videosAppend = com.hhst.youtubelite.home.domain.AppendState.Idle,
@@ -697,6 +720,7 @@ class ChannelViewModel(
                     playlists = if (page.playlistsDeferred) ChannelSection.Loading
                         else if (page.playlists.isEmpty()) ChannelSection.Empty else ChannelSection.Ready(page.playlists)) }
                 ensureSectionLoaded(_state.value.selectedTab)
+                repairVideos(page.videos)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: com.hhst.youtubelite.data.media.MediaException) {
