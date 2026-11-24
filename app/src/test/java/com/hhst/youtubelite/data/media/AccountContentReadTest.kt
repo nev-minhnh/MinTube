@@ -16,6 +16,13 @@ class AccountContentReadTest {
     private val client = MediaClient(OkHttpClient.Builder().addInterceptor { chain ->
         val request = chain.request()
         val body = request.body?.let { okio.Buffer().also(it::writeTo).readUtf8() }.orEmpty()
+        // v1.0.14: a signed-in watch page without a description asks the public player once.
+        if (request.header("Authorization") == null && request.url.encodedPath.endsWith("/player")) {
+            synchronized(requests) { requests += "public:" + request.url.encodedPath }
+            return@addInterceptor Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(200).message("OK")
+                .body("""{"videoDetails":{"videoId":"aqz-KE-bpKQ","shortDescription":"Public description"}}"""
+                    .toResponseBody("application/json".toMediaType())).build()
+        }
         assertEquals("Bearer test-token", request.header("Authorization"))
         assertTrue(body.contains("\"clientName\":\"TVHTML5\""))
         synchronized(requests) { requests += request.url.encodedPath }
@@ -38,7 +45,10 @@ class AccountContentReadTest {
         assertEquals(7L, page.video.sessionGeneration)
         assertEquals(listOf("next"), page.related.map { it.id })
         assertEquals("PIVOT", page.nextKey)
-        assertEquals(2, requests.size)
+        // Title, channel and views stay from the account's /next; only the missing description is public.
+        assertEquals("Public description", page.video.description)
+        assertEquals(3, requests.size)
+        assertEquals(1, requests.count { it.startsWith("public:") })
     }
 
     @Test fun shortsHydrationUsesTheAccountMetadata() = runBlocking {
