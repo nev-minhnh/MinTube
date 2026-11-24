@@ -84,7 +84,7 @@ class TvWatchActivity : TvActivity() {
                 require(modelClass == WatchViewModel::class.java)
                 return WatchViewModel(sources.watch, extras.createSavedStateHandle(), videoId,
                     voteRepository = sources.votes, videoActions = sources.videoActions, saveRepository = sources.saves,
-                    loadOnStart = false, avatars = null) as T
+                    loadOnStart = false, avatars = null, displayRepair = sources.videoDisplay) as T
             }
         })[WatchViewModel::class.java]
         observeAccountChanges {

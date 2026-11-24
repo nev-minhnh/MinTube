@@ -57,7 +57,7 @@ class TvChannelActivity : TvActivity() {
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == ChannelViewModel::class.java)
                 return ChannelViewModel(sources.channel, extras.createSavedStateHandle(), channelId,
-                    videoActions = sources.videoActions) as T
+                    videoActions = sources.videoActions, displayRepair = sources.videoDisplay) as T
             }
         })[ChannelViewModel::class.java]
         hideShorts = prefs.isEnabled(PreferenceKeys.ENABLE_HIDE_SHORTS)

@@ -72,7 +72,7 @@ class TvLibraryPageActivity : TvActivity() {
             Kind.History -> history = model { HistoryViewModel(sources.library, it, LibraryScenario.Content, signedIn, sources.saves) }
                 .also { vm -> collectNotices { vm.actionNotices.collect { notice -> renderTvNotice(notice); refreshDevicePaused() } } }
             Kind.Playlists -> collection = model { CollectionViewModel(sources.library, it, LibraryScenario.Content, signedIn) }
-            Kind.Playlist -> playlist = model { PlaylistViewModel(sources.playlist, it, id, saveRepository = sources.saves) }
+            Kind.Playlist -> playlist = model { PlaylistViewModel(sources.playlist, it, id, saveRepository = sources.saves, displayRepair = sources.videoDisplay) }
                 .also { vm -> collectNotices { vm.actionNotices.collect(::renderTvNotice) } }
             Kind.Queue -> Unit
         }

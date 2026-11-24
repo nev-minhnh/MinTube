@@ -53,7 +53,7 @@ class TvPlaylistActivity : TvActivity() {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 require(modelClass == PlaylistViewModel::class.java)
-                return PlaylistViewModel(sources.playlist, extras.createSavedStateHandle(), playlistId, saveRepository = sources.saves) as T
+                return PlaylistViewModel(sources.playlist, extras.createSavedStateHandle(), playlistId, saveRepository = sources.saves, displayRepair = sources.videoDisplay) as T
             }
         })[PlaylistViewModel::class.java]
         syncSession()

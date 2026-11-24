@@ -100,7 +100,7 @@ class TvLibraryController(private val activity: ComponentActivity) {
     }
 
     private fun playlist(id: String, signedIn: Boolean, generation: Long): PlaylistViewModel =
-        playlistModels.get(id, generation) { handle -> PlaylistViewModel(sources.playlist, handle, id, saveRepository = sources.saves) }
+        playlistModels.get(id, generation) { handle -> PlaylistViewModel(sources.playlist, handle, id, saveRepository = sources.saves, displayRepair = sources.videoDisplay) }
             .also { it.updateSession(signedIn, generation) }
 
     private fun open(shelf: TvLibraryShelf, video: TvVideo) {

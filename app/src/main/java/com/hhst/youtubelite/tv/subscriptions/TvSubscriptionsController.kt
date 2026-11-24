@@ -33,7 +33,7 @@ class TvSubscriptionsController(private val activity: ComponentActivity) {
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             require(modelClass == SubscriptionsViewModel::class.java)
             return SubscriptionsViewModel(sources.subscriptions, extras.createSavedStateHandle(), SubscriptionsScenario.Content,
-                MediaSession.signedIn(), sources.saves) as T
+                MediaSession.signedIn(), sources.saves, displayRepair = sources.videoDisplay) as T
         }
     })["tv-subscriptions", SubscriptionsViewModel::class.java]
 

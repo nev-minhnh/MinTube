@@ -97,6 +97,7 @@ class TvHomeController(private val activity: ComponentActivity) {
                 saveRepository = sources.saves, snapshots = sources.snapshots,
                 accountKey = ::snapshotKey,
                 warm = ::warm,
+                displayRepair = sources.videoDisplay,
             ) as T
         }
     })["tv-home-main", HomeViewModel::class.java]
@@ -162,7 +163,7 @@ class TvHomeController(private val activity: ComponentActivity) {
         val session = MediaSession.snapshot()
         val catalog = TvHomeRows.catalog(main.uiState.value) && chip in HomeCatalog.filters
         val model = chipModels.get(chip, catalog, session.generation) { handle ->
-            HomeViewModel(sources.home, handle, loadOnStart = true)
+            HomeViewModel(sources.home, handle, loadOnStart = true, displayRepair = sources.videoDisplay)
         }
         model.updateSession(session.signedIn, session.generation, null)
         chipStates[chip] = model
