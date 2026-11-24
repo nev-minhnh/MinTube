@@ -21,10 +21,30 @@ internal class PlaybackAttempt(val videoId: String) {
     private val recoveryHistory = ArrayDeque<Map<String, Any?>>()
     val history: List<Map<String, Any?>> get() = recoveryHistory.toList()
 
+    private var lastLightPositionMs = -1L
+    private var lastLightAtMs = -1L
+
     /** Call only after the engine has established this recovery path is eligible. */
     fun tryLightRefresh(): Boolean {
         if (lightRefreshes >= MAX_LIGHT_REFRESHES) return false
         lightRefreshes++
+        return true
+    }
+
+    /**
+     * Same budget, renewed once playback has run healthily since the last light refresh: at least
+     * [HEALTHY_RUN_MS] further into the media AND of wall time. A long video can then survive several
+     * spaced-out route changes (VPN reconnects, Wi-Fi roaming), while a refresh that fails again at
+     * once still stops after one try instead of looping.
+     */
+    fun tryLightRefresh(positionMs: Long, nowMs: Long): Boolean {
+        if (lightRefreshes >= MAX_LIGHT_REFRESHES && lastLightPositionMs >= 0 &&
+            positionMs - lastLightPositionMs >= HEALTHY_RUN_MS && nowMs - lastLightAtMs >= HEALTHY_RUN_MS) {
+            lightRefreshes = 0
+        }
+        if (!tryLightRefresh()) return false
+        lastLightPositionMs = positionMs
+        lastLightAtMs = nowMs
         return true
     }
 
@@ -54,6 +74,7 @@ internal class PlaybackAttempt(val videoId: String) {
 
     private companion object {
         const val MAX_LIGHT_REFRESHES = 1
+        const val HEALTHY_RUN_MS = 30_000L
         const val MAX_FULL_REFRESHES = 1
         const val MAX_HISTORY = 6
     }
